@@ -26,9 +26,11 @@ GLSL, RAMSES ni JavaScript.
 
 ## La ventana
 
-- **Barra superior**: Nuevo, Abrir, Guardar, Guardar como, Exportar PNG, Deshacer/Rehacer,
-  Simular, Validar, Compilar, idioma (EN/ES), tema claro/oscuro, ayuda y botones para mostrar u
-  ocultar los paneles.
+- **Barra superior**: el menú **Archivo** (Nuevo, Abrir, Guardar, Guardar como, Añadir imágenes,
+  Exportar PNG), Guardar, Deshacer/Rehacer, Añadir imágenes, Simular, Validar, Compilar, botones para
+  mostrar u ocultar los paneles y el menú **…** con idioma, tema claro/oscuro y ayuda. Arrastra el
+  borde de un panel para cambiar su tamaño. En ventanas pequeñas, los paneles laterales se abren
+  sobre el lienzo.
 - **Biblioteca** (izquierda): indicadores circulares y de barra, lecturas digitales, tarjetas,
   marcha, shift lights, reloj, testigos, panel de estado, texto, formas y decoración. Arrastra al
   lienzo o haz clic para añadir en el centro.
@@ -78,6 +80,14 @@ dentro del tema. Haz doble clic en una imagen, o pulsa **Editar imagen**, para a
 
 La vista **En tu cuadro** muestra la imagen en su sitio mientras editas. La edición no destruye el
 original: **Restablecer todo** vuelve a él. Ctrl+Z deshace y Esc cancela.
+
+## Animaciones y vídeo
+
+Los GIF, los WebP animados, los APNG y los vídeos cortos (MP4 o WebM) se importan como animaciones. De
+un vídeo se conservan los primeros 12 segundos, hasta 15 fotogramas por segundo y sin sonido. En el
+Inspector se ajusta la velocidad, y en el editor de imagen se recorren los fotogramas. En el coche
+todos los fotogramas comparten una sola textura, así que las animaciones grandes o largas pierden
+nitidez, y Validación te avisa. Las animaciones no se han probado en un vehículo.
 
 ## Atajos
 

@@ -39,6 +39,18 @@ Import (button, drag and drop, paste), embedded PNG assets, full-window non-dest
 baking in the compiler and image layers in the car runtime: developed and tested locally (browser and
 fake renderer client). **Image layers have not been tested in a vehicle.**
 
+## Animated pictures, interface and web analysis (added 2026-11-09)
+
+GIF, animated WebP, APNG and short videos import as sprite sheets, play in the Studio and compile to
+one RGBA atlas that the renderer loops through a stepped `u_frame` animation: developed and tested
+locally (browser import and compile, and a fake renderer client). The `sprite` shader and the
+renderer-side animation **have not been tested in a vehicle.** At most 15 animations fit, because the
+renderer allows 16 assets per client and text uses one.
+
+The interface now uses the project logo, one icon set, a File menu, resizable panels and drawers in
+small windows: tested locally in a browser.
+
+
 ## Pending (ordered)
 
 1. **First vehicle test** of the MGU app (maintainer with SSH). Confirm: install from the Store,

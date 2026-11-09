@@ -19,9 +19,12 @@ loads. No GLSL, RAMSES or JavaScript knowledge is needed.
 └──────────────────────────── status bar ─────────────────────────┘
 ```
 
-**Top bar**: New, Open, Save, Save as, Export PNG, Undo/Redo, Simulate (play/pause the virtual
-car), Validate (jumps to the Validation tab and shows the error count), Build, language (EN/ES),
-light/dark, help, and three buttons that show or hide the side and bottom panels.
+**Top bar**: the **File** menu (New, Open, Save, Save as, Add images, Export PNG), Save, Undo/Redo,
+Add images, Simulate, Validate (shows the error count), Build, three buttons that show or hide the
+panels, and a **…** menu with language, light/dark and help.
+
+Drag the edge of a panel to resize it, and double-click the edge to reset it. In a small window the
+side panels open as drawers over the canvas.
 
 **Status bar**: saved state, selection count, cursor position in layout pixels, renderer layer
 count versus the 64-layer limit, simulated signal health, display profile.
@@ -39,6 +42,14 @@ library), dragging files onto the canvas or the library, or pasting with Ctrl+V.
 GIF, SVG, BMP and AVIF work; images are stored inside the theme, so a saved `.idv7theme` is one
 self-contained file. Images larger than 2048 px are scaled down on import. Click a thumbnail to
 reuse a picture, or drag it onto the layout.
+
+### Animations and video
+
+GIF, animated WebP and APNG files import as animations, and so do short videos (MP4 or WebM). Videos
+keep the first 12 seconds at up to 15 frames per second, with no sound. The Inspector sets the
+playback speed, and the image editor can step through the frames. On the car, all frames must share
+one texture, so large or long animations lose sharpness; Validation warns when that happens. Animations
+have not been tested in a vehicle.
 
 ## Image editor
 
