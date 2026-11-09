@@ -1,0 +1,40 @@
+{
+  "name": "idv7lol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source BMW iDrive 7 custom digital cluster platform, visual theme editor and development toolkit.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.build.json",
+    "typecheck": "tsc -b tsconfig.build.json && tsc -p tsconfig.json",
+    "dev:studio": "npm run dev -w @idv7lol/studio",
+    "build:studio": "npm run build -w @idv7lol/studio",
+    "tauri:dev": "npm run tauri:dev -w @idv7lol/studio",
+    "tauri:build": "npm run tauri:build -w @idv7lol/studio",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "themes:validate": "tsx packages/theme-compiler/src/cli.ts validate themes/*/theme.json",
+    "themes:build": "tsx packages/theme-compiler/src/cli.ts build themes/*/theme.json --out dist/themes"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^24.10.0",
+    "eslint": "^9.39.0",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.4"
+  }
+}

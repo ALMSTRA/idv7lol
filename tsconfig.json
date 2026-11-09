@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true,
+    "types": ["node", "vitest/globals"],
+    "paths": {
+      "@idv7lol/theme-schema": ["./packages/theme-schema/src/index.ts"],
+      "@idv7lol/vehicle-signals": ["./packages/vehicle-signals/src/index.ts"],
+      "@idv7lol/theme-engine": ["./packages/theme-engine/src/index.ts"],
+      "@idv7lol/simulator": ["./packages/simulator/src/index.ts"],
+      "@idv7lol/theme-compiler": ["./packages/theme-compiler/src/index.ts"]
+    }
+  },
+  "include": ["tests/**/*.ts", "tools/**/*.ts", "vitest.config.ts"]
+}

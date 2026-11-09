@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "packages/vehicle-signals"
+    },
+    {
+      "path": "packages/theme-schema"
+    },
+    {
+      "path": "packages/theme-engine"
+    },
+    {
+      "path": "packages/simulator"
+    },
+    {
+      "path": "packages/theme-compiler"
+    }
+  ]
+}

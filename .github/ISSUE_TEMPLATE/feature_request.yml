@@ -1,0 +1,34 @@
+name: Feature request
+description: Suggest a component, Studio feature, theme or runtime capability
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Studio (Windows editor)
+        - Simulator
+        - Theme compiler
+        - MGU app (on the car)
+        - Components / animations
+        - Themes
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Sketches and screenshots of other clusters are welcome; do not paste proprietary assets.
+  - type: textarea
+    id: signals
+    attributes:
+      label: Vehicle data involved
+      description: Which signals would the feature need, and do you know they are available on your car?
