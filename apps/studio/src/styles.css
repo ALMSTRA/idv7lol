@@ -866,6 +866,10 @@ table.plain th {
 .template-card small {
   color: var(--text-muted);
   font-size: 11px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 .modal .actions {
   display: flex;

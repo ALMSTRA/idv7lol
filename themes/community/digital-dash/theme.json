@@ -1,0 +1,1724 @@
+{
+  "schemaVersion": 1,
+  "id": "digital-dash",
+  "name": "Digital Dash",
+  "version": "0.1.0",
+  "author": "eroobeeroo (eroobeeroo/idrive7-cluster-info), converted to idv7lol",
+  "description": "Conversion to idv7lol of \"Digital dash\" from eroobeeroo/idrive7-cluster-info by eroobeeroo, GPL-3.0-or-later. No dials, all digits and bars: a segmented rpm bar, large speed, battery power, six temperature and boost tiles, and the gear with the charge, electric and fuel ranges.",
+  "license": "GPL-3.0-or-later",
+  "target": {
+    "platform": "idrive7-mgu",
+    "display": "kombi-id7-12.3",
+    "renderer": "cluster-render"
+  },
+  "vehicleProfile": "phev",
+  "layout": {
+    "width": 1920,
+    "height": 720,
+    "background": "$background",
+    "reservedZones": [
+      {
+        "id": "cowl",
+        "name": "Top cowl (factory telltales)",
+        "kind": "factory",
+        "x": 730,
+        "y": 0,
+        "width": 460,
+        "height": 128
+      },
+      {
+        "id": "gear-bracket",
+        "name": "Gear bracket (factory gear display)",
+        "kind": "factory",
+        "x": 1410,
+        "y": 262,
+        "width": 252,
+        "height": 192
+      },
+      {
+        "id": "edrive-box",
+        "name": "eDrive status box (hybrids)",
+        "kind": "factory",
+        "x": 1770,
+        "y": 170,
+        "width": 150,
+        "height": 95
+      },
+      {
+        "id": "telltales-bottom",
+        "name": "Bottom telltale strip",
+        "kind": "factory",
+        "x": 560,
+        "y": 652,
+        "width": 960,
+        "height": 68
+      },
+      {
+        "id": "glass-corner-left",
+        "name": "Glass corner (left)",
+        "kind": "keep-clear",
+        "x": 0,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 394.54545454545456,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "id": "glass-corner-right",
+        "name": "Glass corner (right)",
+        "kind": "keep-clear",
+        "x": 1525.4545454545455,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          {
+            "x": 1920,
+            "y": 0
+          },
+          {
+            "x": 1525.4545454545455,
+            "y": 0
+          },
+          {
+            "x": 1920,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "id": "stock-map-window",
+        "name": "Stock map window (slot 0x100)",
+        "kind": "info",
+        "x": 416,
+        "y": 120,
+        "width": 1088,
+        "height": 480
+      }
+    ]
+  },
+  "palettes": {
+    "comfort": {
+      "name": "Comfort",
+      "colors": {
+        "background": "#020305",
+        "surface": "#141e2a",
+        "text": "#ffffff",
+        "text-muted": "#aebdcc",
+        "accent": "#4aa8ff",
+        "track": "#1d2835",
+        "success": "#3ddc84",
+        "warning": "#ffb340",
+        "danger": "#ff453a",
+        "bg-top": "#0b111a",
+        "card-bottom": "#0b121b",
+        "edge": "#2c3d51",
+        "fill-low": "#2a7fd0",
+        "fill-high": "#62c6ff",
+        "ev": "#5cbcff"
+      }
+    },
+    "sport": {
+      "name": "Sport",
+      "colors": {
+        "background": "#040202",
+        "surface": "#221414",
+        "text": "#ffffff",
+        "text-muted": "#d4b4ae",
+        "accent": "#ff4a3a",
+        "track": "#2c1a1a",
+        "success": "#3ddc84",
+        "warning": "#ffb340",
+        "danger": "#ffffff",
+        "bg-top": "#140a0a",
+        "card-bottom": "#140b0b",
+        "edge": "#4a2a28",
+        "fill-low": "#b3261e",
+        "fill-high": "#ff5a40",
+        "ev": "#5cbcff"
+      }
+    },
+    "efficient": {
+      "name": "Efficient",
+      "colors": {
+        "background": "#010403",
+        "surface": "#10211d",
+        "text": "#ffffff",
+        "text-muted": "#a6c9bf",
+        "accent": "#2fd8a6",
+        "track": "#142a24",
+        "success": "#7dff9a",
+        "warning": "#ffb340",
+        "danger": "#ff453a",
+        "bg-top": "#07130f",
+        "card-bottom": "#091512",
+        "edge": "#21493f",
+        "fill-low": "#16956f",
+        "fill-high": "#41f0bd",
+        "ev": "#2fd8a6"
+      }
+    }
+  },
+  "palette": {
+    "default": "comfort",
+    "byDriveMode": {
+      "SPORT": "sport",
+      "SPORT_PLUS": "sport",
+      "TRACK": "sport",
+      "ECO_PRO": "efficient"
+    },
+    "allowManual": true
+  },
+  "fonts": {
+    "default": {
+      "family": "sans"
+    }
+  },
+  "assets": {},
+  "animations": {},
+  "components": [
+    {
+      "id": "bg",
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 720,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$bg-top"
+            },
+            {
+              "offset": 1,
+              "color": "$background"
+            }
+          ]
+        }
+      },
+      "name": "Background",
+      "locked": true
+    },
+    {
+      "id": "rpm-bar",
+      "type": "gauge.bar",
+      "x": 200,
+      "y": 138,
+      "width": 1520,
+      "height": 26,
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 8000,
+        "smoothing": 0.06
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 4
+        },
+        "fill": {
+          "color": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              {
+                "offset": 0,
+                "color": "$fill-low"
+              },
+              {
+                "offset": 1,
+                "color": "$fill-high"
+              }
+            ]
+          },
+          "radius": 3,
+          "mode": "segments",
+          "segments": 58,
+          "segmentGap": 6,
+          "zones": [
+            {
+              "from": 7000,
+              "to": 8000,
+              "color": "$danger"
+            }
+          ]
+        },
+        "marker": {
+          "show": true,
+          "value": 7000,
+          "color": "$danger",
+          "width": 3
+        },
+        "glow": {
+          "show": true,
+          "color": "$fill-high",
+          "blur": 10
+        }
+      },
+      "name": "Engine speed bar"
+    },
+    {
+      "id": "rpm-text",
+      "type": "text",
+      "x": 200,
+      "y": 170,
+      "width": 320,
+      "height": 24,
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 8000,
+        "smoothing": 0.06
+      },
+      "props": {
+        "text": "{value} RPM",
+        "style": {
+          "size": 20,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        },
+        "format": "0"
+      },
+      "name": "Engine speed",
+      "visibleWhen": {
+        "signal": "engine.running",
+        "op": "truthy"
+      }
+    },
+    {
+      "id": "rpm-off",
+      "type": "text",
+      "x": 200,
+      "y": 170,
+      "width": 320,
+      "height": 24,
+      "props": {
+        "text": "ENGINE OFF",
+        "style": {
+          "size": 20,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      },
+      "name": "Engine off",
+      "visibleWhen": {
+        "signal": "engine.running",
+        "op": "falsy"
+      }
+    },
+    {
+      "id": "mode",
+      "type": "text",
+      "x": 1220,
+      "y": 170,
+      "width": 500,
+      "height": 26,
+      "binding": {
+        "signal": "drive.mode",
+        "fallback": "hide"
+      },
+      "props": {
+        "text": "{value}",
+        "style": {
+          "size": 24,
+          "color": "$accent",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 5,
+          "weight": "bold",
+          "uppercase": true
+        },
+        "format": "0"
+      },
+      "name": "Driving mode"
+    },
+    {
+      "id": "speed",
+      "type": "value.digital",
+      "x": 50,
+      "y": 196,
+      "width": 360,
+      "height": 170,
+      "binding": {
+        "signal": "vehicle.speed",
+        "min": 0,
+        "max": 260,
+        "smoothing": 0.06
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 156,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 156,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Speed"
+    },
+    {
+      "id": "speed-unit",
+      "type": "text",
+      "x": 60,
+      "y": 368,
+      "width": 340,
+      "height": 24,
+      "props": {
+        "text": "km/h",
+        "style": {
+          "size": 22,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 4,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "kw-label",
+      "type": "text",
+      "x": 70,
+      "y": 424,
+      "width": 320,
+      "height": 20,
+      "props": {
+        "text": "BATTERY POWER",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "kw",
+      "type": "value.digital",
+      "x": 66,
+      "y": 446,
+      "width": 340,
+      "height": 72,
+      "binding": {
+        "signal": "hybrid.battery.power"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "+0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 66,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 40,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": -200,
+            "to": -0.3,
+            "color": "$success"
+          }
+        ]
+      },
+      "name": "Battery power"
+    },
+    {
+      "id": "kw-regen",
+      "type": "gauge.bar",
+      "x": 70,
+      "y": 526,
+      "width": 120,
+      "height": 12,
+      "binding": {
+        "signal": "hybrid.battery.power",
+        "min": 0,
+        "max": 60,
+        "scale": -1
+      },
+      "props": {
+        "direction": "reverse",
+        "track": {
+          "color": "$track",
+          "radius": 3
+        },
+        "fill": {
+          "color": "$success",
+          "radius": 3
+        }
+      },
+      "name": "Recuperation"
+    },
+    {
+      "id": "kw-draw",
+      "type": "gauge.bar",
+      "x": 194,
+      "y": 526,
+      "width": 196,
+      "height": 12,
+      "binding": {
+        "signal": "hybrid.battery.power",
+        "min": 0,
+        "max": 100
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 3
+        },
+        "fill": {
+          "color": "$ev",
+          "radius": 3
+        }
+      },
+      "name": "Power drawn"
+    },
+    {
+      "id": "gear-mode",
+      "type": "text",
+      "x": 1700,
+      "y": 286,
+      "width": 88,
+      "height": 130,
+      "binding": {
+        "signal": "transmission.mode",
+        "fallback": "hide"
+      },
+      "props": {
+        "text": "{value}",
+        "style": {
+          "size": 120,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "format": "0"
+      },
+      "name": "Gear mode letter",
+      "visibleWhen": {
+        "all": [
+          {
+            "not": {
+              "any": [
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "P"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "R"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "N"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "D"
+                }
+              ]
+            }
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "truthy"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gear-number",
+      "type": "indicator.gear",
+      "x": 1770,
+      "y": 286,
+      "width": 96,
+      "height": 130,
+      "binding": {
+        "signal": "transmission.gear"
+      },
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "neq",
+        "value": "R"
+      },
+      "props": {
+        "showMode": false,
+        "style": {
+          "size": 120,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "mapping": {}
+      }
+    },
+    {
+      "id": "gear-reverse",
+      "type": "text",
+      "x": 1770,
+      "y": 286,
+      "width": 96,
+      "height": 130,
+      "props": {
+        "text": "R",
+        "style": {
+          "size": 120,
+          "color": "#ff453a",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Gear R",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "R"
+      }
+    },
+    {
+      "id": "soc-label",
+      "type": "text",
+      "x": 1520,
+      "y": 460,
+      "width": 170,
+      "height": 20,
+      "props": {
+        "text": "CHARGE",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "soc",
+      "type": "value.digital",
+      "x": 1520,
+      "y": 478,
+      "width": 150,
+      "height": 58,
+      "binding": {
+        "signal": "hybrid.battery.soc"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 53,
+          "color": "$ev",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 53,
+          "color": "$ev",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Charge"
+    },
+    {
+      "id": "erange-label",
+      "type": "text",
+      "x": 1700,
+      "y": 460,
+      "width": 170,
+      "height": 20,
+      "props": {
+        "text": "ELECTRIC",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "erange",
+      "type": "value.digital",
+      "x": 1630,
+      "y": 478,
+      "width": 240,
+      "height": 58,
+      "binding": {
+        "signal": "hybrid.electric.range",
+        "unit": "km"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 53,
+          "color": "$ev",
+          "align": "right",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 53,
+          "color": "$ev",
+          "align": "right",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Electric range"
+    },
+    {
+      "id": "soc-bar",
+      "type": "gauge.bar",
+      "x": 1520,
+      "y": 540,
+      "width": 350,
+      "height": 12,
+      "binding": {
+        "signal": "hybrid.battery.soc"
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 3
+        },
+        "fill": {
+          "color": "$ev",
+          "radius": 3,
+          "mode": "segments",
+          "segments": 20,
+          "segmentGap": 3
+        }
+      }
+    },
+    {
+      "id": "fuel-label",
+      "type": "text",
+      "x": 1520,
+      "y": 566,
+      "width": 100,
+      "height": 20,
+      "props": {
+        "text": "FUEL",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "frange",
+      "type": "value.digital",
+      "x": 1610,
+      "y": 556,
+      "width": 260,
+      "height": 52,
+      "binding": {
+        "signal": "vehicle.range",
+        "unit": "km"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 48,
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 48,
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Fuel range"
+    },
+    {
+      "id": "fuel-bar",
+      "type": "gauge.bar",
+      "x": 1520,
+      "y": 612,
+      "width": 350,
+      "height": 10,
+      "binding": {
+        "signal": "fuel.level",
+        "min": 0,
+        "max": 100
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 3
+        },
+        "fill": {
+          "color": "$fill-high",
+          "radius": 3,
+          "mode": "segments",
+          "segments": 8,
+          "segmentGap": 3,
+          "zones": [
+            {
+              "from": 0,
+              "to": 12.5,
+              "color": "$danger"
+            }
+          ]
+        }
+      },
+      "name": "Fuel bar"
+    },
+    {
+      "id": "clock",
+      "type": "clock",
+      "x": 60,
+      "y": 552,
+      "width": 170,
+      "height": 44,
+      "props": {
+        "format": "24h",
+        "showSuffix": false,
+        "style": {
+          "size": 40,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "outside",
+      "type": "value.digital",
+      "x": 240,
+      "y": 552,
+      "width": 160,
+      "height": 44,
+      "binding": {
+        "signal": "environment.outside.temp"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 40,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "unitStyle": {
+          "size": 40,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Outside temperature"
+    },
+    {
+      "id": "t-oil-card",
+      "type": "rect",
+      "x": 430,
+      "y": 200,
+      "width": 309,
+      "height": 212,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$card-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$edge",
+          "width": 1.5
+        },
+        "radius": 14
+      },
+      "name": "OIL  °C card"
+    },
+    {
+      "id": "t-oil-label",
+      "type": "text",
+      "x": 446,
+      "y": 215,
+      "width": 277,
+      "height": 20,
+      "props": {
+        "text": "OIL  °C",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "t-oil-value",
+      "type": "value.digital",
+      "x": 446,
+      "y": 244,
+      "width": 277,
+      "height": 84,
+      "binding": {
+        "signal": "engine.oil.temp",
+        "min": 40,
+        "max": 150,
+        "smoothing": 0.2
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": 130,
+            "to": 400,
+            "color": "$warning"
+          }
+        ]
+      },
+      "name": "OIL  °C"
+    },
+    {
+      "id": "t-oil-bar",
+      "type": "gauge.bar",
+      "x": 440,
+      "y": 382,
+      "width": 289,
+      "height": 16,
+      "binding": {
+        "signal": "engine.oil.temp",
+        "min": 40,
+        "max": 150,
+        "smoothing": 0.2
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              {
+                "offset": 0,
+                "color": "$fill-low"
+              },
+              {
+                "offset": 1,
+                "color": "$fill-high"
+              }
+            ]
+          },
+          "radius": 4,
+          "zones": [
+            {
+              "from": 130,
+              "to": 150,
+              "color": "$danger"
+            }
+          ]
+        },
+        "marker": {
+          "show": true,
+          "value": 130,
+          "color": "$danger",
+          "width": 3
+        }
+      },
+      "name": "OIL  °C bar"
+    },
+    {
+      "id": "t-coolant-card",
+      "type": "rect",
+      "x": 755,
+      "y": 200,
+      "width": 309,
+      "height": 212,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$card-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$edge",
+          "width": 1.5
+        },
+        "radius": 14
+      },
+      "name": "COOLANT  °C card"
+    },
+    {
+      "id": "t-coolant-label",
+      "type": "text",
+      "x": 771,
+      "y": 215,
+      "width": 277,
+      "height": 20,
+      "props": {
+        "text": "COOLANT  °C",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "t-coolant-value",
+      "type": "value.digital",
+      "x": 771,
+      "y": 244,
+      "width": 277,
+      "height": 84,
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "min": 40,
+        "max": 130,
+        "smoothing": 0.2
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": 118,
+            "to": 400,
+            "color": "$warning"
+          }
+        ]
+      },
+      "name": "COOLANT  °C"
+    },
+    {
+      "id": "t-coolant-bar",
+      "type": "gauge.bar",
+      "x": 765,
+      "y": 382,
+      "width": 289,
+      "height": 16,
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "min": 40,
+        "max": 130,
+        "smoothing": 0.2
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              {
+                "offset": 0,
+                "color": "$fill-low"
+              },
+              {
+                "offset": 1,
+                "color": "$fill-high"
+              }
+            ]
+          },
+          "radius": 4,
+          "zones": [
+            {
+              "from": 118,
+              "to": 130,
+              "color": "$danger"
+            }
+          ]
+        },
+        "marker": {
+          "show": true,
+          "value": 118,
+          "color": "$danger",
+          "width": 3
+        }
+      },
+      "name": "COOLANT  °C bar"
+    },
+    {
+      "id": "t-gearbox-card",
+      "type": "rect",
+      "x": 1081,
+      "y": 200,
+      "width": 309,
+      "height": 212,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$card-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$edge",
+          "width": 1.5
+        },
+        "radius": 14
+      },
+      "name": "GEARBOX  °C card"
+    },
+    {
+      "id": "t-gearbox-label",
+      "type": "text",
+      "x": 1097,
+      "y": 215,
+      "width": 277,
+      "height": 20,
+      "props": {
+        "text": "GEARBOX  °C",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "t-gearbox-value",
+      "type": "value.digital",
+      "x": 1097,
+      "y": 244,
+      "width": 277,
+      "height": 84,
+      "binding": {
+        "signal": "transmission.oil.temp",
+        "min": 20,
+        "max": 140,
+        "smoothing": 0.2
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": 120,
+            "to": 400,
+            "color": "$warning"
+          }
+        ]
+      },
+      "name": "GEARBOX  °C"
+    },
+    {
+      "id": "t-gearbox-bar",
+      "type": "gauge.bar",
+      "x": 1091,
+      "y": 382,
+      "width": 289,
+      "height": 16,
+      "binding": {
+        "signal": "transmission.oil.temp",
+        "min": 20,
+        "max": 140,
+        "smoothing": 0.2
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              {
+                "offset": 0,
+                "color": "$fill-low"
+              },
+              {
+                "offset": 1,
+                "color": "$fill-high"
+              }
+            ]
+          },
+          "radius": 4,
+          "zones": [
+            {
+              "from": 120,
+              "to": 140,
+              "color": "$danger"
+            }
+          ]
+        },
+        "marker": {
+          "show": true,
+          "value": 120,
+          "color": "$danger",
+          "width": 3
+        }
+      },
+      "name": "GEARBOX  °C bar"
+    },
+    {
+      "id": "t-iat-card",
+      "type": "rect",
+      "x": 430,
+      "y": 428,
+      "width": 309,
+      "height": 212,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$card-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$edge",
+          "width": 1.5
+        },
+        "radius": 14
+      },
+      "name": "INTAKE AIR  °C card"
+    },
+    {
+      "id": "t-iat-label",
+      "type": "text",
+      "x": 446,
+      "y": 443,
+      "width": 277,
+      "height": 20,
+      "props": {
+        "text": "INTAKE AIR  °C",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "t-iat-value",
+      "type": "value.digital",
+      "x": 446,
+      "y": 472,
+      "width": 277,
+      "height": 84,
+      "binding": {
+        "signal": "engine.intake.temp",
+        "min": 0,
+        "max": 80,
+        "smoothing": 0.2
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": 60,
+            "to": 400,
+            "color": "$warning"
+          }
+        ]
+      },
+      "name": "INTAKE AIR  °C"
+    },
+    {
+      "id": "t-iat-bar",
+      "type": "gauge.bar",
+      "x": 440,
+      "y": 610,
+      "width": 289,
+      "height": 16,
+      "binding": {
+        "signal": "engine.intake.temp",
+        "min": 0,
+        "max": 80,
+        "smoothing": 0.2
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              {
+                "offset": 0,
+                "color": "$fill-low"
+              },
+              {
+                "offset": 1,
+                "color": "$fill-high"
+              }
+            ]
+          },
+          "radius": 4,
+          "zones": [
+            {
+              "from": 60,
+              "to": 80,
+              "color": "$danger"
+            }
+          ]
+        },
+        "marker": {
+          "show": true,
+          "value": 60,
+          "color": "$danger",
+          "width": 3
+        }
+      },
+      "name": "INTAKE AIR  °C bar"
+    },
+    {
+      "id": "t-batt-card",
+      "type": "rect",
+      "x": 755,
+      "y": 428,
+      "width": 309,
+      "height": 212,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$card-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$edge",
+          "width": 1.5
+        },
+        "radius": 14
+      },
+      "name": "BATTERY  °C card"
+    },
+    {
+      "id": "t-batt-label",
+      "type": "text",
+      "x": 771,
+      "y": 443,
+      "width": 277,
+      "height": 20,
+      "props": {
+        "text": "BATTERY  °C",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "t-batt-value",
+      "type": "value.digital",
+      "x": 771,
+      "y": 472,
+      "width": 277,
+      "height": 84,
+      "binding": {
+        "signal": "hybrid.battery.temp",
+        "min": 0,
+        "max": 60,
+        "smoothing": 0.2
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": 45,
+            "to": 400,
+            "color": "$warning"
+          }
+        ]
+      },
+      "name": "BATTERY  °C"
+    },
+    {
+      "id": "t-batt-bar",
+      "type": "gauge.bar",
+      "x": 765,
+      "y": 610,
+      "width": 289,
+      "height": 16,
+      "binding": {
+        "signal": "hybrid.battery.temp",
+        "min": 0,
+        "max": 60,
+        "smoothing": 0.2
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              {
+                "offset": 0,
+                "color": "$fill-low"
+              },
+              {
+                "offset": 1,
+                "color": "$fill-high"
+              }
+            ]
+          },
+          "radius": 4,
+          "zones": [
+            {
+              "from": 45,
+              "to": 60,
+              "color": "$danger"
+            }
+          ]
+        },
+        "marker": {
+          "show": true,
+          "value": 45,
+          "color": "$danger",
+          "width": 3
+        }
+      },
+      "name": "BATTERY  °C bar"
+    },
+    {
+      "id": "t-boost-card",
+      "type": "rect",
+      "x": 1081,
+      "y": 428,
+      "width": 309,
+      "height": 212,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$card-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$edge",
+          "width": 1.5
+        },
+        "radius": 14
+      },
+      "name": "BOOST  BAR card"
+    },
+    {
+      "id": "t-boost-label",
+      "type": "text",
+      "x": 1097,
+      "y": 443,
+      "width": 277,
+      "height": 20,
+      "props": {
+        "text": "BOOST  BAR",
+        "style": {
+          "size": 18,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "t-boost-value",
+      "type": "value.digital",
+      "x": 1097,
+      "y": 472,
+      "width": 277,
+      "height": 84,
+      "binding": {
+        "signal": "engine.boost",
+        "min": -0.6,
+        "max": 1.6,
+        "smoothing": 0.2
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0.00",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 77,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "BOOST  BAR"
+    },
+    {
+      "id": "t-boost-bar",
+      "type": "gauge.bar",
+      "x": 1091,
+      "y": 610,
+      "width": 289,
+      "height": 16,
+      "binding": {
+        "signal": "engine.boost",
+        "min": -0.6,
+        "max": 1.6,
+        "smoothing": 0.2
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              {
+                "offset": 0,
+                "color": "$fill-low"
+              },
+              {
+                "offset": 1,
+                "color": "$fill-high"
+              }
+            ]
+          },
+          "radius": 4
+        }
+      },
+      "name": "BOOST  BAR bar"
+    }
+  ],
+  "meta": {
+    "tags": ["community", "converted"]
+  }
+}

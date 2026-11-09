@@ -21,6 +21,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   sound) import as a sprite sheet, play in the editor and compile to one atlas that the renderer
   loops by itself, with nothing sent per frame. Tested locally; not tested in a vehicle.
 
+### Added
+
+- Optional free templates in the Studio's welcome window: conversions of the seven Cluster Layouts by
+  eroobeeroo (GPL-3.0-or-later), with credits and differences in `themes/community/README.md`.
+
 ### Changed
 
 - Studio interface: the supplied idv7lol logo and its colours, one icon set instead of text symbols,
@@ -28,6 +33,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   windows. Tested locally in a browser.
 
 ### Fixed
+
+- The validator skipped the factory zones when a theme did not list them in its own layout.
 
 - Studio desktop build: HTML5 drag and drop was disabled by Tauri's `dragDropEnabled`.
 - Compiled `theme.json` was written before image sizes were settled.

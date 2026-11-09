@@ -1,0 +1,1466 @@
+{
+  "schemaVersion": 1,
+  "id": "digital-round",
+  "name": "Digital Round",
+  "version": "0.1.0",
+  "author": "eroobeeroo (eroobeeroo/idrive7-cluster-info), converted to idv7lol",
+  "description": "Conversion to idv7lol of \"Digital round\" from eroobeeroo/idrive7-cluster-info by eroobeeroo, GPL-3.0-or-later. Round dials drawn as a display with a lit value arc running to each needle, the fuel range in the speedometer, the electric range and charge in the rev counter, a centre card with the P R N D row, and arc gauges for oil and coolant.",
+  "license": "GPL-3.0-or-later",
+  "target": {
+    "platform": "idrive7-mgu",
+    "display": "kombi-id7-12.3",
+    "renderer": "cluster-render"
+  },
+  "vehicleProfile": "phev",
+  "layout": {
+    "width": 1920,
+    "height": 720,
+    "background": "$background",
+    "reservedZones": [
+      {
+        "id": "cowl",
+        "name": "Top cowl (factory telltales)",
+        "kind": "factory",
+        "x": 730,
+        "y": 0,
+        "width": 460,
+        "height": 128
+      },
+      {
+        "id": "gear-bracket",
+        "name": "Gear bracket (factory gear display)",
+        "kind": "factory",
+        "x": 1410,
+        "y": 262,
+        "width": 252,
+        "height": 192
+      },
+      {
+        "id": "edrive-box",
+        "name": "eDrive status box (hybrids)",
+        "kind": "factory",
+        "x": 1770,
+        "y": 170,
+        "width": 150,
+        "height": 95
+      },
+      {
+        "id": "telltales-bottom",
+        "name": "Bottom telltale strip",
+        "kind": "factory",
+        "x": 560,
+        "y": 652,
+        "width": 960,
+        "height": 68
+      },
+      {
+        "id": "glass-corner-left",
+        "name": "Glass corner (left)",
+        "kind": "keep-clear",
+        "x": 0,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 394.54545454545456,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "id": "glass-corner-right",
+        "name": "Glass corner (right)",
+        "kind": "keep-clear",
+        "x": 1525.4545454545455,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          {
+            "x": 1920,
+            "y": 0
+          },
+          {
+            "x": 1525.4545454545455,
+            "y": 0
+          },
+          {
+            "x": 1920,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "id": "stock-map-window",
+        "name": "Stock map window (slot 0x100)",
+        "kind": "info",
+        "x": 416,
+        "y": 120,
+        "width": 1088,
+        "height": 480
+      }
+    ]
+  },
+  "palettes": {
+    "comfort": {
+      "name": "Comfort",
+      "colors": {
+        "background": "#030508",
+        "surface": "#141a22",
+        "text": "#f2f7ff",
+        "text-muted": "#a6aeb6",
+        "accent": "#3fa6ff",
+        "track": "#141c26",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff3b30",
+        "face-dark": "#07090d",
+        "bezel": "#7c8a99",
+        "tick": "#f2f7ff",
+        "tick-minor": "#5d6b7a",
+        "numeral": "#e9f1fb",
+        "needle": "#9fd8ff",
+        "hub": "#10151b",
+        "card-top": "#111821",
+        "card-bottom": "#06090d",
+        "card-edge": "#21405e",
+        "ev": "#4ab4ff"
+      }
+    },
+    "sport": {
+      "name": "Sport",
+      "colors": {
+        "background": "#060303",
+        "surface": "#1e1213",
+        "text": "#ffffff",
+        "text-muted": "#b6a5a5",
+        "accent": "#ff2e22",
+        "track": "#241515",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff2414",
+        "face-dark": "#0a0606",
+        "bezel": "#a07a78",
+        "tick": "#ffffff",
+        "tick-minor": "#7a5c5c",
+        "numeral": "#ffffff",
+        "needle": "#ff5a4a",
+        "hub": "#170f0f",
+        "card-top": "#1d1112",
+        "card-bottom": "#0a0606",
+        "card-edge": "#6a1f1a",
+        "ev": "#4ab4ff"
+      }
+    },
+    "efficient": {
+      "name": "Efficient",
+      "colors": {
+        "background": "#020606",
+        "surface": "#0f1a1a",
+        "text": "#effffb",
+        "text-muted": "#9eafac",
+        "accent": "#22d3a0",
+        "track": "#102020",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff3b30",
+        "face-dark": "#050b0b",
+        "bezel": "#6f9a92",
+        "tick": "#effffb",
+        "tick-minor": "#4f6e69",
+        "numeral": "#e6fff8",
+        "needle": "#7ff0d0",
+        "hub": "#0c1514",
+        "card-top": "#0f1a19",
+        "card-bottom": "#050a0a",
+        "card-edge": "#1c5a4c",
+        "ev": "#22d3a0"
+      }
+    }
+  },
+  "palette": {
+    "default": "comfort",
+    "byDriveMode": {
+      "SPORT": "sport",
+      "SPORT_PLUS": "sport",
+      "TRACK": "sport",
+      "ECO_PRO": "efficient"
+    },
+    "allowManual": true
+  },
+  "fonts": {
+    "default": {
+      "family": "sans"
+    }
+  },
+  "assets": {},
+  "animations": {},
+  "components": [
+    {
+      "id": "bg",
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 720,
+      "props": {
+        "fill": "$background"
+      },
+      "name": "Background",
+      "locked": true
+    },
+    {
+      "id": "speed-face",
+      "type": "ellipse",
+      "x": 88,
+      "y": 172,
+      "width": 476,
+      "height": 476,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$face-dark"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$bezel",
+          "width": 5
+        }
+      },
+      "name": "Speedometer face"
+    },
+    {
+      "id": "speed-lit",
+      "type": "gauge.arc",
+      "x": 141,
+      "y": 225,
+      "width": 370,
+      "height": 370,
+      "binding": {
+        "signal": "vehicle.speed",
+        "min": 0,
+        "max": 260,
+        "smoothing": 0.06
+      },
+      "props": {
+        "startAngle": 142,
+        "sweepAngle": 256,
+        "track": {
+          "show": true,
+          "color": "$track",
+          "width": 8
+        },
+        "fill": {
+          "show": true,
+          "color": "$accent",
+          "width": 8
+        },
+        "ticks": {
+          "major": 0
+        },
+        "labels": {
+          "show": false
+        },
+        "redline": {
+          "show": false
+        },
+        "glow": {
+          "show": true,
+          "color": "$accent",
+          "blur": 12
+        }
+      },
+      "name": "Speedometer value arc"
+    },
+    {
+      "id": "speed-dial",
+      "type": "gauge.arc",
+      "x": 94,
+      "y": 178,
+      "width": 464,
+      "height": 464,
+      "binding": {
+        "signal": "vehicle.speed",
+        "min": 0,
+        "max": 260,
+        "smoothing": 0.06
+      },
+      "props": {
+        "startAngle": 142,
+        "sweepAngle": 256,
+        "track": {
+          "show": false
+        },
+        "fill": {
+          "show": false
+        },
+        "ticks": {
+          "major": 13,
+          "minor": 1,
+          "majorLength": 20,
+          "minorLength": 10,
+          "majorWidth": 3,
+          "minorWidth": 2,
+          "color": "$tick",
+          "minorColor": "$tick-minor",
+          "inset": 8
+        },
+        "labels": {
+          "show": true,
+          "every": 2,
+          "divisor": 1,
+          "style": {
+            "size": 30,
+            "color": "$numeral",
+            "align": "center",
+            "baseline": "middle",
+            "weight": "medium"
+          },
+          "inset": 54
+        },
+        "needle": {
+          "show": true,
+          "color": "$needle",
+          "width": 9,
+          "length": 0.884,
+          "tail": 0.095,
+          "shape": "tapered",
+          "cap": {
+            "show": true,
+            "radius": 20,
+            "color": "$hub"
+          }
+        }
+      },
+      "name": "Speedometer"
+    },
+    {
+      "id": "tach-face",
+      "type": "ellipse",
+      "x": 882,
+      "y": 172,
+      "width": 476,
+      "height": 476,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$face-dark"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$bezel",
+          "width": 5
+        }
+      },
+      "name": "Rev counter face"
+    },
+    {
+      "id": "tach-lit",
+      "type": "gauge.arc",
+      "x": 935,
+      "y": 225,
+      "width": 370,
+      "height": 370,
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 8000,
+        "smoothing": 0.06
+      },
+      "props": {
+        "startAngle": 142,
+        "sweepAngle": 256,
+        "track": {
+          "show": true,
+          "color": "$track",
+          "width": 8
+        },
+        "fill": {
+          "show": true,
+          "color": "$accent",
+          "width": 8
+        },
+        "ticks": {
+          "major": 0
+        },
+        "labels": {
+          "show": false
+        },
+        "redline": {
+          "show": true,
+          "from": 7000,
+          "color": "$danger",
+          "width": 14,
+          "placement": "track"
+        },
+        "glow": {
+          "show": true,
+          "color": "$accent",
+          "blur": 12
+        }
+      },
+      "name": "Rev counter value arc"
+    },
+    {
+      "id": "tach-dial",
+      "type": "gauge.arc",
+      "x": 888,
+      "y": 178,
+      "width": 464,
+      "height": 464,
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 8000,
+        "smoothing": 0.06
+      },
+      "props": {
+        "startAngle": 142,
+        "sweepAngle": 256,
+        "track": {
+          "show": false
+        },
+        "fill": {
+          "show": false
+        },
+        "ticks": {
+          "major": 8,
+          "minor": 3,
+          "majorLength": 20,
+          "minorLength": 10,
+          "majorWidth": 3,
+          "minorWidth": 2,
+          "color": "$tick",
+          "minorColor": "$tick-minor",
+          "inset": 8
+        },
+        "labels": {
+          "show": true,
+          "every": 1,
+          "divisor": 1000,
+          "style": {
+            "size": 30,
+            "color": "$numeral",
+            "align": "center",
+            "baseline": "middle",
+            "weight": "medium"
+          },
+          "inset": 54
+        },
+        "needle": {
+          "show": true,
+          "color": "$needle",
+          "width": 9,
+          "length": 0.884,
+          "tail": 0.095,
+          "shape": "tapered",
+          "cap": {
+            "show": true,
+            "radius": 20,
+            "color": "$hub"
+          }
+        }
+      },
+      "name": "Rev counter"
+    },
+    {
+      "id": "speed-unit",
+      "type": "text",
+      "x": 206,
+      "y": 474,
+      "width": 240,
+      "height": 18,
+      "props": {
+        "text": "km/h",
+        "style": {
+          "size": 17,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "tach-unit",
+      "type": "text",
+      "x": 1000,
+      "y": 474,
+      "width": 240,
+      "height": 18,
+      "props": {
+        "text": "X1000 RPM",
+        "style": {
+          "size": 17,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "fuel",
+      "type": "value.digital",
+      "x": 244,
+      "y": 507,
+      "width": 164,
+      "height": 27,
+      "binding": {
+        "signal": "vehicle.range",
+        "unit": "km"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 25,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 25,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Fuel range"
+    },
+    {
+      "id": "fuel-label",
+      "type": "text",
+      "x": 244,
+      "y": 538,
+      "width": 164,
+      "height": 18,
+      "props": {
+        "text": "FUEL RANGE",
+        "style": {
+          "size": 15,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "elec",
+      "type": "value.digital",
+      "x": 1038,
+      "y": 507,
+      "width": 82,
+      "height": 27,
+      "binding": {
+        "signal": "hybrid.electric.range",
+        "unit": "km"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 25,
+          "color": "$ev",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 25,
+          "color": "$ev",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Electric range"
+    },
+    {
+      "id": "soc",
+      "type": "value.digital",
+      "x": 1120,
+      "y": 507,
+      "width": 82,
+      "height": 27,
+      "binding": {
+        "signal": "hybrid.battery.soc"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 25,
+          "color": "$ev",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 25,
+          "color": "$ev",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Charge"
+    },
+    {
+      "id": "elec-label",
+      "type": "text",
+      "x": 1038,
+      "y": 538,
+      "width": 164,
+      "height": 18,
+      "props": {
+        "text": "ELECTRIC",
+        "style": {
+          "size": 15,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "soc-bar",
+      "type": "gauge.bar",
+      "x": 1038,
+      "y": 560,
+      "width": 164,
+      "height": 14,
+      "binding": {
+        "signal": "hybrid.battery.soc"
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 3
+        },
+        "fill": {
+          "color": "$ev",
+          "radius": 3,
+          "mode": "segments",
+          "segments": 16,
+          "segmentGap": 2
+        }
+      },
+      "name": "Charge bar"
+    },
+    {
+      "id": "oil",
+      "type": "gauge.arc",
+      "x": 1708,
+      "y": 314,
+      "width": 164,
+      "height": 164,
+      "binding": {
+        "signal": "engine.oil.temp",
+        "min": 40,
+        "max": 140
+      },
+      "props": {
+        "startAngle": 180,
+        "sweepAngle": 180,
+        "track": {
+          "show": true,
+          "color": "$track",
+          "width": 12
+        },
+        "fill": {
+          "show": true,
+          "color": "$accent",
+          "width": 12,
+          "mode": "segments",
+          "segments": 20,
+          "segmentGap": 2,
+          "zones": [
+            {
+              "from": 130,
+              "to": 140,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "major": 4,
+          "minor": 0,
+          "majorLength": 6,
+          "minorLength": 0,
+          "majorWidth": 2,
+          "minorWidth": 0,
+          "color": "$text-muted",
+          "inset": 2
+        },
+        "labels": {
+          "show": false
+        }
+      },
+      "name": "OIL arc"
+    },
+    {
+      "id": "oil-value",
+      "type": "value.digital",
+      "x": 1690,
+      "y": 356,
+      "width": 200,
+      "height": 40,
+      "binding": {
+        "signal": "engine.oil.temp",
+        "min": 40,
+        "max": 140
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0°",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 37,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 37,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": 130,
+            "to": 200,
+            "color": "$danger"
+          }
+        ]
+      }
+    },
+    {
+      "id": "oil-label",
+      "type": "text",
+      "x": 1690,
+      "y": 404,
+      "width": 200,
+      "height": 16,
+      "props": {
+        "text": "OIL",
+        "style": {
+          "size": 14,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "coolant",
+      "type": "gauge.arc",
+      "x": 1708,
+      "y": 498,
+      "width": 164,
+      "height": 164,
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "min": 40,
+        "max": 140
+      },
+      "props": {
+        "startAngle": 180,
+        "sweepAngle": 180,
+        "track": {
+          "show": true,
+          "color": "$track",
+          "width": 12
+        },
+        "fill": {
+          "show": true,
+          "color": "$accent",
+          "width": 12,
+          "mode": "segments",
+          "segments": 20,
+          "segmentGap": 2,
+          "zones": [
+            {
+              "from": 118,
+              "to": 140,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "major": 4,
+          "minor": 0,
+          "majorLength": 6,
+          "minorLength": 0,
+          "majorWidth": 2,
+          "minorWidth": 0,
+          "color": "$text-muted",
+          "inset": 2
+        },
+        "labels": {
+          "show": false
+        }
+      },
+      "name": "COOLANT arc"
+    },
+    {
+      "id": "coolant-value",
+      "type": "value.digital",
+      "x": 1690,
+      "y": 540,
+      "width": 200,
+      "height": 40,
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "min": 40,
+        "max": 140
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0°",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 37,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 37,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": 118,
+            "to": 200,
+            "color": "$danger"
+          }
+        ]
+      }
+    },
+    {
+      "id": "coolant-label",
+      "type": "text",
+      "x": 1690,
+      "y": 588,
+      "width": 200,
+      "height": 16,
+      "props": {
+        "text": "COOLANT",
+        "style": {
+          "size": 14,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "card",
+      "type": "rect",
+      "x": 574,
+      "y": 140,
+      "width": 278,
+      "height": 470,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$card-top"
+            },
+            {
+              "offset": 1,
+              "color": "$card-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$card-edge",
+          "width": 2
+        },
+        "radius": 30
+      },
+      "name": "Centre card"
+    },
+    {
+      "id": "clock",
+      "type": "clock",
+      "x": 594,
+      "y": 158,
+      "width": 118,
+      "height": 30,
+      "props": {
+        "format": "24h",
+        "showSuffix": false,
+        "style": {
+          "size": 29,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "outside",
+      "type": "value.digital",
+      "x": 714,
+      "y": 158,
+      "width": 118,
+      "height": 30,
+      "binding": {
+        "signal": "environment.outside.temp"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 29,
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "unitStyle": {
+          "size": 29,
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      }
+    },
+    {
+      "id": "sel-p",
+      "type": "text",
+      "x": 618,
+      "y": 206,
+      "width": 34,
+      "height": 34,
+      "props": {
+        "text": "P",
+        "style": {
+          "size": 31,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Selector P"
+    },
+    {
+      "id": "sel-p-lit",
+      "type": "text",
+      "x": 618,
+      "y": 206,
+      "width": 34,
+      "height": 34,
+      "props": {
+        "text": "P",
+        "style": {
+          "size": 31,
+          "color": "$accent",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Selector P lit",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "P"
+      }
+    },
+    {
+      "id": "sel-r",
+      "type": "text",
+      "x": 670,
+      "y": 206,
+      "width": 34,
+      "height": 34,
+      "props": {
+        "text": "R",
+        "style": {
+          "size": 31,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Selector R"
+    },
+    {
+      "id": "sel-r-lit",
+      "type": "text",
+      "x": 670,
+      "y": 206,
+      "width": 34,
+      "height": 34,
+      "props": {
+        "text": "R",
+        "style": {
+          "size": 31,
+          "color": "$danger",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Selector R lit",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "R"
+      }
+    },
+    {
+      "id": "sel-n",
+      "type": "text",
+      "x": 722,
+      "y": 206,
+      "width": 34,
+      "height": 34,
+      "props": {
+        "text": "N",
+        "style": {
+          "size": 31,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Selector N"
+    },
+    {
+      "id": "sel-n-lit",
+      "type": "text",
+      "x": 722,
+      "y": 206,
+      "width": 34,
+      "height": 34,
+      "props": {
+        "text": "N",
+        "style": {
+          "size": 31,
+          "color": "$accent",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Selector N lit",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "N"
+      }
+    },
+    {
+      "id": "sel-d",
+      "type": "text",
+      "x": 774,
+      "y": 206,
+      "width": 34,
+      "height": 34,
+      "props": {
+        "text": "D",
+        "style": {
+          "size": 31,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Selector D"
+    },
+    {
+      "id": "sel-d-lit",
+      "type": "text",
+      "x": 774,
+      "y": 206,
+      "width": 34,
+      "height": 34,
+      "props": {
+        "text": "D",
+        "style": {
+          "size": 31,
+          "color": "$accent",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Selector D lit",
+      "visibleWhen": {
+        "all": [
+          {
+            "not": {
+              "any": [
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "P"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "R"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "N"
+                }
+              ]
+            }
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "truthy"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gear-mode",
+      "type": "text",
+      "x": 639,
+      "y": 251,
+      "width": 74,
+      "height": 132,
+      "binding": {
+        "signal": "transmission.mode",
+        "fallback": "hide"
+      },
+      "props": {
+        "text": "{value}",
+        "style": {
+          "size": 120,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "format": "0"
+      },
+      "name": "Gear mode letter",
+      "visibleWhen": {
+        "all": [
+          {
+            "not": {
+              "any": [
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "P"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "R"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "N"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "D"
+                }
+              ]
+            }
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "truthy"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gear-number",
+      "type": "indicator.gear",
+      "x": 713,
+      "y": 251,
+      "width": 74,
+      "height": 132,
+      "binding": {
+        "signal": "transmission.gear"
+      },
+      "visibleWhen": {
+        "all": [
+          {
+            "not": {
+              "any": [
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "P"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "R"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "N"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "D"
+                }
+              ]
+            }
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "truthy"
+          }
+        ]
+      },
+      "props": {
+        "showMode": false,
+        "style": {
+          "size": 120,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "mapping": {}
+      }
+    },
+    {
+      "id": "gear-pnd",
+      "type": "indicator.gear",
+      "x": 593,
+      "y": 251,
+      "width": 240,
+      "height": 132,
+      "binding": {
+        "signal": "transmission.gear"
+      },
+      "visibleWhen": {
+        "any": [
+          {
+            "signal": "transmission.gear",
+            "op": "eq",
+            "value": "P"
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "eq",
+            "value": "N"
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "eq",
+            "value": "D"
+          }
+        ]
+      },
+      "props": {
+        "showMode": false,
+        "style": {
+          "size": 120,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "mapping": {}
+      }
+    },
+    {
+      "id": "gear-reverse",
+      "type": "text",
+      "x": 593,
+      "y": 251,
+      "width": 240,
+      "height": 132,
+      "props": {
+        "text": "R",
+        "style": {
+          "size": 120,
+          "color": "$danger",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Gear R",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "R"
+      }
+    },
+    {
+      "id": "speed-digits",
+      "type": "value.digital",
+      "x": 574,
+      "y": 402,
+      "width": 278,
+      "height": 76,
+      "binding": {
+        "signal": "vehicle.speed",
+        "min": 0,
+        "max": 260,
+        "smoothing": 0.06
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 70,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 70,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Speed"
+    },
+    {
+      "id": "speed-digits-unit",
+      "type": "text",
+      "x": 574,
+      "y": 484,
+      "width": 278,
+      "height": 22,
+      "props": {
+        "text": "km/h",
+        "style": {
+          "size": 20,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "rule",
+      "type": "rect",
+      "x": 604,
+      "y": 524,
+      "width": 218,
+      "height": 2,
+      "props": {
+        "fill": "$card-edge"
+      },
+      "name": "Rule"
+    },
+    {
+      "id": "kw-now",
+      "type": "value.digital",
+      "x": 574,
+      "y": 540,
+      "width": 278,
+      "height": 40,
+      "binding": {
+        "signal": "hybrid.battery.power"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "+0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 37,
+          "color": "$ev",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 37,
+          "color": "$ev",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": -200,
+            "to": -0.3,
+            "color": "$success"
+          }
+        ]
+      },
+      "name": "Battery power"
+    }
+  ],
+  "meta": {
+    "tags": ["community", "converted"]
+  }
+}

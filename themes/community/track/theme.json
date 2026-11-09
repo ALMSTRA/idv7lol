@@ -1,0 +1,1172 @@
+{
+  "schemaVersion": 1,
+  "id": "track",
+  "name": "Track",
+  "version": "0.1.0",
+  "author": "eroobeeroo (eroobeeroo/idrive7-cluster-info), converted to idv7lol",
+  "description": "Conversion to idv7lol of \"Track\" from eroobeeroo/idrive7-cluster-info by eroobeeroo, GPL-3.0-or-later. A motorsport data display: shift lights over a segmented rpm bar, a huge gear with engine speed, tiles for oil, coolant, boost and power, large speed and the ranges right of the gear bracket.",
+  "license": "GPL-3.0-or-later",
+  "target": {
+    "platform": "idrive7-mgu",
+    "display": "kombi-id7-12.3",
+    "renderer": "cluster-render"
+  },
+  "vehicleProfile": "phev",
+  "layout": {
+    "width": 1920,
+    "height": 720,
+    "background": "$background",
+    "reservedZones": [
+      {
+        "id": "cowl",
+        "name": "Top cowl (factory telltales)",
+        "kind": "factory",
+        "x": 730,
+        "y": 0,
+        "width": 460,
+        "height": 128
+      },
+      {
+        "id": "gear-bracket",
+        "name": "Gear bracket (factory gear display)",
+        "kind": "factory",
+        "x": 1410,
+        "y": 262,
+        "width": 252,
+        "height": 192
+      },
+      {
+        "id": "edrive-box",
+        "name": "eDrive status box (hybrids)",
+        "kind": "factory",
+        "x": 1770,
+        "y": 170,
+        "width": 150,
+        "height": 95
+      },
+      {
+        "id": "telltales-bottom",
+        "name": "Bottom telltale strip",
+        "kind": "factory",
+        "x": 560,
+        "y": 652,
+        "width": 960,
+        "height": 68
+      },
+      {
+        "id": "glass-corner-left",
+        "name": "Glass corner (left)",
+        "kind": "keep-clear",
+        "x": 0,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 394.54545454545456,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "id": "glass-corner-right",
+        "name": "Glass corner (right)",
+        "kind": "keep-clear",
+        "x": 1525.4545454545455,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          {
+            "x": 1920,
+            "y": 0
+          },
+          {
+            "x": 1525.4545454545455,
+            "y": 0
+          },
+          {
+            "x": 1920,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "id": "stock-map-window",
+        "name": "Stock map window (slot 0x100)",
+        "kind": "info",
+        "x": 416,
+        "y": 120,
+        "width": 1088,
+        "height": 480
+      }
+    ]
+  },
+  "palettes": {
+    "comfort": {
+      "name": "Comfort",
+      "colors": {
+        "background": "#000000",
+        "surface": "#13161a",
+        "text": "#ffffff",
+        "text-muted": "#9aa3ad",
+        "accent": "#ffb000",
+        "track": "#1a1d22",
+        "success": "#2fe06b",
+        "warning": "#ffc400",
+        "danger": "#ff2a1f",
+        "tile-bottom": "#08090b",
+        "tile-edge": "#2a2f36",
+        "led-off": "#16191d",
+        "ev": "#4ab4ff",
+        "regen": "#3ddc84"
+      }
+    },
+    "sport": {
+      "name": "Sport",
+      "colors": {
+        "background": "#000000",
+        "surface": "#13161a",
+        "text": "#ffffff",
+        "text-muted": "#9aa3ad",
+        "accent": "#ff3326",
+        "track": "#1a1d22",
+        "success": "#2fe06b",
+        "warning": "#ffc400",
+        "danger": "#ff2a1f",
+        "tile-bottom": "#08090b",
+        "tile-edge": "#2a2f36",
+        "led-off": "#16191d",
+        "ev": "#4ab4ff",
+        "regen": "#3ddc84"
+      }
+    },
+    "efficient": {
+      "name": "Efficient",
+      "colors": {
+        "background": "#000000",
+        "surface": "#13161a",
+        "text": "#ffffff",
+        "text-muted": "#9aa3ad",
+        "accent": "#35e08a",
+        "track": "#1a1d22",
+        "success": "#2fe06b",
+        "warning": "#ffc400",
+        "danger": "#ff2a1f",
+        "tile-bottom": "#08090b",
+        "tile-edge": "#2a2f36",
+        "led-off": "#16191d",
+        "ev": "#4ab4ff",
+        "regen": "#3ddc84"
+      }
+    }
+  },
+  "palette": {
+    "default": "comfort",
+    "byDriveMode": {
+      "SPORT": "sport",
+      "SPORT_PLUS": "sport",
+      "TRACK": "sport",
+      "ECO_PRO": "efficient"
+    },
+    "allowManual": true
+  },
+  "fonts": {
+    "default": {
+      "family": "sans"
+    }
+  },
+  "assets": {},
+  "animations": {},
+  "components": [
+    {
+      "id": "bg",
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 720,
+      "props": {
+        "fill": "$background"
+      },
+      "name": "Background",
+      "locked": true
+    },
+    {
+      "id": "shift-lights",
+      "type": "indicator.shiftlights",
+      "x": 580,
+      "y": 136,
+      "width": 760,
+      "height": 40,
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 8000
+      },
+      "props": {
+        "count": 15,
+        "shape": "circle",
+        "gap": 24,
+        "from": 4500,
+        "to": 6700,
+        "flashAbove": 6700,
+        "flashRateHz": 7,
+        "colors": [
+          "$success",
+          "$success",
+          "$success",
+          "$success",
+          "$success",
+          "$success",
+          "$success",
+          "$warning",
+          "$warning",
+          "$warning",
+          "$warning",
+          "$danger",
+          "$danger",
+          "$danger",
+          "$danger"
+        ],
+        "offColor": "$led-off",
+        "symmetric": false,
+        "glow": true
+      }
+    },
+    {
+      "id": "rpm-bar",
+      "type": "gauge.bar",
+      "x": 580,
+      "y": 188,
+      "width": 760,
+      "height": 26,
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 8000,
+        "smoothing": 0.06
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 4
+        },
+        "fill": {
+          "color": {
+            "type": "linear",
+            "angle": 0,
+            "stops": [
+              {
+                "offset": 0,
+                "color": "$text"
+              },
+              {
+                "offset": 1,
+                "color": "$accent"
+              }
+            ]
+          },
+          "radius": 3,
+          "mode": "segments",
+          "segments": 48,
+          "segmentGap": 5,
+          "zones": [
+            {
+              "from": 7000,
+              "to": 8000,
+              "color": "$danger"
+            }
+          ]
+        },
+        "marker": {
+          "show": true,
+          "value": 7000,
+          "color": "$danger",
+          "width": 3
+        }
+      },
+      "name": "Engine speed bar"
+    },
+    {
+      "id": "gear-card",
+      "type": "rect",
+      "x": 760,
+      "y": 262,
+      "width": 400,
+      "height": 290,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$tile-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$accent",
+          "width": 2
+        },
+        "radius": 14
+      },
+      "name": "Gear card"
+    },
+    {
+      "id": "gear-mode",
+      "type": "text",
+      "x": 846,
+      "y": 271,
+      "width": 114,
+      "height": 202,
+      "binding": {
+        "signal": "transmission.mode",
+        "fallback": "hide"
+      },
+      "props": {
+        "text": "{value}",
+        "style": {
+          "size": 184,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "format": "0"
+      },
+      "name": "Gear mode letter",
+      "visibleWhen": {
+        "all": [
+          {
+            "not": {
+              "any": [
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "P"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "R"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "N"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "D"
+                }
+              ]
+            }
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "truthy"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gear-number",
+      "type": "indicator.gear",
+      "x": 960,
+      "y": 271,
+      "width": 114,
+      "height": 202,
+      "binding": {
+        "signal": "transmission.gear"
+      },
+      "visibleWhen": {
+        "all": [
+          {
+            "not": {
+              "any": [
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "P"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "R"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "N"
+                },
+                {
+                  "signal": "transmission.gear",
+                  "op": "eq",
+                  "value": "D"
+                }
+              ]
+            }
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "truthy"
+          }
+        ]
+      },
+      "props": {
+        "showMode": false,
+        "style": {
+          "size": 184,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "mapping": {}
+      }
+    },
+    {
+      "id": "gear-pnd",
+      "type": "indicator.gear",
+      "x": 776,
+      "y": 271,
+      "width": 368,
+      "height": 202,
+      "binding": {
+        "signal": "transmission.gear"
+      },
+      "visibleWhen": {
+        "any": [
+          {
+            "signal": "transmission.gear",
+            "op": "eq",
+            "value": "P"
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "eq",
+            "value": "N"
+          },
+          {
+            "signal": "transmission.gear",
+            "op": "eq",
+            "value": "D"
+          }
+        ]
+      },
+      "props": {
+        "showMode": false,
+        "style": {
+          "size": 184,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "mapping": {}
+      }
+    },
+    {
+      "id": "gear-reverse",
+      "type": "text",
+      "x": 776,
+      "y": 271,
+      "width": 368,
+      "height": 202,
+      "props": {
+        "text": "R",
+        "style": {
+          "size": 184,
+          "color": "$danger",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        }
+      },
+      "name": "Gear R",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "R"
+      }
+    },
+    {
+      "id": "rpm",
+      "type": "text",
+      "x": 760,
+      "y": 478,
+      "width": 400,
+      "height": 40,
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 8000,
+        "smoothing": 0.06
+      },
+      "props": {
+        "text": "{value}",
+        "style": {
+          "size": 37,
+          "color": "$accent",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "format": "0"
+      },
+      "name": "Engine speed"
+    },
+    {
+      "id": "rpm-label",
+      "type": "text",
+      "x": 760,
+      "y": 522,
+      "width": 400,
+      "height": 18,
+      "props": {
+        "text": "RPM",
+        "style": {
+          "size": 16,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 4
+        }
+      }
+    },
+    {
+      "id": "mode",
+      "type": "text",
+      "x": 580,
+      "y": 576,
+      "width": 760,
+      "height": 26,
+      "binding": {
+        "signal": "drive.mode",
+        "fallback": "hide"
+      },
+      "props": {
+        "text": "{value}",
+        "style": {
+          "size": 24,
+          "color": "$accent",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 6,
+          "weight": "bold",
+          "uppercase": true
+        },
+        "format": "0"
+      },
+      "name": "Driving mode"
+    },
+    {
+      "id": "speed",
+      "type": "value.digital",
+      "x": 60,
+      "y": 196,
+      "width": 460,
+      "height": 170,
+      "binding": {
+        "signal": "vehicle.speed",
+        "min": 0,
+        "max": 260,
+        "smoothing": 0.06
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 156,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 156,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Speed"
+    },
+    {
+      "id": "speed-unit",
+      "type": "text",
+      "x": 60,
+      "y": 370,
+      "width": 460,
+      "height": 28,
+      "props": {
+        "text": "km/h",
+        "style": {
+          "size": 26,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 3,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "clock",
+      "type": "clock",
+      "x": 70,
+      "y": 640,
+      "width": 200,
+      "height": 30,
+      "props": {
+        "format": "24h",
+        "showSuffix": false,
+        "style": {
+          "size": 28,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "outside",
+      "type": "value.digital",
+      "x": 310,
+      "y": 640,
+      "width": 200,
+      "height": 30,
+      "binding": {
+        "signal": "environment.outside.temp"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 28,
+          "color": "$text-muted",
+          "align": "right",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "unitStyle": {
+          "size": 28,
+          "color": "$text-muted",
+          "align": "right",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Outside temperature"
+    },
+    {
+      "id": "oil-card",
+      "type": "rect",
+      "x": 580,
+      "y": 262,
+      "width": 164,
+      "height": 135,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$tile-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$tile-edge",
+          "width": 2
+        },
+        "radius": 10
+      },
+      "name": "OIL tile"
+    },
+    {
+      "id": "oil-label",
+      "type": "text",
+      "x": 594,
+      "y": 272,
+      "width": 136,
+      "height": 18,
+      "props": {
+        "text": "OIL",
+        "style": {
+          "size": 16,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "oil",
+      "type": "value.digital",
+      "x": 594,
+      "y": 296,
+      "width": 136,
+      "height": 87,
+      "binding": {
+        "signal": "engine.oil.temp"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0°",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 80,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 80,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "OIL"
+    },
+    {
+      "id": "coolant-card",
+      "type": "rect",
+      "x": 580,
+      "y": 417,
+      "width": 164,
+      "height": 135,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$tile-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$tile-edge",
+          "width": 2
+        },
+        "radius": 10
+      },
+      "name": "COOLANT tile"
+    },
+    {
+      "id": "coolant-label",
+      "type": "text",
+      "x": 594,
+      "y": 427,
+      "width": 136,
+      "height": 18,
+      "props": {
+        "text": "COOLANT",
+        "style": {
+          "size": 16,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "coolant",
+      "type": "value.digital",
+      "x": 594,
+      "y": 451,
+      "width": 136,
+      "height": 87,
+      "binding": {
+        "signal": "engine.coolant.temp"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0°",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 80,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 80,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "COOLANT"
+    },
+    {
+      "id": "boost-card",
+      "type": "rect",
+      "x": 1176,
+      "y": 262,
+      "width": 164,
+      "height": 135,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$tile-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$tile-edge",
+          "width": 2
+        },
+        "radius": 10
+      },
+      "name": "BOOST BAR tile"
+    },
+    {
+      "id": "boost-label",
+      "type": "text",
+      "x": 1190,
+      "y": 272,
+      "width": 136,
+      "height": 18,
+      "props": {
+        "text": "BOOST BAR",
+        "style": {
+          "size": 16,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "boost",
+      "type": "value.digital",
+      "x": 1190,
+      "y": 296,
+      "width": 136,
+      "height": 87,
+      "binding": {
+        "signal": "engine.boost"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0.00",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 60,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 60,
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "BOOST BAR"
+    },
+    {
+      "id": "power-card",
+      "type": "rect",
+      "x": 1176,
+      "y": 417,
+      "width": 164,
+      "height": 135,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$surface"
+            },
+            {
+              "offset": 1,
+              "color": "$tile-bottom"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$tile-edge",
+          "width": 2
+        },
+        "radius": 10
+      },
+      "name": "POWER KW tile"
+    },
+    {
+      "id": "power-label",
+      "type": "text",
+      "x": 1190,
+      "y": 427,
+      "width": 136,
+      "height": 18,
+      "props": {
+        "text": "POWER KW",
+        "style": {
+          "size": 16,
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "power",
+      "type": "value.digital",
+      "x": 1190,
+      "y": 451,
+      "width": 136,
+      "height": 87,
+      "binding": {
+        "signal": "hybrid.battery.power"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": false,
+        "valueStyle": {
+          "size": 80,
+          "color": "$ev",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 80,
+          "color": "$ev",
+          "align": "left",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": [
+          {
+            "from": -200,
+            "to": -0.3,
+            "color": "$regen"
+          }
+        ]
+      },
+      "name": "POWER KW"
+    },
+    {
+      "id": "fuel",
+      "type": "value.digital",
+      "x": 1672,
+      "y": 292,
+      "width": 216,
+      "height": 44,
+      "binding": {
+        "signal": "vehicle.range",
+        "unit": "km"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 40,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 40,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      }
+    },
+    {
+      "id": "fuel-label",
+      "type": "text",
+      "x": 1672,
+      "y": 342,
+      "width": 216,
+      "height": 18,
+      "props": {
+        "text": "FUEL RANGE",
+        "style": {
+          "size": 15,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "elec",
+      "type": "value.digital",
+      "x": 1672,
+      "y": 400,
+      "width": 216,
+      "height": 44,
+      "binding": {
+        "signal": "hybrid.electric.range",
+        "unit": "km"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 40,
+          "color": "$ev",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 40,
+          "color": "$ev",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      }
+    },
+    {
+      "id": "elec-label",
+      "type": "text",
+      "x": 1672,
+      "y": 450,
+      "width": 216,
+      "height": 18,
+      "props": {
+        "text": "ELECTRIC",
+        "style": {
+          "size": 15,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "weight": "medium"
+        }
+      }
+    },
+    {
+      "id": "soc-value",
+      "type": "value.digital",
+      "x": 1672,
+      "y": 506,
+      "width": 216,
+      "height": 44,
+      "binding": {
+        "signal": "hybrid.battery.soc"
+      },
+      "props": {
+        "layout": "inline",
+        "format": "0",
+        "showUnit": true,
+        "valueStyle": {
+          "size": 40,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "bold"
+        },
+        "unitStyle": {
+          "size": 40,
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "weight": "medium"
+        },
+        "zones": []
+      },
+      "name": "Charge"
+    },
+    {
+      "id": "soc-bar",
+      "type": "gauge.bar",
+      "x": 1680,
+      "y": 562,
+      "width": 200,
+      "height": 16,
+      "binding": {
+        "signal": "hybrid.battery.soc"
+      },
+      "props": {
+        "track": {
+          "color": "$track",
+          "radius": 3
+        },
+        "fill": {
+          "color": "$ev",
+          "radius": 3,
+          "mode": "segments",
+          "segments": 16,
+          "segmentGap": 3
+        }
+      },
+      "name": "Charge bar"
+    }
+  ],
+  "meta": {
+    "tags": ["community", "converted"]
+  }
+}

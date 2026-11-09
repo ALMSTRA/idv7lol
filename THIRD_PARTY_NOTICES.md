@@ -15,9 +15,12 @@ The Studio's interface icons come from [Lucide](https://lucide.dev) (ISC licence
 `lucide-react` package.
 
 Reference projects studied but **not copied** (their code stays under their own licences and
-is not part of idv7lol): eroobeeroo/idrive7-apps
-and eroobeeroo/idrive7-cluster-info (GPL-3.0-or-later), robertnisipeanu/mgu-store
-(GPL-3.0-or-later).
+is not part of idv7lol): eroobeeroo/idrive7-apps and robertnisipeanu/mgu-store (GPL-3.0-or-later).
+
+`themes/community/` holds hand conversions of the seven layouts in
+[eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info), Copyright (C)
+2026 eroobeeroo, GPL-3.0-or-later. Their arrangement, proportions, colours and readouts were carried
+over; no upstream code, shader, font or image was copied. See `themes/community/README.md`.
 
 Runtime dependencies of the Studio and tooling (React, Vite, Tauri, zod, zustand, …) are
 listed with their licences in the generated `apps/studio/src-tauri/THIRD_PARTY.txt` and

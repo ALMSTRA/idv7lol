@@ -24,7 +24,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "themes:validate": "tsx packages/theme-compiler/src/cli.ts validate themes/*/theme.json",
+    "themes:validate": "tsx packages/theme-compiler/src/cli.ts validate themes/*/theme.json themes/examples/*/theme.json themes/community/*/theme.json",
     "themes:build": "tsx packages/theme-compiler/src/cli.ts build themes/*/theme.json --out dist/themes"
   },
   "devDependencies": {
