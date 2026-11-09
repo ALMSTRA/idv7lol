@@ -11,3 +11,7 @@ apps/studio/src-tauri/icons/
 *.icns
 package-lock.json
 CHANGELOG.md
+apps/studio/public/fonts/
+apps/idv7lol/fonts/
+apps/studio/src-tauri/gen/
+apps/studio/dist/

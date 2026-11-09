@@ -1,0 +1,755 @@
+{
+  "schemaVersion": 1,
+  "id": "idv7lol-performance",
+  "name": "IDV7LOL Performance",
+  "version": "0.1.0",
+  "author": "idv7lol contributors",
+  "description": "Sport-oriented layout: a dominant segmented tachometer with shift lights, digital speed in the centre, boost gauge, oil and coolant bars, fuel and trip data.",
+  "license": "GPL-3.0-or-later",
+  "target": {
+    "platform": "idrive7-mgu",
+    "display": "kombi-id7-12.3",
+    "renderer": "cluster-render"
+  },
+  "vehicleProfile": "turbo-ice-sport",
+  "layout": {
+    "width": 1920,
+    "height": 720,
+    "background": "$background",
+    "reservedZones": [
+      {
+        "id": "cowl",
+        "name": "Top cowl (factory telltales)",
+        "kind": "factory",
+        "x": 730,
+        "y": 0,
+        "width": 460,
+        "height": 128
+      },
+      {
+        "id": "gear-bracket",
+        "name": "Gear bracket (factory gear display)",
+        "kind": "factory",
+        "x": 1410,
+        "y": 262,
+        "width": 252,
+        "height": 192
+      },
+      {
+        "id": "edrive-box",
+        "name": "eDrive status box (hybrids)",
+        "kind": "factory",
+        "x": 1770,
+        "y": 170,
+        "width": 150,
+        "height": 95
+      },
+      {
+        "id": "telltales-bottom",
+        "name": "Bottom telltale strip",
+        "kind": "factory",
+        "x": 560,
+        "y": 652,
+        "width": 960,
+        "height": 68
+      },
+      {
+        "id": "glass-corner-left",
+        "name": "Glass corner (left)",
+        "kind": "keep-clear",
+        "x": 0,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          { "x": 0, "y": 0 },
+          { "x": 394.54545454545456, "y": 0 },
+          { "x": 0, "y": 217 }
+        ]
+      },
+      {
+        "id": "glass-corner-right",
+        "name": "Glass corner (right)",
+        "kind": "keep-clear",
+        "x": 1525.4545454545455,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          { "x": 1920, "y": 0 },
+          { "x": 1525.4545454545455, "y": 0 },
+          { "x": 1920, "y": 217 }
+        ]
+      },
+      {
+        "id": "stock-map-window",
+        "name": "Stock map window (slot 0x100)",
+        "kind": "info",
+        "x": 416,
+        "y": 120,
+        "width": 1088,
+        "height": 480
+      }
+    ]
+  },
+  "palettes": {
+    "night": {
+      "name": "Night",
+      "colors": {
+        "background": "#000000",
+        "surface": "#111419",
+        "text": "#f2f4f7",
+        "text-muted": "#8a93a1",
+        "accent": "#3f8cff",
+        "track": "#1c2129",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff3b3b",
+        "cold": "#4fb3ff"
+      }
+    },
+    "sport": {
+      "name": "Sport",
+      "colors": {
+        "background": "#000000",
+        "surface": "#17100f",
+        "text": "#ffffff",
+        "text-muted": "#a4908c",
+        "accent": "#ff3a2d",
+        "track": "#2a1b18",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff3b3b",
+        "cold": "#4fb3ff"
+      }
+    },
+    "track": {
+      "name": "Track",
+      "colors": {
+        "background": "#000000",
+        "surface": "#141414",
+        "text": "#ffffff",
+        "text-muted": "#9a9a9a",
+        "accent": "#ffd400",
+        "track": "#262626",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff3b3b",
+        "cold": "#4fb3ff"
+      }
+    }
+  },
+  "palette": {
+    "default": "night",
+    "byDriveMode": { "SPORT": "sport", "SPORT_PLUS": "sport", "TRACK": "track" },
+    "allowManual": true
+  },
+  "fonts": { "default": { "family": "sans" } },
+  "assets": {},
+  "animations": {
+    "fade-in": {
+      "name": "Fade in",
+      "duration": 700,
+      "easing": "ease-out-cubic",
+      "loop": false,
+      "direction": "normal",
+      "tracks": [
+        {
+          "property": "opacity",
+          "keyframes": [
+            { "t": 0, "value": 0 },
+            { "t": 1, "value": 1 }
+          ]
+        }
+      ]
+    },
+    "redline-pulse": {
+      "name": "Redline pulse",
+      "duration": 260,
+      "easing": "ease-in-out",
+      "loop": true,
+      "direction": "alternate",
+      "tracks": [
+        {
+          "property": "props.style.color",
+          "keyframes": [
+            { "t": 0, "value": "#ffffff" },
+            { "t": 1, "value": "#ff3b3b" }
+          ]
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "bg",
+      "name": "Background",
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 720,
+      "locked": true,
+      "props": { "fill": "$background" }
+    },
+
+    {
+      "id": "shift-lights",
+      "name": "Shift lights",
+      "type": "indicator.shiftlights",
+      "x": 660,
+      "y": 134,
+      "width": 600,
+      "height": 26,
+      "binding": { "signal": "engine.rpm", "min": 0, "max": 8000 },
+      "props": {
+        "count": 12,
+        "shape": "pill",
+        "gap": 6,
+        "from": 5200,
+        "to": 7200,
+        "flashAbove": 7300,
+        "flashRateHz": 7,
+        "colors": [
+          "$success",
+          "$success",
+          "$success",
+          "$success",
+          "$warning",
+          "$warning",
+          "$warning",
+          "$warning",
+          "$danger",
+          "$danger",
+          "$danger",
+          "$danger"
+        ],
+        "offColor": "$track",
+        "symmetric": false,
+        "glow": true
+      }
+    },
+
+    {
+      "id": "tacho",
+      "name": "Tachometer",
+      "type": "gauge.arc",
+      "x": 710,
+      "y": 150,
+      "width": 500,
+      "height": 500,
+      "binding": { "signal": "engine.rpm", "min": 0, "max": 8000, "smoothing": 0.06 },
+      "animations": [{ "clip": "fade-in", "trigger": { "on": "load" } }],
+      "props": {
+        "startAngle": 135,
+        "sweepAngle": 270,
+        "track": { "show": true, "color": "$track", "width": 18, "cap": "butt" },
+        "fill": {
+          "show": true,
+          "color": "$accent",
+          "width": 18,
+          "mode": "segments",
+          "segments": 48,
+          "segmentGap": 1.2,
+          "cap": "butt",
+          "zones": [{ "from": 7000, "to": 8000, "color": "$danger" }]
+        },
+        "ticks": {
+          "major": 8,
+          "minor": 4,
+          "majorLength": 16,
+          "minorLength": 8,
+          "majorWidth": 3,
+          "minorWidth": 1.5,
+          "color": "$text",
+          "minorColor": "$text-muted",
+          "inset": 6,
+          "redlineColor": "$danger"
+        },
+        "labels": {
+          "show": true,
+          "every": 1,
+          "style": {
+            "size": 26,
+            "weight": "medium",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "divisor": 1000,
+          "format": "0",
+          "inset": 30
+        },
+        "needle": { "show": false },
+        "redline": {
+          "show": true,
+          "from": 7000,
+          "color": "$danger",
+          "width": 8,
+          "placement": "outer"
+        },
+        "valueText": { "show": false },
+        "glow": { "show": true, "color": "$accent", "blur": 16 }
+      }
+    },
+
+    {
+      "id": "speed",
+      "name": "Speed",
+      "type": "value.digital",
+      "x": 810,
+      "y": 300,
+      "width": 300,
+      "height": 170,
+      "binding": { "signal": "vehicle.speed" },
+      "animations": [{ "clip": "fade-in", "trigger": { "on": "load" }, "delay": 150 }],
+      "props": {
+        "format": "0",
+        "unit": "kmh",
+        "showUnit": true,
+        "label": "",
+        "layout": "stacked",
+        "valueStyle": {
+          "size": 126,
+          "weight": "bold",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": -2
+        },
+        "unitStyle": {
+          "size": 24,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle"
+        },
+        "zones": [],
+        "tabular": true
+      }
+    },
+
+    {
+      "id": "gear",
+      "name": "Gear",
+      "type": "indicator.gear",
+      "x": 900,
+      "y": 560,
+      "width": 120,
+      "height": 84,
+      "binding": { "signal": "transmission.gear" },
+      "animations": [
+        {
+          "clip": "redline-pulse",
+          "trigger": {
+            "on": "while",
+            "condition": { "signal": "engine.rpm", "op": "gte", "value": 7000 }
+          }
+        }
+      ],
+      "props": {
+        "style": {
+          "size": 60,
+          "weight": "bold",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle"
+        },
+        "showMode": true,
+        "modeStyle": {
+          "size": 20,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle"
+        },
+        "modeSignal": "transmission.mode",
+        "manualColor": "$accent",
+        "mapping": {}
+      }
+    },
+
+    {
+      "id": "drive-mode",
+      "name": "Driving mode",
+      "type": "text",
+      "x": 440,
+      "y": 150,
+      "width": 200,
+      "height": 30,
+      "binding": { "signal": "drive.mode", "fallback": "hide" },
+      "props": {
+        "text": "{value}",
+        "style": {
+          "size": 22,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "uppercase": true
+        }
+      }
+    },
+
+    {
+      "id": "turn-left",
+      "name": "Turn signal left",
+      "type": "telltale",
+      "x": 596,
+      "y": 134,
+      "width": 40,
+      "height": 40,
+      "binding": { "signal": "light.turn.left", "fallback": "hide" },
+      "props": {
+        "icon": "turn-left",
+        "onColor": "$success",
+        "offColor": "$track",
+        "hideWhenOff": false
+      }
+    },
+    {
+      "id": "turn-right",
+      "name": "Turn signal right",
+      "type": "telltale",
+      "x": 1284,
+      "y": 134,
+      "width": 40,
+      "height": 40,
+      "binding": { "signal": "light.turn.right", "fallback": "hide" },
+      "props": {
+        "icon": "turn-right",
+        "onColor": "$success",
+        "offColor": "$track",
+        "hideWhenOff": false
+      }
+    },
+
+    {
+      "id": "boost",
+      "name": "Boost",
+      "type": "gauge.arc",
+      "x": 110,
+      "y": 190,
+      "width": 300,
+      "height": 300,
+      "binding": { "signal": "engine.boost", "unit": "bar", "min": -1, "max": 2, "smoothing": 0.1 },
+      "props": {
+        "startAngle": 135,
+        "sweepAngle": 270,
+        "track": { "show": true, "color": "$track", "width": 10 },
+        "fill": {
+          "show": true,
+          "color": "$accent",
+          "width": 10,
+          "mode": "solid",
+          "zones": [{ "from": 1.6, "to": 2, "color": "$danger" }]
+        },
+        "ticks": {
+          "major": 6,
+          "minor": 1,
+          "majorLength": 10,
+          "minorLength": 5,
+          "majorWidth": 2,
+          "minorWidth": 1,
+          "color": "$text-muted",
+          "inset": 4
+        },
+        "labels": { "show": false },
+        "needle": {
+          "show": true,
+          "color": "$text",
+          "width": 4,
+          "length": 0.72,
+          "tail": 0.08,
+          "shape": "tapered",
+          "cap": { "show": true, "radius": 8, "color": "$surface" }
+        },
+        "valueText": {
+          "show": true,
+          "style": {
+            "size": 44,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "format": "+0.00",
+          "unit": "bar",
+          "showUnit": true,
+          "unitStyle": {
+            "size": 18,
+            "color": "$text-muted",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "offsetY": 56
+        }
+      }
+    },
+    {
+      "id": "boost-label",
+      "name": "Boost label",
+      "type": "text",
+      "x": 110,
+      "y": 494,
+      "width": 300,
+      "height": 24,
+      "props": {
+        "text": "BOOST",
+        "style": {
+          "size": 20,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 3
+        }
+      }
+    },
+
+    {
+      "id": "oil-label",
+      "name": "Oil label",
+      "type": "text",
+      "x": 110,
+      "y": 540,
+      "width": 400,
+      "height": 24,
+      "binding": { "signal": "engine.oil.temp" },
+      "props": {
+        "text": "OIL   {value}{unit}",
+        "format": "0",
+        "style": {
+          "size": 20,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 1
+        }
+      }
+    },
+    {
+      "id": "oil-bar",
+      "name": "Oil temperature",
+      "type": "gauge.bar",
+      "x": 110,
+      "y": 568,
+      "width": 400,
+      "height": 14,
+      "binding": { "signal": "engine.oil.temp", "min": 40, "max": 160, "smoothing": 0.3 },
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": { "show": true, "color": "$track", "radius": 3 },
+        "fill": {
+          "color": "$accent",
+          "radius": 3,
+          "mode": "solid",
+          "zones": [
+            { "from": 40, "to": 75, "color": "$cold" },
+            { "from": 130, "to": 160, "color": "$danger" }
+          ]
+        },
+        "marker": { "show": true, "value": 75, "color": "$text-muted", "width": 2 }
+      }
+    },
+
+    {
+      "id": "coolant-label",
+      "name": "Coolant label",
+      "type": "text",
+      "x": 110,
+      "y": 596,
+      "width": 400,
+      "height": 24,
+      "binding": { "signal": "engine.coolant.temp" },
+      "props": {
+        "text": "COOLANT   {value}{unit}",
+        "format": "0",
+        "style": {
+          "size": 20,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 1
+        }
+      }
+    },
+    {
+      "id": "coolant-bar",
+      "name": "Coolant temperature",
+      "type": "gauge.bar",
+      "x": 110,
+      "y": 624,
+      "width": 400,
+      "height": 14,
+      "binding": { "signal": "engine.coolant.temp", "min": 40, "max": 140, "smoothing": 0.3 },
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": { "show": true, "color": "$track", "radius": 3 },
+        "fill": {
+          "color": "$accent",
+          "radius": 3,
+          "mode": "solid",
+          "zones": [
+            { "from": 40, "to": 75, "color": "$cold" },
+            { "from": 115, "to": 140, "color": "$danger" }
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "trip-panel",
+      "name": "Trip data",
+      "type": "status.panel",
+      "x": 1410,
+      "y": 470,
+      "width": 400,
+      "height": 96,
+      "props": {
+        "rows": [
+          {
+            "label": "RANGE",
+            "binding": { "signal": "vehicle.range" },
+            "format": "0",
+            "unit": "km",
+            "showUnit": true
+          },
+          {
+            "label": "BATTERY",
+            "binding": { "signal": "electrical.battery.voltage" },
+            "format": "0.0",
+            "unit": "volt",
+            "showUnit": true
+          }
+        ],
+        "rowHeight": 40,
+        "padding": 8,
+        "labelStyle": {
+          "size": 18,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 1
+        },
+        "valueStyle": {
+          "size": 26,
+          "weight": "medium",
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle"
+        },
+        "unitStyle": { "size": 16, "color": "$text-muted", "align": "left", "baseline": "middle" },
+        "radius": 0
+      }
+    },
+
+    {
+      "id": "fuel-label",
+      "name": "Fuel label",
+      "type": "text",
+      "x": 1410,
+      "y": 596,
+      "width": 400,
+      "height": 24,
+      "binding": { "signal": "fuel.level" },
+      "props": {
+        "text": "FUEL   {value}{unit}",
+        "format": "0",
+        "style": {
+          "size": 20,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 1
+        }
+      }
+    },
+    {
+      "id": "fuel-bar",
+      "name": "Fuel level",
+      "type": "gauge.bar",
+      "x": 1410,
+      "y": 624,
+      "width": 400,
+      "height": 14,
+      "binding": { "signal": "fuel.level", "smoothing": 0.5 },
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": { "show": true, "color": "$track", "radius": 3 },
+        "fill": {
+          "color": "$accent",
+          "radius": 3,
+          "mode": "solid",
+          "zones": [{ "from": 0, "to": 15, "color": "$danger" }]
+        },
+        "marker": { "show": true, "value": 15, "color": "$text-muted", "width": 2 }
+      }
+    },
+
+    {
+      "id": "clock",
+      "name": "Clock",
+      "type": "clock",
+      "x": 1680,
+      "y": 300,
+      "width": 220,
+      "height": 48,
+      "props": {
+        "format": "24h",
+        "showSeconds": false,
+        "showSuffix": false,
+        "style": {
+          "size": 40,
+          "weight": "medium",
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle"
+        }
+      }
+    },
+    {
+      "id": "outside-temp",
+      "name": "Outside temperature",
+      "type": "text",
+      "x": 1680,
+      "y": 352,
+      "width": 220,
+      "height": 30,
+      "binding": { "signal": "environment.outside.temp" },
+      "props": {
+        "text": "{value}{unit}",
+        "format": "0.0",
+        "style": { "size": 24, "color": "$text-muted", "align": "right", "baseline": "middle" }
+      }
+    },
+    {
+      "id": "consumption",
+      "name": "Instant consumption",
+      "type": "text",
+      "x": 1680,
+      "y": 386,
+      "width": 220,
+      "height": 30,
+      "binding": { "signal": "fuel.consumption.instant" },
+      "props": {
+        "text": "{value} {unit}",
+        "format": "0.0",
+        "style": { "size": 22, "color": "$text-muted", "align": "right", "baseline": "middle" }
+      }
+    }
+  ],
+  "meta": {
+    "createdWith": "idv7lol",
+    "tags": ["sport", "turbo", "shift-lights"],
+    "preview": "preview.png"
+  }
+}

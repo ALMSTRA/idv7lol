@@ -42,3 +42,4 @@ bmw-sdk/
 
 # Local scratch
 .scratch/
+apps/studio/dist/

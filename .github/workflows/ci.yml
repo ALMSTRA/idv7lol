@@ -30,8 +30,12 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - name: Validate bundled themes
+        run: npm run themes:validate
       - name: Build packages
         run: npm run build
+      - name: Build Studio front end
+        run: npm run build -w @idv7lol/studio
 
   secrets:
     name: Secret scan
@@ -45,3 +49,31 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  studio-windows:
+    name: Build Studio (Windows)
+    # The desktop build is slow: run it for pushes to main and tags, and for PRs that touch the Studio.
+    if: github.event_name == 'push' || contains(github.event.pull_request.title, 'studio')
+    needs: check
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/studio/src-tauri
+      - run: npm ci
+      - name: Build Studio installer
+        run: npm run tauri:build
+      - name: Upload development artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: idv7lol-studio-windows
+          path: |
+            apps/studio/src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: warn
+          retention-days: 14

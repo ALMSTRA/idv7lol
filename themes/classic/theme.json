@@ -1,0 +1,691 @@
+{
+  "schemaVersion": 1,
+  "id": "idv7lol-classic",
+  "name": "IDV7LOL Classic",
+  "version": "0.1.0",
+  "author": "idv7lol contributors",
+  "description": "Analogue inspiration: two round dials with needles for speed and revs, amber illumination, a small oil-temperature dial, fuel and coolant bars and a classic clock.",
+  "license": "GPL-3.0-or-later",
+  "target": {
+    "platform": "idrive7-mgu",
+    "display": "kombi-id7-12.3",
+    "renderer": "cluster-render"
+  },
+  "vehicleProfile": "turbo-ice",
+  "layout": {
+    "width": 1920,
+    "height": 720,
+    "background": {
+      "type": "linear",
+      "angle": 90,
+      "stops": [
+        { "offset": 0, "color": "$surface" },
+        { "offset": 1, "color": "$background" }
+      ]
+    },
+    "reservedZones": [
+      {
+        "id": "cowl",
+        "name": "Top cowl (factory telltales)",
+        "kind": "factory",
+        "x": 730,
+        "y": 0,
+        "width": 460,
+        "height": 128
+      },
+      {
+        "id": "gear-bracket",
+        "name": "Gear bracket (factory gear display)",
+        "kind": "factory",
+        "x": 1410,
+        "y": 262,
+        "width": 252,
+        "height": 192
+      },
+      {
+        "id": "edrive-box",
+        "name": "eDrive status box (hybrids)",
+        "kind": "factory",
+        "x": 1770,
+        "y": 170,
+        "width": 150,
+        "height": 95
+      },
+      {
+        "id": "telltales-bottom",
+        "name": "Bottom telltale strip",
+        "kind": "factory",
+        "x": 560,
+        "y": 652,
+        "width": 960,
+        "height": 68
+      },
+      {
+        "id": "glass-corner-left",
+        "name": "Glass corner (left)",
+        "kind": "keep-clear",
+        "x": 0,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          { "x": 0, "y": 0 },
+          { "x": 394.54545454545456, "y": 0 },
+          { "x": 0, "y": 217 }
+        ]
+      },
+      {
+        "id": "glass-corner-right",
+        "name": "Glass corner (right)",
+        "kind": "keep-clear",
+        "x": 1525.4545454545455,
+        "y": 0,
+        "width": 394.54545454545456,
+        "height": 217,
+        "polygon": [
+          { "x": 1920, "y": 0 },
+          { "x": 1525.4545454545455, "y": 0 },
+          { "x": 1920, "y": 217 }
+        ]
+      },
+      {
+        "id": "stock-map-window",
+        "name": "Stock map window (slot 0x100)",
+        "kind": "info",
+        "x": 416,
+        "y": 120,
+        "width": 1088,
+        "height": 480
+      }
+    ]
+  },
+  "palettes": {
+    "amber": {
+      "name": "Amber",
+      "colors": {
+        "background": "#000000",
+        "surface": "#0e0d0b",
+        "text": "#f3ecd8",
+        "text-muted": "#998f78",
+        "accent": "#ff8a1f",
+        "track": "#262219",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff3b3b",
+        "needle": "#e8422f",
+        "chrome": "#5a5751"
+      }
+    },
+    "sport": {
+      "name": "Sport",
+      "colors": {
+        "background": "#000000",
+        "surface": "#120c0c",
+        "text": "#fff4f1",
+        "text-muted": "#a08a86",
+        "accent": "#ff3b3b",
+        "track": "#2a1a19",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff3b3b",
+        "needle": "#ff3b3b",
+        "chrome": "#5c5556"
+      }
+    }
+  },
+  "palette": {
+    "default": "amber",
+    "byDriveMode": { "SPORT": "sport", "SPORT_PLUS": "sport" },
+    "allowManual": true
+  },
+  "fonts": { "default": { "family": "sans" }, "condensed": { "family": "sans-condensed" } },
+  "assets": {},
+  "animations": {
+    "fade-in": {
+      "name": "Fade in",
+      "duration": 800,
+      "easing": "ease-out-cubic",
+      "loop": false,
+      "direction": "normal",
+      "tracks": [
+        {
+          "property": "opacity",
+          "keyframes": [
+            { "t": 0, "value": 0 },
+            { "t": 1, "value": 1 }
+          ]
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "bg",
+      "name": "Background",
+      "type": "rect",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 720,
+      "locked": true,
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            { "offset": 0, "color": "$surface" },
+            { "offset": 1, "color": "$background" }
+          ]
+        }
+      }
+    },
+
+    {
+      "id": "speed-dial",
+      "name": "Speedometer",
+      "type": "gauge.arc",
+      "x": 470,
+      "y": 170,
+      "width": 400,
+      "height": 400,
+      "binding": { "signal": "vehicle.speed", "min": 0, "max": 260, "smoothing": 0.12 },
+      "animations": [{ "clip": "fade-in", "trigger": { "on": "load" } }],
+      "props": {
+        "startAngle": 135,
+        "sweepAngle": 270,
+        "track": { "show": true, "color": "$chrome", "width": 3 },
+        "fill": { "show": false },
+        "ticks": {
+          "major": 13,
+          "minor": 1,
+          "majorLength": 16,
+          "minorLength": 8,
+          "majorWidth": 3,
+          "minorWidth": 1.5,
+          "color": "$text",
+          "minorColor": "$text-muted",
+          "inset": 8
+        },
+        "labels": {
+          "show": true,
+          "every": 2,
+          "style": {
+            "size": 24,
+            "weight": "medium",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "divisor": 1,
+          "format": "0",
+          "inset": 28
+        },
+        "needle": {
+          "show": true,
+          "color": "$needle",
+          "width": 7,
+          "length": 0.9,
+          "tail": 0.14,
+          "shape": "tapered",
+          "cap": { "show": true, "radius": 16, "color": "$chrome" }
+        },
+        "redline": { "show": false },
+        "valueText": {
+          "show": true,
+          "style": {
+            "size": 54,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "format": "0",
+          "unit": "kmh",
+          "showUnit": true,
+          "unitStyle": {
+            "size": 18,
+            "color": "$text-muted",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "offsetY": 92
+        }
+      }
+    },
+
+    {
+      "id": "rpm-dial",
+      "name": "Rev counter",
+      "type": "gauge.arc",
+      "x": 1000,
+      "y": 170,
+      "width": 400,
+      "height": 400,
+      "binding": { "signal": "engine.rpm", "min": 0, "max": 8000, "smoothing": 0.06 },
+      "animations": [{ "clip": "fade-in", "trigger": { "on": "load" }, "delay": 100 }],
+      "props": {
+        "startAngle": 135,
+        "sweepAngle": 270,
+        "track": { "show": true, "color": "$chrome", "width": 3 },
+        "fill": { "show": false },
+        "ticks": {
+          "major": 8,
+          "minor": 4,
+          "majorLength": 16,
+          "minorLength": 8,
+          "majorWidth": 3,
+          "minorWidth": 1.5,
+          "color": "$text",
+          "minorColor": "$text-muted",
+          "inset": 8,
+          "redlineColor": "$danger"
+        },
+        "labels": {
+          "show": true,
+          "every": 1,
+          "style": {
+            "size": 26,
+            "weight": "medium",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "divisor": 1000,
+          "format": "0",
+          "inset": 28
+        },
+        "needle": {
+          "show": true,
+          "color": "$needle",
+          "width": 7,
+          "length": 0.9,
+          "tail": 0.14,
+          "shape": "tapered",
+          "cap": { "show": true, "radius": 16, "color": "$chrome" }
+        },
+        "redline": {
+          "show": true,
+          "from": 6500,
+          "color": "$danger",
+          "width": 10,
+          "placement": "track"
+        },
+        "valueText": { "show": false }
+      }
+    },
+    {
+      "id": "rpm-caption",
+      "name": "RPM caption",
+      "type": "text",
+      "x": 1100,
+      "y": 440,
+      "width": 200,
+      "height": 24,
+      "props": {
+        "text": "x1000 rpm",
+        "style": {
+          "size": 18,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 1
+        }
+      }
+    },
+
+    {
+      "id": "gear",
+      "name": "Gear",
+      "type": "indicator.gear",
+      "x": 880,
+      "y": 300,
+      "width": 110,
+      "height": 140,
+      "binding": { "signal": "transmission.gear" },
+      "props": {
+        "style": {
+          "size": 84,
+          "weight": "bold",
+          "color": "$accent",
+          "align": "center",
+          "baseline": "middle"
+        },
+        "showMode": true,
+        "modeStyle": {
+          "size": 20,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2
+        },
+        "modeSignal": "transmission.mode",
+        "mapping": {}
+      }
+    },
+
+    {
+      "id": "oil-dial",
+      "name": "Oil temperature",
+      "type": "gauge.arc",
+      "x": 150,
+      "y": 260,
+      "width": 240,
+      "height": 240,
+      "binding": { "signal": "engine.oil.temp", "min": 40, "max": 160, "smoothing": 0.4 },
+      "props": {
+        "startAngle": 135,
+        "sweepAngle": 270,
+        "track": { "show": true, "color": "$chrome", "width": 2 },
+        "fill": { "show": false },
+        "ticks": {
+          "major": 6,
+          "minor": 1,
+          "majorLength": 10,
+          "minorLength": 5,
+          "majorWidth": 2,
+          "minorWidth": 1,
+          "color": "$text",
+          "minorColor": "$text-muted",
+          "inset": 6,
+          "redlineColor": "$danger"
+        },
+        "labels": {
+          "show": true,
+          "every": 3,
+          "style": {
+            "size": 18,
+            "weight": "medium",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "divisor": 1,
+          "format": "0",
+          "inset": 22
+        },
+        "needle": {
+          "show": true,
+          "color": "$needle",
+          "width": 4,
+          "length": 0.86,
+          "tail": 0.12,
+          "shape": "tapered",
+          "cap": { "show": true, "radius": 9, "color": "$chrome" }
+        },
+        "redline": {
+          "show": true,
+          "from": 135,
+          "color": "$danger",
+          "width": 6,
+          "placement": "track"
+        },
+        "valueText": {
+          "show": true,
+          "style": {
+            "size": 30,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "format": "0",
+          "unit": "celsius",
+          "showUnit": true,
+          "unitStyle": {
+            "size": 14,
+            "color": "$text-muted",
+            "align": "center",
+            "baseline": "middle"
+          },
+          "offsetY": 52
+        }
+      }
+    },
+    {
+      "id": "oil-caption",
+      "name": "Oil caption",
+      "type": "text",
+      "x": 150,
+      "y": 506,
+      "width": 240,
+      "height": 24,
+      "props": {
+        "text": "OIL",
+        "style": {
+          "size": 18,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 3
+        }
+      }
+    },
+
+    {
+      "id": "fuel-caption",
+      "name": "Fuel caption",
+      "type": "text",
+      "x": 470,
+      "y": 588,
+      "width": 400,
+      "height": 22,
+      "binding": { "signal": "fuel.level" },
+      "props": {
+        "text": "FUEL   {value}{unit}",
+        "format": "0",
+        "style": {
+          "size": 18,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "fuel-bar",
+      "name": "Fuel",
+      "type": "gauge.bar",
+      "x": 470,
+      "y": 614,
+      "width": 400,
+      "height": 10,
+      "binding": { "signal": "fuel.level", "smoothing": 0.5 },
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": { "show": true, "color": "$track", "radius": 2 },
+        "fill": {
+          "color": "$accent",
+          "radius": 2,
+          "mode": "segments",
+          "segments": 20,
+          "segmentGap": 3,
+          "zones": [{ "from": 0, "to": 15, "color": "$danger" }]
+        },
+        "ticks": {
+          "show": true,
+          "count": 5,
+          "color": "$text-muted",
+          "length": 5,
+          "width": 1.5,
+          "side": "after"
+        }
+      }
+    },
+
+    {
+      "id": "coolant-caption",
+      "name": "Coolant caption",
+      "type": "text",
+      "x": 1000,
+      "y": 588,
+      "width": 400,
+      "height": 22,
+      "binding": { "signal": "engine.coolant.temp" },
+      "props": {
+        "text": "COOLANT   {value}{unit}",
+        "format": "0",
+        "style": {
+          "size": 18,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 2
+        }
+      }
+    },
+    {
+      "id": "coolant-bar",
+      "name": "Coolant",
+      "type": "gauge.bar",
+      "x": 1000,
+      "y": 614,
+      "width": 400,
+      "height": 10,
+      "binding": { "signal": "engine.coolant.temp", "min": 40, "max": 140, "smoothing": 0.4 },
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": { "show": true, "color": "$track", "radius": 2 },
+        "fill": {
+          "color": "$accent",
+          "radius": 2,
+          "mode": "segments",
+          "segments": 20,
+          "segmentGap": 3,
+          "zones": [{ "from": 115, "to": 140, "color": "$danger" }]
+        },
+        "ticks": {
+          "show": true,
+          "count": 5,
+          "color": "$text-muted",
+          "length": 5,
+          "width": 1.5,
+          "side": "after"
+        }
+      }
+    },
+
+    {
+      "id": "clock",
+      "name": "Clock",
+      "type": "clock",
+      "x": 860,
+      "y": 584,
+      "width": 150,
+      "height": 40,
+      "props": {
+        "format": "24h",
+        "showSeconds": false,
+        "showSuffix": false,
+        "style": {
+          "font": "condensed",
+          "size": 34,
+          "weight": "medium",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle"
+        }
+      }
+    },
+    {
+      "id": "odometer",
+      "name": "Odometer",
+      "type": "text",
+      "x": 860,
+      "y": 622,
+      "width": 150,
+      "height": 24,
+      "binding": { "signal": "vehicle.odometer" },
+      "props": {
+        "text": "{value} km",
+        "format": "0,0",
+        "style": {
+          "font": "condensed",
+          "size": 18,
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle"
+        }
+      }
+    },
+
+    {
+      "id": "range",
+      "name": "Range",
+      "type": "text",
+      "x": 1450,
+      "y": 480,
+      "width": 320,
+      "height": 40,
+      "binding": { "signal": "vehicle.range" },
+      "props": {
+        "text": "RANGE  {value} km",
+        "format": "0",
+        "style": {
+          "size": 24,
+          "weight": "medium",
+          "color": "$text",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 1
+        }
+      }
+    },
+    {
+      "id": "outside",
+      "name": "Outside temperature",
+      "type": "text",
+      "x": 1450,
+      "y": 524,
+      "width": 320,
+      "height": 36,
+      "binding": { "signal": "environment.outside.temp" },
+      "props": {
+        "text": "OUTSIDE  {value}{unit}",
+        "format": "0.0",
+        "style": {
+          "size": 22,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 1
+        }
+      }
+    },
+    {
+      "id": "drive-mode",
+      "name": "Driving mode",
+      "type": "text",
+      "x": 1450,
+      "y": 566,
+      "width": 320,
+      "height": 36,
+      "binding": { "signal": "drive.mode", "fallback": "hide" },
+      "props": {
+        "text": "{value}",
+        "style": {
+          "size": 22,
+          "weight": "medium",
+          "color": "$accent",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 3,
+          "uppercase": true
+        }
+      }
+    }
+  ],
+  "meta": {
+    "createdWith": "idv7lol",
+    "tags": ["analog", "classic", "needles"],
+    "preview": "preview.png"
+  }
+}

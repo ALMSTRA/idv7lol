@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "id": "example-minimal",
+  "name": "Example: minimal",
+  "version": "0.1.0",
+  "author": "idv7lol contributors",
+  "description": "The smallest useful theme: a digital speed, a rev bar and the gear. Start here when writing a theme by hand.",
+  "license": "GPL-3.0-or-later",
+  "vehicleProfile": "generic-ice",
+  "layout": { "width": 1920, "height": 720, "background": "$background" },
+  "palettes": {
+    "night": {
+      "name": "Night",
+      "colors": {
+        "background": "#000000",
+        "surface": "#15181d",
+        "text": "#f4f6f8",
+        "text-muted": "#8d96a3",
+        "accent": "#3f8cff",
+        "track": "#262b33",
+        "success": "#3ddc84",
+        "warning": "#ffb020",
+        "danger": "#ff3b3b"
+      }
+    }
+  },
+  "palette": { "default": "night" },
+  "components": [
+    {
+      "id": "rev-bar",
+      "type": "gauge.bar",
+      "x": 560,
+      "y": 160,
+      "width": 800,
+      "height": 16,
+      "binding": { "signal": "engine.rpm", "min": 0, "max": 7000, "smoothing": 0.06 },
+      "props": {
+        "fill": { "color": "$accent", "zones": [{ "from": 6000, "to": 7000, "color": "$danger" }] }
+      }
+    },
+    {
+      "id": "speed",
+      "type": "value.digital",
+      "x": 660,
+      "y": 240,
+      "width": 600,
+      "height": 260,
+      "binding": { "signal": "vehicle.speed" },
+      "props": { "format": "0", "unit": "kmh", "showUnit": true }
+    },
+    {
+      "id": "gear",
+      "type": "indicator.gear",
+      "x": 1180,
+      "y": 520,
+      "width": 120,
+      "height": 100,
+      "binding": { "signal": "transmission.gear" },
+      "props": {
+        "style": {
+          "size": 64,
+          "weight": "bold",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle"
+        }
+      }
+    }
+  ]
+}
