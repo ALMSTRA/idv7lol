@@ -4,13 +4,15 @@ idv7lol's own code is licensed under GPL-3.0-or-later (see `LICENSE`). The follo
 third-party material is included or will be included with its own licence. Each entry is
 updated when the material is added to the repository.
 
-| Material                                              | Origin                                                                                                                                                             | Licence                   | Where                                                     |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- | --------------------------------------------------------- |
-| cluster-render protocol and JavaScript client         | Robert Nisipeanu, [robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps) `native/cluster-render/js/cluster_render_client.js`, `PROTOCOL.md` | MPL-2.0                   | `apps/mgu/` (planned, copied verbatim with header)        |
-| Barlow, Barlow Semi Condensed, Barlow Condensed fonts | Jeremy Tribby, [Barlow](https://github.com/jpt/barlow)                                                                                                             | SIL Open Font License 1.1 | `apps/studio/public/fonts/`, compiler SDF atlas (planned) |
+| Material                                              | Origin                                                                                                                                                             | Licence                   | Where                                                                                                         |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| cluster-render protocol and JavaScript client         | Robert Nisipeanu, [robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps) `native/cluster-render/js/cluster_render_client.js`, `PROTOCOL.md` | MPL-2.0                   | `apps/idv7lol/cluster_render_client.js` (copied verbatim with header)                                         |
+| Barlow, Barlow Semi Condensed, Barlow Condensed fonts | Jeremy Tribby, [Barlow](https://github.com/jpt/barlow)                                                                                                             | SIL Open Font License 1.1 | `apps/studio/public/fonts/*.r8`, `apps/idv7lol/font_*.wad` (baked SDF atlases); `@fontsource/*` in the Studio |
+
+| MGU App Kit (`kit/`: tools, runtime, platform, icons) | cauliflowermossgrape and contributors, [idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps) | MIT (`kit/LICENSE`) | `kit/` — vendored so the MGU Store can build the app on the head unit |
 
 Reference projects studied but **not copied** (their code stays under their own licences and
-is not part of idv7lol): cauliflowermossgrape/idrive7-apps (MIT kit), eroobeeroo/idrive7-apps
+is not part of idv7lol): eroobeeroo/idrive7-apps
 and eroobeeroo/idrive7-cluster-info (GPL-3.0-or-later), robertnisipeanu/mgu-store
 (GPL-3.0-or-later).
 

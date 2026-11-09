@@ -54,6 +54,8 @@ export interface CompiledBinding extends Binding {
   rangeMax: number;
   /** Signal kind from the catalog. */
   kind: 'number' | 'boolean' | 'enum' | 'string';
+  /** Unit the catalog delivers the signal in (before display conversion). */
+  catalogUnit: string;
   /** Unit symbol in display units. */
   unitSymbol: string;
 }

@@ -1,0 +1,15 @@
+idv7lol - BMW iDrive 7 custom cluster app
+Copyright (C) 2026 idv7lol contributors
+Licensed under GPL-3.0-or-later (see ../../LICENSE).
+
+This app includes third-party material:
+
+- cluster_render_client.js: Copyright (C) 2026 Robert Nisipeanu, MPL-2.0
+  (https://github.com/robertnisipeanu/idrive-apps, native/cluster-render/js).
+- kit/*: the MGU App Kit, Copyright (c) 2026 cauliflowermossgrape and contributors, MIT
+  (https://github.com/cauliflowermossgrape/idrive7-apps). See ../../kit/LICENSE.
+- font_*.wad / font_*.js: signed-distance-field atlases baked from the Barlow font family,
+  Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow), SIL Open Font
+  License 1.1 (https://openfontlicense.org).
+
+idv7lol is not affiliated with, endorsed by or supported by BMW AG.

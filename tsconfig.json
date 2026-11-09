@@ -9,8 +9,9 @@
       "@idv7lol/vehicle-signals": ["./packages/vehicle-signals/src/index.ts"],
       "@idv7lol/theme-engine": ["./packages/theme-engine/src/index.ts"],
       "@idv7lol/simulator": ["./packages/simulator/src/index.ts"],
+      "@idv7lol/theme-compiler/node": ["./packages/theme-compiler/src/node.ts"],
       "@idv7lol/theme-compiler": ["./packages/theme-compiler/src/index.ts"]
     }
   },
-  "include": ["tests/**/*.ts", "tools/**/*.ts", "vitest.config.ts"]
+  "include": ["tests/**/*.ts", "tools/**/*.ts", "apps/idv7lol/**/*.ts", "vitest.config.ts"]
 }

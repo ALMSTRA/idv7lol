@@ -97,6 +97,7 @@ export function compileBinding(b: Binding): CompiledBinding {
     rangeMin: b.min ?? Math.min(dmin, dmax),
     rangeMax: b.max ?? Math.max(dmin, dmax),
     kind: def?.kind ?? 'number',
+    catalogUnit: def?.unit ?? 'none',
     unitSymbol: unitSymbol(unit),
   };
 }

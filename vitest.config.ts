@@ -10,6 +10,7 @@ export default defineConfig({
       '@idv7lol/vehicle-signals': r('./packages/vehicle-signals/src/index.ts'),
       '@idv7lol/theme-engine': r('./packages/theme-engine/src/index.ts'),
       '@idv7lol/simulator': r('./packages/simulator/src/index.ts'),
+      '@idv7lol/theme-compiler/node': r('./packages/theme-compiler/src/node.ts'),
       '@idv7lol/theme-compiler': r('./packages/theme-compiler/src/index.ts'),
     },
   },

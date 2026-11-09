@@ -9,7 +9,12 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/src-tauri/target/**',
       '**/src-tauri/gen/**',
-      'apps/mgu/build/**',
+      'kit/**',
+      'apps/idv7lol/cluster_render_client.js',
+      'apps/idv7lol/theme_*.js',
+      'apps/idv7lol/font_*.js',
+      'apps/idv7lol/themes_index.js',
+      'apps/studio/dist/**',
       'coverage/**',
     ],
   },
@@ -25,8 +30,8 @@ export default tseslint.config(
     },
   },
   {
-    // The MGU runtime runs on the head unit's old Node.js: plain CommonJS.
-    files: ['apps/mgu/**/*.js'],
+    // The MGU runtime runs on the head unit's Node 8: plain CommonJS, ES2017 syntax only.
+    files: ['apps/idv7lol/**/*.js'],
     languageOptions: {
       ecmaVersion: 2017,
       sourceType: 'script',

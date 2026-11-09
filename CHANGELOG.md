@@ -12,6 +12,25 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- `@idv7lol/simulator`: virtual vehicle model, scenarios (idle, cold start, city, highway,
+  track, redline, manual shifts, drive modes, signal loss, communication failure), overrides,
+  faults, latency, recording and replay. Tested locally.
+- `@idv7lol/theme-compiler`: validation with readable findings, component → GLSL layer
+  compiler (10 shaders), exact renderer layer budget, TrueType/WOFF → SDF atlas baking, PNG
+  codec, bundle writer and CLI. Tested locally.
+- Themes: IDV7LOL Performance, Modern, Classic and a minimal example; all validate clean.
+- idv7lol Studio (Tauri 2 + React): canvas editor, library, inspector, layers, palettes,
+  simulator, validation, animation clips, Build & Deploy, console, welcome templates, undo/redo,
+  Spanish/English, dark/light, file dialogs, PNG export. Windows NSIS installer compiled
+  (unsigned).
+- idv7lol MGU app (Node 8): cluster-render engine with 60 Hz easing and fail-safe, signal
+  providers via the MIT kit, menu with status/diagnostics pages, compiled themes embedded,
+  `mgu-repo.json` for the MGU Store. Engine tested locally against a fake renderer client;
+  **not tested in a vehicle**.
+- Documentation: quick start, Studio user guide (EN) and guía de usuario (ES), theme
+  development, component API, generated signals reference, build, deployment, compatibility,
+  troubleshooting.
+
 - Monorepo foundation: npm workspaces, TypeScript project references, Vitest, ESLint, Prettier,
   GPL-3.0-or-later licence, contribution and security policies, issue and PR templates, CI.
 - `@idv7lol/vehicle-signals`: signal catalog (60+ signals with units, ranges, availability),

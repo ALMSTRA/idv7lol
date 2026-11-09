@@ -15,3 +15,8 @@ apps/studio/public/fonts/
 apps/idv7lol/fonts/
 apps/studio/src-tauri/gen/
 apps/studio/dist/
+kit/
+apps/idv7lol/cluster_render_client.js
+apps/idv7lol/theme_*.js
+apps/idv7lol/font_*.js
+apps/idv7lol/themes_index.js

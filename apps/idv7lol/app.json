@@ -1,0 +1,175 @@
+{
+  "id": "idv7lol",
+  "title": "idv7lol",
+  "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
+  "version": "0.1.0",
+  "startType": "autostart",
+  "vendor": "custom",
+  "loggingId": "IDV7",
+  "iconGlyph": "gauge",
+  "signals": {
+    "de.bmw.infotainment.vehicle.CDS": {
+      "statusEngineSpeed2": "rs",
+      "statusEngineTemperature": "rs"
+    },
+    "de.bmw.infotainment.vehicle.CDS2": {
+      "statusLongitudinalAccelerationMassCenter": "rs",
+      "statusLateralAccelerationMassCenter": "rs"
+    },
+    "de.bmw.infotainment.vehicle.Vehicle2": {
+      "statusCarSpeed2": "rs"
+    },
+    "de.bmw.infotainment.drivingexcitement.FES": {
+      "statusSwitchDriveDynamicSport2": "rs",
+      "statusActualValueTorque2": "rs",
+      "statusFESVehicleDynamicSwitchHMI": "rs"
+    },
+    "de.bmw.infrastructure.EnvironmentalInformation": {
+      "ExteriorTemperature": "s"
+    },
+    "de.bmw.infotainment.misc.MDrive": {
+      "_optional": "the gearbox S / M programme (cars without an M/S selector show D)",
+      "dataDisplayGearbox": "s"
+    },
+    "de.bmw.infrastructure.VehicleInformation": {
+      "statusGearboxDrive": "s",
+      "DataPowerTrain2": "s"
+    },
+    "de.bmw.infrastructure.analytics.BasicDataSet": {
+      "_optional": "gearbox oil temperature",
+      "basicDataSet": "s"
+    }
+  },
+  "screens": [
+    {
+      "name": "MAIN",
+      "kind": "canvas",
+      "title": "idv7lol",
+      "buttons": [
+        ["BTN_SHOW", "Show on the cluster"],
+        ["BTN_THEME", "Next theme"],
+        ["BTN_PALETTE", "Palette"],
+        ["BTN_DIAG", "Diagnostics"]
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "key": "show",
+      "label": "Show on the cluster",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        ["off", "Off (factory cluster)"],
+        ["on", "On"]
+      ]
+    },
+    {
+      "key": "theme",
+      "label": "Theme",
+      "type": "choice",
+      "default": "idv7lol-performance",
+      "options": [
+        ["idv7lol-classic", "IDV7LOL Classic"],
+        ["idv7lol-modern", "IDV7LOL Modern"],
+        ["idv7lol-performance", "IDV7LOL Performance"]
+      ]
+    },
+    {
+      "key": "palette",
+      "label": "Palette",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        ["auto", "Automatic (driving mode)"],
+        ["amber", "Palette: amber"],
+        ["sport", "Palette: sport"],
+        ["night", "Palette: night"],
+        ["eco", "Palette: eco"],
+        ["track", "Palette: track"]
+      ]
+    },
+    {
+      "key": "sweep",
+      "label": "Start-up sweep",
+      "type": "choice",
+      "default": "on",
+      "options": [
+        ["on", "On"],
+        ["off", "Off"]
+      ]
+    },
+    {
+      "key": "utcOffset",
+      "label": "Clock: offset from UTC",
+      "type": "choice",
+      "default": "0",
+      "options": [
+        ["-600", "-10:00"],
+        ["-540", "-09:00"],
+        ["-480", "-08:00"],
+        ["-420", "-07:00"],
+        ["-360", "-06:00"],
+        ["-300", "-05:00"],
+        ["-240", "-04:00"],
+        ["-180", "-03:00"],
+        ["-120", "-02:00"],
+        ["-60", "-01:00"],
+        ["0", "UTC"],
+        ["60", "+01:00"],
+        ["120", "+02:00"],
+        ["180", "+03:00"],
+        ["240", "+04:00"],
+        ["300", "+05:00"],
+        ["330", "+05:30"],
+        ["480", "+08:00"],
+        ["540", "+09:00"],
+        ["600", "+10:00"]
+      ]
+    },
+    {
+      "key": "demo",
+      "label": "Demo data",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        ["auto", "Auto (until the car answers)"],
+        ["on", "On"],
+        ["off", "Off"]
+      ]
+    }
+  ],
+  "config": {
+    "scaling": {
+      "rpm": {
+        "factor": 0.25,
+        "offset": 0,
+        "invalid": 65535
+      },
+      "speed": {
+        "factor": 0.015625,
+        "offset": 0,
+        "invalid": 65535
+      },
+      "accel": {
+        "factor": 0.002,
+        "offset": -65,
+        "invalid": 65535
+      },
+      "temp": {
+        "factor": 1,
+        "offset": -48,
+        "invalid": 255
+      },
+      "torque": {
+        "factor": 0.5,
+        "offset": -1023.5,
+        "invalid": 65535,
+        "invalidFrom": 4095
+      }
+    }
+  },
+  "requires": {
+    "cluster-render": "0.4.2"
+  }
+}

@@ -1,84 +1,88 @@
 # Project status
 
-_Last updated: 2026-11-09._ Version: **0.1.0-dev** (no release yet).
+_Last updated: 2026-11-09._ Version: **0.1.0-dev** (no release tag yet).
 
-## Current architecture
+Status words: **developed** (code exists) · **tested locally** (automated tests or PC preview) ·
+**compiled** (artifacts built) · **published** (on GitHub) · **tested in vehicle**.
 
-npm-workspaces monorepo (TypeScript, Vitest, ESLint, Prettier):
+## Where things stand
 
-- `packages/vehicle-signals` — catalog of 60+ signals, units with conversion, vehicle profiles,
-  `SignalBus` with timestamps/validity.
-- `packages/theme-schema` — zod v4 schema of `theme.json` (schemaVersion 1): 15 component types
-  (`rect`, `ellipse`, `line`, `arc`, `text`, `image`, `gauge.arc`, `gauge.bar`, `value.digital`,
-  `indicator.gear`, `indicator.shiftlights`, `clock`, `telltale`, `status.panel`, `group`),
-  bindings (unit, range, smoothing, staleness, fallback), conditions, keyframe animation clips
-  with triggers, palettes with per-driving-mode selection, display profile `kombi-id7-12.3`
-  with reserved zones, factories (`createComponent`, `createEmptyTheme`), parse/migrate.
-- `packages/theme-engine` — Canvas2D renderer for every component, `EngineState` (binding
-  evaluation, conditions, edges), `AnimationPlayer`, `RenderContext` (palette/fill/font
-  resolution), hit-testing and reserved-zone overlap detection, layer-cost estimation
-  against cluster-render limits (64/app).
-- `packages/simulator`, `packages/theme-compiler`, `apps/mgu`, `apps/studio` — scaffolded,
-  implementation in progress.
+| Area                                                                                                                                                              | Status                                                                                                                                           |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Repository, licence, policies, templates, CI (lint, typecheck, tests, theme validation, secret scan, Windows installer job)                                       | published                                                                                                                                        |
+| `@idv7lol/vehicle-signals` — 61 signals, units, 5 vehicle profiles, SignalBus                                                                                     | tested locally (10 tests), published                                                                                                             |
+| `@idv7lol/theme-schema` — schema v1, 15 component types, bindings, conditions, animations, palettes, display profile with reserved zones                          | tested locally (10 tests), published                                                                                                             |
+| `@idv7lol/theme-engine` — Canvas2D renderer, bindings/smoothing/staleness, animation player, hit testing, zone overlaps, layer cost                               | tested locally (15 tests), published                                                                                                             |
+| `@idv7lol/simulator` — vehicle model, scenarios, faults, recording/replay                                                                                         | tested locally (13 tests), published                                                                                                             |
+| `@idv7lol/theme-compiler` — validation, GLSL piece compiler (10 shaders), SDF font baking, PNG codec, CLI                                                         | tested locally (17 tests), published                                                                                                             |
+| Themes Performance (28 layers), Modern (39), Classic (29), example minimal (5)                                                                                    | validated, compiled into the app, published                                                                                                      |
+| idv7lol Studio (Tauri 2 + React) — canvas, library, inspector, layers, palettes, simulator, validation, timeline, build & deploy, console, i18n es/en, dark/light | developed, tested locally in the browser and as the desktop build; installer **compiled** (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned)       |
+| idv7lol MGU app (Node 8) — engine, signals, menu, diagnostics, kit (MIT) + cluster-render client (MPL-2.0), `mgu-repo.json`                                       | developed; engine tested locally against a fake client (6 tests); kit staging verified with `build.py --preview-only`; **not tested in vehicle** |
+| Documentation (EN) + Spanish user guide                                                                                                                           | published                                                                                                                                        |
 
-## Finished (tested locally, published)
+**Nothing has been tested in a vehicle.** The first on-car run must be done parked, by someone
+with SSH access to the head unit, following `docs/user/DEPLOYMENT.md`.
 
-- Repository, licence (GPL-3.0-or-later), CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, issue/PR
-  templates, Dependabot, CI (format, lint, typecheck, tests, secret scan).
-- Signal catalog, units, profiles, bus (10 tests).
-- Theme schema and factories (10 tests).
-- Theme engine: rendering of all component types, bindings, animations, geometry, cost (15 tests).
-- Research of the reference projects, condensed in `docs/architecture/RENDERER.md` and
-  `docs/architecture/ARCHITECTURE.md`.
+## Architecture (short)
+
+npm-workspaces monorepo. `packages/*` are TypeScript libraries shared by the Studio
+(`apps/studio`, Tauri 2 + React 19 + Vite) and used by the compiler to produce the car runtime's
+data. `apps/idv7lol` is the CommonJS Node 8 app for the head unit; it loads
+`theme_<id>.js` modules (compiled themes: pieces with GLSL shaders, uniforms, palette colours and
+dynamics) and the `font_sans.wad` SDF atlas, and drives `cluster-render`'s `panel` target.
+`kit/` is the MIT app kit from cauliflowermossgrape/idrive7-apps, vendored so the MGU Store can
+build the app on the unit. Details: `docs/architecture/ARCHITECTURE.md`, `RENDERER.md`.
 
 ## Pending (ordered)
 
-1. **Simulator** (`packages/simulator`): virtual vehicle model, scenarios, recording/replay,
-   signal-loss and communication-failure modes.
-2. **Theme compiler** (`packages/theme-compiler`): validation (schema, signals vs profile,
-   reserved zones, layer budget, palette tokens, fonts), GLSL piece generation per component,
-   SDF font atlas baking, runtime bundle output, CLI.
-3. **Bundled themes**: Performance, Modern, Classic (editable, bound to simulated values).
-4. **MGU app** (`apps/mgu`): Node 8 runtime, cluster-render client (MPL-2.0 copy), SOME/IP
-   signal providers, theme loader, menu (activate/deactivate/theme/palette/info/diagnostics),
-   fail-safe (drop layers when data is stale), `app.json`, `mgu-repo.json`.
-5. **Studio MVP** (`apps/studio`): Tauri 2 + React; canvas (zoom/pan/select/drag/resize/
-   rotate/snap/guides), library, inspector, layers, save/open, preview, simulator panel,
-   validation panel, i18n es/en, dark/light.
-6. Advanced Studio: timeline, presets library, palette editor, undo/redo, wizards.
-7. Diagnostics: event console, compile/shader errors, signal health, reports.
-8. Build & release: NSIS installer, CI Windows build, releases, installation guide.
+1. **First vehicle test** of the MGU app (maintainer with SSH). Confirm: install from the Store,
+   layout up/down, telltales on top, deactivate restores the factory cluster, shader compile on
+   the unit's libramses, bandwidth, the three themes. Record in `COMPATIBILITY.md`.
+2. Map more signals on the car: fuel level/range (`KombiIF`, member-name discovery), 12 V
+   battery, cruise, lights, hybrid values (shared tmpfs from eDrive Live as Cluster Layouts does).
+3. Theme upload path so Studio exports can be installed without rebuilding the app (e.g. the app
+   reading `data/themes/*.json` placed by a USB import or a future Store feature).
+4. Studio: multi-select resize, nested group editing, inline text editing, custom component
+   presets library (save/load), WebGL preview using the compiler's own shaders, PNG export of
+   scenario sequences, project folders with assets (images).
+5. Car runtime: opacity animations (needs a `u_alpha` in shaders), conditional transform clips,
+   custom telltale icons, image layers upload path, `budget` event handling (lower rates).
+6. Diagnostics: export report from Studio; QR/USB log export on the car (Cluster Layouts style).
+7. Release v0.1.0: tag, Studio installer as release asset, screenshots in README.
 
 ## Known bugs / caveats
 
-- The Canvas2D preview is not the RAMSES renderer: anti-aliasing, glow and font rendering will
-  differ from the car. The Studio must say so (planned "preview vs car" note).
-- Display profile geometry comes from the Cluster Layouts project, not yet verified by idv7lol
-  on a car (`verified: false`).
-- `value.digital` `tabular` digits are not applied in the Canvas2D preview (SDF text on the
-  car uses fixed advances anyway).
+- Preview ≠ car: Canvas2D vs RAMSES shaders (anti-aliasing, glow, text). Gradients use two
+  stops on the car; radial gradients linear; shadows, dashes, tint, group clip not on car.
+- Display profile geometry comes from Cluster Layouts (`verified: false` until our own test).
+- Studio: the inspector edits one component at a time (multi-select supports common fields and
+  transforms only); the condition editor handles a single comparison (complex trees are kept
+  but shown as "edit in JSON").
+- `value.digital` tabular digits are not applied in the Canvas2D preview.
+- Browser build (no Tauri): Save downloads a file; bundle export downloads separate files.
+- The Tauri installer is unsigned (no certificate).
 
 ## Compatibility
 
-- Target: iDrive 7 (MGU) with `cluster-render` ≥ 0.4.2 installed via MGU Store; Node 8 on the
-  head unit. Development car: iDrive 7 MGU, I-step 20w44.1-1-3 (identifier of the head-unit
-  software, **not** a renderer version). Nothing tested in a vehicle yet.
+iDrive 7 (MGU) only; cluster-render ≥ 0.4.2; Node 8 on the unit. Development car: iDrive 7,
+I-step `20w44.1-1-3` (a software identifier, not a renderer version). See
+`docs/compatibility/COMPATIBILITY.md`.
 
 ## Important decisions
 
-- Own declarative theme format; the compiler maps it to cluster-render effect layers.
+- Own declarative theme format (schemaVersion 1); the compiler maps it to one small GLSL layer
+  per piece (the proven safe pattern; one huge shader restarted a KOMBI upstream).
 - zod 4 with `.prefault({})` for nested defaults; types inferred from schemas.
-- Canvas2D engine shared by Studio canvas, simulator and PNG export; WebGL shader preview is a
-  later milestone.
-- Fonts: Barlow Semi Condensed / Barlow Condensed (SIL OFL 1.1) to match what the reference
-  renderer bakes; the Studio will bundle them.
-- Studio stack: Tauri 2 + React 19 + TypeScript + Vite; zustand for state; no telemetry.
+- Text on the car via an R8 SDF atlas (Barlow, OFL) baked by our own TrueType→SDF pipeline;
+  digits first in the glyph order so shaders can draw numerals.
+- Studio: Tauri 2 + React 19 + Vite 8 + zustand; no telemetry; fonts bundled from @fontsource.
+- The MGU app embeds compiled themes as JS modules + `.wad` atlas (kit ships top-level files);
+  generated files are committed because the Store builds on the unit.
 
 ## Development commands
 
-See [developer/BUILD.md](developer/BUILD.md). Tests: `npm test` (35 passing).
+See [developer/BUILD.md](developer/BUILD.md). Tests: `npm test` (71 passing: 65 packages + 6 app runtime).
 
 ## Next milestone
 
-Milestone 5 (Simulator) and 4 (Compiler) are being done before the MGU app because the app
-embeds the compiler output; then Milestone 2 (MGU runtime) and 3 (Studio MVP).
+Vehicle test (pending item 1) and the remaining signal providers (item 2); then tag v0.1.0.

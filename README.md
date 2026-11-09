@@ -13,12 +13,12 @@ car keeps its factory instrumentation whenever idv7lol is off.
 > distract you and can void warranties or break local rules. Use it parked or on a closed
 > course, keep the factory warnings in view, and read [SECURITY.md](SECURITY.md).
 
-|         |                                                                                                     |
-| ------- | --------------------------------------------------------------------------------------------------- |
-| Licence | GPL-3.0-or-later (third-party parts keep their own licences, see `THIRD_PARTY_NOTICES.md`)          |
-| Target  | BMW iDrive 7 / MGU head units with the open-source `cluster-render` service                         |
-| Desktop | Windows 10/11 x64 (idv7lol Studio, Tauri 2 + React)                                                 |
-| Status  | **In development.** See the status table below and [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) |
+|         |                                                                                                                                         |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Licence | GPL-3.0-or-later (third-party parts keep their own licences, see `THIRD_PARTY_NOTICES.md`)                                              |
+| Target  | BMW iDrive 7 / MGU head units with the open-source `cluster-render` service                                                             |
+| Desktop | Windows 10/11 x64 (idv7lol Studio, Tauri 2 + React)                                                                                     |
+| Status  | **0.1.0 in development.** Everything runs on a PC; nothing is tested in a car yet. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) |
 
 ## What is in the box
 
@@ -39,18 +39,17 @@ car keeps its factory instrumentation whenever idv7lol is off.
 Status words are deliberate: **developed** (code exists), **tested locally** (automated tests
 or PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested in vehicle**.
 
-| Area                                         | Status                                 |
-| -------------------------------------------- | -------------------------------------- |
-| Signal catalog, units, vehicle profiles      | developed · tested locally · published |
-| Theme document format (schema v1)            | developed · tested locally · published |
-| Theme engine (Canvas2D renderer, animations) | developed · tested locally · published |
-| Simulator                                    | in progress                            |
-| Theme compiler → MGU runtime                 | in progress                            |
-| idv7lol MGU app                              | in progress                            |
-| idv7lol Studio (Windows)                     | in progress                            |
-| Bundled themes                               | in progress                            |
-| Windows installer                            | not started                            |
-| Tested in a vehicle                          | **no**                                 |
+| Area                                                     | Status                                                                             |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Signal catalog, units, vehicle profiles                  | developed · tested locally · published                                             |
+| Theme document format (schema v1)                        | developed · tested locally · published                                             |
+| Theme engine (Canvas2D renderer, animations)             | developed · tested locally · published                                             |
+| Simulator (vehicle model, scenarios, faults, recording)  | developed · tested locally · published                                             |
+| Theme compiler → GLSL layers, SDF fonts, validation, CLI | developed · tested locally · published                                             |
+| Bundled themes (Performance, Modern, Classic)            | validated · compiled into the app · published                                      |
+| idv7lol Studio (Windows)                                 | developed · tested locally · installer compiled (unsigned)                         |
+| idv7lol MGU app (Node 8 runtime)                         | developed · engine tested locally with a fake renderer · staged with the kit build |
+| Tested in a vehicle                                      | **no** — see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)                      |
 
 ## Quick start (developers)
 

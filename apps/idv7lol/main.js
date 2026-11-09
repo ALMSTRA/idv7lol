@@ -1,0 +1,309 @@
+'use strict';
+/**
+ * idv7lol - your own layout on the whole instrument cluster of a BMW iDrive 7 (MGU) car.
+ *
+ * The app runs on the head unit (Node 8). It reads the car's signals
+ * (vehicle.js), loads a theme compiled by the idv7lol Studio / theme
+ * compiler (theme_<id>.js) and draws it through the cluster-render service
+ * (engine.js). Its own page on the central display shows status and
+ * diagnostics; everything else is in the iDrive Settings menu the kit builds
+ * from app.json.
+ *
+ * Safety: off by default. The layout exists only while "Show on the
+ * cluster" is on AND car data is live; it is dropped (and the factory
+ * cluster returns) when either stops, when the app stops or when the
+ * render service dies. The factory telltales and pop-ups stay on top:
+ * the panel target sits below them. Nothing is written to the vehicle.
+ */
+const fs = require('fs');
+const path = require('path');
+const mgu = require('./kit/mgu');
+const { ClusterRender } = require('./cluster_render_client');
+const { ClusterEngine } = require('./engine');
+const { startVehicle } = require('./vehicle');
+const index = require('./themes_index');
+
+const W = 1600,
+  H = 520;
+const APP_ID = 'idv7lol';
+
+function loadTheme(id) {
+  const entry = index.themes.find((t) => t.id === id) || index.themes[0];
+  if (!entry) throw new Error('no themes bundled');
+  const theme = require('./' + entry.module);
+  const fonts = {};
+  theme.fonts.forEach((fam) => {
+    const metrics = require('./font_' + fam);
+    const pixels = fs.readFileSync(path.join(__dirname, 'font_' + fam + '.wad'));
+    fonts[fam] = { metrics, pixels };
+  });
+  return { entry, theme, fonts };
+}
+
+mgu.run({
+  async start(ctx) {
+    const { ui, settings, log } = ctx;
+    const version = (ctx.spec && ctx.spec.version) || '0.0.0';
+    log.info(
+      'idv7lol ' + version + ' starting; themes: ' + index.themes.map((t) => t.id).join(', '),
+    );
+
+    const showing = () => settings.get('show') === 'on';
+    const utcOffset = () => Number(settings.get('utcOffset')) || 0;
+    const vehicle = startVehicle(ctx, { redline: 7000 });
+
+    let current = loadTheme(settings.get('theme'));
+    const paletteId = () => {
+      const manual = settings.get('palette');
+      const sel = current.theme.paletteSelection;
+      if (manual && manual !== 'auto' && sel.allowManual && current.theme.palettes[manual])
+        return manual;
+      const mode = vehicle.store.get('drive.mode');
+      if (
+        mode &&
+        mode.valid &&
+        sel.byDriveMode[mode.value] &&
+        current.theme.palettes[sel.byDriveMode[mode.value]]
+      )
+        return sel.byDriveMode[mode.value];
+      return sel.default;
+    };
+
+    const client = new ClusterRender(APP_ID);
+    const engine = new ClusterEngine({
+      client,
+      log,
+      target: 'panel',
+      theme: current.theme,
+      fonts: current.fonts,
+      paletteId,
+      enabled: showing,
+      live: vehicle.live,
+      signals: vehicle.store,
+      sweep: () => settings.get('sweep') !== 'off',
+      utcOffsetMinutes: utcOffset,
+    });
+    client.on('ready', () =>
+      log.info('cluster-render connected: ' + client.backend + ' ' + client.targets),
+    );
+    client.on('disconnected', () => log.warn('cluster-render disconnected'));
+    client.on('budget', (cap, max, reason) =>
+      log.info(
+        'upload budget ' + cap + ' / ' + max + ' KB/s' + (reason ? ' (' + reason + ')' : ''),
+      ),
+    );
+    client.connect();
+    engine.start();
+    setInterval(() => {
+      if (engine.shown) client.status();
+    }, 5000);
+
+    settings.onChange((k) => {
+      if (k === 'theme') {
+        try {
+          current = loadTheme(settings.get('theme'));
+          engine.setTheme(current.theme, current.fonts);
+          log.info('theme: ' + current.theme.id);
+        } catch (e) {
+          log.warn('theme load failed: ' + e);
+        }
+      }
+      if (k === 'palette') engine.recolour();
+      if (k === 'sweep' || k === 'utcOffset') return;
+      render().catch(() => {});
+    });
+
+    /* ---------- the app's own page ---------- */
+    let page = 0; // 0 status, 1 signals, 2 renderer, 3 about
+    const PAGES = 4;
+    ui.onClick('BTN_SHOW', () => {
+      settings.set('show', showing() ? 'off' : 'on');
+      return render();
+    });
+    ui.onClick('BTN_THEME', () => {
+      const ids = index.themes.map((t) => t.id);
+      const i = ids.indexOf(settings.get('theme'));
+      settings.set('theme', ids[(i + 1) % ids.length]);
+      return render();
+    });
+    ui.onClick('BTN_PALETTE', () => {
+      const ids = ['auto'].concat(Object.keys(current.theme.palettes));
+      const i = ids.indexOf(settings.get('palette'));
+      settings.set('palette', ids[(i + 1) % ids.length]);
+      return render();
+    });
+    ui.onClick('BTN_DIAG', () => {
+      page = (page + 1) % PAGES;
+      return render();
+    });
+
+    const isNum = (v) => typeof v === 'number' && isFinite(v);
+    const fmt = (v, d) => (isNum(v) ? v.toFixed(d || 0) : '--');
+    function render() {
+      const t = ctx.theme();
+      const cv = ctx.canvas(W, H).clear(t.bg);
+      const st = engine.status();
+      const vs = vehicle.status();
+      const text = (s, x, y, size, c, opts) =>
+        cv.text(
+          String(s).slice(0, 140),
+          x,
+          y,
+          size,
+          c,
+          Object.assign({ literal: true }, opts || {}),
+        );
+      text('idv7lol ' + version, 48, 72, 40, t.text, { font: 'bold' });
+      if (page === 0) {
+        const lines = [
+          [
+            'On the cluster',
+            !showing()
+              ? 'Off - the factory cluster shows. Press "Show on the cluster".'
+              : st.shown
+                ? 'Showing ' + current.theme.name + '  ·  palette ' + st.palette
+                : 'Waiting for live car data (' + (vs.demo ? 'demo' : 'no signals yet') + ')',
+          ],
+          [
+            'Theme',
+            current.theme.name +
+              '  ·  ' +
+              current.theme.pieces.length +
+              ' layers  ·  ' +
+              current.theme.compiledWith,
+          ],
+          [
+            'Cluster renderer',
+            (st.connected ? 'connected (' + st.backend + ')' : 'not connected') +
+              '  ·  panel: ' +
+              st.target +
+              '  ·  refused ops: ' +
+              st.refused,
+          ],
+          [
+            'Car data',
+            (vs.demo ? 'DEMO' : vehicle.live() ? 'live' : 'not live') +
+              '  ·  ' +
+              fmt(vehicle.store.number('vehicle.speed')) +
+              ' km/h  ·  ' +
+              fmt(vehicle.store.number('engine.rpm')) +
+              ' rpm  ·  gear ' +
+              ((vehicle.store.get('transmission.gear') || {}).value || '-') +
+              '  ·  oil ' +
+              fmt(vehicle.store.number('engine.oil.temp')) +
+              '°  ·  coolant ' +
+              fmt(vehicle.store.number('engine.coolant.temp')) +
+              '°',
+          ],
+          [
+            'Drive mode',
+            ((vehicle.store.get('drive.mode') || {}).value || '-') +
+              '  ·  gearbox ' +
+              ((vehicle.store.get('transmission.mode') || {}).value || '-'),
+          ],
+          ['Providers', vs.providers || '-'],
+          [
+            'Safety',
+            'Experimental software. Factory warnings stay on top. Deactivate here or uninstall from the MGU Store to restore everything.',
+          ],
+        ];
+        lines.forEach(([k, v], i) => {
+          text(k, 48, 140 + i * 50, 20, t.dim, { font: 'bold' });
+          text(v, 300, 140 + i * 50, i === 6 ? 16 : 19, t.text, { font: 'label' });
+        });
+      } else if (page === 1) {
+        text(
+          'Signals (' + (vs.demo ? 'demo' : 'car') + ')  ·  catalog id, value, age',
+          48,
+          120,
+          22,
+          t.dim,
+          { font: 'bold' },
+        );
+        const ids = vehicle.store.ids().sort();
+        const now = Date.now();
+        ids.slice(0, 24).forEach((id, i) => {
+          const s = vehicle.store.get(id);
+          const col = i % 2,
+            row = Math.floor(i / 2);
+          const v = typeof s.value === 'number' ? Math.round(s.value * 100) / 100 : s.value;
+          text(
+            id + '  =  ' + v + '   (' + Math.round((now - s.at) / 100) / 10 + ' s)',
+            48 + col * 780,
+            156 + row * 26,
+            16,
+            s.valid && now - s.at < 3000 ? t.text : t.dim,
+            { font: 'label' },
+          );
+        });
+        let y = 156 + 12 * 26 + 10;
+        Object.keys(vs.raw)
+          .slice(0, 4)
+          .forEach((k) => {
+            text(k + ': ' + vs.raw[k], 48, y, 14, t.dim, { font: 'label' });
+            y += 20;
+          });
+      } else if (page === 2) {
+        text(
+          'Cluster renderer status (' + (st.connected ? 'connected' : 'disconnected') + ')',
+          48,
+          120,
+          22,
+          t.dim,
+          { font: 'bold' },
+        );
+        const lines = (engine.rendererStatus || 'press again with the layout showing')
+          .split('\n')
+          .filter((l) => !/effect of idv7lol/.test(l));
+        lines
+          .slice(0, 16)
+          .forEach((l, i) => text(l, 48, 156 + i * 22, 15, t.text, { font: 'label' }));
+        text(
+          'messages sent: ' + st.messages + '   layers: ' + st.layers + '   targets: ' + st.targets,
+          48,
+          500,
+          14,
+          t.dim,
+          { font: 'label' },
+        );
+      } else {
+        text('About', 48, 120, 22, t.dim, { font: 'bold' });
+        [
+          'idv7lol is free, open-source software (GPL-3.0-or-later): github.com/ALMSTRA/idv7lol',
+          'Not affiliated with BMW AG. Experimental: use parked, keep the factory warnings in view.',
+          'Themes are made with idv7lol Studio and compiled to one GPU layer per piece.',
+          'Drawing by cluster-render (Robert Nisipeanu, MPL-2.0 client). Fonts: Barlow (SIL OFL 1.1).',
+          'App kit: cauliflowermossgrape/idrive7-apps (MIT).',
+          'Versions: app ' +
+            version +
+            '  ·  theme ' +
+            current.theme.version +
+            '  ·  compiler ' +
+            current.theme.compiledWith,
+        ].forEach((l, i) => text(l, 48, 160 + i * 36, 17, t.text, { font: 'label' }));
+      }
+      text(
+        'Show: ' +
+          (showing() ? 'ON' : 'off') +
+          '   ·   Theme: ' +
+          current.theme.name +
+          '   ·   Palette: ' +
+          settings.get('palette') +
+          '   ·   page ' +
+          (page + 1) +
+          '/' +
+          PAGES,
+        48,
+        500,
+        15,
+        t.dim,
+        { font: 'label' },
+      );
+      return ui.image('MAIN_GFX', cv);
+    }
+    ctx.loop('MAIN', 2, render);
+    Promise.resolve()
+      .then(render)
+      .catch((e) => log.warn('first render: ' + ((e && e.stack) || e)));
+  },
+});

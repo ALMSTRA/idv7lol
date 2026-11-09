@@ -1,0 +1,14 @@
+{
+  "name": "@idv7lol/mgu-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "idv7lol app for the BMW iDrive 7 head unit (built on the unit by the MGU Store with kit/tools/build.py). CommonJS for Node 8.",
+  "license": "GPL-3.0-or-later",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=8.7.0"
+  },
+  "scripts": {
+    "test": "vitest run --dir ."
+  }
+}
