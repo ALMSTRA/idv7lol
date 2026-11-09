@@ -64,14 +64,12 @@ function parsePayload(text: string): Payload | null {
 function pasteText(text: string, at?: Point): void {
   const value = text.trim().slice(0, 200);
   if (!value) return;
-  useProjectStore
-    .getState()
-    .addComponent('text', at, {
-      width: Math.min(800, 40 + value.length * 14),
-      height: 48,
-      name: value.slice(0, 40),
-      props: { text: value },
-    });
+  useProjectStore.getState().addComponent('text', at, {
+    width: Math.min(800, 40 + value.length * 14),
+    height: 48,
+    name: value.slice(0, 40),
+    props: { text: value },
+  });
 }
 
 function pasteResolved(files: File[], text: string, at?: Point): void {
