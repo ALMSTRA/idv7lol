@@ -10,7 +10,21 @@ export interface LogEntry {
   text: string;
 }
 
+export interface MenuItem {
+  label?: string;
+  shortcut?: string;
+  disabled?: boolean;
+  checked?: boolean;
+  danger?: boolean;
+  separator?: boolean;
+  items?: MenuItem[];
+  onSelect?: () => void;
+}
+
 interface UiState {
+  menu: { key: number; x: number; y: number; items: MenuItem[] } | null;
+  openMenu(x: number, y: number, items: MenuItem[]): void;
+  closeMenu(): void;
   lang: 'en' | 'es';
   scheme: ColorScheme;
   leftOpen: boolean;
@@ -112,6 +126,9 @@ export const useUiStore = create<UiState>((set, get) => {
     previewPalette: null,
     welcomeOpen: true,
     imageEditorFor: null,
+    menu: null,
+    openMenu: (x, y, items) => set({ menu: { key: Date.now(), x, y, items } }),
+    closeMenu: () => set({ menu: null }),
     log: [],
     cursor: null,
 

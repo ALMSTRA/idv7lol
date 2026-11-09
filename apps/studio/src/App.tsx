@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { parseThemeJson, serializeTheme, type Theme } from '@idv7lol/theme-schema';
-import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
 import { useProjectStore } from './store/project.js';
 import { useUiStore } from './store/ui.js';
-import { useSimStore, simulator } from './store/sim.js';
+import { useSimStore } from './store/sim.js';
 import { useT } from './i18n/index.js';
+import { perf } from './lib/perf.js';
 import { CanvasView, renderToCanvas } from './canvas/CanvasView.js';
 import { LibraryPanel } from './panels/LibraryPanel.js';
 import { InspectorPanel } from './panels/InspectorPanel.js';
@@ -16,10 +16,20 @@ import { TimelinePanel } from './panels/TimelinePanel.js';
 import { BuildPanel } from './panels/BuildPanel.js';
 import { ConsolePanel } from './panels/ConsolePanel.js';
 import { WelcomeDialog } from './panels/WelcomeDialog.js';
-import { useValidation } from './lib/useValidation.js';
 import { ImageEditor } from './panels/ImageEditor.js';
-import { imageFilesOf, syncAssets } from './lib/imageStore.js';
-import { browseAndPlace, importAndPlace } from './lib/imageActions.js';
+import { syncAssets } from './lib/imageStore.js';
+import { browseAndPlace } from './lib/imageActions.js';
+import { copySelection, cutSelection, pasteFromEvent } from './lib/clipboard.js';
+import { ContextMenu } from './panels/ContextMenu.js';
+import {
+  CursorReadout,
+  LayerCount,
+  LiveStats,
+  ValidateButton,
+  ValidationTabBadge,
+} from './panels/StatusBits.js';
+import { useShallow } from 'zustand/react/shallow';
+import { findComponent } from '@idv7lol/theme-engine';
 import {
   baseName,
   isTauri,
@@ -32,10 +42,46 @@ import {
 } from './host/files.js';
 
 export function App(): JSX.Element {
+  perf.appRenders += 1;
   const t = useT();
-  const ui = useUiStore();
-  const project = useProjectStore();
-  const report = useValidation();
+  const ui = useUiStore(
+    useShallow((s) => ({
+      lang: s.lang,
+      scheme: s.scheme,
+      leftOpen: s.leftOpen,
+      rightOpen: s.rightOpen,
+      bottomOpen: s.bottomOpen,
+      rightTab: s.rightTab,
+      bottomTab: s.bottomTab,
+      welcomeOpen: s.welcomeOpen,
+      logMessage: s.logMessage,
+      setWelcomeOpen: s.setWelcomeOpen,
+      setBottomTab: s.setBottomTab,
+      setRightTab: s.setRightTab,
+      setLang: s.setLang,
+      setScheme: s.setScheme,
+      toggle: s.toggle,
+    })),
+  );
+  const project = useProjectStore(
+    useShallow((s) => ({
+      dirty: s.dirty,
+      filePath: s.filePath,
+      past: s.past,
+      future: s.future,
+      undo: s.undo,
+      redo: s.redo,
+      loadTheme: s.loadTheme,
+      markSaved: s.markSaved,
+      newTheme: s.newTheme,
+      selectionCount: s.selection.length,
+      themeName: s.theme.name,
+      assets: s.theme.assets,
+      layoutWidth: s.theme.layout.width,
+      layoutHeight: s.theme.layout.height,
+      display: s.theme.target.display,
+    })),
+  );
   const running = useSimStore((s) => s.running);
   const [, force] = useState(0);
 
@@ -138,8 +184,8 @@ export function App(): JSX.Element {
 
   /* ----- window title & unload guard ----- */
   useEffect(() => {
-    document.title = `${project.dirty ? '• ' : ''}${project.theme.name} — idv7lol Studio`;
-  }, [project.dirty, project.theme.name]);
+    document.title = `${project.dirty ? '• ' : ''}${project.themeName} — idv7lol Studio`;
+  }, [project.dirty, project.themeName]);
   useEffect(() => {
     const h = (e: BeforeUnloadEvent) => {
       if (useProjectStore.getState().dirty) e.preventDefault();
@@ -149,22 +195,26 @@ export function App(): JSX.Element {
   }, []);
 
   /* ----- images: keep pixels decoded; Ctrl+V pastes pictures or components ----- */
-  useEffect(() => syncAssets(project.theme), [project.theme.assets]);
+  useEffect(() => syncAssets(useProjectStore.getState().theme), [project.assets]);
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
       const target = e.target as HTMLElement | null;
       if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
       if (useUiStore.getState().imageEditorFor) return;
-      const files = imageFilesOf(e.clipboardData?.items);
-      if (files.length) {
-        e.preventDefault();
-        void importAndPlace(files);
-      } else {
-        useProjectStore.getState().paste();
-      }
+      pasteFromEvent(e);
+    };
+    // The browser's own menu makes no sense in an app window; text fields keep theirs.
+    const onMenu = (e: MouseEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return;
+      e.preventDefault();
     };
     window.addEventListener('paste', onPaste);
-    return () => window.removeEventListener('paste', onPaste);
+    window.addEventListener('contextmenu', onMenu);
+    return () => {
+      window.removeEventListener('paste', onPaste);
+      window.removeEventListener('contextmenu', onMenu);
+    };
   }, []);
 
   /* ----- keyboard shortcuts ----- */
@@ -213,7 +263,36 @@ export function App(): JSX.Element {
         return;
       }
       if (mod && e.key.toLowerCase() === 'c') {
-        p.copySelected();
+        copySelection();
+        return;
+      }
+      if (mod && e.key.toLowerCase() === 'x') {
+        cutSelection();
+        return;
+      }
+      if (mod && (e.code === 'BracketRight' || e.code === 'BracketLeft')) {
+        e.preventDefault();
+        const up = e.code === 'BracketRight';
+        const dir = e.shiftKey ? (up ? 'top' : 'bottom') : up ? 'up' : 'down';
+        p.selection.forEach((id) => useProjectStore.getState().reorder(id, dir));
+        return;
+      }
+      if (mod && !e.shiftKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        const comps = p.selection.map((id) => findComponent(p.theme.components, id));
+        const locked = comps.every((c) => c?.locked);
+        p.selection.forEach((id) =>
+          useProjectStore.getState().updateComponent(id, { locked: !locked }),
+        );
+        return;
+      }
+      if (mod && e.shiftKey && e.key.toLowerCase() === 'h') {
+        e.preventDefault();
+        const comps = p.selection.map((id) => findComponent(p.theme.components, id));
+        const hidden = comps.every((c) => !c?.visible);
+        p.selection.forEach((id) =>
+          useProjectStore.getState().updateComponent(id, { visible: hidden }),
+        );
         return;
       }
       if (mod && e.key.toLowerCase() === 'a') {
@@ -263,10 +342,6 @@ export function App(): JSX.Element {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [doSave, doOpen]);
-
-  const errors = report?.errors.length ?? 0;
-  const warnings = report?.warnings.length ?? 0;
-  const layers = report?.layers ?? 0;
 
   return (
     <div className="app">
@@ -318,17 +393,10 @@ export function App(): JSX.Element {
         >
           {running ? '❚❚' : '▶'} {t('menu.simulate')}
         </button>
-        <button onClick={() => ui.setBottomTab('validation')} className={errors ? 'danger' : ''}>
-          ✓ {t('menu.validate')}
-          {report && (
-            <span className={`badge ${errors ? 'error' : warnings ? 'warning' : 'ok'}`}>
-              {errors || warnings || '✓'}
-            </span>
-          )}
-        </button>
+        <ValidateButton />
         <button onClick={() => ui.setBottomTab('build')}>⚙ {t('menu.build')}</button>
         <span className="grow" />
-        <span className="title">{project.filePath ?? project.theme.name}</span>
+        <span className="title">{project.filePath ?? project.themeName}</span>
         <span className="sep" />
         <select
           value={ui.lang}
@@ -421,21 +489,19 @@ export function App(): JSX.Element {
               }
             >
               {t(`panels.${tab}`)}
-              {tab === 'validation' && report && (errors || warnings) ? (
-                <span className={`badge ${errors ? 'error' : 'warning'}`}>
-                  {errors || warnings}
-                </span>
-              ) : null}
+              {tab === 'validation' && <ValidationTabBadge />}
             </button>
           ))}
         </div>
-        <div className="bottom-body">
-          {ui.bottomTab === 'simulator' && <SimulatorPanel />}
-          {ui.bottomTab === 'validation' && <ValidationPanel />}
-          {ui.bottomTab === 'timeline' && <TimelinePanel />}
-          {ui.bottomTab === 'build' && <BuildPanel />}
-          {ui.bottomTab === 'console' && <ConsolePanel />}
-        </div>
+        {ui.bottomOpen && (
+          <div className="bottom-body">
+            {ui.bottomTab === 'simulator' && <SimulatorPanel />}
+            {ui.bottomTab === 'validation' && <ValidationPanel />}
+            {ui.bottomTab === 'timeline' && <TimelinePanel />}
+            {ui.bottomTab === 'build' && <BuildPanel />}
+            {ui.bottomTab === 'console' && <ConsolePanel />}
+          </div>
+        )}
       </div>
 
       <div className="statusbar">
@@ -446,16 +512,13 @@ export function App(): JSX.Element {
           />
           {project.dirty ? t('status.unsaved') : t('status.saved')}
         </span>
-        <span>{t('status.selection', { n: project.selection.length })}</span>
-        <span>{ui.cursor ? t('status.cursor', { x: ui.cursor.x, y: ui.cursor.y }) : ''}</span>
+        <span>{t('status.selection', { n: project.selectionCount })}</span>
+        <CursorReadout />
         <span className="grow" />
-        <span>{t('validation.layers', { n: layers, max: RENDERER_LIMITS.layersPerApp })}</span>
+        <LayerCount />
+        <LiveStats />
         <span>
-          {t('sim.health')} {Math.round(simulator.bus.number('system.signal.health', 0))}%
-        </span>
-        <span>
-          {project.theme.layout.width}×{project.theme.layout.height} ·{' '}
-          {project.theme.target.display}
+          {project.layoutWidth}×{project.layoutHeight} · {project.display}
         </span>
         <button
           className="ghost icon"
@@ -468,6 +531,8 @@ export function App(): JSX.Element {
       </div>
 
       <ImageEditor />
+
+      <ContextMenu />
 
       {ui.welcomeOpen && (
         <WelcomeDialog

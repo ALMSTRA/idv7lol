@@ -2,12 +2,13 @@ import { useMemo, useState } from 'react';
 import type { Component } from '@idv7lol/theme-schema';
 import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
 import { buildPieces } from '@idv7lol/theme-compiler';
-import { useProjectStore } from '../store/project.js';
+import { useProjectStore, useThemeForPanels } from '../store/project.js';
 import { useT } from '../i18n/index.js';
+import { openLayerMenu } from '../lib/contextMenus.js';
 
 export function LayersPanel(): JSX.Element {
   const t = useT();
-  const theme = useProjectStore((s) => s.theme);
+  const theme = useThemeForPanels();
   const selection = useProjectStore((s) => s.selection);
   const select = useProjectStore((s) => s.select);
   const update = useProjectStore((s) => s.updateComponent);
@@ -96,6 +97,10 @@ export function LayersPanel(): JSX.Element {
               }}
               onClick={(e) => select([c.id], e.shiftKey || e.ctrlKey)}
               onDoubleClick={() => setEditing(c.id)}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                openLayerMenu(e.clientX, e.clientY, c.id);
+              }}
             >
               <span className="type" title={c.type}>
                 {glyphFor(c.type)}

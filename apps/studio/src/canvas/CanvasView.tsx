@@ -4,6 +4,7 @@ import {
   EngineState,
   ThemeEngine,
   flattenComponents,
+  findComponent,
   hitTest,
   type FlatComponent,
 } from '@idv7lol/theme-engine';
@@ -12,6 +13,9 @@ import { useUiStore } from '../store/ui.js';
 import { simulator, useSimStore } from '../store/sim.js';
 import { libraryEntry } from '../lib/componentLibrary.js';
 import { useT } from '../i18n/index.js';
+import { perf } from '../lib/perf.js';
+import { openCanvasMenu } from '../lib/contextMenus.js';
+import { useShallow } from 'zustand/react/shallow';
 import { imageFilesOf, imageResolver } from '../lib/imageStore.js';
 import { importAndPlace } from '../lib/imageActions.js';
 import {
@@ -84,6 +88,7 @@ function applyRects(
 }
 
 export function CanvasView(): JSX.Element {
+  perf.canvasRenders += 1;
   const t = useT();
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -95,16 +100,31 @@ export function CanvasView(): JSX.Element {
   const spaceRef = useRef(false);
   const [cursor, setCursor] = useState('default');
   const fittedFor = useRef<string | null>(null);
+  const bgFor = useRef({ scheme: '', color: '#0a0b0e' });
   const [fileDrag, setFileDrag] = useState(0);
 
-  const theme = useProjectStore((s) => s.theme);
+  const themeId = useProjectStore((s) => s.theme.id);
   const selection = useProjectStore((s) => s.selection);
-  const hover = useProjectStore((s) => s.hover);
-  const ui = useUiStore();
+  const ui = useUiStore(
+    useShallow((s) => ({
+      showZones: s.showZones,
+      showGrid: s.showGrid,
+      snap: s.snap,
+      showRulers: s.showRulers,
+      toggle: s.toggle,
+    })),
+  );
   const running = useSimStore((s) => s.running);
 
-  const themeRef = useRef(theme);
-  themeRef.current = theme;
+  // Read at use, so edits and drags never re-render this component.
+  const themeRef = useMemo(
+    () => ({
+      get current() {
+        return useProjectStore.getState().theme;
+      },
+    }),
+    [],
+  );
   const selectionRef = useRef(selection);
   selectionRef.current = selection;
 
@@ -116,11 +136,11 @@ export function CanvasView(): JSX.Element {
 
   // Fit when a different theme is loaded.
   useEffect(() => {
-    if (fittedFor.current !== theme.id) {
-      fittedFor.current = theme.id;
+    if (fittedFor.current !== themeId) {
+      fittedFor.current = themeId;
       fit();
     }
-  }, [theme.id, fit]);
+  }, [themeId, fit]);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -157,13 +177,23 @@ export function CanvasView(): JSX.Element {
       if (!ctx) return;
       const now = performance.now();
       if (useSimStore.getState().running) simulator.tick(now);
+      const frameStart = now;
       const v = viewRef.current;
       const th = themeRef.current;
       const uiState = useUiStore.getState();
       engine.state.manualPalette = uiState.previewPalette;
 
+      // Nothing to draw behind the full-window image editor.
+      if (uiState.imageEditorFor) return;
+
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.fillStyle = getComputedStyle(wrap).getPropertyValue('--canvas-bg') || '#0a0b0e';
+      if (bgFor.current.scheme !== uiState.scheme) {
+        bgFor.current = {
+          scheme: uiState.scheme,
+          color: getComputedStyle(wrap).getPropertyValue('--canvas-bg') || '#0a0b0e',
+        };
+      }
+      ctx.fillStyle = bgFor.current.color;
       ctx.fillRect(0, 0, W, H);
 
       // layout shadow + content
@@ -195,6 +225,8 @@ export function CanvasView(): JSX.Element {
         modeRef.current,
         guidesRef.current,
       );
+      perf.frames += 1;
+      perf.renderMs += performance.now() - frameStart;
     };
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
@@ -357,7 +389,9 @@ export function CanvasView(): JSX.Element {
       case 'resize': {
         const dx = (sx - m.sx) / v.zoom;
         const dy = (sy - m.sy) / v.zoom;
-        const r = resizeRect(m.start, m.handle, dx, dy, e.shiftKey);
+        // Pictures keep their proportions unless Shift is held; other components the reverse.
+        const isImage = findComponent(th.components, m.id)?.type === 'image';
+        const r = resizeRect(m.start, m.handle, dx, dy, isImage ? !e.shiftKey : e.shiftKey);
         const uiState = useUiStore.getState();
         if (uiState.snap && uiState.showGrid && !e.ctrlKey) {
           const g = uiState.gridSize;
@@ -449,6 +483,20 @@ export function CanvasView(): JSX.Element {
     };
   }, []);
 
+  const onContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const { sx, sy } = screenPoint(e);
+    const p = toLayout(viewRef.current, sx, sy);
+    // Locked components are included so they can be unlocked from here.
+    const hit = hitTest(themeRef.current, p.x, p.y);
+    openCanvasMenu(
+      e.clientX,
+      e.clientY,
+      { x: Math.round(p.x), y: Math.round(p.y) },
+      hit?.component.id,
+    );
+  };
+
   const onDoubleClick = (e: React.MouseEvent) => {
     const { sx, sy } = screenPoint(e);
     const p = toLayout(viewRef.current, sx, sy);
@@ -519,7 +567,7 @@ export function CanvasView(): JSX.Element {
         onPointerCancel={onPointerUp}
         onWheel={onWheel}
         onDoubleClick={onDoubleClick}
-        onContextMenu={(e) => e.preventDefault()}
+        onContextMenu={onContextMenu}
       />
       <div className="canvas-toolbar">
         <button
@@ -646,7 +694,6 @@ export function CanvasView(): JSX.Element {
       </div>
       {fileDrag > 0 && <div className="canvas-dropzone">{t('image.drop')}</div>}
       <div className="canvas-note">{t('canvas.note')}</div>
-      <span style={{ display: 'none' }}>{hover}</span>
     </div>
   );
 }

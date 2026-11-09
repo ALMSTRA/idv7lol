@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import { flattenComponents } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
 import { useT } from '../i18n/index.js';
 import { browseAndPlace, importAndPlace } from '../lib/imageActions.js';
-import { imageFilesOf } from '../lib/imageStore.js';
+import { getThumb, imageFilesOf, imagesVersion, subscribeImages } from '../lib/imageStore.js';
+import { openAssetMenu } from '../lib/contextMenus.js';
 
 /** The theme's pictures: add from the computer, drag onto the layout, reuse. */
 export function ImagesPanel(): JSX.Element {
@@ -12,6 +13,7 @@ export function ImagesPanel(): JSX.Element {
   const place = useProjectStore((s) => s.placeAsset);
   const remove = useProjectStore((s) => s.removeAsset);
   const [over, setOver] = useState(false);
+  useSyncExternalStore(subscribeImages, imagesVersion);
 
   const uses = useMemo(() => {
     const m = new Map<string, number>();
@@ -57,8 +59,12 @@ export function ImagesPanel(): JSX.Element {
                 e.dataTransfer.effectAllowed = 'copy';
               }}
               onClick={() => place(id)}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                openAssetMenu(e.clientX, e.clientY, id);
+              }}
             >
-              <img src={a.data} alt={a.name ?? id} draggable={false} />
+              <img src={getThumb(id) ?? a.data} alt={a.name ?? id} draggable={false} />
               <button
                 className="img-del"
                 aria-label={t('misc.remove')}

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { create } from 'zustand';
 import {
   ComponentSchema,
@@ -55,7 +56,12 @@ export interface ProjectState {
   deleteSelected(): void;
   duplicateSelected(): void;
   copySelected(): void;
-  paste(): void;
+  paste(at?: { x: number; y: number }): void;
+  pasteComponents(
+    components: Component[],
+    assets: Theme['assets'],
+    at?: { x: number; y: number },
+  ): void;
   moveSelected(dx: number, dy: number, record?: boolean): void;
   reorder(id: string, direction: 'up' | 'down' | 'top' | 'bottom'): void;
   moveToIndex(id: string, index: number): void;
@@ -131,6 +137,21 @@ function imageComponent(
     height: h,
     props: { asset: assetId },
   });
+}
+
+/** Move pasted components so their group is centred on a layout point. */
+function placeClones(clones: Component[], at?: { x: number; y: number }): void {
+  if (!at || !clones.length) return;
+  const minX = Math.min(...clones.map((c) => c.x));
+  const minY = Math.min(...clones.map((c) => c.y));
+  const maxX = Math.max(...clones.map((c) => c.x + c.width));
+  const maxY = Math.max(...clones.map((c) => c.y + c.height));
+  const dx = Math.round(at.x - (minX + maxX) / 2);
+  const dy = Math.round(at.y - (minY + maxY) / 2);
+  for (const c of clones) {
+    c.x += dx;
+    c.y += dy;
+  }
 }
 
 export function allIds(theme: Theme): string[] {
@@ -425,7 +446,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     const s = get();
     set({ clipboard: selectedTopLevel(s.theme, s.selection).map((c) => structuredClone(c)) });
   },
-  paste: () => {
+  paste: (at) => {
     const s = get();
     if (!s.clipboard.length) return;
     const taken = new Set(allIds(s.theme));
@@ -435,8 +456,40 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       cl.y += 20;
       return cl;
     });
+    placeClones(clones, at);
     s.setTheme({ ...s.theme, components: [...s.theme.components, ...clones] });
     set({ selection: clones.map((c) => c.id), clipboard: clones.map((c) => structuredClone(c)) });
+  },
+  pasteComponents: (components, incoming, at) => {
+    const s = get();
+    const assets = { ...s.theme.assets };
+    const rename = new Map<string, string>();
+    for (const [id, a] of Object.entries(incoming)) {
+      if (!assets[id]) assets[id] = a;
+      else if (assets[id]!.data !== a.data) {
+        let n = 2;
+        while (assets[`${id}-${n}`]) n++;
+        assets[`${id}-${n}`] = a;
+        rename.set(id, `${id}-${n}`);
+      }
+    }
+    const remap = (c: Component): Component => {
+      if (c.type === 'image' && rename.has(c.props.asset))
+        return { ...c, props: { ...c.props, asset: rename.get(c.props.asset)! } };
+      if (c.type === 'group')
+        return { ...c, props: { ...c.props, children: c.props.children.map(remap) } };
+      return c;
+    };
+    const taken = new Set(allIds(s.theme));
+    const clones = components.map((c) => {
+      const cl = cloneWithNewIds(remap(c), taken);
+      cl.x += 20;
+      cl.y += 20;
+      return cl;
+    });
+    placeClones(clones, at);
+    s.setTheme({ ...s.theme, assets, components: [...s.theme.components, ...clones] });
+    set({ selection: clones.map((c) => c.id) });
   },
   moveSelected: (dx, dy, record = true) => {
     const s = get();
@@ -593,4 +646,39 @@ export function selectedComponents(state: ProjectState): Component[] {
   return state.selection
     .map((id) => findComponent(state.theme.components, id))
     .filter((c): c is Component => !!c);
+}
+
+/**
+ * The theme, for panels: live while editing, but at most ten updates a second
+ * during a canvas drag, so the drag itself stays smooth.
+ */
+export function useThemeForPanels(): Theme {
+  const [theme, setTheme] = useState(() => useProjectStore.getState().theme);
+  useEffect(() => {
+    let shown = useProjectStore.getState().theme;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    setTheme(shown);
+    const flush = () => {
+      timer = null;
+      const t = useProjectStore.getState().theme;
+      if (t !== shown) {
+        shown = t;
+        setTheme(t);
+      }
+    };
+    const unsubscribe = useProjectStore.subscribe((s) => {
+      if (s.theme === shown) return;
+      if (!s.txn) {
+        if (timer) clearTimeout(timer);
+        flush();
+      } else if (!timer) {
+        timer = setTimeout(flush, 100);
+      }
+    });
+    return () => {
+      unsubscribe();
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
+  return theme;
 }

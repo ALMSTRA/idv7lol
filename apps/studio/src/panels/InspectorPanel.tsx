@@ -14,11 +14,11 @@ import type {
 import { getProfile, getSignal, profileHasSignal, unitSymbol } from '@idv7lol/vehicle-signals';
 import { buildPieces } from '@idv7lol/theme-compiler';
 import { findComponent, resolveColor } from '@idv7lol/theme-engine';
-import { useProjectStore } from '../store/project.js';
+import { useProjectStore, useThemeForPanels } from '../store/project.js';
 import { useT } from '../i18n/index.js';
 import { useUiStore } from '../store/ui.js';
 import { replaceImage } from '../lib/imageActions.js';
-import { imageResolver } from '../lib/imageStore.js';
+import { imageResolver, subscribeImages } from '../lib/imageStore.js';
 import { DESCRIPTORS, getPath, patchFor, type FieldDescriptor } from '../inspector/descriptors.js';
 import {
   Checkbox,
@@ -74,7 +74,7 @@ function Section({
 
 export function InspectorPanel(): JSX.Element {
   const t = useT();
-  const theme = useProjectStore((s) => s.theme);
+  const theme = useThemeForPanels();
   const selection = useProjectStore((s) => s.selection);
   const comps = useMemo(
     () =>
@@ -149,15 +149,14 @@ function EditedThumb({
         palette ? resolveColor(x, palette) : x,
       );
       const cv = ref.current;
-      if (!img || !cv) return false;
-      cv.width = img.width;
-      cv.height = img.height;
-      cv.getContext('2d')!.drawImage(img.image as HTMLCanvasElement, 0, 0);
-      return true;
+      if (!img || !cv) return;
+      const s = Math.min(1, 560 / Math.max(img.width, img.height));
+      cv.width = Math.max(1, Math.round(img.width * s));
+      cv.height = Math.max(1, Math.round(img.height * s));
+      cv.getContext('2d')!.drawImage(img.image as CanvasImageSource, 0, 0, cv.width, cv.height);
     };
-    if (draw()) return;
-    const h = setInterval(() => draw() && clearInterval(h), 150);
-    return () => clearInterval(h);
+    draw();
+    return subscribeImages(draw);
   }, [c.props.asset, c.props.edits, theme.palettes, theme.palette.default]);
   return <canvas ref={ref} className="inspector-thumb" onClick={onClick} />;
 }

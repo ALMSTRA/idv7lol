@@ -58,11 +58,11 @@ function applyStrokes(
   mask: Uint8Array,
 ): void {
   const unit = Math.min(w, h);
+  const cover = new Uint8Array(w * h);
   for (const stroke of strokes) {
     const radius = Math.max(0.75, (stroke.size * unit) / 2);
     const coreR = radius * stroke.hardness;
     const pts = stroke.points;
-    const cover = new Uint8Array(w * h);
     let minX = w;
     let minY = h;
     let maxX = -1;
@@ -102,7 +102,10 @@ function applyStrokes(
       for (let x = minX; x <= maxX; x++) {
         const idx = y * w + x;
         const c = cover[idx]!;
-        if (c) mask[idx] = Math.round(mask[idx]! + ((target - mask[idx]!) * c) / 255);
+        if (c) {
+          mask[idx] = Math.round(mask[idx]! + ((target - mask[idx]!) * c) / 255);
+          cover[idx] = 0;
+        }
       }
     }
   }
@@ -373,12 +376,13 @@ function sharpenRaster(r: Raster, amount: number): void {
 /* Pipeline                                                                   */
 /* -------------------------------------------------------------------------- */
 
-/** Apply every edit and return a new raster; the source is never modified. */
-export function applyImageEdits(
-  src: Raster,
-  e: ImageEdits,
-  resolveColor: (c: string) => string = (c) => c,
-): Raster {
+/** Identifies the result of the expensive first stage (removal, brush, geometry). */
+export function sourceStageKey(e: ImageEdits): string {
+  return JSON.stringify([e.colorKey, e.strokes, e.rotate, e.flipH, e.flipV, e.crop]);
+}
+
+/** First stage: background removal, brush strokes, rotation, flip, crop. */
+export function applySourceStage(src: Raster, e: ImageEdits): Raster {
   let cur: Raster = { width: src.width, height: src.height, data: new Uint8ClampedArray(src.data) };
 
   if (e.colorKey || e.strokes.length) {
@@ -392,8 +396,20 @@ export function applyImageEdits(
 
   cur = rotateFlip(cur, e.rotate, e.flipH, e.flipV);
   if (e.crop) cur = cropRaster(cur, e.crop);
-  if (cur === src) cur = { ...cur, data: new Uint8ClampedArray(cur.data) };
+  return cur;
+}
 
+/** Second stage: colour, blur and shape. Does not modify its input. */
+export function applyFinishStage(
+  stage: Raster,
+  e: ImageEdits,
+  resolveColor: (c: string) => string = (c) => c,
+): Raster {
+  const cur: Raster = {
+    width: stage.width,
+    height: stage.height,
+    data: new Uint8ClampedArray(stage.data),
+  };
   adjustColors(cur, e);
 
   const unit = Math.min(cur.width, cur.height);
@@ -439,6 +455,15 @@ export function applyImageEdits(
     }
   }
   return cur;
+}
+
+/** Apply every edit and return a new raster; the source is never modified. */
+export function applyImageEdits(
+  src: Raster,
+  e: ImageEdits,
+  resolveColor: (c: string) => string = (c) => c,
+): Raster {
+  return applyFinishStage(applySourceStage(src, e), e, resolveColor);
 }
 
 /* -------------------------------------------------------------------------- */

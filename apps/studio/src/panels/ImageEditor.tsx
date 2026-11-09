@@ -17,7 +17,15 @@ import {
 import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
 import { useT } from '../i18n/index.js';
-import { ensureSource, imageResolver, previewOf, rasterToCanvas } from '../lib/imageStore.js';
+import {
+  ensureSource,
+  imageResolver,
+  previewOf,
+  rasterToCanvas,
+  renderLatest,
+  subscribeImages,
+  withResolvedTint,
+} from '../lib/imageStore.js';
 import { engine } from '../canvas/CanvasView.js';
 
 type Tool = 'adjust' | 'crop' | 'background' | 'brush' | 'effects' | 'looks';
@@ -277,6 +285,9 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
   const [stage, setStage] = useState({ w: 800, h: 500 });
   const [out, setOut] = useState({ w: 1, h: 1 });
   const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const panning = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -304,31 +315,29 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
 
   const palette = theme.palettes[theme.palette.default];
   const resolve = useCallback((c: string) => (palette ? resolveColor(c, palette) : c), [palette]);
-  const preview = useMemo(() => (source ? previewOf(source, 1400) : null), [source]);
 
   const view = useMemo<ImageEdits>(() => {
     if (before) return CLEAN;
     return tool === 'crop' ? { ...edits, crop: undefined } : edits;
   }, [edits, tool, before]);
 
-  /* ----- draw the working image, at most once per frame ----- */
+  /* ----- draw the working image; the worker keeps the interface free ----- */
   useEffect(() => {
-    if (!preview) return;
-    const h = requestAnimationFrame(() => {
+    if (!source || !comp) return;
+    renderLatest('editor', comp.props.asset, withResolvedTint(view, resolve), 1400, (r) => {
       const c = canvasRef.current;
       if (!c) return;
-      const r = applyImageEdits(preview, view, resolve);
-      c.width = r.width;
-      c.height = r.height;
-      c.getContext('2d')!.putImageData(
-        new ImageData(r.data as Uint8ClampedArray<ArrayBuffer>, r.width, r.height),
-        0,
-        0,
-      );
+      if (c.width !== r.width || c.height !== r.height) {
+        c.width = r.width;
+        c.height = r.height;
+      } else {
+        c.getContext('2d')!.clearRect(0, 0, c.width, c.height);
+      }
+      c.getContext('2d')!.drawImage(r.image, 0, 0);
       setOut({ w: r.width, h: r.height });
     });
-    return () => cancelAnimationFrame(h);
-  }, [preview, view, resolve]);
+    // `comp` only supplies the asset id, which is fixed for an open editor.
+  }, [source, view, resolve]);
 
   useEffect(() => {
     const el = stageRef.current;
@@ -339,6 +348,8 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
   }, []);
 
   /* ----- the picture in place on the cluster, after the last change settles ----- */
+  const [imagesTick, setImagesTick] = useState(0);
+  useEffect(() => subscribeImages(() => setImagesTick((n) => n + 1)), []);
   useEffect(() => {
     const h = setTimeout(() => {
       const c = miniRef.current;
@@ -359,7 +370,7 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
       });
     }, 160);
     return () => clearTimeout(h);
-  }, [edits, theme, comp, componentId]);
+  }, [edits, theme, comp, componentId, imagesTick]);
 
   /* ----- history ----- */
   const remember = useCallback(() => {
@@ -428,8 +439,13 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
 
   /* ----- geometry of the working image on screen ----- */
   const fit = Math.min((stage.w - 56) / out.w, (stage.h - 56) / out.h, 3);
-  const dispW = Math.max(1, out.w * fit);
-  const dispH = Math.max(1, out.h * fit);
+  const dispW = Math.max(1, out.w * fit * zoom);
+  const dispH = Math.max(1, out.h * fit * zoom);
+  const zoomBy = (f: number) => setZoom((z) => Math.max(0.2, Math.min(12, z * f)));
+  const zoomFit = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
   const pointAt = (e: React.PointerEvent) => {
     const r = canvasRef.current!.getBoundingClientRect();
     return {
@@ -488,6 +504,12 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
   };
 
   const onStageDown = (e: React.PointerEvent) => {
+    if (e.button === 1 || e.altKey) {
+      e.preventDefault();
+      (e.target as Element).setPointerCapture(e.pointerId);
+      panning.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y };
+      return;
+    }
     if (e.button !== 0) return;
     const { nx, ny } = pointAt(e);
     if (tool === 'background') {
@@ -511,6 +533,11 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
     }
   };
   const onStageMove = (e: React.PointerEvent) => {
+    if (panning.current) {
+      const g = panning.current;
+      setPan({ x: g.px + e.clientX - g.x, y: g.py + e.clientY - g.y });
+      return;
+    }
     const { nx, ny, sx, sy } = pointAt(e);
     if (tool === 'brush') setPointer({ x: sx, y: sy });
     if (!painting.current) return;
@@ -525,6 +552,7 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
   };
   const onStageUp = () => {
     painting.current = false;
+    panning.current = null;
   };
 
   /* ----- crop helpers ----- */
@@ -640,11 +668,21 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
         ))}
       </nav>
 
-      <main ref={stageRef} className="ie-stage" onPointerLeave={() => setPointer(null)}>
+      <main
+        ref={stageRef}
+        className="ie-stage"
+        onPointerLeave={() => setPointer(null)}
+        onWheel={(e) => zoomBy(e.deltaY < 0 ? 1.12 : 1 / 1.12)}
+      >
         {failed && <p className="ie-empty">{t('image.noData')}</p>}
         <div
           className={`ie-sheet bg-${backdrop}`}
-          style={{ width: dispW, height: dispH, cursor }}
+          style={{
+            width: dispW,
+            height: dispH,
+            cursor,
+            transform: `translate(${pan.x}px, ${pan.y}px)`,
+          }}
           onPointerDown={onStageDown}
           onPointerMove={onStageMove}
           onPointerUp={onStageUp}
@@ -667,6 +705,16 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
           )}
         </div>
         <div className="ie-stagebar">
+          <button className="ghost icon" onClick={() => zoomBy(1 / 1.25)} aria-label="-">
+            −
+          </button>
+          <button className="ghost" onClick={zoomFit} title={t('canvas.fit')}>
+            {Math.round(zoom * 100)}%
+          </button>
+          <button className="ghost icon" onClick={() => zoomBy(1.25)} aria-label="+">
+            +
+          </button>
+          <span className="ie-sep" />
           {(['checker', 'black', 'white'] as const).map((b) => (
             <button
               key={b}
