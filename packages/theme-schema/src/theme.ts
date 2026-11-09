@@ -60,6 +60,17 @@ export const FontSchema = z.object({
 });
 export type Font = z.infer<typeof FontSchema>;
 
+/** Frames of an animated picture, laid out in a grid inside the embedded PNG. */
+export const AssetAnimationSchema = z.object({
+  frames: z.number().int().min(2).max(255),
+  columns: z.number().int().positive(),
+  frameWidth: z.number().int().positive(),
+  frameHeight: z.number().int().positive(),
+  /** Display time of each frame in milliseconds. */
+  durations: z.array(z.number().positive()),
+});
+export type AssetAnimation = z.infer<typeof AssetAnimationSchema>;
+
 export const AssetSchema = z
   .object({
     type: z.enum(['image']),
@@ -75,6 +86,7 @@ export const AssetSchema = z
     width: z.number().int().positive().optional(),
     height: z.number().int().positive().optional(),
     license: z.string().max(120).optional(),
+    animation: AssetAnimationSchema.optional(),
   })
   .refine((a) => a.path !== undefined || a.data !== undefined, {
     message: 'an image asset needs a file path or embedded data',

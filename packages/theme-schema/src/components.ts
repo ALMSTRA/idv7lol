@@ -153,6 +153,8 @@ export const ImagePropsSchema = z.object({
   asset: IdSchema,
   fit: z.enum(['contain', 'cover', 'stretch']).default('contain'),
   edits: ImageEditsSchema.prefault({}),
+  /** Playback speed of animated pictures. */
+  speed: z.number().min(0.1).max(4).default(1),
 });
 
 /* -------------------------------------------------------------------------- */

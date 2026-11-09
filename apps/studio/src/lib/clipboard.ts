@@ -1,4 +1,4 @@
-import { applyImageEdits, findComponent, resolveColor } from '@idv7lol/theme-engine';
+import { applyImageEdits, findComponent, frameRaster, resolveColor } from '@idv7lol/theme-engine';
 import type { Asset, Component } from '@idv7lol/theme-schema';
 import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
@@ -120,7 +120,10 @@ export async function copyImageToSystem(componentId: string): Promise<void> {
   const src = c?.type === 'image' ? getSource(c.props.asset) : undefined;
   if (c?.type !== 'image' || !src) return;
   const palette = theme.palettes[theme.palette.default];
-  const out = applyImageEdits(src, c.props.edits, (x) => (palette ? resolveColor(x, palette) : x));
+  const anim = theme.assets[c.props.asset]?.animation;
+  const out = applyImageEdits(anim ? frameRaster(src, anim, 0) : src, c.props.edits, (x) =>
+    palette ? resolveColor(x, palette) : x,
+  );
   const blob = await new Promise<Blob | null>((r) => rasterToCanvas(out).toBlob(r, 'image/png'));
   if (!blob) return;
   try {

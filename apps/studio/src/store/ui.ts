@@ -22,6 +22,10 @@ export interface MenuItem {
 }
 
 interface UiState {
+  busy: string | null;
+  toast: { key: number; text: string } | null;
+  setBusy(text: string | null): void;
+  showToast(text: string): void;
   menu: { key: number; x: number; y: number; items: MenuItem[] } | null;
   openMenu(x: number, y: number, items: MenuItem[]): void;
   closeMenu(): void;
@@ -127,6 +131,10 @@ export const useUiStore = create<UiState>((set, get) => {
     welcomeOpen: true,
     imageEditorFor: null,
     menu: null,
+    busy: null,
+    toast: null,
+    setBusy: (busy) => set({ busy }),
+    showToast: (text) => set({ toast: { key: Date.now(), text } }),
     openMenu: (x, y, items) => set({ menu: { key: Date.now(), x, y, items } }),
     closeMenu: () => set({ menu: null }),
     log: [],

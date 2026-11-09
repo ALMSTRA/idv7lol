@@ -612,7 +612,24 @@ void main() {
 }
 `;
 
+/** An animated picture: one cell of an atlas, chosen by a renderer-side animation of u_frame. */
+export const SPRITE_FS = `${PRELUDE}
+uniform sampler2D u_atlas;
+uniform vec2 u_cells;   // columns, rows
+uniform vec2 u_texel;   // half a texel of a cell, to stop neighbours bleeding in
+uniform float u_frame;
+uniform float u_opacity;
+void main() {
+  float f = floor(u_frame + 0.5);
+  vec2 cell = vec2(mod(f, u_cells.x), floor(f / u_cells.x));
+  vec2 uv = (cell + clamp(v_uv, u_texel, vec2(1.0) - u_texel)) / u_cells;
+  vec4 c = texture2D(u_atlas, uv);
+  gl_FragColor = vec4(c.rgb, c.a * u_opacity);
+}
+`;
+
 export const SHADERS: Readonly<Record<ShaderKind, string>> = {
+  sprite: SPRITE_FS,
   flat: FLAT_FS,
   panel: PANEL_FS,
   'arc-band': ARC_BAND_FS,

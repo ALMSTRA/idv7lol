@@ -325,6 +325,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         data: img.data,
         width: img.width,
         height: img.height,
+        ...(img.animation ? { animation: img.animation } : {}),
       };
       const c = imageComponent(
         s.theme,
@@ -382,6 +383,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         data: img.data,
         width: img.width,
         height: img.height,
+        ...(img.animation ? { animation: img.animation } : {}),
       },
     };
     const components = mapTree(s.theme.components, (c) =>

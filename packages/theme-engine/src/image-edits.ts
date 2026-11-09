@@ -1,4 +1,4 @@
-import type { ImageEdits } from '@idv7lol/theme-schema';
+import type { AssetAnimation, ImageEdits } from '@idv7lol/theme-schema';
 import { parseColor } from './color.js';
 
 /**
@@ -568,4 +568,44 @@ export function fitRaster(
     );
   }
   return out;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Animated pictures                                                          */
+/* -------------------------------------------------------------------------- */
+
+export function frameRect(
+  a: AssetAnimation,
+  index: number,
+): { x: number; y: number; w: number; h: number } {
+  const i = Math.max(0, Math.min(a.frames - 1, index));
+  return {
+    x: (i % a.columns) * a.frameWidth,
+    y: Math.floor(i / a.columns) * a.frameHeight,
+    w: a.frameWidth,
+    h: a.frameHeight,
+  };
+}
+
+/** One frame of a sprite sheet as its own raster. */
+export function frameRaster(sheet: Raster, a: AssetAnimation, index: number): Raster {
+  const r = frameRect(a, index);
+  const out = createRaster(r.w, r.h);
+  for (let y = 0; y < r.h; y++) {
+    const start = ((y + r.y) * sheet.width + r.x) * 4;
+    out.data.set(sheet.data.subarray(start, start + r.w * 4), y * r.w * 4);
+  }
+  return out;
+}
+
+/** The frame showing at a time, looping. */
+export function frameAt(a: AssetAnimation, timeMs: number): number {
+  let total = 0;
+  for (let i = 0; i < a.frames; i++) total += a.durations[i] ?? 100;
+  let t = ((timeMs % total) + total) % total;
+  for (let i = 0; i < a.frames; i++) {
+    t -= a.durations[i] ?? 100;
+    if (t < 0) return i;
+  }
+  return a.frames - 1;
 }

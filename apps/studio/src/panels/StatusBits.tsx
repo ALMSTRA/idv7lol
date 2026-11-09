@@ -78,3 +78,22 @@ export function LiveStats(): JSX.Element {
   }, [label]);
   return <span ref={ref} title="Frames per second and time spent drawing each frame" />;
 }
+
+/** Progress of long imports and short confirmations. */
+export function Notices(): JSX.Element | null {
+  const busy = useUiStore((s) => s.busy);
+  const toast = useUiStore((s) => s.toast);
+  const [shown, setShown] = useState<number | null>(null);
+  useEffect(() => {
+    if (!toast) return;
+    setShown(toast.key);
+    const h = setTimeout(() => setShown(null), 3500);
+    return () => clearTimeout(h);
+  }, [toast]);
+  const text = busy ?? (toast && shown === toast.key ? toast.text : null);
+  return text ? (
+    <div className="notice" role="status">
+      {text}
+    </div>
+  ) : null;
+}

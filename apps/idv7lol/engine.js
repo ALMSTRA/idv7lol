@@ -321,6 +321,61 @@ class ClusterEngine {
         this.log.warn('image ' + img.key + ': no usable pixels');
         return st;
       }
+      if (img.sprite) {
+        // The renderer plays the frames by itself: nothing is sent per frame.
+        st.asset = this.cr.asset({
+          target,
+          format: 'rgba8',
+          w: img.iw,
+          h: img.ih,
+          sampling: 'bilinear',
+        });
+        const sprite = {
+          target,
+          klass: 'content',
+          z: img.z,
+          x: img.x,
+          y: img.y,
+          w: img.w,
+          h: img.h,
+          visible: 1,
+          fs: theme.shaders.sprite,
+        };
+        if (img.rotation) {
+          sprite.rotate = img.rotation;
+          sprite.px = img.pivotX;
+          sprite.py = img.pivotY;
+        }
+        st.ref = st.asset ? this.cr.effect(sprite) : 0;
+        if (!st.ref) {
+          this.log.warn('animation refused: ' + img.key);
+          return st;
+        }
+        this.cr.pixels(st.asset, null, pixels);
+        this.cr.bind(st.ref, 'u_atlas', st.asset);
+        const sp = img.sprite;
+        this.cr.uniform(st.ref, 'u_size', [img.w, img.h]);
+        this.cr.uniform(st.ref, 'u_cells', [sp.columns, sp.rows]);
+        this.cr.uniform(st.ref, 'u_texel', [r3(0.5 / sp.cellW), r3(0.5 / sp.cellH)]);
+        this.cr.uniform(st.ref, 'u_opacity', [img.opacity]);
+        this.cr.uniform(st.ref, 'u_frame', [0]);
+        let t = 0;
+        const keys = sp.durations.map((d, i) => {
+          const key = t + ':' + i;
+          t += d;
+          return key;
+        });
+        keys.push(t + ':' + (sp.frames - 1));
+        this.cr.animate(st.ref, {
+          property: 'uniform',
+          name: 'u_frame',
+          keys: keys.join(' '),
+          loop: true,
+          interp: 'step',
+        });
+        this.messages++;
+        return st;
+      }
       const opts = {
         target,
         klass: 'content',
@@ -367,6 +422,7 @@ class ClusterEngine {
     Object.keys(this.assets).forEach((fam) => this.cr.drop(this.assets[fam]));
     this.images.forEach((st) => {
       if (st.ref) this.cr.drop(st.ref);
+      if (st.asset) this.cr.drop(st.asset);
     });
     this.images = [];
     this.pieces = [];

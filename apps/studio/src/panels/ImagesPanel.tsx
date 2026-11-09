@@ -65,6 +65,7 @@ export function ImagesPanel(): JSX.Element {
               }}
             >
               <img src={getThumb(id) ?? a.data} alt={a.name ?? id} draggable={false} />
+              {a.animation && <span className="img-badge">{a.animation.frames}f</span>}
               <button
                 className="img-del"
                 aria-label={t('misc.remove')}

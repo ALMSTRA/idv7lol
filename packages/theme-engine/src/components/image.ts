@@ -1,4 +1,5 @@
 import type { ImageComponent } from '@idv7lol/theme-schema';
+import { frameAt } from '../image-edits.js';
 import type { ComponentRenderer } from './types.js';
 
 export const imageRenderer: ComponentRenderer<ImageComponent> = {
@@ -6,7 +7,9 @@ export const imageRenderer: ComponentRenderer<ImageComponent> = {
   draw(rc, c, w, h) {
     const { ctx } = rc;
     const p = c.props;
-    const img = rc.options.images?.get(p.asset, p.edits, (color) => rc.color(color));
+    const animation = rc.theme.assets[p.asset]?.animation;
+    const frame = animation ? frameAt(animation, rc.now * p.speed) : undefined;
+    const img = rc.options.images?.get(p.asset, p.edits, (color) => rc.color(color), frame);
     if (!img) {
       // Placeholder: dashed box with a cross, so a missing asset is obvious.
       ctx.beginPath();
@@ -43,7 +46,12 @@ export const imageRenderer: ComponentRenderer<ImageComponent> = {
       ctx.rect(0, 0, w, h);
       ctx.clip();
     }
-    ctx.drawImage(img.image, dx, dy, dw, dh);
+    if (img.crop) {
+      const r = img.crop;
+      ctx.drawImage(img.image, r.x, r.y, r.w, r.h, dx, dy, dw, dh);
+    } else {
+      ctx.drawImage(img.image, dx, dy, dw, dh);
+    }
     ctx.restore();
   },
   layers: () => 1,

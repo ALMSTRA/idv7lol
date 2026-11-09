@@ -403,6 +403,15 @@ export function validateTheme(doc: unknown): ValidationReport {
     );
   if (layers === 0) out.warning('budget.empty', 'The theme has no visible components.');
   const atlasBytes = new Set(Object.values(theme.fonts).map((f) => f.family)).size * 344_064;
+  const sprites = build.images.filter((i) => i.sprite).length;
+  // One asset is the glyph atlas of the text.
+  if (sprites + 1 > RENDERER_LIMITS.assetsPerClient) {
+    out.error(
+      'budget.assets',
+      `${sprites} animations are placed but the car allows ${RENDERER_LIMITS.assetsPerClient - 1}.`,
+      { hint: 'Remove some animations from the layout.' },
+    );
+  }
   const imageBytes = build.images.reduce((sum, i) => sum + i.iw * i.ih * 4, 0);
   if (imageBytes > 0) {
     const mib = (n: number) => (n / (1024 * 1024)).toFixed(1);

@@ -1446,3 +1446,31 @@ table.plain th {
 .ctx button.danger:not(:hover):not(.on) {
   color: var(--danger);
 }
+
+.img-badge {
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  padding: 0 4px;
+  font-size: 10px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+}
+.notice {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  z-index: 90;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 9px 16px;
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+}
+.ie-scrub {
+  width: 180px;
+  accent-color: var(--accent);
+}

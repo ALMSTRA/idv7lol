@@ -1,6 +1,8 @@
 import { getDisplayProfile, type Theme } from '@idv7lol/theme-schema';
 import {
   applyImageEdits,
+  createRaster,
+  frameRaster,
   collectSignals,
   findComponent,
   fitRaster,
@@ -49,6 +51,7 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
 
   const usedShaders: Record<string, string> = {};
   for (const p of build.pieces) usedShaders[p.shader] = SHADERS[p.shader];
+  if (build.images.some((i) => i.sprite)) usedShaders['sprite'] = SHADERS.sprite;
 
   const signals = new Set(collectSignals(theme.components));
   signals.add('drive.mode');
@@ -133,6 +136,29 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
         img.rgba.byteLength,
       ),
     };
+    const resolve = (c: string) => (palette ? resolveColor(c, palette) : c);
+    const anim = theme.assets[ref.asset]?.animation;
+    if (anim && entry.sprite) {
+      const { columns, cellW, cellH, frames } = entry.sprite;
+      const atlas = createRaster(entry.iw, entry.ih);
+      for (let i = 0; i < frames; i++) {
+        const cell = fitRaster(
+          applyImageEdits(frameRaster(source, anim, i), component.props.edits, resolve),
+          cellW,
+          cellH,
+          component.props.fit,
+        );
+        const ox = (i % columns) * cellW;
+        const oy = Math.floor(i / columns) * cellH;
+        for (let y = 0; y < cellH; y++)
+          atlas.data.set(
+            cell.data.subarray(y * cellW * 4, (y + 1) * cellW * 4),
+            ((y + oy) * entry.iw + ox) * 4,
+          );
+      }
+      files.push({ path: entry.file, data: new Uint8Array(atlas.data.buffer as ArrayBuffer) });
+      continue;
+    }
     const edited = applyImageEdits(source, component.props.edits, (c) =>
       palette ? resolveColor(c, palette) : c,
     );

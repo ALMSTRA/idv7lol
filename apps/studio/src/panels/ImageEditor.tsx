@@ -17,6 +17,7 @@ import {
 import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
 import { useT } from '../i18n/index.js';
+import { frameRaster } from '@idv7lol/theme-engine';
 import {
   ensureSource,
   imageResolver,
@@ -286,6 +287,9 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
   const [out, setOut] = useState({ w: 1, h: 1 });
   const [pointer, setPointer] = useState<{ x: number; y: number } | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [frame, setFrame] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const animation = asset?.animation;
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const panning = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
 
@@ -302,9 +306,9 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
       return;
     }
     let live = true;
-    void ensureSource(comp!.props.asset, asset.data).then((r) => {
+    void ensureSource(comp!.props.asset, asset.data, asset.animation).then((r) => {
       if (!live) return;
-      if (r) setSource(r);
+      if (r) setSource(asset.animation ? frameRaster(r, asset.animation, 0) : r);
       else setFailed(true);
     });
     return () => {
@@ -324,20 +328,36 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
   /* ----- draw the working image; the worker keeps the interface free ----- */
   useEffect(() => {
     if (!source || !comp) return;
-    renderLatest('editor', comp.props.asset, withResolvedTint(view, resolve), 1400, (r) => {
-      const c = canvasRef.current;
-      if (!c) return;
-      if (c.width !== r.width || c.height !== r.height) {
-        c.width = r.width;
-        c.height = r.height;
-      } else {
-        c.getContext('2d')!.clearRect(0, 0, c.width, c.height);
-      }
-      c.getContext('2d')!.drawImage(r.image, 0, 0);
-      setOut({ w: r.width, h: r.height });
-    });
+    renderLatest(
+      'editor',
+      comp.props.asset,
+      withResolvedTint(view, resolve),
+      1400,
+      (r) => {
+        const c = canvasRef.current;
+        if (!c) return;
+        if (c.width !== r.width || c.height !== r.height) {
+          c.width = r.width;
+          c.height = r.height;
+        } else {
+          c.getContext('2d')!.clearRect(0, 0, c.width, c.height);
+        }
+        c.getContext('2d')!.drawImage(r.image, 0, 0);
+        setOut({ w: r.width, h: r.height });
+      },
+      animation ? frame : undefined,
+    );
     // `comp` only supplies the asset id, which is fixed for an open editor.
-  }, [source, view, resolve]);
+  }, [source, view, resolve, frame, animation]);
+
+  useEffect(() => {
+    if (!playing || !animation) return;
+    const h = setTimeout(
+      () => setFrame((f) => (f + 1) % animation.frames),
+      animation.durations[frame] ?? 100,
+    );
+    return () => clearTimeout(h);
+  }, [playing, animation, frame]);
 
   useEffect(() => {
     const el = stageRef.current;
@@ -705,6 +725,33 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
           )}
         </div>
         <div className="ie-stagebar">
+          {animation && (
+            <>
+              <button
+                className="ghost icon"
+                onClick={() => setPlaying(!playing)}
+                aria-label={t(playing ? 'sim.pause' : 'sim.play')}
+              >
+                {playing ? '❚❚' : '▶'}
+              </button>
+              <input
+                className="ie-scrub"
+                type="range"
+                aria-label={t('image.frame')}
+                min={0}
+                max={animation.frames - 1}
+                value={frame}
+                onChange={(e) => {
+                  setPlaying(false);
+                  setFrame(parseInt(e.target.value));
+                }}
+              />
+              <span className="ie-dim">
+                {frame + 1}/{animation.frames}
+              </span>
+              <span className="ie-sep" />
+            </>
+          )}
           <button className="ghost icon" onClick={() => zoomBy(1 / 1.25)} aria-label="-">
             −
           </button>

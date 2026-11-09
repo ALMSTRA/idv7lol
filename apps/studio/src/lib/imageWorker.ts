@@ -2,11 +2,12 @@
 import {
   applyFinishStage,
   applySourceStage,
+  frameRaster,
   resizeRaster,
   sourceStageKey,
   type Raster,
 } from '@idv7lol/theme-engine';
-import type { ImageEdits } from '@idv7lol/theme-schema';
+import type { AssetAnimation, ImageEdits } from '@idv7lol/theme-schema';
 
 /**
  * Runs the image pipeline away from the interface thread. The expensive early
@@ -17,6 +18,7 @@ interface Load {
   type: 'load';
   key: string;
   raster: Raster;
+  animation?: AssetAnimation;
 }
 interface Render {
   type: 'render';
@@ -25,35 +27,43 @@ interface Render {
   channel: string;
   edits: ImageEdits;
   maxSide: number;
+  frame?: number;
 }
 
-const sources = new Map<string, Map<number, Raster>>();
+const sources = new Map<
+  string,
+  { sizes: Map<string, Raster>; full: Raster; animation?: AssetAnimation }
+>();
 const stages = new Map<string, { key: string; raster: Raster }>();
 
-function sourceAt(key: string, maxSide: number): Raster | undefined {
-  const sizes = sources.get(key);
-  const full = sizes?.get(0);
-  if (!sizes || !full) return undefined;
-  if (!maxSide || Math.max(full.width, full.height) <= maxSide) return full;
-  let r = sizes.get(maxSide);
-  if (!r) {
-    const s = maxSide / Math.max(full.width, full.height);
-    r = resizeRaster(full, full.width * s, full.height * s);
-    sizes.set(maxSide, r);
+function sourceAt(key: string, maxSide: number, frame?: number): Raster | undefined {
+  const entry = sources.get(key);
+  if (!entry) return undefined;
+  const id = `${frame ?? 'x'}|${maxSide}`;
+  let r = entry.sizes.get(id);
+  if (r) return r;
+  r =
+    entry.animation && frame !== undefined
+      ? frameRaster(entry.full, entry.animation, frame)
+      : entry.full;
+  if (maxSide && Math.max(r.width, r.height) > maxSide) {
+    const s = maxSide / Math.max(r.width, r.height);
+    r = resizeRaster(r, r.width * s, r.height * s);
   }
+  entry.sizes.set(id, r);
   return r;
 }
 
 self.onmessage = async (e: MessageEvent<Load | Render>) => {
   const m = e.data;
   if (m.type === 'load') {
-    sources.set(m.key, new Map([[0, m.raster]]));
+    sources.set(m.key, { sizes: new Map(), full: m.raster, animation: m.animation });
     return;
   }
   try {
-    const src = sourceAt(m.source, m.maxSide);
+    const src = sourceAt(m.source, m.maxSide, m.frame);
     if (!src) throw new Error('unknown image');
-    const key = `${m.source}|${m.maxSide}|${sourceStageKey(m.edits)}`;
+    const key = `${m.source}|${m.maxSide}|${m.frame ?? ''}|${sourceStageKey(m.edits)}`;
     let stage = stages.get(m.channel);
     if (stage?.key !== key) {
       stage = { key, raster: applySourceStage(src, m.edits) };

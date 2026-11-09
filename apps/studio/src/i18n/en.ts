@@ -290,6 +290,11 @@ export const en = {
   },
   console: { title: 'Console', clear: 'Clear' },
   image: {
+    processing: 'Processing {name}: {pct}%',
+    trimmed: 'Only the first 12 seconds were kept: {names}',
+    animated: 'Animation of {n} frames, on loop.',
+    speed: 'Speed',
+    frame: 'Frame',
     title: 'Image editor',
     tools: 'Tools',
     add: 'Add images',

@@ -17,6 +17,9 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   background removal, erase/restore brush, effects, compare, undo and a live view on the cluster.
 - Compiler bakes each image's edits at its layer size and validates renderer pixel memory.
 - MGU app draws image layers (tested locally against a fake renderer; not tested in a vehicle).
+- Animated pictures: GIF, animated WebP, APNG and short videos (up to 12 s, 15 fps, 120 frames, no
+  sound) import as a sprite sheet, play in the editor and compile to one atlas that the renderer
+  loops by itself, with nothing sent per frame. Tested locally; not tested in a vehicle.
 
 ### Fixed
 

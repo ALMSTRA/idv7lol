@@ -425,10 +425,40 @@ function wrapStatic(text: string, maxChars: number): string[] {
   return out;
 }
 
+/** The renderer's largest texture upload: one message, at most 2048 on a side. */
+const MAX_ATLAS_BYTES = 1920 * 720 * 4;
+const MAX_ATLAS_SIDE = 2048;
+
+/** A grid that fits `frames` cells of about `w`×`h` in one atlas, shrinking the cells if needed. */
+export function atlasLayout(
+  frames: number,
+  w: number,
+  h: number,
+): { columns: number; rows: number; cellW: number; cellH: number } {
+  let s = Math.min(1, Math.sqrt(MAX_ATLAS_BYTES / 4 / (frames * w * h)));
+  for (;;) {
+    const cellW = Math.max(2, Math.floor(w * s));
+    const cellH = Math.max(2, Math.floor(h * s));
+    const columns = Math.max(
+      1,
+      Math.min(
+        frames,
+        Math.floor(MAX_ATLAS_SIDE / cellW),
+        Math.ceil(Math.sqrt((frames * cellH) / cellW)),
+      ),
+    );
+    const rows = Math.ceil(frames / columns);
+    if (rows * cellH <= MAX_ATLAS_SIDE && columns * cellW * rows * cellH * 4 <= MAX_ATLAS_BYTES)
+      return { columns, rows, cellW, cellH };
+    s *= 0.95;
+  }
+}
+
 function buildImage(ctx: Ctx, f: FlatComponent): void {
   const c = f.component;
   if (c.type !== 'image') return;
-  if (!ctx.theme.assets[c.props.asset]) return; // validator reports it
+  const asset = ctx.theme.assets[c.props.asset];
+  if (!asset) return; // validator reports it
   const key = `${c.id}:img`;
   ctx.assetRefs.push({ componentId: c.id, asset: c.props.asset, key });
   if (c.props.edits.tint?.color.startsWith('$')) {
@@ -458,6 +488,29 @@ function buildImage(ctx: Ctx, f: FlatComponent): void {
     pivotY: fy * c.height,
     ...(c.visibleWhen ? { visibleWhen: c.visibleWhen } : {}),
   });
+  if (asset.animation) {
+    const a = asset.animation;
+    const entry = ctx.images[ctx.images.length - 1]!;
+    const boxW = Math.min(RENDERER_LIMITS.imageMaxWidth, Math.round(c.width));
+    const boxH = Math.min(RENDERER_LIMITS.imageMaxHeight, Math.round(c.height));
+    const grid = atlasLayout(a.frames, boxW, boxH);
+    entry.iw = grid.columns * grid.cellW;
+    entry.ih = grid.rows * grid.cellH;
+    entry.sprite = {
+      ...grid,
+      frames: a.frames,
+      durations: a.durations.map((d) => Math.max(20, Math.round(d / c.props.speed))),
+    };
+    if (grid.cellW < boxW * 0.6) {
+      warn(
+        ctx,
+        'image.atlas-scaled',
+        `This animation is shown at ${grid.cellW}×${grid.cellH} per frame on the car and scaled up: ${a.frames} frames must fit one texture.`,
+        c.id,
+        'Make it smaller on the layout or use fewer frames for a sharper result.',
+      );
+    }
+  }
 }
 
 function zoneStatics(

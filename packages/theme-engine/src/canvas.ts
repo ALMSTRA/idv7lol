@@ -73,6 +73,17 @@ export interface Canvas2DLike {
   ): GradientLike;
   createConicGradient?(startAngle: number, x: number, y: number): GradientLike;
   drawImage(image: unknown, dx: number, dy: number, dw: number, dh: number): void;
+  drawImage(
+    image: unknown,
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+    dx: number,
+    dy: number,
+    dw: number,
+    dh: number,
+  ): void;
 }
 
 /** Something the engine can hand to drawImage. Resolved by the host (Studio/Node). */
@@ -87,7 +98,17 @@ export interface ImageResolver {
     assetId: string,
     edits?: ImageEdits,
     resolveColor?: (color: string) => string,
-  ): { image: ImageSource; width: number; height: number } | undefined;
+    /** Frame to draw, for animated pictures. */
+    frame?: number,
+  ):
+    | {
+        image: ImageSource;
+        width: number;
+        height: number;
+        /** Part of `image` to draw, when it is a sprite sheet. */
+        crop?: { x: number; y: number; w: number; h: number };
+      }
+    | undefined;
 }
 
 export type RecordedOp = { op: string; args: unknown[] };
@@ -226,8 +247,8 @@ export class RecordingContext implements Canvas2DLike {
       toString: () => `conic(${stops.map((s) => s.join(':')).join(',')})`,
     } as GradientLike;
   }
-  drawImage(image: unknown, dx: number, dy: number, dw: number, dh: number): void {
-    this.rec('drawImage', image, dx, dy, dw, dh);
+  drawImage(image: unknown, ...args: number[]): void {
+    this.rec('drawImage', image, ...args);
   }
 
   /** Texts drawn, in order. */

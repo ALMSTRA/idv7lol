@@ -1,10 +1,18 @@
 import {
   applyImageEdits,
   resizeRaster,
+  frameRaster,
+  frameRect,
   type ImageResolver,
   type Raster,
 } from '@idv7lol/theme-engine';
-import { ImageEditsSchema, type ImageEdits, type Theme } from '@idv7lol/theme-schema';
+import {
+  ImageEditsSchema,
+  type AssetAnimation,
+  type ImageEdits,
+  type Theme,
+} from '@idv7lol/theme-schema';
+import { buildSheet, decodeAnimated } from './media.js';
 
 /**
  * Decoded pixels of the theme's image assets and the edited versions the
@@ -16,16 +24,18 @@ interface Source {
   raster: Raster;
   base: HTMLCanvasElement;
   thumb: string;
+  animation?: AssetAnimation;
 }
 export interface Rendered {
   image: CanvasImageSource;
   width: number;
   height: number;
+  crop?: { x: number; y: number; w: number; h: number };
 }
 
 /** Imported images larger than this are scaled down; the car's largest layer is 1920×720. */
 const MAX_SIDE = 2048;
-const MAX_EDITED = 48;
+const MAX_EDITED = 400;
 const THUMB_SIDE = 160;
 const CLEAN_KEY = JSON.stringify(ImageEditsSchema.parse({}));
 
@@ -75,6 +85,7 @@ interface Job {
   source: string;
   edits: ImageEdits;
   maxSide: number;
+  frame?: number;
   done: (r: Rendered) => void;
 }
 
@@ -97,8 +108,12 @@ function finish(job: Job, result: Rendered | null): void {
 function computeHere(job: Job): void {
   // Only when workers are unavailable: same pipeline, on this thread, after input is handled.
   setTimeout(() => {
-    const src = sources.get(job.source)?.raster;
-    if (!src) return finish(job, null);
+    const entry = sources.get(job.source);
+    if (!entry) return finish(job, null);
+    const src =
+      entry.animation && job.frame !== undefined
+        ? frameRaster(entry.raster, entry.animation, job.frame)
+        : entry.raster;
     const small = job.maxSide ? previewOf(src, job.maxSide) : src;
     const out = applyImageEdits(small, job.edits);
     finish(job, { image: rasterToCanvas(out), width: out.width, height: out.height });
@@ -123,7 +138,8 @@ function getWorker(): Worker | null {
       worker = null;
       for (const job of [...running.values()]) computeHere(job);
     };
-    for (const [key, s] of sources) worker.postMessage({ type: 'load', key, raster: s.raster });
+    for (const [key, s] of sources)
+      worker.postMessage({ type: 'load', key, raster: s.raster, animation: s.animation });
   } catch {
     worker = null;
   }
@@ -143,6 +159,7 @@ function dispatch(job: Job): void {
       channel: job.channel,
       edits: job.edits,
       maxSide: job.maxSide,
+      frame: job.frame,
     });
   else computeHere(job);
 }
@@ -157,8 +174,9 @@ export function renderLatest(
   edits: ImageEdits,
   maxSide: number,
   done: (r: Rendered) => void,
+  frame?: number,
 ): void {
-  const job: Job = { id: nextJob++, channel, source, edits, maxSide, done };
+  const job: Job = { id: nextJob++, channel, source, edits, maxSide, done, frame };
   const ch = channels.get(channel);
   if (ch) ch.next = job;
   else dispatch(job);
@@ -185,20 +203,23 @@ async function decode(url: string): Promise<{ raster: Raster; base: HTMLCanvasEl
   return { raster: { width: c.width, height: c.height, data: d.data }, base: c };
 }
 
-function makeThumb(base: HTMLCanvasElement): string {
-  const s = Math.min(1, THUMB_SIDE / Math.max(base.width, base.height));
-  const t = canvasOf(
-    Math.max(1, Math.round(base.width * s)),
-    Math.max(1, Math.round(base.height * s)),
-  );
+function makeThumb(base: HTMLCanvasElement, animation?: AssetAnimation): string {
+  const bw = animation ? animation.frameWidth : base.width;
+  const bh = animation ? animation.frameHeight : base.height;
+  const s = Math.min(1, THUMB_SIDE / Math.max(bw, bh));
+  const t = canvasOf(Math.max(1, Math.round(bw * s)), Math.max(1, Math.round(bh * s)));
   const ctx = t.getContext('2d')!;
   ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(base, 0, 0, t.width, t.height);
+  ctx.drawImage(base, 0, 0, bw, bh, 0, 0, t.width, t.height);
   return t.toDataURL('image/png');
 }
 
 /** Load one asset's pixels (once). Resolves to null when the data cannot be decoded. */
-export function ensureSource(id: string, data: string): Promise<Raster | null> {
+export function ensureSource(
+  id: string,
+  data: string,
+  animation?: AssetAnimation,
+): Promise<Raster | null> {
   const have = sources.get(id);
   if (have?.data === data) return Promise.resolve(have.raster);
   const key = `${id}:${data.length}`;
@@ -206,8 +227,8 @@ export function ensureSource(id: string, data: string): Promise<Raster | null> {
   if (running2) return running2;
   const p = decode(data)
     .then(({ raster, base }) => {
-      sources.set(id, { data, raster, base, thumb: makeThumb(base) });
-      getWorker()?.postMessage({ type: 'load', key: id, raster });
+      sources.set(id, { data, raster, base, thumb: makeThumb(base, animation), animation });
+      getWorker()?.postMessage({ type: 'load', key: id, raster, animation });
       for (const k of edited.keys()) if (k.startsWith(`${id}|`)) edited.delete(k);
       for (const k of requested) if (k.startsWith(`${id}|`)) requested.delete(k);
       lastByAsset.delete(id);
@@ -226,7 +247,7 @@ export const getThumb = (id: string): string | undefined => sources.get(id)?.thu
 /** Keep the decoded pixels in step with the theme's assets. */
 export function syncAssets(theme: Theme): void {
   for (const [id, asset] of Object.entries(theme.assets)) {
-    if (asset.data) void ensureSource(id, asset.data);
+    if (asset.data) void ensureSource(id, asset.data, asset.animation);
   }
 }
 
@@ -252,14 +273,18 @@ export function withResolvedTint(
 
 /** What the canvas draws. Never blocks: a missing result is requested and the last one shown. */
 export const imageResolver: ImageResolver = {
-  get(assetId, edits, resolveColor) {
+  get(assetId, edits, resolveColor, frame) {
     const source = sources.get(assetId);
     if (!source) return undefined;
     const ek = editsKey(edits);
-    const base = { image: source.base, width: source.base.width, height: source.base.height };
+    const anim = source.animation;
+    const cell = anim && frame !== undefined ? frameRect(anim, frame) : undefined;
+    const base: Rendered = cell
+      ? { image: source.base, width: cell.w, height: cell.h, crop: cell }
+      : { image: source.base, width: source.base.width, height: source.base.height };
     if (ek === CLEAN_KEY || !edits) return base;
     const tint = edits.tint && resolveColor ? resolveColor(edits.tint.color) : '';
-    const key = `${assetId}|${ek}|${tint}`;
+    const key = `${assetId}|${ek}|${tint}|${cell ? frame : ''}`;
     const hit = edited.get(key);
     if (hit) {
       lastByAsset.set(assetId, hit);
@@ -267,16 +292,23 @@ export const imageResolver: ImageResolver = {
     }
     if (!requested.has(key)) {
       requested.add(key);
-      renderLatest(`res:${key}`, assetId, withResolvedTint(edits, resolveColor), 0, (r) => {
-        requested.delete(key);
-        edited.set(key, r);
-        lastByAsset.set(assetId, r);
-        if (edited.size > MAX_EDITED) {
-          const oldest = edited.keys().next().value!;
-          edited.delete(oldest);
-        }
-        notify();
-      });
+      renderLatest(
+        `res:${key}`,
+        assetId,
+        withResolvedTint(edits, resolveColor),
+        0,
+        (r) => {
+          requested.delete(key);
+          edited.set(key, r);
+          lastByAsset.set(assetId, r);
+          if (edited.size > MAX_EDITED) {
+            const oldest = edited.keys().next().value!;
+            edited.delete(oldest);
+          }
+          notify();
+        },
+        frame,
+      );
     }
     return lastByAsset.get(assetId) ?? base;
   },
@@ -289,7 +321,7 @@ export async function decodeThemeImages(
   const out: Record<string, { width: number; height: number; rgba: Uint8Array }> = {};
   for (const [id, asset] of Object.entries(theme.assets)) {
     if (!asset.data) continue;
-    const r = await ensureSource(id, asset.data);
+    const r = await ensureSource(id, asset.data, asset.animation);
     if (r)
       out[id] = {
         width: r.width,
@@ -308,6 +340,7 @@ export interface ImportedImage {
   data: string;
   width: number;
   height: number;
+  animation?: AssetAnimation;
 }
 
 function idFromName(name: string, taken: Set<string>): string {
@@ -344,11 +377,33 @@ function canvasToDataUrl(c: HTMLCanvasElement): Promise<string> {
 export async function importFiles(
   files: File[],
   assets: Theme['assets'],
-): Promise<{ images: ImportedImage[]; failed: string[] }> {
+  onProgress: (name: string, fraction: number) => void = () => undefined,
+): Promise<{ images: ImportedImage[]; failed: string[]; trimmed: string[] }> {
   const taken = new Set(Object.keys(assets));
   const images: ImportedImage[] = [];
   const failed: string[] = [];
+  const trimmed: string[] = [];
   for (const file of files) {
+    try {
+      const decoded = await decodeAnimated(file, (f) => onProgress(file.name, f));
+      if (decoded) {
+        const { canvas, animation } = buildSheet(decoded);
+        if (decoded.trimmed) trimmed.push(file.name);
+        images.push({
+          id: idFromName(file.name || 'animation', taken),
+          name: file.name || 'animation',
+          data: await canvasToDataUrl(canvas),
+          width: animation.frameWidth,
+          height: animation.frameHeight,
+          animation,
+        });
+        continue;
+      }
+      if (file.type.startsWith('video/')) throw new Error('unreadable');
+    } catch {
+      failed.push(file.name || 'video');
+      continue;
+    }
     const url = URL.createObjectURL(file);
     try {
       const img = await loadElement(url);
@@ -377,14 +432,14 @@ export async function importFiles(
       URL.revokeObjectURL(url);
     }
   }
-  return { images, failed };
+  return { images, failed, trimmed };
 }
 
 export function pickImageFiles(multiple = true): Promise<File[]> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*,.svg';
+    input.accept = 'image/*,video/*,.svg';
     input.multiple = multiple;
     input.onchange = () => resolve(input.files ? [...input.files] : []);
     input.oncancel = () => resolve([]);
@@ -397,7 +452,8 @@ export function imageFilesOf(list: FileList | DataTransferItemList | null | unde
   const out: File[] = [];
   for (const entry of Array.from(list as ArrayLike<File | DataTransferItem>)) {
     const f = 'getAsFile' in entry ? (entry.kind === 'file' ? entry.getAsFile() : null) : entry;
-    if (f && (f.type.startsWith('image/') || /\.svg$/i.test(f.name))) out.push(f);
+    if (f && (f.type.startsWith('image/') || f.type.startsWith('video/') || /\.svg$/i.test(f.name)))
+      out.push(f);
   }
   return out;
 }

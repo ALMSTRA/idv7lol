@@ -40,7 +40,8 @@ export type ShaderKind =
   | 'text'
   | 'shiftlights'
   | 'telltale'
-  | 'panel';
+  | 'panel'
+  | 'sprite';
 
 /** A static uniform: numbers sent once when the layer is made. */
 export type StaticUniforms = Record<string, number[]>;
@@ -171,6 +172,15 @@ export interface CompiledImage {
   /** Rotation pivot in pixels from the layer's top-left. */
   pivotX: number;
   pivotY: number;
+  /** Set for animated pictures: `iw`×`ih` is then the atlas holding every frame. */
+  sprite?: {
+    columns: number;
+    rows: number;
+    cellW: number;
+    cellH: number;
+    frames: number;
+    durations: number[];
+  };
   visibleWhen?: Condition;
 }
 

@@ -294,6 +294,81 @@ describe('MGU engine images', () => {
   });
 });
 
+describe('MGU engine animations', () => {
+  it('uploads one atlas and lets the renderer flip frames with no traffic per frame', () => {
+    const sheet = new Uint8Array(8 * 4 * 4).fill(255);
+    const png = encodePng(8, 4, sheet);
+    const theme = createEmptyTheme({ id: 'anim', name: 'Anim' });
+    const doc = {
+      ...theme,
+      assets: {
+        gif: {
+          type: 'image' as const,
+          data: `data:image/png;base64,${Buffer.from(png).toString('base64')}`,
+          animation: {
+            frames: 2,
+            columns: 2,
+            frameWidth: 4,
+            frameHeight: 4,
+            durations: [100, 200],
+          },
+        },
+      },
+      components: [
+        createComponent('image', {
+          id: 'g',
+          x: 600,
+          y: 240,
+          width: 64,
+          height: 64,
+          props: { asset: 'gif', fit: 'stretch', speed: 2 },
+        }),
+      ],
+    };
+    const result = compileTheme(doc, { images: { gif: decodePng(png) } });
+    expect(result.report.errors).toEqual([]);
+    const entry = result.compiled!.images[0]!;
+    expect(entry.sprite).toMatchObject({
+      columns: 2,
+      cellW: 64,
+      cellH: 64,
+      frames: 2,
+      durations: [50, 100],
+    });
+    const atlas = result.files.find((f) => f.path === 'images/g.rgba')!.data as Uint8Array;
+    expect(atlas.length).toBe(entry.iw * entry.ih * 4);
+    expect(result.compiled!.shaders['sprite']).toContain('u_atlas');
+
+    const client = new FakeClient();
+    const engine = new ClusterEngine({
+      client,
+      log: quiet,
+      theme: result.compiled,
+      fonts: {},
+      signals: new SignalStore(),
+      enabled: () => true,
+      live: () => true,
+      sweep: () => false,
+      now: () => 1000,
+      paletteId: () => 'night',
+      loadImage: () => Buffer.from(atlas),
+    });
+    engine.tick();
+    expect(client.ops.some((o) => o.op === 'asset' && o.format === 'rgba8')).toBe(true);
+    const anim = client.ops.find((o) => o.op === 'animate')!;
+    expect(anim).toMatchObject({
+      name: 'u_frame',
+      keys: '0:0 50:1 150:1',
+      loop: true,
+      interp: 'step',
+    });
+    const before = client.ops.length;
+    engine.tick();
+    engine.tick();
+    expect(client.ops.length).toBe(before);
+  });
+});
+
 describe('vehicle helpers', () => {
   it('maps BMW drive-mode payloads and gear enums', () => {
     expect(driveModeOf('SPORT_PLUS')).toBe('SPORT_PLUS');

@@ -25,6 +25,7 @@ import {
   CursorReadout,
   LayerCount,
   LiveStats,
+  Notices,
   ValidateButton,
   ValidationTabBadge,
 } from './panels/StatusBits.js';
@@ -533,6 +534,8 @@ export function App(): JSX.Element {
       <ImageEditor />
 
       <ContextMenu />
+
+      <Notices />
 
       {ui.welcomeOpen && (
         <WelcomeDialog

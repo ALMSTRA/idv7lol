@@ -297,6 +297,11 @@ export const es: Dictionary = {
   },
   console: { title: 'Consola', clear: 'Limpiar' },
   image: {
+    processing: 'Procesando {name}: {pct}%',
+    trimmed: 'Solo se conservaron los primeros 12 segundos: {names}',
+    animated: 'Animación de {n} fotogramas, en bucle.',
+    speed: 'Velocidad',
+    frame: 'Fotograma',
     title: 'Editor de imagen',
     tools: 'Herramientas',
     add: 'Añadir imágenes',

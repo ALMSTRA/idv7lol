@@ -8,6 +8,9 @@ import {
   createRaster,
   displayToSource,
   editedSize,
+  frameAt,
+  frameRaster,
+  frameRect,
   fitRaster,
   resizeRaster,
   type Raster,
@@ -142,6 +145,23 @@ describe('applyImageEdits', () => {
     const round = applyImageEdits(full, E({ radius: 50 }));
     expect(px(round, 0, 0)[3]).toBe(0);
     expect(px(round, 20, 20)[3]).toBe(255);
+  });
+});
+
+describe('animated sheets', () => {
+  const a = { frames: 3, columns: 2, frameWidth: 2, frameHeight: 2, durations: [100, 100, 200] };
+  it('finds frames by time, looping', () => {
+    expect(frameAt(a, 0)).toBe(0);
+    expect(frameAt(a, 150)).toBe(1);
+    expect(frameAt(a, 399)).toBe(2);
+    expect(frameAt(a, 400)).toBe(0);
+  });
+  it('slices frames out of the sheet', () => {
+    const sheet = gradient(4, 4);
+    expect(frameRect(a, 2)).toEqual({ x: 0, y: 2, w: 2, h: 2 });
+    const f = frameRaster(sheet, a, 1);
+    expect([f.width, f.height]).toEqual([2, 2]);
+    expect(px(f, 0, 0).slice(0, 2)).toEqual([2, 0]);
   });
 });
 

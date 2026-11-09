@@ -193,6 +193,24 @@ function ImageSection({ c, theme }: { c: ImageComponent; theme: Theme }): JSX.El
           {t('image.background')}
         </button>
       </div>
+      {asset?.animation && (
+        <>
+          <div className="hint">{t('image.animated', { n: asset.animation.frames })}</div>
+          <Field label={t('image.speed')}>
+            <input
+              type="range"
+              min={0.1}
+              max={4}
+              step={0.05}
+              value={c.props.speed}
+              onChange={(e) => updateProps(c.id, { speed: parseFloat(e.target.value) })}
+            />
+            <span style={{ flex: 'none', width: 40, textAlign: 'right' }}>
+              {c.props.speed.toFixed(2)}×
+            </span>
+          </Field>
+        </>
+      )}
       <Field label={t('image.fit')}>
         <Select
           value={c.props.fit}
