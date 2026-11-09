@@ -14,7 +14,7 @@
  *     sends only what moved; texts, colours and visibility at most 30 Hz and
  *     only on change;
  *   - drops every layer when the layout is turned off, when data goes
- *     stale, or when the app stops - the factory cluster is untouched
+ *     stale, or when the app stops. The factory cluster is untouched
  *     underneath and shows again.
  *
  * Nothing here writes to the vehicle. The client (cluster_render_client.js)

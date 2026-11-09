@@ -17,9 +17,9 @@ import type { BundleFile, CompileResult, CompiledPiece, CompiledTheme, Finding }
 export const COMPILER_VERSION = '0.1.0';
 
 export interface CompileOptions {
-  /** Already-baked font atlases to include: family → { pixels, metrics }. */
+  /** Already-baked font atlases to include, keyed by family. */
   fonts?: Record<string, { pixels: Uint8Array; metrics: object }>;
-  /** Decoded image assets: asset id → RGBA8 pixels. */
+  /** Decoded image assets as RGBA8 pixels, keyed by asset id. */
   images?: Record<string, { width: number; height: number; rgba: Uint8Array }>;
   /** Compile even with validation errors (for diagnostics). */
   force?: boolean;
@@ -30,10 +30,10 @@ export interface CompileOptions {
  * Compile a theme into the runtime format plus the files of a bundle.
  * The bundle layout is what `apps/idv7lol` loads:
  *
- *   theme.json            — CompiledTheme (pieces, shaders by kind, palettes…)
- *   fonts/<family>.r8     — SDF atlas pixels (R8)
- *   fonts/<family>.json   — FontMetrics
- *   images/<asset>.rgba   — RGBA8 pixels of image assets
+ *   theme.json            CompiledTheme (pieces, shaders by kind, palettes…)
+ *   fonts/<family>.r8     SDF atlas pixels (R8)
+ *   fonts/<family>.json   FontMetrics
+ *   images/<asset>.rgba   RGBA8 pixels of image assets
  */
 export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileResult {
   const report = validateTheme(doc);

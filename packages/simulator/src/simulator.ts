@@ -101,7 +101,7 @@ export class Simulator {
     this.model.reset(sc.cold);
     this.publisher.faults.dropped.clear();
     this.publisher.faults.commLoss = false;
-    // Apply the first keyframe immediately.
+    // first keyframe applies right away, not on the next tick
     Object.assign(this.model.inputs, scenarioInputsAt(sc, 0, this.model.inputs));
     const f0 = scenarioFaultsBetween(sc, -1, 0);
     this.applyFaults(f0.faults, f0.commLoss);

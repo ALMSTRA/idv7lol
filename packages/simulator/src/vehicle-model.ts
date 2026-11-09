@@ -1,8 +1,8 @@
 import type { DriveMode } from '@idv7lol/theme-schema';
 
 /**
- * A deliberately simple but believable vehicle model. It is not a physics
- * engine: it produces plausible, smooth signals for previewing clusters.
+ * Simple vehicle model, not a physics engine. It only has to produce
+ * plausible, smooth signals for previewing clusters.
  * Everything is in catalog units (km/h, rpm, °C, bar, %, litres).
  */
 
@@ -194,7 +194,7 @@ export class VehicleModel {
     const moving = i.gearPosition === 'D' || i.gearPosition === 'R';
 
     if (!i.ignition) {
-      // Everything winds down.
+      // ignition off: everything winds down
       s.rpm = approach(s.rpm, 0, 0.6, dt);
       s.speed = Math.max(
         0,

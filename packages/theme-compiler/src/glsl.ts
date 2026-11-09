@@ -4,7 +4,7 @@
  * `v_uv` from the service's quad vertex shader ((0,0) at the top-left).
  *
  * Angle convention everywhere: degrees, 0 at 3 o'clock, clockwise positive
- * (screen coordinates, y down) — the same as the Canvas2D engine.
+ * (screen coordinates, y down), same as the Canvas2D engine.
  */
 import type { ShaderKind } from './types.js';
 

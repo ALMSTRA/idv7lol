@@ -192,7 +192,6 @@ export interface ZoneOverlap {
   zone: ReservedZone;
 }
 
-/** Every component that touches a reserved zone of the theme's layout. */
 /** The theme's zones plus its display's: a theme cannot opt out of the factory areas. */
 export function effectiveZones(theme: Theme): ReservedZone[] {
   const zones = new Map(theme.layout.reservedZones.map((z) => [z.id, z]));
@@ -201,6 +200,7 @@ export function effectiveZones(theme: Theme): ReservedZone[] {
   return [...zones.values()];
 }
 
+/** Every component that touches a reserved zone of the theme's layout. */
 export function reservedZoneOverlaps(theme: Theme): ZoneOverlap[] {
   const out: ZoneOverlap[] = [];
   const zones = effectiveZones(theme);

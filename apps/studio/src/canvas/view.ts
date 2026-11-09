@@ -6,7 +6,7 @@ import {
   type FlatComponent,
 } from '@idv7lol/theme-engine';
 
-/** Screen ↔ layout mapping: screen = layout * zoom + pan (CSS pixels). */
+/** Maps between screen and layout: screen = layout * zoom + pan (CSS pixels). */
 export interface View {
   zoom: number;
   panX: number;

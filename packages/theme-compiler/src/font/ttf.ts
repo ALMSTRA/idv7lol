@@ -311,7 +311,6 @@ export function flattenContour(points: Point[], segments = 8): Array<[number, nu
   for (let k = 1; k <= n; k++) {
     const idx = (startIdx + k) % n;
     if (k === n) {
-      // Close back to the start point.
       if (firstIsOn) visit(points[startIdx]!);
       else {
         // all-off contour: the start was an implied midpoint

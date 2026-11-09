@@ -64,7 +64,7 @@ export const EllipsePropsSchema = z.object({
 /** A straight line across the component box, corner to corner or along an axis. */
 export const LinePropsSchema = z.object({
   stroke: StrokeSchema,
-  /** `diagonal` runs top-left→bottom-right, `diagonal-flip` bottom-left→top-right. */
+  /** `diagonal` runs from top-left to bottom-right, `diagonal-flip` from bottom-left to top-right. */
   direction: z.enum(['horizontal', 'vertical', 'diagonal', 'diagonal-flip']).default('horizontal'),
 });
 
@@ -285,7 +285,7 @@ export const ArcGaugePropsSchema = z.object({
 /** Linear gauge: bars for fuel, temperatures, boost, rev bars. */
 export const BarGaugePropsSchema = z.object({
   orientation: z.enum(['horizontal', 'vertical']).default('horizontal'),
-  /** `forward` fills left→right / bottom→top; `reverse` the other way. */
+  /** `forward` fills left to right (or bottom to top), `reverse` the other way. */
   direction: z.enum(['forward', 'reverse']).default('forward'),
   track: z
     .object({

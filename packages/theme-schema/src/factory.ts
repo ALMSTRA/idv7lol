@@ -60,7 +60,7 @@ function requiredProps(type: ComponentType): Record<string, unknown> {
   }
 }
 
-/** Sensible default binding for component types that only make sense with data. */
+/** Default binding for component types that are useless without data. */
 function defaultBinding(type: ComponentType): ComponentInput['binding'] | undefined {
   switch (type) {
     case 'gauge.arc':

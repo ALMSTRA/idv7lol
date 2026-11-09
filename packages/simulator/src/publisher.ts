@@ -126,7 +126,7 @@ export class SignalPublisher {
       bus.set(id, v, at);
       written.push(id);
     }
-    // Health is derived from what we just did.
+    // health = share of signals actually written this pass
     const total = written.length + this.faults.dropped.size;
     bus.set('system.signal.health', total ? Math.round((written.length / total) * 100) : 0, at);
     return written;

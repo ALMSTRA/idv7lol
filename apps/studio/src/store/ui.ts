@@ -165,5 +165,4 @@ export const useUiStore = create<UiState>((set, get) => {
   };
 });
 
-// Apply the colour scheme at start-up.
 document.documentElement.dataset['theme'] = useUiStore.getState().scheme;

@@ -195,7 +195,7 @@ export interface CompiledTheme {
   compiledAt: string;
   target: { display: string; renderTarget: string; width: number; height: number };
   vehicleProfile: string;
-  /** Palette id → token → "#rrggbb[aa]" */
+  /** Colours by palette id, then token, as "#rrggbb[aa]". */
   palettes: Record<string, { name: string; colors: Record<string, string> }>;
   paletteSelection: Theme['palette'];
   /** Background colour of the layout (a token or literal); `transparent` keeps the factory cluster visible. */

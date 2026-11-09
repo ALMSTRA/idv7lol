@@ -20,7 +20,7 @@ function save(): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(sizes));
   } catch {
-    /* sizes simply reset next time */
+    /* sizes reset next time */
   }
 }
 

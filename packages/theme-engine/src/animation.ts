@@ -12,7 +12,7 @@ export interface AnimationOverrides {
   rotation?: number;
   opacity?: number;
   scale?: number;
-  /** Dotted paths under `props`, e.g. "needle.color" → value. */
+  /** Values keyed by dotted path under `props`, e.g. "needle.color". */
   props: Record<string, number | string>;
 }
 

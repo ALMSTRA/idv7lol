@@ -269,7 +269,7 @@ describe('rendering', () => {
     engine.state.bus.set('engine.rpm', 1000, 0);
     let ctx = new RecordingContext();
     let stats = engine.render(ctx, theme, 0);
-    // rpm too low → first rect skipped; fade at opacity 0 → skipped
+    // rpm too low skips the first rect; the fade at opacity 0 is skipped too
     expect(stats.skipped).toBe(2);
     engine.state.bus.set('engine.rpm', 6000, 500);
     ctx = new RecordingContext();

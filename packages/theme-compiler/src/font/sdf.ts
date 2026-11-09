@@ -4,7 +4,7 @@
  * For every cell pixel centre we compute the exact distance to the nearest
  * outline segment and the sign from the non-zero winding number. Distances are
  * encoded as `0.5 + sd / (2 * spread)` into a byte, 128 on the outline, higher
- * inside — the convention the TEXT shaders expect.
+ * inside. That is the convention the TEXT shaders expect.
  */
 
 export type Polyline = Array<[number, number]>;
@@ -54,7 +54,6 @@ export function rasterizeSdf(
 ): RasterGlyph {
   const pixels = new Uint8Array(cellW * cellH);
   if (polys.length === 0) return { pixels };
-  // Collect segments.
   const segs: Array<[number, number, number, number]> = [];
   for (const poly of polys) {
     const n = poly.length;

@@ -261,7 +261,7 @@ export function scenarioInputsAt(
       : Math.min(t, scenario.duration);
   let idx = -1;
   for (let i = 0; i < kfs.length; i++) if (kfs[i]!.t <= time) idx = i;
-  // Accumulate discrete state from the start up to idx.
+  // discrete fields: last value set by any keyframe up to idx
   const acc: Partial<VehicleInputs> = {};
   for (let i = 0; i <= idx; i++) Object.assign(acc, kfs[i]!.inputs ?? {});
   Object.assign(out, acc);

@@ -194,7 +194,7 @@ describe('MGU engine', () => {
       .filter((u) => u.ref === band)
       .map((u) => (u.v as number[])[0]!);
     expect(vals[vals.length - 1]!).toBeCloseTo(7000 / 8000, 2);
-    // live stops → grace → teardown
+    // live stops, the grace period runs out, then teardown
     t.state.live = false;
     t.advance(1000);
     expect(t.engine.shown).toBe(true);
@@ -224,7 +224,7 @@ describe('MGU engine', () => {
     const gearPiece = compiled.pieces.findIndex((p) => p.key === 'gear:gear') + 2;
     const colors = t.client.uniforms('u_color').filter((u) => u.ref === gearPiece);
     const lastColor = colors[colors.length - 1]!.v as number[];
-    // manualColor is $accent (night: #3f8cff) → blue dominant
+    // manualColor is $accent (night: #3f8cff), so blue dominates
     expect(lastColor[2]!).toBeGreaterThan(lastColor[0]!);
     expect(t.client.uniforms('u_text').some((u) => (u.v as number[])[0] === 3)).toBe(true); // '3' is glyph code 3
   });

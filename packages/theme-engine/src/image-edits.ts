@@ -6,8 +6,8 @@ import { parseColor } from './color.js';
  * and the theme compiler run this same code, so what the author sees in the
  * editor is what gets baked for the car.
  *
- * Order: background removal and brush strokes (source space) → rotate → flip
- * → crop → colour adjustments → sharpen → blur → tint → vignette → corners.
+ * Order: background removal and brush strokes (in source space), rotate,
+ * flip, crop, colour adjustments, sharpen, blur, tint, vignette, corners.
  */
 export interface Raster {
   width: number;

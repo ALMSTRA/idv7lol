@@ -43,7 +43,7 @@ export const GradientStopSchema = z.object({
 
 export const GradientSchema = z.object({
   type: z.enum(['linear', 'radial', 'conic']),
-  /** Angle in degrees for linear/conic gradients (0 = left→right, 90 = top→bottom). */
+  /** Angle in degrees for linear/conic gradients (0 = left to right, 90 = top to bottom). */
   angle: z.number().default(0),
   stops: z.array(GradientStopSchema).min(2),
 });
