@@ -10,6 +10,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
     }
   },
   "files": [
@@ -24,5 +28,13 @@
     "@idv7lol/theme-engine": "*",
     "@idv7lol/vehicle-signals": "*",
     "zod": "^4.1.12"
+  },
+  "bin": {
+    "idv7lol-theme": "./dist/cli.js"
+  },
+  "devDependencies": {
+    "@fontsource/barlow": "5.3.0",
+    "@fontsource/barlow-condensed": "5.3.0",
+    "@fontsource/barlow-semi-condensed": "5.3.0"
   }
 }
