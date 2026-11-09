@@ -1,3 +1,4 @@
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { Color, Fill, Gradient, Stroke, TextStyle, Theme, Zone } from '@idv7lol/theme-schema';
 import {
@@ -284,7 +285,7 @@ export function TextStyleInput({
           onChange={(weight) => onChange({ ...value, weight: weight as TextStyle['weight'] })}
         />
         <button className="icon ghost" onClick={() => setOpen(!open)} title="More">
-          {open ? '▾' : '▸'}
+          {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
         </button>
       </div>
       <div className="row">

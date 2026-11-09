@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { Theme } from '@idv7lol/theme-schema';
 import { EngineState, ThemeEngine } from '@idv7lol/theme-engine';
 import { SignalBus } from '@idv7lol/vehicle-signals';
-import { TEMPLATES, blankTemplate } from '../lib/templates.js';
+import { TEMPLATES, blankTemplate, type Template } from '../lib/templates.js';
 import { useT } from '../i18n/index.js';
 import { isTauri, recentFiles } from '../host/files.js';
 
@@ -53,27 +53,43 @@ export function WelcomeDialog({
 }): JSX.Element {
   const t = useT();
   const recent = isTauri ? recentFiles() : [];
+  const community = TEMPLATES.filter((tp) => tp.community);
+  const card = (tp: Template) => (
+    <button key={tp.id} className="template-card" onClick={() => onPick(tp.theme)}>
+      <div className="thumb">
+        <Thumb theme={tp.theme} />
+      </div>
+      <strong>{tp.name}</strong>
+      <small>{tp.description}</small>
+    </button>
+  );
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>{t('welcome.title')}</h2>
-        <p className="lead">{t('welcome.lead')}</p>
+        <div className="welcome-head">
+          <img src="/logo.png" alt="idv7lol" />
+          <div>
+            <h2>{t('welcome.title')}</h2>
+            <p className="lead">{t('welcome.lead')}</p>
+          </div>
+        </div>
         <div className="template-grid">
-          {TEMPLATES.map((tp) => (
-            <button key={tp.id} className="template-card" onClick={() => onPick(tp.theme)}>
-              <div className="thumb">
-                <Thumb theme={tp.theme} />
-              </div>
-              <strong>{tp.name}</strong>
-              <small>{tp.description}</small>
-            </button>
-          ))}
+          {TEMPLATES.filter((tp) => !tp.community).map(card)}
           <button className="template-card" onClick={() => onPick(blankTemplate())}>
             <div className="thumb" />
             <strong>{t('welcome.blank')}</strong>
             <small>{t('welcome.blankDesc')}</small>
           </button>
         </div>
+        {community.length > 0 && (
+          <>
+            <div className="template-section">
+              {t('welcome.community')}
+              <small>{t('welcome.communityNote')}</small>
+            </div>
+            <div className="template-grid">{community.map(card)}</div>
+          </>
+        )}
         {recent.length > 0 && (
           <>
             <h4 style={{ margin: '16px 0 6px' }}>{t('welcome.recent')}</h4>

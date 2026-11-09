@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/assets/logo.png" alt="idv7lol" width="480"></p>
+
 # idv7lol
 
 **Open-source custom digital cluster platform for BMW iDrive 7 (MGU), with a visual theme

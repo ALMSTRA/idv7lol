@@ -1,3 +1,4 @@
+import { Pause, Play } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ImageEditsSchema,
@@ -732,7 +733,7 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
                 onClick={() => setPlaying(!playing)}
                 aria-label={t(playing ? 'sim.pause' : 'sim.play')}
               >
-                {playing ? '❚❚' : '▶'}
+                {playing ? <Pause size={14} /> : <Play size={14} />}
               </button>
               <input
                 className="ie-scrub"

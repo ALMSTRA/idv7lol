@@ -1,3 +1,23 @@
+import {
+  AlignCenterHorizontal,
+  AlignCenterVertical,
+  AlignEndHorizontal,
+  AlignEndVertical,
+  AlignHorizontalDistributeCenter,
+  AlignStartHorizontal,
+  AlignStartVertical,
+  AlignVerticalDistributeCenter,
+  Grid3x3,
+  Group,
+  Info,
+  Magnet,
+  Minus,
+  Pause,
+  Play,
+  Plus,
+  Ruler,
+  Shield,
+} from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Component, Theme } from '@idv7lol/theme-schema';
 import {
@@ -575,28 +595,28 @@ export function CanvasView(): JSX.Element {
           title={t('canvas.zones')}
           onClick={() => ui.toggle('showZones')}
         >
-          ▦
+          <Shield size={15} />
         </button>
         <button
           className={`icon ${ui.showGrid ? 'active' : ''}`}
           title={t('canvas.grid')}
           onClick={() => ui.toggle('showGrid')}
         >
-          ⋯
+          <Grid3x3 size={15} />
         </button>
         <button
           className={`icon ${ui.snap ? 'active' : ''}`}
           title={t('canvas.snap')}
           onClick={() => ui.toggle('snap')}
         >
-          ⌗
+          <Magnet size={15} />
         </button>
         <button
           className={`icon ${ui.showRulers ? 'active' : ''}`}
           title={t('canvas.rulers')}
           onClick={() => ui.toggle('showRulers')}
         >
-          📏
+          <Ruler size={15} />
         </button>
         <span className="sep" style={{ width: 1, background: 'var(--border)', margin: '0 4px' }} />
         <button
@@ -605,7 +625,7 @@ export function CanvasView(): JSX.Element {
           disabled={!selection.length}
           onClick={() => useProjectStore.getState().align('left')}
         >
-          ⫷
+          <AlignStartVertical size={15} />
         </button>
         <button
           className="icon"
@@ -613,7 +633,7 @@ export function CanvasView(): JSX.Element {
           disabled={!selection.length}
           onClick={() => useProjectStore.getState().align('center')}
         >
-          ⫿
+          <AlignCenterVertical size={15} />
         </button>
         <button
           className="icon"
@@ -621,7 +641,7 @@ export function CanvasView(): JSX.Element {
           disabled={!selection.length}
           onClick={() => useProjectStore.getState().align('right')}
         >
-          ⫸
+          <AlignEndVertical size={15} />
         </button>
         <button
           className="icon"
@@ -629,7 +649,7 @@ export function CanvasView(): JSX.Element {
           disabled={!selection.length}
           onClick={() => useProjectStore.getState().align('top')}
         >
-          ⤒
+          <AlignStartHorizontal size={15} />
         </button>
         <button
           className="icon"
@@ -637,7 +657,7 @@ export function CanvasView(): JSX.Element {
           disabled={!selection.length}
           onClick={() => useProjectStore.getState().align('middle')}
         >
-          ⇕
+          <AlignCenterHorizontal size={15} />
         </button>
         <button
           className="icon"
@@ -645,7 +665,7 @@ export function CanvasView(): JSX.Element {
           disabled={!selection.length}
           onClick={() => useProjectStore.getState().align('bottom')}
         >
-          ⤓
+          <AlignEndHorizontal size={15} />
         </button>
         <button
           className="icon"
@@ -653,7 +673,7 @@ export function CanvasView(): JSX.Element {
           disabled={selection.length < 3}
           onClick={() => useProjectStore.getState().distribute('h')}
         >
-          ⇹
+          <AlignHorizontalDistributeCenter size={15} />
         </button>
         <button
           className="icon"
@@ -661,7 +681,7 @@ export function CanvasView(): JSX.Element {
           disabled={selection.length < 3}
           onClick={() => useProjectStore.getState().distribute('v')}
         >
-          ⇳
+          <AlignVerticalDistributeCenter size={15} />
         </button>
         {multi && (
           <button
@@ -669,31 +689,33 @@ export function CanvasView(): JSX.Element {
             title={t('layers.group')}
             onClick={() => useProjectStore.getState().groupSelected()}
           >
-            ⧉
+            <Group size={15} />
           </button>
         )}
       </div>
       <div className="canvas-zoom">
         <button className="icon" onClick={() => zoomTo(view.zoom / 1.25)}>
-          −
+          <Minus size={15} />
         </button>
         <span style={{ minWidth: 44, textAlign: 'center', fontVariantNumeric: 'tabular-nums' }}>
           {zoomPct}%
         </span>
         <button className="icon" onClick={() => zoomTo(view.zoom * 1.25)}>
-          +
+          <Plus size={15} />
         </button>
         <button onClick={fit}>{t('canvas.fit')}</button>
+        <span className="canvas-info" title={t('canvas.note')}>
+          <Info size={14} />
+        </span>
         <button
           className={`icon ${running ? 'active' : ''}`}
           title={t('menu.simulate')}
           onClick={() => useSimStore.getState().setRunning(!running)}
         >
-          {running ? '❚❚' : '▶'}
+          {running ? <Pause size={15} /> : <Play size={15} />}
         </button>
       </div>
       {fileDrag > 0 && <div className="canvas-dropzone">{t('image.drop')}</div>}
-      <div className="canvas-note">{t('canvas.note')}</div>
     </div>
   );
 }

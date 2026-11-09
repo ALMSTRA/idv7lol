@@ -1,7 +1,23 @@
+import {
+  ChevronDown,
+  Cpu,
+  Ellipsis,
+  ImagePlus,
+  PanelBottom,
+  PanelLeft,
+  PanelRight,
+  Pause,
+  Play,
+  Redo2,
+  RefreshCw,
+  Save,
+  Undo2,
+} from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { parseThemeJson, serializeTheme, type Theme } from '@idv7lol/theme-schema';
 import { useProjectStore } from './store/project.js';
-import { useUiStore } from './store/ui.js';
+import { restorePanes, Splitter } from './ui/Splitter.js';
+import { useUiStore, type MenuItem } from './store/ui.js';
 import { useSimStore } from './store/sim.js';
 import { useT } from './i18n/index.js';
 import { perf } from './lib/perf.js';
@@ -43,6 +59,17 @@ import {
 } from './host/files.js';
 
 export function App(): JSX.Element {
+  useEffect(() => {
+    restorePanes();
+    // Small windows start with the side panels closed; they open as drawers.
+    const narrow = window.matchMedia('(max-width: 1000px)');
+    const apply = () =>
+      useUiStore.setState({ leftOpen: !narrow.matches, rightOpen: !narrow.matches });
+    if (narrow.matches) apply();
+    narrow.addEventListener('change', apply);
+    return () => narrow.removeEventListener('change', apply);
+  }, []);
+
   perf.appRenders += 1;
   const t = useT();
   const ui = useUiStore(
@@ -344,108 +371,142 @@ export function App(): JSX.Element {
     return () => window.removeEventListener('keydown', onKey);
   }, [doSave, doOpen]);
 
+  const openBelow = (e: React.MouseEvent<HTMLElement>, items: MenuItem[]) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    useUiStore.getState().openMenu(r.left, r.bottom + 4, items);
+  };
+  const fileMenu = (): MenuItem[] => [
+    {
+      label: t('menu.new'),
+      shortcut: 'Ctrl+N',
+      onSelect: () => useUiStore.getState().setWelcomeOpen(true),
+    },
+    { label: t('menu.open'), shortcut: 'Ctrl+O', onSelect: () => void doOpen() },
+    { separator: true },
+    { label: t('menu.save'), shortcut: 'Ctrl+S', onSelect: () => void doSave(false) },
+    { label: t('menu.saveAs'), shortcut: 'Ctrl+Shift+S', onSelect: () => void doSave(true) },
+    { separator: true },
+    { label: t('image.add'), onSelect: () => void browseAndPlace() },
+    { label: t('menu.export'), onSelect: () => void doExportPng() },
+  ];
+  const moreMenu = (): MenuItem[] => [
+    {
+      label: t('menu.language'),
+      items: [
+        { label: 'English', checked: ui.lang === 'en', onSelect: () => ui.setLang('en') },
+        { label: 'Español', checked: ui.lang === 'es', onSelect: () => ui.setLang('es') },
+      ],
+    },
+    {
+      label: t('menu.theme'),
+      onSelect: () => ui.setScheme(ui.scheme === 'dark' ? 'light' : 'dark'),
+    },
+    { separator: true },
+    {
+      label: t('menu.help'),
+      onSelect: () =>
+        openExternal('https://github.com/ALMSTRA/idv7lol/blob/main/docs/user/STUDIO_USER_GUIDE.md'),
+    },
+  ];
+
   return (
     <div className="app">
       <div className="topbar">
         <span className="brand">
-          <img src="/icon.png" alt="" />
-          idv7lol Studio
+          <img src="/logo-mark.png" alt="idv7lol" />
+          <span className="brand-name">Studio</span>
         </span>
-        <button onClick={() => useUiStore.getState().setWelcomeOpen(true)} title="Ctrl+N">
-          {t('menu.new')}
+        <button onClick={(e) => openBelow(e, fileMenu())}>
+          {t('menu.file')}
+          <ChevronDown size={13} />
         </button>
-        <button onClick={() => void doOpen()} title="Ctrl+O">
-          {t('menu.open')}
-        </button>
-        <button
-          onClick={() => void doSave(false)}
-          title="Ctrl+S"
-          className={project.dirty ? 'primary' : ''}
-        >
-          {t('menu.save')}
-        </button>
-        <button onClick={() => void doSave(true)} title="Ctrl+Shift+S">
-          {t('menu.saveAs')}
-        </button>
-        <button onClick={() => void browseAndPlace()}>{t('image.add')}</button>
-        <button onClick={() => void doExportPng()}>{t('menu.export')}</button>
         <span className="sep" />
+        <button
+          className="icon"
+          onClick={() => void doSave(false)}
+          title={`${t('menu.save')} (Ctrl+S)`}
+          aria-label={t('menu.save')}
+        >
+          <Save size={16} />
+        </button>
         <button
           className="icon"
           onClick={() => project.undo()}
           disabled={!project.past.length}
           title={`${t('menu.undo')} (Ctrl+Z)`}
+          aria-label={t('menu.undo')}
         >
-          ↶
+          <Undo2 size={16} />
         </button>
         <button
           className="icon"
           onClick={() => project.redo()}
           disabled={!project.future.length}
           title={`${t('menu.redo')} (Ctrl+Y)`}
+          aria-label={t('menu.redo')}
         >
-          ↷
+          <Redo2 size={16} />
         </button>
         <span className="sep" />
+        <button onClick={() => void browseAndPlace()} title={t('image.add')}>
+          <ImagePlus size={16} />
+          <span className="lbl">{t('image.add')}</span>
+        </button>
+        <div className="center">
+          <span className="title">
+            {project.dirty && <span className="dirty-dot" title={t('status.unsaved')} />}
+            {project.filePath ?? project.themeName}
+          </span>
+        </div>
         <button
           className={running ? 'active' : ''}
           onClick={() => useSimStore.getState().setRunning(!running)}
-          title="F5"
+          title={`${t('menu.simulate')} (F5)`}
         >
-          {running ? '❚❚' : '▶'} {t('menu.simulate')}
+          {running ? <Pause size={15} /> : <Play size={15} />}
+          <span className="lbl">{t('menu.simulate')}</span>
         </button>
         <ValidateButton />
-        <button onClick={() => ui.setBottomTab('build')}>⚙ {t('menu.build')}</button>
-        <span className="grow" />
-        <span className="title">{project.filePath ?? project.themeName}</span>
+        <button
+          className="primary"
+          onClick={() => ui.setBottomTab('build')}
+          title={t('menu.build')}
+        >
+          <Cpu size={15} />
+          <span className="lbl">{t('menu.build')}</span>
+        </button>
         <span className="sep" />
-        <select
-          value={ui.lang}
-          onChange={(e) => ui.setLang(e.target.value as 'en' | 'es')}
-          title={t('menu.language')}
-          style={{ width: 64 }}
-        >
-          <option value="en">EN</option>
-          <option value="es">ES</option>
-        </select>
-        <button
-          className="icon"
-          onClick={() => ui.setScheme(ui.scheme === 'dark' ? 'light' : 'dark')}
-          title={t('menu.theme')}
-        >
-          {ui.scheme === 'dark' ? '☾' : '☀'}
-        </button>
-        <button
-          className="icon"
-          onClick={() =>
-            openExternal(
-              'https://github.com/ALMSTRA/idv7lol/blob/main/docs/user/STUDIO_USER_GUIDE.md',
-            )
-          }
-          title={t('menu.help')}
-        >
-          ?
-        </button>
         <button
           className={`icon ${ui.leftOpen ? 'active' : ''}`}
           onClick={() => ui.toggle('leftOpen')}
           title={t('panels.library')}
+          aria-label={t('panels.library')}
         >
-          ◧
+          <PanelLeft size={16} />
         </button>
         <button
           className={`icon ${ui.bottomOpen ? 'active' : ''}`}
           onClick={() => ui.toggle('bottomOpen')}
           title={t('panels.simulator')}
+          aria-label={t('panels.simulator')}
         >
-          ⬓
+          <PanelBottom size={16} />
         </button>
         <button
           className={`icon ${ui.rightOpen ? 'active' : ''}`}
           onClick={() => ui.toggle('rightOpen')}
           title={t('panels.inspector')}
+          aria-label={t('panels.inspector')}
         >
-          ◨
+          <PanelRight size={16} />
+        </button>
+        <button
+          className="icon"
+          onClick={(e) => openBelow(e, moreMenu())}
+          title={t('menu.more')}
+          aria-label={t('menu.more')}
+        >
+          <Ellipsis size={16} />
         </button>
       </div>
 
@@ -457,6 +518,8 @@ export function App(): JSX.Element {
           <LibraryPanel />
         </div>
         <CanvasView />
+        {ui.leftOpen && <Splitter pane="left" />}
+        {ui.rightOpen && <Splitter pane="right" />}
         <div className="panel right">
           <div className="tabs">
             {(['inspector', 'layers', 'palettes'] as const).map((tab) => (
@@ -478,6 +541,7 @@ export function App(): JSX.Element {
       </div>
 
       <div className={`bottom ${ui.bottomOpen ? '' : 'collapsed'}`}>
+        {ui.bottomOpen && <Splitter pane="bottom" />}
         <div className="tabs">
           {(['simulator', 'validation', 'timeline', 'build', 'console'] as const).map((tab) => (
             <button
@@ -518,7 +582,7 @@ export function App(): JSX.Element {
         <span className="grow" />
         <LayerCount />
         <LiveStats />
-        <span>
+        <span className="opt">
           {project.layoutWidth}×{project.layoutHeight} · {project.display}
         </span>
         <button
@@ -527,7 +591,7 @@ export function App(): JSX.Element {
           onClick={() => force((x) => x + 1)}
           title="refresh"
         >
-          ↻
+          <RefreshCw size={12} />
         </button>
       </div>
 

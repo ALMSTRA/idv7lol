@@ -1,3 +1,4 @@
+import { Check, CircleCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
 import { useUiStore } from '../store/ui.js';
@@ -34,11 +35,16 @@ export function ValidateButton(): JSX.Element {
   const errors = report?.errors.length ?? 0;
   const warnings = report?.warnings.length ?? 0;
   return (
-    <button onClick={() => open('validation')} className={errors ? 'danger' : ''}>
-      ✓ {t('menu.validate')}
+    <button
+      onClick={() => open('validation')}
+      className={errors ? 'danger' : ''}
+      title={t('menu.validate')}
+    >
+      <CircleCheck size={15} />
+      <span className="lbl">{t('menu.validate')}</span>
       {report && (
         <span className={`badge ${errors ? 'error' : warnings ? 'warning' : 'ok'}`}>
-          {errors || warnings || '✓'}
+          {errors || warnings || <Check size={11} />}
         </span>
       )}
     </button>

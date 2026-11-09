@@ -9,6 +9,8 @@ export interface Template {
   name: string;
   description: string;
   theme: Theme;
+  /** Conversions of other people's GPL layouts, offered as optional starting points. */
+  community: boolean;
 }
 
 function load(doc: unknown): Theme | null {
@@ -21,10 +23,24 @@ export const TEMPLATES: Template[] = [
   { id: 'modern', doc: modern },
   { id: 'classic', doc: classic },
   { id: 'minimal', doc: minimal },
+  ...Object.entries(
+    import.meta.glob<unknown>('../../../../themes/community/*/theme.json', {
+      eager: true,
+      import: 'default',
+    }),
+  ).map(([path, doc]) => ({ id: `community/${path.split('/').at(-2)!}`, doc })),
 ]
   .map(({ id, doc }) => {
     const theme = load(doc);
-    return theme ? { id, name: theme.name, description: theme.description, theme } : null;
+    return theme
+      ? {
+          id,
+          name: theme.name,
+          description: theme.description,
+          theme,
+          community: id.startsWith('community/'),
+        }
+      : null;
   })
   .filter((t): t is Template => t !== null);
 

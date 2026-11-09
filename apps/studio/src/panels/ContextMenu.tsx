@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useUiStore, type MenuItem } from '../store/ui.js';
 
@@ -98,7 +99,7 @@ function MenuList({
               }}
               onClick={() => run(it)}
             >
-              <span className="ctx-check">{it.checked ? '✓' : ''}</span>
+              <span className="ctx-check">{it.checked ? <Check size={13} /> : null}</span>
               <span className="ctx-label">{it.label}</span>
               {it.shortcut && <kbd>{it.shortcut}</kbd>}
               {it.items && <span className="ctx-more">›</span>}

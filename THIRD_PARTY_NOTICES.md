@@ -11,6 +11,9 @@ updated when the material is added to the repository.
 
 | MGU App Kit (`kit/`: tools, runtime, platform, icons) | cauliflowermossgrape and contributors, [idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps) | MIT (`kit/LICENSE`) | `kit/` — vendored so the MGU Store can build the app on the head unit |
 
+The Studio's interface icons come from [Lucide](https://lucide.dev) (ISC licence), through the
+`lucide-react` package.
+
 Reference projects studied but **not copied** (their code stays under their own licences and
 is not part of idv7lol): eroobeeroo/idrive7-apps
 and eroobeeroo/idrive7-cluster-info (GPL-3.0-or-later), robertnisipeanu/mgu-store

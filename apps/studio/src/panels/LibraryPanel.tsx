@@ -1,3 +1,4 @@
+import { EntryIcon } from '../ui/componentIcons.js';
 import { useState } from 'react';
 import { LIBRARY, LIBRARY_GROUPS } from '../lib/componentLibrary.js';
 import { useProjectStore } from '../store/project.js';
@@ -44,7 +45,9 @@ export function LibraryPanel(): JSX.Element {
                   onClick={() => add(e.type, undefined, e.overrides)}
                   title={t('library.hint')}
                 >
-                  <span className="glyph">{e.glyph}</span>
+                  <span className="glyph">
+                    <EntryIcon entry={e} />
+                  </span>
                   <span className="label">
                     {t(`presets.${e.nameKey}`)}
                     {e.descKey && <small>{t(`presets.${e.descKey}`)}</small>}

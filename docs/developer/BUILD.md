@@ -59,7 +59,7 @@ Produces `apps/studio/src-tauri/target/release/bundle/nsis/idv7lol Studio_<versi
 (and the bare `idv7lol-studio.exe`). The installer is **not code-signed**: there is no
 certificate; SmartScreen shows a warning on first run. Documented limitation.
 
-Icons: `npx tsx tools/development/make-icon.ts apps/studio/app-icon.png` then
+Icons: replace `apps/studio/app-icon.png` (made from `docs/assets/logo.png`), then
 `npx tauri icon app-icon.png -o src-tauri/icons` inside `apps/studio`.
 
 Font atlases for the Studio's compile step: `npx tsx tools/build/bake-fonts.ts` →

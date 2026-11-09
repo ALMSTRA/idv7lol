@@ -3,6 +3,8 @@ import type { Dictionary } from './en.js';
 export const es: Dictionary = {
   app: { name: 'idv7lol Studio', untitled: 'Tema sin título' },
   menu: {
+    file: 'Archivo',
+    more: 'Más',
     new: 'Nuevo',
     open: 'Abrir…',
     save: 'Guardar',
@@ -276,6 +278,9 @@ export const es: Dictionary = {
     contrast: 'Contraste del texto',
   },
   welcome: {
+    community: 'Plantillas gratuitas de la comunidad',
+    communityNote:
+      'Conversiones opcionales de diseños con licencia GPL de otros autores. Cada tema incluye sus créditos.',
     title: 'Bienvenido a idv7lol Studio',
     lead: 'Diseña un cuadro de instrumentos personalizado para tu BMW iDrive 7. Empieza desde una plantilla, abre un tema o parte de un lienzo vacío.',
     blank: 'Lienzo vacío',

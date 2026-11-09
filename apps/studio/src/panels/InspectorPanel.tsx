@@ -1,3 +1,4 @@
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   AnimationRef,
@@ -64,7 +65,7 @@ function Section({
   return (
     <div className="section">
       <div className="section-title" onClick={() => setOpen(!open)}>
-        <span>{open ? '▾' : '▸'}</span>
+        {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
         <span>{title}</span>
       </div>
       {open && <div className="section-body">{children}</div>}

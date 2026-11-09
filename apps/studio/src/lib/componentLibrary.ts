@@ -9,7 +9,6 @@ export interface LibraryEntry {
   /** i18n keys under `presets.` */
   nameKey: string;
   descKey?: string;
-  glyph: string;
   /** Overrides passed to createComponent (size, binding, props…). */
   overrides: Record<string, unknown>;
 }
@@ -21,7 +20,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'gauge.arc',
     nameKey: 'tachometer',
     descKey: 'tachometerDesc',
-    glyph: '◔',
     overrides: {
       width: 480,
       height: 480,
@@ -46,7 +44,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'gauge.arc',
     nameKey: 'analogSpeed',
     descKey: 'analogSpeedDesc',
-    glyph: '◷',
     overrides: {
       width: 420,
       height: 420,
@@ -67,7 +64,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'gauge.arc',
     nameKey: 'boost',
     descKey: 'boostDesc',
-    glyph: '◕',
     overrides: {
       width: 280,
       height: 280,
@@ -94,7 +90,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'gauge.arc',
     nameKey: 'ring',
     descKey: 'ringDesc',
-    glyph: '◯',
     overrides: {
       width: 220,
       height: 220,
@@ -116,7 +111,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'gauge.bar',
     nameKey: 'linearTacho',
     descKey: 'linearTachoDesc',
-    glyph: '▬',
     overrides: {
       width: 800,
       height: 18,
@@ -135,7 +129,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'gauge.bar',
     nameKey: 'fuel',
     descKey: 'fuelDesc',
-    glyph: '▮',
     overrides: {
       width: 400,
       height: 14,
@@ -157,7 +150,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'gauge.bar',
     nameKey: 'temp',
     descKey: 'tempDesc',
-    glyph: '▭',
     overrides: {
       width: 400,
       height: 14,
@@ -179,7 +171,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'value.digital',
     nameKey: 'speed',
     descKey: 'speedDesc',
-    glyph: '88',
     overrides: {
       width: 320,
       height: 170,
@@ -198,7 +189,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'value.digital',
     nameKey: 'card',
     descKey: 'cardDesc',
-    glyph: '▣',
     overrides: {
       width: 180,
       height: 110,
@@ -223,7 +213,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'value.digital',
     nameKey: 'battery',
     descKey: 'batteryDesc',
-    glyph: '⚡',
     overrides: {
       width: 200,
       height: 90,
@@ -244,7 +233,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'status.panel',
     nameKey: 'panel',
     descKey: 'panelDesc',
-    glyph: '☰',
     overrides: {
       width: 360,
       height: 160,
@@ -257,7 +245,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'clock',
     nameKey: 'clock',
     descKey: 'clockDesc',
-    glyph: '◴',
     overrides: { width: 200, height: 48 },
   },
   {
@@ -266,7 +253,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'indicator.gear',
     nameKey: 'gear',
     descKey: 'gearDesc',
-    glyph: 'D',
     overrides: { width: 160, height: 180 },
   },
   {
@@ -275,7 +261,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'indicator.shiftlights',
     nameKey: 'shift',
     descKey: 'shiftDesc',
-    glyph: '●●●',
     overrides: {
       width: 600,
       height: 28,
@@ -288,7 +273,6 @@ export const LIBRARY: LibraryEntry[] = [
     group: 'indicators',
     type: 'telltale',
     nameKey: 'turnLeft',
-    glyph: '⇦',
     overrides: {
       width: 48,
       height: 48,
@@ -301,7 +285,6 @@ export const LIBRARY: LibraryEntry[] = [
     group: 'indicators',
     type: 'telltale',
     nameKey: 'turnRight',
-    glyph: '⇨',
     overrides: {
       width: 48,
       height: 48,
@@ -315,7 +298,6 @@ export const LIBRARY: LibraryEntry[] = [
     type: 'text',
     nameKey: 'text',
     descKey: 'textDesc',
-    glyph: 'T',
     overrides: { width: 240, height: 40, props: { text: 'Label', style: { size: 24 } } },
   },
   {
@@ -323,7 +305,6 @@ export const LIBRARY: LibraryEntry[] = [
     group: 'text',
     type: 'rect',
     nameKey: 'rect',
-    glyph: '▭',
     overrides: { props: { fill: '$surface', radius: 12 } },
   },
   {
@@ -331,7 +312,6 @@ export const LIBRARY: LibraryEntry[] = [
     group: 'text',
     type: 'ellipse',
     nameKey: 'ellipse',
-    glyph: '◯',
     overrides: { props: { fill: '$surface' } },
   },
   {
@@ -339,7 +319,6 @@ export const LIBRARY: LibraryEntry[] = [
     group: 'text',
     type: 'line',
     nameKey: 'line',
-    glyph: '—',
     overrides: { width: 300, height: 2, props: { stroke: { color: '$track', width: 2 } } },
   },
   {
@@ -347,7 +326,6 @@ export const LIBRARY: LibraryEntry[] = [
     group: 'decor',
     type: 'arc',
     nameKey: 'arc',
-    glyph: '◠',
     overrides: { props: { stroke: { color: '$track', width: 10 } } },
   },
 ];

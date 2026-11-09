@@ -21,6 +21,12 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   sound) import as a sprite sheet, play in the editor and compile to one atlas that the renderer
   loops by itself, with nothing sent per frame. Tested locally; not tested in a vehicle.
 
+### Changed
+
+- Studio interface: the supplied idv7lol logo and its colours, one icon set instead of text symbols,
+  a File menu and a shorter toolbar, resizable panels that remember their size, and drawers in small
+  windows. Tested locally in a browser.
+
 ### Fixed
 
 - Studio desktop build: HTML5 drag and drop was disabled by Tauri's `dragDropEnabled`.

@@ -1,3 +1,4 @@
+import { Cpu } from 'lucide-react';
 import { useState } from 'react';
 import { compileTheme, type CompileResult } from '@idv7lol/theme-compiler';
 import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
@@ -85,7 +86,7 @@ export function BuildPanel(): JSX.Element {
             onClick={compile}
             disabled={state.busy || !report || !report.ok}
           >
-            ⚙ {t('build.compile')}
+            <Cpu size={14} /> {t('build.compile')}
           </button>
           <button onClick={exportBundle} disabled={!c || stale}>
             ⇩ {t('build.exportBundle')}

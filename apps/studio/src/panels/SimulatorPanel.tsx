@@ -1,3 +1,13 @@
+import {
+  ArrowLeft,
+  ArrowRight,
+  CircleDot,
+  Pause,
+  Pencil,
+  Play,
+  RotateCcw,
+  Zap,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { SCENARIOS } from '@idv7lol/simulator';
 import { PROFILES, SIGNALS, getSignal } from '@idv7lol/vehicle-signals';
@@ -55,17 +65,18 @@ export function SimulatorPanel(): JSX.Element {
             className={sim.running ? 'active' : 'primary'}
             onClick={() => sim.setRunning(!sim.running)}
           >
-            {sim.running ? `❚❚ ${t('sim.pause')}` : `▶ ${t('sim.play')}`}
+            {sim.running ? <Pause size={14} /> : <Play size={14} />}
+            {sim.running ? t('sim.pause') : t('sim.play')}
           </button>
           <button onClick={() => sim.reset()}>↺ {t('sim.reset')}</button>
           <button
             className={sim.recording ? 'danger active' : ''}
             onClick={() => sim.toggleRecording()}
           >
-            ● {sim.recording ? t('sim.stopRecord') : t('sim.record')}
+            <CircleDot size={14} /> {sim.recording ? t('sim.stopRecord') : t('sim.record')}
           </button>
           <button disabled={!sim.lastRecording} onClick={() => sim.replayLast()}>
-            ⟲ {t('sim.replay')}
+            <RotateCcw size={14} /> {t('sim.replay')}
           </button>
         </div>
         <div className="sim-row">
@@ -237,7 +248,7 @@ export function SimulatorPanel(): JSX.Element {
               checked={inputs.turnLeft}
               onChange={(e) => sim.setInputs({ turnLeft: e.target.checked, turnRight: false })}
             />{' '}
-            ⇦
+            <ArrowLeft size={14} />
           </label>
           <label>
             <input
@@ -245,7 +256,7 @@ export function SimulatorPanel(): JSX.Element {
               checked={inputs.turnRight}
               onChange={(e) => sim.setInputs({ turnRight: e.target.checked, turnLeft: false })}
             />{' '}
-            ⇨
+            <ArrowRight size={14} />
           </label>
           <label>
             <input
@@ -258,7 +269,7 @@ export function SimulatorPanel(): JSX.Element {
         </div>
       </div>
 
-      <div className="sim-card" style={{ gridColumn: '3 / 5' }}>
+      <div className="sim-card sim-wide">
         <h4>
           {t('sim.signals')} · {t('sim.health')}{' '}
           {Math.round(simulator.bus.number('system.signal.health', 0))}%
@@ -364,14 +375,14 @@ export function SimulatorPanel(): JSX.Element {
                     )
                   }
                 >
-                  ✎
+                  <Pencil size={13} />
                 </button>
                 <button
                   className={`icon ghost ${dropped.has(s.id) ? 'active' : ''}`}
                   title={t('sim.drop')}
                   onClick={() => sim.drop(s.id, !dropped.has(s.id))}
                 >
-                  ⚡
+                  <Zap size={13} />
                 </button>
               </div>
             );

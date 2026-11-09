@@ -1,3 +1,5 @@
+import { TypeIcon } from '../ui/componentIcons.js';
+import { Eye, EyeOff, Group, Lock, LockOpen, Ungroup } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { Component } from '@idv7lol/theme-schema';
 import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
@@ -60,7 +62,7 @@ export function LayersPanel(): JSX.Element {
           disabled={selection.length < 2}
           onClick={() => useProjectStore.getState().groupSelected()}
         >
-          ⧉
+          <Group size={14} />
         </button>
         <button
           className="icon ghost"
@@ -70,7 +72,7 @@ export function LayersPanel(): JSX.Element {
           }
           onClick={() => useProjectStore.getState().ungroupSelected()}
         >
-          ⧈
+          <Ungroup size={14} />
         </button>
       </div>
       <div className="panel-body">
@@ -103,7 +105,7 @@ export function LayersPanel(): JSX.Element {
               }}
             >
               <span className="type" title={c.type}>
-                {glyphFor(c.type)}
+                <TypeIcon type={c.type} size={14} />
               </span>
               <span className="name">
                 {editing === c.id ? (
@@ -136,7 +138,7 @@ export function LayersPanel(): JSX.Element {
                   update(c.id, { visible: !c.visible } as Partial<Component>)
                 )}
               >
-                {c.visible ? '👁' : '◌'}
+                {c.visible ? <Eye size={13} /> : <EyeOff size={13} />}
               </button>
               <button
                 className="icon"
@@ -146,7 +148,7 @@ export function LayersPanel(): JSX.Element {
                   update(c.id, { locked: !c.locked } as Partial<Component>)
                 )}
               >
-                {c.locked ? '🔒' : '🔓'}
+                {c.locked ? <Lock size={13} /> : <LockOpen size={13} />}
               </button>
               {parentId === null && (
                 <>
@@ -172,39 +174,4 @@ export function LayersPanel(): JSX.Element {
       </div>
     </>
   );
-}
-
-function glyphFor(type: Component['type']): string {
-  switch (type) {
-    case 'gauge.arc':
-      return '◔';
-    case 'gauge.bar':
-      return '▬';
-    case 'value.digital':
-      return '88';
-    case 'indicator.gear':
-      return 'D';
-    case 'indicator.shiftlights':
-      return '●●';
-    case 'clock':
-      return '◴';
-    case 'telltale':
-      return '⇦';
-    case 'status.panel':
-      return '☰';
-    case 'text':
-      return 'T';
-    case 'rect':
-      return '▭';
-    case 'ellipse':
-      return '◯';
-    case 'line':
-      return '—';
-    case 'arc':
-      return '◠';
-    case 'image':
-      return '🖼';
-    case 'group':
-      return '⧉';
-  }
 }

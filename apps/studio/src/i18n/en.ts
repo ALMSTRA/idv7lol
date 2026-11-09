@@ -1,6 +1,8 @@
 export const en = {
   app: { name: 'idv7lol Studio', untitled: 'Untitled theme' },
   menu: {
+    file: 'File',
+    more: 'More',
     new: 'New',
     open: 'Open…',
     save: 'Save',
@@ -269,6 +271,9 @@ export const en = {
     contrast: 'Text contrast',
   },
   welcome: {
+    community: 'Free community layouts',
+    communityNote:
+      'Optional conversions of GPL-licensed layouts by other authors. Credits are in each theme.',
     title: 'Welcome to idv7lol Studio',
     lead: 'Design a custom instrument cluster for your BMW iDrive 7. Start from a template, open a theme, or begin with a blank layout.',
     blank: 'Blank layout',
