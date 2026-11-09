@@ -121,7 +121,7 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
 }
 
 /** Font family used by a text-capable piece (from the component's style), defaulting to the theme default. */
-function fontFamilyOf(theme: Theme, piece: CompiledPiece): string {
+function fontFamilyOf(theme: Theme, _piece: CompiledPiece): string {
   const fonts = theme.fonts;
   const first = Object.values(fonts)[0];
   return (fonts['default'] ?? first)?.family ?? 'sans';

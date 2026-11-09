@@ -261,52 +261,73 @@ const f2dot14 = (b: Uint8Array, o: number) => i16(b, o) / 16384;
 
 /**
  * Flatten a TrueType contour (quadratic Béziers with implied on-curve
- * midpoints) into a closed polyline in font units.
+ * midpoints between consecutive control points) into a closed polyline.
  */
 export function flattenContour(points: Point[], segments = 8): Array<[number, number]> {
-  if (points.length === 0) return [];
-  // Ensure we start on an on-curve point.
-  const pts = [...points];
-  const firstOn = pts.findIndex((p) => p.onCurve);
-  if (firstOn < 0) {
-    // All off-curve: insert implied midpoints.
-    const mid = { x: (pts[0]!.x + pts[1]!.x) / 2, y: (pts[0]!.y + pts[1]!.y) / 2, onCurve: true };
-    pts.unshift(mid);
-  } else if (firstOn > 0) {
-    pts.push(...pts.splice(0, firstOn));
+  const n = points.length;
+  if (n === 0) return [];
+  // Start point: the first on-curve point, or the midpoint of the first two controls.
+  let startIdx = points.findIndex((p) => p.onCurve);
+  let start: { x: number; y: number };
+  if (startIdx < 0) {
+    const a = points[0]!;
+    const b = points[1 % n]!;
+    start = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    startIdx = 0;
+  } else {
+    start = { x: points[startIdx]!.x, y: points[startIdx]!.y };
   }
-  const out: Array<[number, number]> = [];
-  const n = pts.length;
-  let i = 0;
-  out.push([pts[0]!.x, pts[0]!.y]);
-  while (i < n) {
-    const cur = pts[i]!;
-    const next = pts[(i + 1) % n]!;
-    if (next.onCurve) {
-      out.push([next.x, next.y]);
-      i += 1;
-      continue;
-    }
-    // next is a control point; the end point is the following on-curve point or an implied midpoint
-    const after = pts[(i + 2) % n]!;
-    const end = after.onCurve
-      ? after
-      : { x: (next.x + after.x) / 2, y: (next.y + after.y) / 2, onCurve: true };
+  const out: Array<[number, number]> = [[start.x, start.y]];
+  let cur = start;
+  let control: { x: number; y: number } | null = null;
+  const quadTo = (c: { x: number; y: number }, end: { x: number; y: number }) => {
     for (let s = 1; s <= segments; s++) {
       const t = s / segments;
       const mt = 1 - t;
       out.push([
-        mt * mt * cur.x + 2 * mt * t * next.x + t * t * end.x,
-        mt * mt * cur.y + 2 * mt * t * next.y + t * t * end.y,
+        mt * mt * cur.x + 2 * mt * t * c.x + t * t * end.x,
+        mt * mt * cur.y + 2 * mt * t * c.y + t * t * end.y,
       ]);
     }
-    if (after.onCurve) i += 2;
-    else {
-      // implied midpoint becomes the new current point
-      pts.splice(i + 2, 0, end);
-      i += 2;
+    cur = end;
+  };
+  const visit = (p: Point) => {
+    if (p.onCurve) {
+      if (control) quadTo(control, p);
+      else {
+        out.push([p.x, p.y]);
+        cur = p;
+      }
+      control = null;
+    } else if (control) {
+      const mid = { x: (control.x + p.x) / 2, y: (control.y + p.y) / 2 };
+      quadTo(control, mid);
+      control = p;
+    } else {
+      control = p;
     }
-    if (i >= n) break;
+  };
+  const firstIsOn = points[startIdx]!.onCurve;
+  for (let k = 1; k <= n; k++) {
+    const idx = (startIdx + k) % n;
+    if (k === n) {
+      // Close back to the start point.
+      if (firstIsOn) visit(points[startIdx]!);
+      else {
+        // all-off contour: the start was an implied midpoint
+        visit({ ...start, onCurve: true });
+      }
+      break;
+    }
+    visit(points[idx]!);
   }
+  // Drop a duplicated closing point.
+  const last = out[out.length - 1]!;
+  if (
+    out.length > 1 &&
+    Math.abs(last[0] - out[0]![0]) < 1e-9 &&
+    Math.abs(last[1] - out[0]![1]) < 1e-9
+  )
+    out.pop();
   return out;
 }

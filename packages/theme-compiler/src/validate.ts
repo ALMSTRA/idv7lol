@@ -6,7 +6,6 @@ import {
   type Component,
   type Condition,
   type Fill,
-  type Theme,
 } from '@idv7lol/theme-schema';
 import {
   contrastRatio,
