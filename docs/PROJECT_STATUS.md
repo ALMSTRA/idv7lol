@@ -113,7 +113,7 @@ I-step `20w44.1-1-3` (a software identifier, not a renderer version). See
 
 ## Development commands
 
-See [developer/BUILD.md](developer/BUILD.md). Tests: `npm test` (71 passing: 65 packages + 6 app runtime).
+See [developer/BUILD.md](developer/BUILD.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Tests: `npm test` (89 passing).
 
 ## Next milestone
 
