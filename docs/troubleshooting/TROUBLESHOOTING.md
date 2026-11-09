@@ -22,8 +22,8 @@ texts; the Layers panel shows each component's cost. Status panels cost 1 per ro
 **Characters the car font cannot draw.** The atlas has digits, Latin letters and common
 punctuation; accents and symbols are skipped on the car. Use plain ASCII in texts.
 
-**Save does nothing in the browser version.** The browser build downloads the file instead of
-writing it; use the desktop app for Save/Open to paths and bundle export.
+**Save does nothing when running `npm run dev:studio`.** Development mode in a browser downloads
+the file instead of writing it. Use the desktop app for Save, Open and bundle export.
 
 **Compile is disabled.** Validation has errors; fix them first.
 

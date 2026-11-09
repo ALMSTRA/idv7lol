@@ -50,7 +50,6 @@ renderer allows 16 assets per client and text uses one.
 The interface now uses the project logo, one icon set, a File menu, resizable panels and drawers in
 small windows: tested locally in a browser.
 
-
 ## Community templates (added 2026-11-09)
 
 `themes/community/` holds hand conversions of the seven Cluster Layouts by eroobeeroo
@@ -90,7 +89,8 @@ rebuilt with this work (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned).
   transforms only); the condition editor handles a single comparison (complex trees are kept
   but shown as "edit in JSON").
 - `value.digital` tabular digits are not applied in the Canvas2D preview.
-- Browser build (no Tauri): Save downloads a file; bundle export downloads separate files.
+- Development mode (`npm run dev:studio`, no Tauri): Save downloads a file and bundle export
+  downloads separate files.
 - The Tauri installer is unsigned (no certificate).
 
 ## Compatibility
