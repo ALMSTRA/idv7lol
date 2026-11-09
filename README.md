@@ -80,6 +80,53 @@ There is more in [docs/QUICKSTART.md](docs/QUICKSTART.md) and
 [docs/developer/BUILD.md](docs/developer/BUILD.md). Spanish speakers can start with
 [docs/user/GUIA_USUARIO_ES.md](docs/user/GUIA_USUARIO_ES.md).
 
+## Putting it on the car
+
+> Nobody has run this on a car yet. Read these as the intended steps, do them parked with the car
+> on stable power, and know how to remove the app before you start (last step below). The full
+> guide is [docs/user/DEPLOYMENT.md](docs/user/DEPLOYMENT.md).
+
+You need a BMW with an iDrive 7 (MGU) head unit and the
+[MGU Store](https://github.com/robertnisipeanu/mgu-store) installed on it. Installing the Store
+needs root SSH access once; its README explains how.
+
+1. In the Store on the car, open **Settings**, then **Sources**, then **Add GitHub repository**,
+   and enter `ALMSTRA/idv7lol` with the `main` branch.
+2. Open **idv7lol** in the list and press **Install**. The Store installs `cluster-render` first if
+   it is missing, then builds idv7lol on the head unit. That takes about a minute.
+3. Restart the head unit if the Store asks for it.
+4. Open the **idv7lol** app from the apps menu. Nothing is drawn on the cluster until you press
+   **Show on the cluster**, and the layout only appears while car data is live.
+5. Pick the theme and palette with **Next theme** and **Palette**, or in the app's settings.
+6. To go back to the factory cluster, turn **Show on the cluster** off. To uninstall, use
+   **Remove** in the Store's list of installed apps.
+
+No internet on the head unit? Copy the repository to a USB stick and add it in the Store with
+**Add from USB**. The Store builds it the same way.
+
+### Your own theme
+
+The car app has its themes built in, so a theme from the Studio can't be copied over on its own
+yet. For now:
+
+1. Fork this repository on GitHub.
+2. Save your theme from the Studio and put it in your fork as `themes/<your-theme>/theme.json`.
+3. Check it and generate the car files:
+
+```bash
+npm run themes:validate
+```
+
+```bash
+npx tsx tools/build/build-mgu-themes.ts
+```
+
+4. Commit and push to your fork.
+5. In the Store, add your fork as a source instead of `ALMSTRA/idv7lol` and install from there.
+
+On the car, fuel level, range and the 12 V battery are not read yet and show dashes. Opacity
+animations don't play there either. The current list of known limits is in the deployment guide.
+
 ## How it works
 
 A theme is a JSON file (`themes/<id>/theme.json`) with a list of components. Each one reads a
@@ -100,15 +147,6 @@ layers, and the factory cluster comes back.
   [troubleshooting](docs/troubleshooting/TROUBLESHOOTING.md)
 - [Project status](docs/PROJECT_STATUS.md) and [changelog](CHANGELOG.md)
 
-## Thanks
-
-This would not exist without the iDrive 7 custom-app community:
-[cauliflowermossgrape/idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps) for the
-app kit and GPU renderer, [robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps)
-for `cluster-render`, [robertnisipeanu/mgu-store](https://github.com/robertnisipeanu/mgu-store) for
-the Store, and [eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info)
-for Cluster Layouts, which showed that full custom layouts work on the KOMBI.
-
 ## License and contributing
 
 GPL-3.0-or-later. Third-party parts keep their own licences, listed in
@@ -116,3 +154,22 @@ GPL-3.0-or-later. Third-party parts keep their own licences, listed in
 
 Contributions are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). Ask questions in GitHub
 Discussions. Report security problems privately as described in [SECURITY.md](SECURITY.md).
+
+## Credits
+
+idv7lol is built on top of other people's open-source work. Thank you to all of them.
+
+- **[eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info)**:
+  Cluster Layouts proved that a fully custom layout works on the KOMBI, and it is the project this
+  one started from. Its seven layouts are included as free templates, converted to idv7lol's format
+  (GPL-3.0-or-later, see [themes/community/README.md](themes/community/README.md)).
+- **[cauliflowermossgrape/idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps)**:
+  the app kit and GPU renderer. The kit is included in `kit/` under the MIT licence.
+- **[robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps)**:
+  `cluster-render`, the service that draws on the cluster. Its client is included under MPL-2.0.
+- **[robertnisipeanu/mgu-store](https://github.com/robertnisipeanu/mgu-store)**: the Store that
+  installs apps on the head unit.
+- **[Barlow](https://github.com/jpt/barlow)** by Jeremy Tribby (SIL Open Font License) for the
+  cluster font, and **[Lucide](https://lucide.dev)** (ISC) for the editor's icons.
+
+Full licence details are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
