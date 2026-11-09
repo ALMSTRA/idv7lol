@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Tauri / Rust
+apps/studio/src-tauri/target/
+apps/studio/src-tauri/gen/schemas/
+
+# Logs and temp
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Editors
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Secrets and vehicle data: never commit these
+.env
+.env.*
+*.pem
+*.key
+*_rsa
+*.p12
+*.pfx
+secrets/
+vehicle-logs/
+
+# Proprietary SDK material must never enter the repository
+sdk/
+bmw-sdk/
+**/vendor-sdk/
+
+# Local scratch
+.scratch/

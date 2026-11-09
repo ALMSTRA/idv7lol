@@ -1,0 +1,21 @@
+# Third-party notices
+
+idv7lol's own code is licensed under GPL-3.0-or-later (see `LICENSE`). The following
+third-party material is included or will be included with its own licence. Each entry is
+updated when the material is added to the repository.
+
+| Material                                              | Origin                                                                                                                                                             | Licence                   | Where                                                     |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- | --------------------------------------------------------- |
+| cluster-render protocol and JavaScript client         | Robert Nisipeanu, [robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps) `native/cluster-render/js/cluster_render_client.js`, `PROTOCOL.md` | MPL-2.0                   | `apps/mgu/` (planned, copied verbatim with header)        |
+| Barlow, Barlow Semi Condensed, Barlow Condensed fonts | Jeremy Tribby, [Barlow](https://github.com/jpt/barlow)                                                                                                             | SIL Open Font License 1.1 | `apps/studio/public/fonts/`, compiler SDF atlas (planned) |
+
+Reference projects studied but **not copied** (their code stays under their own licences and
+is not part of idv7lol): cauliflowermossgrape/idrive7-apps (MIT kit), eroobeeroo/idrive7-apps
+and eroobeeroo/idrive7-cluster-info (GPL-3.0-or-later), robertnisipeanu/mgu-store
+(GPL-3.0-or-later).
+
+Runtime dependencies of the Studio and tooling (React, Vite, Tauri, zod, zustand, …) are
+listed with their licences in the generated `apps/studio/src-tauri/THIRD_PARTY.txt` and
+`package-lock.json`.
+
+Proprietary BMW material (SDK, head-unit binaries, vsomeip configurations) is never included.
