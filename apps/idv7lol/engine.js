@@ -122,6 +122,8 @@ class ClusterEngine {
     this.now = opts.now || (() => Date.now());
     this.shown = false;
     this.pieces = []; // runtime state per piece
+    this.images = []; // runtime state per image layer
+    this.loadImage = opts.loadImage || (() => null);
     this.assets = {}; // family -> asset ref
     this.lastLive = 0;
     this.tickCount = 0;
@@ -197,7 +199,7 @@ class ClusterEngine {
   status() {
     return {
       shown: this.shown,
-      layers: this.pieces.length,
+      layers: this.pieces.length + this.images.length,
       refused: this.refused,
       connected: !!this.cr.ready,
       backend: this.cr.backend || '',
@@ -306,6 +308,47 @@ class ClusterEngine {
       this._startAnimations(st);
       return st;
     });
+    // image layers: baked by the compiler at exactly their layer size
+    this.images = (theme.images || []).map((img) => {
+      const st = { img, ref: 0, visible: true };
+      let pixels = null;
+      try {
+        pixels = this.loadImage(img);
+      } catch (e) {
+        this.log.warn('image ' + img.key + ': ' + e);
+      }
+      if (!pixels || pixels.length !== img.iw * img.ih * 4) {
+        this.log.warn('image ' + img.key + ': no usable pixels');
+        return st;
+      }
+      const opts = {
+        target,
+        klass: 'content',
+        z: img.z,
+        x: img.x,
+        y: img.y,
+        w: img.w,
+        h: img.h,
+        iw: img.iw,
+        ih: img.ih,
+        opacity: img.opacity,
+        sampling: 'bilinear',
+        visible: 1,
+      };
+      if (img.rotation) {
+        opts.rotate = img.rotation;
+        opts.px = img.pivotX;
+        opts.py = img.pivotY;
+      }
+      st.ref = this.cr.image(opts);
+      if (st.ref) {
+        this.cr.pixels(st.ref, null, pixels);
+        this.messages++;
+      } else {
+        this.log.warn('image layer refused: ' + img.key);
+      }
+      return st;
+    });
     this.startedAt = this.now();
     this._update(true);
     if (this.sweep()) this._sweep();
@@ -322,6 +365,10 @@ class ClusterEngine {
       if (p.ref) this.cr.drop(p.ref);
     });
     Object.keys(this.assets).forEach((fam) => this.cr.drop(this.assets[fam]));
+    this.images.forEach((st) => {
+      if (st.ref) this.cr.drop(st.ref);
+    });
+    this.images = [];
     this.pieces = [];
     this.assets = {};
     this.log.info('layout down: the factory cluster shows');
@@ -446,6 +493,16 @@ class ClusterEngine {
     const now = this.now();
     const pal = this.palette();
     const textsNow = force || this.tickCount % TEXT_DIVIDER === 0;
+    if (textsNow) {
+      this.images.forEach((st) => {
+        if (!st.ref || !st.img.visibleWhen) return;
+        const vis = conditions.evaluate(st.img.visibleWhen, this.signals, now);
+        if (vis !== st.visible || force) {
+          st.visible = vis;
+          this.cr.set(st.ref, { visible: vis ? 1 : 0 });
+        }
+      });
+    }
     this.pieces.forEach((st) => {
       if (!st.ref) return;
       const piece = st.piece;

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import {
   ComponentSchema,
+  ImageEditsSchema,
   createComponent,
   createEmptyTheme,
   nextComponentId,
@@ -9,6 +10,7 @@ import {
   type Theme,
 } from '@idv7lol/theme-schema';
 import { findComponent, flattenComponents } from '@idv7lol/theme-engine';
+import type { ImportedImage } from '../lib/imageStore.js';
 
 const HISTORY_LIMIT = 100;
 
@@ -45,6 +47,11 @@ export interface ProjectState {
   insertComponents(components: Component[], at?: { x: number; y: number }): string[];
   updateComponent(id: string, patch: Partial<Component>, record?: boolean): void;
   updateProps(id: string, patch: Record<string, unknown>, record?: boolean): void;
+  importImages(images: ImportedImage[], at?: { x: number; y: number }): string[];
+  placeAsset(assetId: string, at?: { x: number; y: number }): string | null;
+  removeAsset(assetId: string): void;
+  replaceImageAsset(componentId: string, image: ImportedImage): void;
+  makeBackground(componentId: string): void;
   deleteSelected(): void;
   duplicateSelected(): void;
   copySelected(): void;
@@ -93,6 +100,37 @@ function deepMerge(
     }
   }
   return out;
+}
+
+/** An image component at a sensible size: natural, or shrunk to fit part of the layout. */
+function imageComponent(
+  theme: Theme,
+  assetId: string,
+  width: number,
+  height: number,
+  name: string,
+  taken: string[],
+  at: { x: number; y: number } | undefined,
+  index: number,
+): Component {
+  const scale = Math.min(
+    1,
+    (theme.layout.width * 0.4) / width,
+    (theme.layout.height * 0.6) / height,
+  );
+  const w = Math.max(8, Math.round(width * scale));
+  const h = Math.max(8, Math.round(height * scale));
+  const cx = at ? at.x : theme.layout.width / 2;
+  const cy = at ? at.y : theme.layout.height / 2;
+  return createComponent('image', {
+    id: nextComponentId('image', taken),
+    name: name.slice(0, 64),
+    x: Math.round(cx - w / 2 + index * 28),
+    y: Math.round(cy - h / 2 + index * 28),
+    width: w,
+    height: h,
+    props: { asset: assetId },
+  });
 }
 
 export function allIds(theme: Theme): string[] {
@@ -253,6 +291,111 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       return parsed.success ? parsed.data : ({ ...c, props: merged } as Component);
     });
     s.setTheme({ ...s.theme, components }, record);
+  },
+  importImages: (images, at) => {
+    const s = get();
+    const assets = { ...s.theme.assets };
+    const taken = allIds(s.theme);
+    const added: Component[] = [];
+    images.forEach((img, i) => {
+      assets[img.id] = {
+        type: 'image',
+        name: img.name,
+        data: img.data,
+        width: img.width,
+        height: img.height,
+      };
+      const c = imageComponent(
+        s.theme,
+        img.id,
+        img.width,
+        img.height,
+        img.name,
+        [...taken, ...added.map((a) => a.id)],
+        at,
+        i,
+      );
+      added.push(c);
+    });
+    s.setTheme({ ...s.theme, assets, components: [...s.theme.components, ...added] });
+    const ids = added.map((c) => c.id);
+    set({ selection: ids });
+    return ids;
+  },
+  placeAsset: (assetId, at) => {
+    const s = get();
+    const a = s.theme.assets[assetId];
+    if (!a) return null;
+    const c = imageComponent(
+      s.theme,
+      assetId,
+      a.width ?? 400,
+      a.height ?? 400,
+      a.name ?? assetId,
+      allIds(s.theme),
+      at,
+      0,
+    );
+    s.setTheme({ ...s.theme, components: [...s.theme.components, c] });
+    set({ selection: [c.id] });
+    return c.id;
+  },
+  removeAsset: (assetId) => {
+    const s = get();
+    const assets = { ...s.theme.assets };
+    delete assets[assetId];
+    const components = mapTree(s.theme.components, (c) =>
+      c.type === 'image' && c.props.asset === assetId ? null : c,
+    );
+    const ids = new Set(flattenComponents(components).map((f) => f.component.id));
+    s.setTheme({ ...s.theme, assets, components });
+    set({ selection: s.selection.filter((id) => ids.has(id)) });
+  },
+  replaceImageAsset: (componentId, img) => {
+    const s = get();
+    const assets = {
+      ...s.theme.assets,
+      [img.id]: {
+        type: 'image' as const,
+        name: img.name,
+        data: img.data,
+        width: img.width,
+        height: img.height,
+      },
+    };
+    const components = mapTree(s.theme.components, (c) =>
+      c.id === componentId && c.type === 'image'
+        ? { ...c, props: { ...c.props, asset: img.id, edits: ImageEditsSchema.parse({}) } }
+        : c,
+    );
+    s.setTheme({ ...s.theme, assets, components });
+  },
+  makeBackground: (componentId) => {
+    const s = get();
+    const list = s.theme.components;
+    const self = list.find((c) => c.id === componentId);
+    if (!self || self.type !== 'image') return;
+    const { width, height } = s.theme.layout;
+    const rest = list.filter((c) => c !== self);
+    // Stay above a solid full-layout background rectangle, or it would hide the picture.
+    let index = 0;
+    while (index < rest.length) {
+      const c = rest[index]!;
+      if (c.type === 'rect' && c.x <= 0 && c.y <= 0 && c.width >= width && c.height >= height)
+        index += 1;
+      else break;
+    }
+    const moved: Component = {
+      ...self,
+      x: 0,
+      y: 0,
+      width,
+      height,
+      rotation: 0,
+      props: { ...self.props, fit: 'cover' },
+    };
+    rest.splice(index, 0, moved);
+    s.setTheme({ ...s.theme, components: rest });
   },
   deleteSelected: () => {
     const s = get();

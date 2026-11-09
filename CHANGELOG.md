@@ -12,6 +12,17 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- Images in the Studio: import from the computer by button, drag and drop or paste; assets embedded
+  in the theme; full-window non-destructive editor with adjustments, looks, crop, rotate and flip,
+  background removal, erase/restore brush, effects, compare, undo and a live view on the cluster.
+- Compiler bakes each image's edits at its layer size and validates renderer pixel memory.
+- MGU app draws image layers (tested locally against a fake renderer; not tested in a vehicle).
+
+### Fixed
+
+- Studio desktop build: HTML5 drag and drop was disabled by Tauri's `dragDropEnabled`.
+- Compiled `theme.json` was written before image sizes were settled.
+
 - `@idv7lol/simulator`: virtual vehicle model, scenarios (idle, cold start, city, highway,
   track, redline, manual shifts, drive modes, signal loss, communication failure), overrides,
   faults, latency, recording and replay. Tested locally.

@@ -5,6 +5,7 @@ import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
 import { useT } from '../i18n/index.js';
 import { useValidation } from '../lib/useValidation.js';
+import { decodeThemeImages } from '../lib/imageStore.js';
 import { fetchStatic, isTauri, openExternal, pickFolder, writeBundleFiles } from '../host/files.js';
 
 interface BuildState {
@@ -33,7 +34,7 @@ export function BuildPanel(): JSX.Element {
         if (px && mt)
           fonts[fam] = { pixels: px, metrics: JSON.parse(new TextDecoder().decode(mt)) as object };
       }
-      const result = compileTheme(theme, { fonts });
+      const result = compileTheme(theme, { fonts, images: await decodeThemeImages(theme) });
       setState({ result, exportedTo: null, busy: false });
       if (result.compiled)
         log(

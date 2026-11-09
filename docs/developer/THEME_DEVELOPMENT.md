@@ -106,7 +106,7 @@ and `npm run themes:validate` report exact numbers.
 ## What the car cannot draw (yet)
 
 Gradients with more than two stops (first and last are used), radial gradients (drawn linear),
-shadows, dashed lines, image tinting, group clipping, elliptical decorative arcs (drawn as
+shadows, dashed lines, group clipping, elliptical decorative arcs (drawn as
 circles), decimals in gauge numerals (use `divisor`), custom telltale icons, text longer than 32
 glyphs per line, characters outside the atlas (digits, Latin letters, `- ° / . : % + , ' ! | ( )
 ~ < > = # & * ? _ "`). Each case is a validation note or warning.

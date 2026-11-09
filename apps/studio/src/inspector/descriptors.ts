@@ -452,21 +452,8 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
       ],
     },
   ],
-  image: [
-    {
-      title: 'Image',
-      fields: [
-        { path: 'asset', label: 'Asset id', kind: 'text' },
-        {
-          path: 'fit',
-          label: 'Fit',
-          kind: 'select',
-          options: opt(['contain', 'cover', 'stretch']),
-        },
-        { path: 'tint', label: 'Tint', kind: 'color' },
-      ],
-    },
-  ],
+  // The picture has its own section and editor (InspectorPanel, ImageEditor).
+  image: [],
 };
 
 export function getPath(obj: unknown, path: string): unknown {

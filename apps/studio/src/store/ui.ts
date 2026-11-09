@@ -27,6 +27,8 @@ interface UiState {
   /** Manual palette for the preview (null = automatic by driving mode). */
   previewPalette: string | null;
   welcomeOpen: boolean;
+  /** Component whose picture is open in the image editor. */
+  imageEditorFor: string | null;
   log: LogEntry[];
   cursor: { x: number; y: number } | null;
 
@@ -47,6 +49,7 @@ interface UiState {
   setBottomTab(tab: BottomTab): void;
   setPreviewPalette(id: string | null): void;
   setWelcomeOpen(open: boolean): void;
+  setImageEditorFor(id: string | null): void;
   setCursor(c: { x: number; y: number } | null): void;
   logMessage(level: LogEntry['level'], text: string): void;
   clearLog(): void;
@@ -108,6 +111,7 @@ export const useUiStore = create<UiState>((set, get) => {
     showBounds: false,
     previewPalette: null,
     welcomeOpen: true,
+    imageEditorFor: null,
     log: [],
     cursor: null,
 
@@ -128,6 +132,7 @@ export const useUiStore = create<UiState>((set, get) => {
     setBottomTab: (bottomTab) => set({ bottomTab, bottomOpen: true }),
     setPreviewPalette: (previewPalette) => set({ previewPalette }),
     setWelcomeOpen: (welcomeOpen) => set({ welcomeOpen }),
+    setImageEditorFor: (imageEditorFor) => set({ imageEditorFor }),
     setCursor: (cursor) => set({ cursor }),
     logMessage: (level, text) =>
       set({ log: [...get().log.slice(-299), { at: Date.now(), level, text }] }),

@@ -11,6 +11,7 @@ import type {
   Zone,
 } from '@idv7lol/theme-schema';
 import {
+  RENDERER_LIMITS,
   anchorFraction,
   flattenComponents,
   normalize,
@@ -427,18 +428,18 @@ function wrapStatic(text: string, maxChars: number): string[] {
 function buildImage(ctx: Ctx, f: FlatComponent): void {
   const c = f.component;
   if (c.type !== 'image') return;
-  const asset = ctx.theme.assets[c.props.asset];
-  if (!asset) return; // validator reports it
+  if (!ctx.theme.assets[c.props.asset]) return; // validator reports it
   const key = `${c.id}:img`;
   ctx.assetRefs.push({ componentId: c.id, asset: c.props.asset, key });
-  if (c.props.tint) warn(ctx, 'image.tint', 'Image tinting is not applied on the car.', c.id);
-  if (c.props.fit !== 'stretch')
+  if (c.props.edits.tint?.color.startsWith('$')) {
     info(
       ctx,
-      'image.fit',
-      `Image fit "${c.props.fit}" is resolved at compile time from the asset size.`,
+      'image.tint-palette',
+      'The image tint is baked with the default palette; it does not change with the palette on the car.',
       c.id,
     );
+  }
+  const { fx, fy } = anchorFraction(c.anchor);
   ctx.images.push({
     key,
     componentId: c.id,
@@ -447,10 +448,14 @@ function buildImage(ctx: Ctx, f: FlatComponent): void {
     w: Math.round(c.width),
     h: Math.round(c.height),
     z: ctx.z++,
-    iw: asset.width ?? Math.round(c.width),
-    ih: asset.height ?? Math.round(c.height),
-    file: `images/${c.props.asset}.rgba`,
+    // The renderer limits image layers; a larger box is drawn scaled up.
+    iw: Math.max(1, Math.min(RENDERER_LIMITS.imageMaxWidth, Math.round(c.width))),
+    ih: Math.max(1, Math.min(RENDERER_LIMITS.imageMaxHeight, Math.round(c.height))),
+    file: `images/${c.id}.rgba`,
     opacity: c.opacity,
+    rotation: c.rotation,
+    pivotX: fx * c.width,
+    pivotY: fy * c.height,
     ...(c.visibleWhen ? { visibleWhen: c.visibleWhen } : {}),
   });
 }

@@ -350,14 +350,6 @@ export const LIBRARY: LibraryEntry[] = [
     glyph: '◠',
     overrides: { props: { stroke: { color: '$track', width: 10 } } },
   },
-  {
-    id: 'image',
-    group: 'decor',
-    type: 'image',
-    nameKey: 'image',
-    glyph: '🖼',
-    overrides: { props: { asset: 'logo' } },
-  },
 ];
 
 export const LIBRARY_GROUPS: LibraryGroup[] = ['gauges', 'readouts', 'indicators', 'text', 'decor'];

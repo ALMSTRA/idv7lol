@@ -1,5 +1,11 @@
 import { getDisplayProfile, type Theme } from '@idv7lol/theme-schema';
-import { collectSignals } from '@idv7lol/theme-engine';
+import {
+  applyImageEdits,
+  collectSignals,
+  findComponent,
+  fitRaster,
+  resolveColor,
+} from '@idv7lol/theme-engine';
 import { buildPieces } from './pieces.js';
 import { SHADERS } from './glsl.js';
 import { codeOf } from './font/glyphs.js';
@@ -88,7 +94,7 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
     warnings,
   };
 
-  const files: BundleFile[] = [{ path: 'theme.json', data: JSON.stringify(compiled, null, 2) }];
+  const files: BundleFile[] = [];
   for (const fam of fontFamilies) {
     const f = opts.fonts?.[fam];
     if (f) {
@@ -102,21 +108,47 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
       });
     }
   }
+
+  // Bake each image component: edits first, then fitted to exactly its layer size.
+  const palette = theme.palettes[theme.palette.default];
   for (const ref of build.assetRefs) {
     const img = opts.images?.[ref.asset];
     const entry = compiled.images.find((i) => i.key === ref.key);
-    if (img && entry) {
-      entry.iw = img.width;
-      entry.ih = img.height;
-      files.push({ path: entry.file, data: img.rgba });
-    } else if (entry) {
+    const component = findComponent(theme.components, ref.componentId);
+    if (!entry) continue;
+    if (!img || component?.type !== 'image') {
       report.infos.push({
         severity: 'info',
         code: 'bundle.image-missing',
         message: `Image asset "${ref.asset}" was not decoded; the bundle needs ${entry.file}.`,
       });
+      continue;
     }
+    const source = {
+      width: img.width,
+      height: img.height,
+      data: new Uint8ClampedArray(
+        img.rgba.buffer as ArrayBuffer,
+        img.rgba.byteOffset,
+        img.rgba.byteLength,
+      ),
+    };
+    const edited = applyImageEdits(source, component.props.edits, (c) =>
+      palette ? resolveColor(c, palette) : c,
+    );
+    const baked = fitRaster(edited, entry.iw, entry.ih, component.props.fit);
+    files.push({
+      path: entry.file,
+      data: new Uint8Array(
+        baked.data.buffer as ArrayBuffer,
+        baked.data.byteOffset,
+        baked.data.byteLength,
+      ),
+    });
   }
+
+  // Last, so it records every value settled above.
+  files.unshift({ path: 'theme.json', data: JSON.stringify(compiled, null, 2) });
   return { report, compiled, files };
 }
 

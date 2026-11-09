@@ -124,6 +124,34 @@ describe('validateTheme', () => {
   });
 });
 
+describe('image memory budget', () => {
+  const asset = { type: 'image' as const, data: 'data:image/png;base64,AAAA', width: 4, height: 4 };
+  const pic = (id: string, x: number) =>
+    createComponent('image', { id, x, y: 240, width: 500, height: 400, props: { asset: 'a' } });
+
+  // Each 900×420 image is about 1.5 MiB; the warning starts at 9.6 MiB and the limit is 16 MiB.
+  it('warns when images take much of the renderer memory and fails over the limit', () => {
+    const big = (id: string) =>
+      createComponent('image', {
+        id,
+        x: 500,
+        y: 220,
+        width: 900,
+        height: 420,
+        props: { asset: 'a' },
+      });
+    expect(validateTheme(theme([pic('p1', 450)], { assets: { a: asset } })).errors).toEqual([]);
+    const warned = validateTheme(
+      theme(['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7'].map(big), { assets: { a: asset } }),
+    );
+    expect(warned.warnings.some((w) => w.code === 'budget.images')).toBe(true);
+    const failed = validateTheme(
+      theme(Array.from({ length: 11 }, (_, i) => `b${i}`).map(big), { assets: { a: asset } }),
+    );
+    expect(failed.errors.some((e) => e.code === 'budget.images')).toBe(true);
+  });
+});
+
 describe('shaders', () => {
   it('pass the static lint', () => {
     for (const [kind, src] of Object.entries(SHADERS)) expect(lintShader(src), kind).toEqual([]);

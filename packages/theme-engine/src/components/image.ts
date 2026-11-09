@@ -6,7 +6,7 @@ export const imageRenderer: ComponentRenderer<ImageComponent> = {
   draw(rc, c, w, h) {
     const { ctx } = rc;
     const p = c.props;
-    const img = rc.options.images?.get(p.asset);
+    const img = rc.options.images?.get(p.asset, p.edits, (color) => rc.color(color));
     if (!img) {
       // Placeholder: dashed box with a cross, so a missing asset is obvious.
       ctx.beginPath();
@@ -44,16 +44,6 @@ export const imageRenderer: ComponentRenderer<ImageComponent> = {
       ctx.clip();
     }
     ctx.drawImage(img.image, dx, dy, dw, dh);
-    if (p.tint) {
-      const anyCtx = ctx as unknown as { globalCompositeOperation?: string };
-      if (anyCtx.globalCompositeOperation !== undefined) {
-        const prev = anyCtx.globalCompositeOperation;
-        anyCtx.globalCompositeOperation = 'source-atop';
-        ctx.fillStyle = rc.color(p.tint);
-        ctx.fillRect(dx, dy, dw, dh);
-        anyCtx.globalCompositeOperation = prev;
-      }
-    }
     ctx.restore();
   },
   layers: () => 1,

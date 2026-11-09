@@ -32,6 +32,34 @@ Components grouped as Gauges, Readouts, Indicators, Text & shapes, Decoration. E
 preset (for example _Tachometer_ is a circular gauge already bound to `engine.rpm` with a
 redline and segments). Drag an entry onto the canvas, or click it to add it at the centre.
 
+### Images
+
+Add pictures from your computer in any of these ways: the **Add images** button (top bar or
+library), dragging files onto the canvas or the library, or pasting with Ctrl+V. PNG, JPEG, WebP,
+GIF, SVG, BMP and AVIF work; images are stored inside the theme, so a saved `.idv7theme` is one
+self-contained file. Images larger than 2048 px are scaled down on import. Click a thumbnail to
+reuse a picture, or drag it onto the layout.
+
+## Image editor
+
+Double-click a picture on the canvas, or press **Edit image** in the Inspector. Edits are
+non-destructive: the original stays intact and **Reset all** returns to it.
+
+| Tool              | What it does                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------- |
+| Adjust            | brightness, contrast, saturation, temperature, hue; double-click a name to reset it   |
+| Looks             | one-click styles (Night, Neon, Mono, Warm, Cold, Punch, Muted)                        |
+| Crop              | drag the frame; free, component, cluster, 16:9 or 1:1 proportions; rotate and flip    |
+| Remove background | click a color in the image or **Detect background**; tune tolerance and edge softness |
+| Brush             | erase parts by hand, or restore what was removed; `[` and `]` change the size         |
+| Effects           | blur, sharpen, vignette, rounded corners, black and white, invert, colorize           |
+
+The panel **On your cluster** shows the picture in place in your layout while you work. Ctrl+Z and
+Ctrl+Y undo and redo, Esc cancels. Below the image you can switch the backdrop (transparent, black,
+white) and hold a button to compare with the original. On the car, the edits are baked into the
+picture at its size on the cluster. Images use renderer memory according to that size; Validation
+warns when a theme uses too much.
+
 ## Canvas (centre)
 
 | Action                            | How                                                                                                                      |

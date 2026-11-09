@@ -93,12 +93,66 @@ export const TextPropsSchema = z.object({
   lineHeight: z.number().positive().default(1.2),
 });
 
+/** One brush stroke of the image editor; points are [x0, y0, x1, y1…] normalised to the source. */
+export const ImageStrokeSchema = z.object({
+  mode: z.enum(['erase', 'restore']),
+  /** Brush diameter as a fraction of the source's shorter side. */
+  size: z.number().positive().max(1),
+  hardness: z.number().min(0).max(1).default(0.7),
+  points: z.array(z.number()).min(2),
+});
+
+/**
+ * Non-destructive image edits. The original asset is never changed; the
+ * Studio previews these and the compiler bakes them for the car. Every value
+ * is resolution-independent.
+ */
+export const ImageEditsSchema = z.object({
+  rotate: z.union([z.literal(0), z.literal(90), z.literal(180), z.literal(270)]).default(0),
+  flipH: z.boolean().default(false),
+  flipV: z.boolean().default(false),
+  /** Normalised to the image after rotation and flip. */
+  crop: z
+    .object({
+      x: z.number().min(0).max(1),
+      y: z.number().min(0).max(1),
+      width: z.number().positive().max(1),
+      height: z.number().positive().max(1),
+    })
+    .optional(),
+  brightness: z.number().min(-100).max(100).default(0),
+  contrast: z.number().min(-100).max(100).default(0),
+  saturation: z.number().min(-100).max(100).default(0),
+  hue: z.number().min(-180).max(180).default(0),
+  temperature: z.number().min(-100).max(100).default(0),
+  sharpen: z.number().min(0).max(100).default(0),
+  blur: z.number().min(0).max(100).default(0),
+  invert: z.boolean().default(false),
+  grayscale: z.boolean().default(false),
+  /** Colourise with a colour or palette token; amount 0..100. */
+  tint: z
+    .object({ color: ColorSchema, amount: z.number().min(0).max(100).default(100) })
+    .optional(),
+  vignette: z.number().min(0).max(100).default(0),
+  /** Corner radius as a percentage of the shorter side. */
+  radius: z.number().min(0).max(50).default(0),
+  /** Remove a background colour. */
+  colorKey: z
+    .object({
+      color: z.string(),
+      tolerance: z.number().min(0).max(100).default(15),
+      softness: z.number().min(0).max(100).default(10),
+    })
+    .optional(),
+  strokes: z.array(ImageStrokeSchema).default([]),
+});
+export type ImageEdits = z.infer<typeof ImageEditsSchema>;
+
 export const ImagePropsSchema = z.object({
   /** Id of an entry in the theme's `assets` table. */
   asset: IdSchema,
   fit: z.enum(['contain', 'cover', 'stretch']).default('contain'),
-  /** Tint the image with a colour (keeps the alpha channel). */
-  tint: ColorSchema.optional(),
+  edits: ImageEditsSchema.prefault({}),
 });
 
 /* -------------------------------------------------------------------------- */

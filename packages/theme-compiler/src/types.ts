@@ -167,6 +167,10 @@ export interface CompiledImage {
   /** File name of the raw RGBA8 data in the bundle. */
   file: string;
   opacity: number;
+  rotation: number;
+  /** Rotation pivot in pixels from the layer's top-left. */
+  pivotX: number;
+  pivotY: number;
   visibleWhen?: Condition;
 }
 

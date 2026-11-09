@@ -10,3 +10,4 @@ export * from './components/index.js';
 export * from './renderer.js';
 export * from './bounds.js';
 export * from './cost.js';
+export * from './image-edits.js';

@@ -60,14 +60,25 @@ export const FontSchema = z.object({
 });
 export type Font = z.infer<typeof FontSchema>;
 
-export const AssetSchema = z.object({
-  type: z.enum(['image']),
-  /** Path relative to the theme folder. PNG or SVG. */
-  path: z.string().max(200),
-  width: z.number().int().positive().optional(),
-  height: z.number().int().positive().optional(),
-  license: z.string().max(120).optional(),
-});
+export const AssetSchema = z
+  .object({
+    type: z.enum(['image']),
+    /** Display name, usually the imported file's name. */
+    name: z.string().max(120).optional(),
+    /** PNG file relative to the theme folder. */
+    path: z.string().max(200).optional(),
+    /** Embedded PNG, so a theme saved from the Studio is one self-contained file. */
+    data: z
+      .string()
+      .startsWith('data:image/png;base64,', 'embedded images must be PNG data URLs')
+      .optional(),
+    width: z.number().int().positive().optional(),
+    height: z.number().int().positive().optional(),
+    license: z.string().max(120).optional(),
+  })
+  .refine((a) => a.path !== undefined || a.data !== undefined, {
+    message: 'an image asset needs a file path or embedded data',
+  });
 export type Asset = z.infer<typeof AssetSchema>;
 
 export const ReservedZoneSchema = RectSchema.extend({

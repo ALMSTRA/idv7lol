@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   AnimationRef,
   Binding,
   Comparison,
   Component,
+  ImageComponent,
   Condition,
   StatusPanelComponent,
   TextStyle,
@@ -12,9 +13,12 @@ import type {
 } from '@idv7lol/theme-schema';
 import { getProfile, getSignal, profileHasSignal, unitSymbol } from '@idv7lol/vehicle-signals';
 import { buildPieces } from '@idv7lol/theme-compiler';
-import { findComponent } from '@idv7lol/theme-engine';
+import { findComponent, resolveColor } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
 import { useT } from '../i18n/index.js';
+import { useUiStore } from '../store/ui.js';
+import { replaceImage } from '../lib/imageActions.js';
+import { imageResolver } from '../lib/imageStore.js';
 import { DESCRIPTORS, getPath, patchFor, type FieldDescriptor } from '../inspector/descriptors.js';
 import {
   Checkbox,
@@ -94,6 +98,7 @@ export function InspectorPanel(): JSX.Element {
   return (
     <div>
       <CommonSection comps={[c]} theme={theme} />
+      {c.type === 'image' && <ImageSection c={c} theme={theme} />}
       <BindingSection c={c} theme={theme} />
       {c.type !== 'group' && (
         <PropsSections c={c} theme={theme} onProps={(patch) => updateProps(c.id, patch)} />
@@ -123,6 +128,83 @@ export function InspectorPanel(): JSX.Element {
         />
       </Section>
     </div>
+  );
+}
+
+/** The picture as it looks with its edits applied. */
+function EditedThumb({
+  c,
+  theme,
+  onClick,
+}: {
+  c: ImageComponent;
+  theme: Theme;
+  onClick: () => void;
+}): JSX.Element {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const palette = theme.palettes[theme.palette.default];
+    const draw = () => {
+      const img = imageResolver.get(c.props.asset, c.props.edits, (x) =>
+        palette ? resolveColor(x, palette) : x,
+      );
+      const cv = ref.current;
+      if (!img || !cv) return false;
+      cv.width = img.width;
+      cv.height = img.height;
+      cv.getContext('2d')!.drawImage(img.image as HTMLCanvasElement, 0, 0);
+      return true;
+    };
+    if (draw()) return;
+    const h = setInterval(() => draw() && clearInterval(h), 150);
+    return () => clearInterval(h);
+  }, [c.props.asset, c.props.edits, theme.palettes, theme.palette.default]);
+  return <canvas ref={ref} className="inspector-thumb" onClick={onClick} />;
+}
+
+function ImageSection({ c, theme }: { c: ImageComponent; theme: Theme }): JSX.Element {
+  const t = useT();
+  const open = useUiStore((s) => s.setImageEditorFor);
+  const updateProps = useProjectStore((s) => s.updateProps);
+  const makeBackground = useProjectStore((s) => s.makeBackground);
+  const asset = theme.assets[c.props.asset];
+  return (
+    <Section title={t('image.picture')}>
+      {asset?.data ? (
+        <EditedThumb c={c} theme={theme} onClick={() => open(c.id)} />
+      ) : (
+        <div className="hint">{t('image.noData')}</div>
+      )}
+      <button
+        className="primary"
+        style={{ justifyContent: 'center' }}
+        disabled={!asset?.data}
+        onClick={() => open(c.id)}
+      >
+        {t('image.edit')}
+      </button>
+      <div className="row" style={{ display: 'flex', gap: 4 }}>
+        <button
+          style={{ flex: 1, justifyContent: 'center' }}
+          onClick={() => void replaceImage(c.id)}
+        >
+          {t('image.replace')}
+        </button>
+        <button style={{ flex: 1, justifyContent: 'center' }} onClick={() => makeBackground(c.id)}>
+          {t('image.background')}
+        </button>
+      </div>
+      <Field label={t('image.fit')}>
+        <Select
+          value={c.props.fit}
+          options={(['contain', 'cover', 'stretch'] as const).map((v) => ({
+            value: v,
+            label: t(`image.fits.${v}`),
+          }))}
+          onChange={(fit) => updateProps(c.id, { fit })}
+        />
+      </Field>
+    </Section>
   );
 }
 

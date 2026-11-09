@@ -80,6 +80,7 @@ mgu.run({
       enabled: showing,
       live: vehicle.live,
       signals: vehicle.store,
+      loadImage: (img) => fs.readFileSync(path.join(__dirname, img.file)),
       sweep: () => settings.get('sweep') !== 'off',
       utcOffsetMinutes: utcOffset,
     });
@@ -168,7 +169,7 @@ mgu.run({
             'Theme',
             current.theme.name +
               '  ·  ' +
-              current.theme.pieces.length +
+              current.theme.layers +
               ' layers  ·  ' +
               current.theme.compiledWith,
           ],

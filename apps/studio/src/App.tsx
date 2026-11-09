@@ -17,6 +17,9 @@ import { BuildPanel } from './panels/BuildPanel.js';
 import { ConsolePanel } from './panels/ConsolePanel.js';
 import { WelcomeDialog } from './panels/WelcomeDialog.js';
 import { useValidation } from './lib/useValidation.js';
+import { ImageEditor } from './panels/ImageEditor.js';
+import { imageFilesOf, syncAssets } from './lib/imageStore.js';
+import { browseAndPlace, importAndPlace } from './lib/imageActions.js';
 import {
   baseName,
   isTauri,
@@ -145,9 +148,29 @@ export function App(): JSX.Element {
     return () => window.removeEventListener('beforeunload', h);
   }, []);
 
+  /* ----- images: keep pixels decoded; Ctrl+V pastes pictures or components ----- */
+  useEffect(() => syncAssets(project.theme), [project.theme.assets]);
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+      if (useUiStore.getState().imageEditorFor) return;
+      const files = imageFilesOf(e.clipboardData?.items);
+      if (files.length) {
+        e.preventDefault();
+        void importAndPlace(files);
+      } else {
+        useProjectStore.getState().paste();
+      }
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, []);
+
   /* ----- keyboard shortcuts ----- */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (useUiStore.getState().imageEditorFor) return;
       const target = e.target as HTMLElement | null;
       const typing =
         target &&
@@ -191,10 +214,6 @@ export function App(): JSX.Element {
       }
       if (mod && e.key.toLowerCase() === 'c') {
         p.copySelected();
-        return;
-      }
-      if (mod && e.key.toLowerCase() === 'v') {
-        p.paste();
         return;
       }
       if (mod && e.key.toLowerCase() === 'a') {
@@ -272,6 +291,7 @@ export function App(): JSX.Element {
         <button onClick={() => void doSave(true)} title="Ctrl+Shift+S">
           {t('menu.saveAs')}
         </button>
+        <button onClick={() => void browseAndPlace()}>{t('image.add')}</button>
         <button onClick={() => void doExportPng()}>{t('menu.export')}</button>
         <span className="sep" />
         <button
@@ -446,6 +466,8 @@ export function App(): JSX.Element {
           ↻
         </button>
       </div>
+
+      <ImageEditor />
 
       {ui.welcomeOpen && (
         <WelcomeDialog

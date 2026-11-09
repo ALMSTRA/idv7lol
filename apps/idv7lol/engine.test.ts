@@ -3,7 +3,8 @@ import { createRequire } from 'node:module';
 import { EventEmitter } from 'node:events';
 import { readFileSync } from 'node:fs';
 import { compileTheme } from '@idv7lol/theme-compiler';
-import { bakeFamily } from '@idv7lol/theme-compiler/node';
+import { bakeFamily, decodePng, encodePng } from '@idv7lol/theme-compiler/node';
+import { createComponent, createEmptyTheme } from '@idv7lol/theme-schema';
 import type { CompiledTheme } from '@idv7lol/theme-compiler';
 
 const require = createRequire(import.meta.url);
@@ -54,6 +55,12 @@ class FakeClient extends EventEmitter {
     const ref = this.next++;
     this.layers.set(ref, { kind: 'effect', ...o });
     this.ops.push({ op: 'layer', ref, ...o });
+    return ref;
+  }
+  image(o: Record<string, unknown>) {
+    const ref = this.next++;
+    this.layers.set(ref, { kind: 'image', ...o });
+    this.ops.push({ op: 'image', ref, ...o });
     return ref;
   }
   asset(o: Record<string, unknown>) {
@@ -220,6 +227,70 @@ describe('MGU engine', () => {
     // manualColor is $accent (night: #3f8cff) → blue dominant
     expect(lastColor[2]!).toBeGreaterThan(lastColor[0]!);
     expect(t.client.uniforms('u_text').some((u) => (u.v as number[])[0] === 3)).toBe(true); // '3' is glyph code 3
+  });
+});
+
+describe('MGU engine images', () => {
+  it('uploads baked images as layers, follows conditions and drops them', () => {
+    const png = encodePng(2, 2, new Uint8Array(16).fill(255));
+    const theme = createEmptyTheme({ id: 'img', name: 'Img' });
+    const doc = {
+      ...theme,
+      assets: {
+        pic: {
+          type: 'image' as const,
+          data: `data:image/png;base64,${Buffer.from(png).toString('base64')}`,
+        },
+      },
+      components: [
+        createComponent('image', {
+          id: 'pic-1',
+          x: 600,
+          y: 200,
+          width: 40,
+          height: 20,
+          rotation: 10,
+          visibleWhen: { signal: 'engine.rpm', op: 'gt', value: 1000 },
+          props: { asset: 'pic', fit: 'stretch', edits: { brightness: -50 } },
+        }),
+      ],
+    };
+    const result = compileTheme(doc, { images: { pic: decodePng(png) } });
+    expect(result.report.errors).toEqual([]);
+    const baked = result.files.find((f) => f.path === 'images/pic-1.rgba')!.data as Uint8Array;
+    expect(baked.length).toBe(40 * 20 * 4);
+    expect(baked[0]).toBeLessThan(255); // the edit was baked in
+    expect(JSON.parse(result.files[0]!.data as string).images[0].iw).toBe(40);
+
+    let now = 50_000;
+    const store = new SignalStore();
+    const client = new FakeClient();
+    let on = true;
+    const engine = new ClusterEngine({
+      client,
+      log: quiet,
+      theme: result.compiled,
+      fonts: {},
+      signals: store,
+      enabled: () => on,
+      live: () => true,
+      sweep: () => false,
+      now: () => now,
+      paletteId: () => 'night',
+      loadImage: () => Buffer.from(baked),
+    });
+    store.set('engine.rpm', 500, now);
+    engine.tick();
+    const layer = client.ops.find((o) => o.op === 'image')!;
+    expect(layer).toMatchObject({ w: 40, h: 20, iw: 40, ih: 20, rotate: 10, sampling: 'bilinear' });
+    expect(client.count('pixels')).toBe(1);
+    now += 34;
+    engine.tick();
+    engine.tick();
+    expect(client.ops.some((o) => o.op === 'set' && o.visible === 0)).toBe(true);
+    on = false;
+    engine.tick();
+    expect(client.layers.size).toBe(0);
   });
 });
 

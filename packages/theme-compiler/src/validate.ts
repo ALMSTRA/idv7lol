@@ -402,6 +402,28 @@ export function validateTheme(doc: unknown): ValidationReport {
       `The theme needs ${layers} renderer layers; keep it under ${RENDERER_LIMITS.layersRecommended} so other apps still fit (hard limit ${RENDERER_LIMITS.layersPerApp}).`,
     );
   if (layers === 0) out.warning('budget.empty', 'The theme has no visible components.');
+  const atlasBytes = new Set(Object.values(theme.fonts).map((f) => f.family)).size * 344_064;
+  const imageBytes = build.images.reduce((sum, i) => sum + i.iw * i.ih * 4, 0);
+  if (imageBytes > 0) {
+    const mib = (n: number) => (n / (1024 * 1024)).toFixed(1);
+    const total = imageBytes + atlasBytes;
+    const limit = RENDERER_LIMITS.pixelMemoryBytes;
+    if (total > limit) {
+      out.error(
+        'budget.images',
+        `Images need ${mib(total)} MiB of renderer memory; the cluster renderer has ${mib(limit)} MiB for all apps.`,
+        {
+          hint: 'Make images smaller or remove some: memory depends on their size on the cluster.',
+        },
+      );
+    } else if (total > limit * 0.6) {
+      out.warning(
+        'budget.images',
+        `Images need ${mib(total)} MiB of the renderer's ${mib(limit)} MiB, shared with other apps.`,
+        { hint: 'Smaller images leave room for other apps and load faster.' },
+      );
+    }
+  }
   for (const [kind, src] of Object.entries(SHADERS))
     for (const p of lintShader(src)) out.error('shader.lint', `Shader ${kind}: ${p}`);
 

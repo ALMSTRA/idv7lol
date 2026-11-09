@@ -12,6 +12,11 @@ export const RENDERER_LIMITS = {
   uniformsPerLayer: 32,
   floatsPerLayer: 4096,
   glyphsPerTextLayer: 32,
+  /** CPU pixel memory of the service, shared by all images and atlases of all apps. */
+  pixelMemoryBytes: 16 * 1024 * 1024,
+  /** Largest image layer the renderer accepts. */
+  imageMaxWidth: 1920,
+  imageMaxHeight: 720,
 } as const;
 
 export interface ComponentCost {

@@ -38,8 +38,10 @@ export function imagesFor(theme: Theme, themeDir: string): NonNullable<CompileOp
   for (const [id, asset] of Object.entries(theme.assets)) {
     if (asset.type !== 'image') continue;
     try {
-      const img = decodePng(new Uint8Array(readFileSync(resolve(themeDir, asset.path))));
-      out[id] = img;
+      const bytes = asset.data
+        ? Buffer.from(asset.data.slice(asset.data.indexOf(',') + 1), 'base64')
+        : readFileSync(resolve(themeDir, asset.path ?? ''));
+      out[id] = decodePng(new Uint8Array(bytes));
     } catch {
       /* reported by compileTheme as a missing image */
     }

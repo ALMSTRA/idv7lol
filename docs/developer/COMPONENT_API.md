@@ -53,8 +53,11 @@ in degrees, 0 = 3 o'clock, clockwise. Car: 1 layer, circular.
 
 ### `image`
 
-`asset` (id in `assets`), `fit` (`contain cover stretch`), `tint` (Studio only). Car: 1 image
-layer from a PNG decoded at compile time.
+`asset` (id in `assets`), `fit` (`contain cover stretch`), `edits` (non-destructive: `rotate`, `flipH`,
+`flipV`, `crop`, `brightness`, `contrast`, `saturation`, `hue`, `temperature`, `sharpen`, `blur`,
+`invert`, `grayscale`, `tint`, `vignette`, `radius`, `colorKey`, `strokes`). The pipeline is
+`packages/theme-engine/src/image-edits.ts`, shared by the Studio and the compiler. Car: 1 image layer
+baked at the component's size, at most 1920×720; a palette-token tint uses the default palette.
 
 ### `group`
 

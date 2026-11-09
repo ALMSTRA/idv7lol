@@ -63,6 +63,22 @@ GLSL, RAMSES ni JavaScript.
   superada_, _Paquete compilado_, _Bundle exportado_ y _Probado en el vehículo_ (esto último
   solo lo puedes marcar tú, con el coche aparcado).
 
+## Imágenes
+
+Añade imágenes de tu PC con el botón **Añadir imágenes**, arrastrando archivos al lienzo o a la
+biblioteca, o pegando con Ctrl+V. Sirven PNG, JPEG, WebP, GIF, SVG, BMP y AVIF, y quedan guardadas
+dentro del tema. Haz doble clic en una imagen, o pulsa **Editar imagen**, para abrir el editor:
+
+- **Ajustes**: brillo, contraste, saturación, temperatura y tono. Doble clic en un nombre lo restablece.
+- **Estilos**: Noche, Neón, Mono, Cálido, Frío, Intenso y Suave con un clic.
+- **Recortar**: arrastra el marco, elige proporción, gira y voltea.
+- **Quitar fondo**: haz clic en el color a quitar o usa **Detectar el fondo**.
+- **Pincel**: borra a mano o recupera lo borrado; las teclas `[` y `]` cambian el tamaño.
+- **Efectos**: desenfoque, nitidez, viñeta, esquinas, blanco y negro, invertir y colorear.
+
+La vista **En tu cuadro** muestra la imagen en su sitio mientras editas. La edición no destruye el
+original: **Restablecer todo** vuelve a él. Ctrl+Z deshace y Esc cancela.
+
 ## Atajos
 
 | Acción                              | Atajo                    |

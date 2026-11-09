@@ -12,6 +12,8 @@ import { useUiStore } from '../store/ui.js';
 import { simulator, useSimStore } from '../store/sim.js';
 import { libraryEntry } from '../lib/componentLibrary.js';
 import { useT } from '../i18n/index.js';
+import { imageFilesOf, imageResolver } from '../lib/imageStore.js';
+import { importAndPlace } from '../lib/imageActions.js';
 import {
   CURSORS,
   HANDLE_SIZE,
@@ -93,6 +95,7 @@ export function CanvasView(): JSX.Element {
   const spaceRef = useRef(false);
   const [cursor, setCursor] = useState('default');
   const fittedFor = useRef<string | null>(null);
+  const [fileDrag, setFileDrag] = useState(0);
 
   const theme = useProjectStore((s) => s.theme);
   const selection = useProjectStore((s) => s.selection);
@@ -172,6 +175,7 @@ export function CanvasView(): JSX.Element {
       ctx.fillRect(0, 0, th.layout.width, th.layout.height);
       ctx.shadowBlur = 0;
       engine.render(ctx, th, now, {
+        images: imageResolver,
         showReservedZones: uiState.showZones,
         showBounds: uiState.showBounds,
       });
@@ -445,8 +449,30 @@ export function CanvasView(): JSX.Element {
     };
   }, []);
 
+  const onDoubleClick = (e: React.MouseEvent) => {
+    const { sx, sy } = screenPoint(e);
+    const p = toLayout(viewRef.current, sx, sy);
+    const hit = hitTest(themeRef.current, p.x, p.y, { respectLocks: true });
+    if (hit?.component.type === 'image') useUiStore.getState().setImageEditorFor(hit.component.id);
+  };
+
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    setFileDrag(0);
+    const { sx: dropX, sy: dropY } = screenPoint(e);
+    const dropAt = toLayout(viewRef.current, dropX, dropY);
+    const files = imageFilesOf(e.dataTransfer.files);
+    if (files.length) {
+      void importAndPlace(files, { x: Math.round(dropAt.x), y: Math.round(dropAt.y) });
+      return;
+    }
+    const assetId = e.dataTransfer.getData('application/x-idv7lol-asset');
+    if (assetId) {
+      useProjectStore
+        .getState()
+        .placeAsset(assetId, { x: Math.round(dropAt.x), y: Math.round(dropAt.y) });
+      return;
+    }
     const id = e.dataTransfer.getData('application/x-idv7lol-library');
     if (!id) return;
     const entry = libraryEntry(id);
@@ -476,6 +502,12 @@ export function CanvasView(): JSX.Element {
       ref={wrapRef}
       className="canvas-wrap"
       onDragOver={(e) => e.preventDefault()}
+      onDragEnter={(e) => {
+        if (e.dataTransfer.types.includes('Files')) setFileDrag((n) => n + 1);
+      }}
+      onDragLeave={(e) => {
+        if (e.dataTransfer.types.includes('Files')) setFileDrag((n) => Math.max(0, n - 1));
+      }}
       onDrop={onDrop}
     >
       <canvas
@@ -486,6 +518,7 @@ export function CanvasView(): JSX.Element {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onWheel={onWheel}
+        onDoubleClick={onDoubleClick}
         onContextMenu={(e) => e.preventDefault()}
       />
       <div className="canvas-toolbar">
@@ -611,6 +644,7 @@ export function CanvasView(): JSX.Element {
           {running ? '❚❚' : '▶'}
         </button>
       </div>
+      {fileDrag > 0 && <div className="canvas-dropzone">{t('image.drop')}</div>}
       <div className="canvas-note">{t('canvas.note')}</div>
       <span style={{ display: 'none' }}>{hover}</span>
     </div>
@@ -832,6 +866,6 @@ export function renderToCanvas(theme: Theme, scale = 1): HTMLCanvasElement {
   canvas.height = Math.round(theme.layout.height * scale);
   const ctx = canvas.getContext('2d')!;
   ctx.scale(scale, scale);
-  engine.render(ctx, theme, performance.now(), {});
+  engine.render(ctx, theme, performance.now(), { images: imageResolver });
   return canvas;
 }

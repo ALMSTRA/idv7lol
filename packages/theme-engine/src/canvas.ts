@@ -1,3 +1,5 @@
+import type { ImageEdits } from '@idv7lol/theme-schema';
+
 /**
  * The subset of CanvasRenderingContext2D the engine uses. Keeping it explicit
  * lets the engine run against a real browser canvas, an OffscreenCanvas, a
@@ -77,8 +79,15 @@ export interface Canvas2DLike {
 export type ImageSource = unknown;
 
 export interface ImageResolver {
-  /** Return a drawable for an asset id, or undefined while loading / missing. */
-  get(assetId: string): { image: ImageSource; width: number; height: number } | undefined;
+  /**
+   * Return a drawable for an asset id with its edits applied, or undefined
+   * while loading / missing. `resolveColor` turns palette tokens into colours.
+   */
+  get(
+    assetId: string,
+    edits?: ImageEdits,
+    resolveColor?: (color: string) => string,
+  ): { image: ImageSource; width: number; height: number } | undefined;
 }
 
 export type RecordedOp = { op: string; args: unknown[] };

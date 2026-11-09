@@ -95,6 +95,43 @@ describe('createComponent', () => {
   });
 });
 
+describe('image assets', () => {
+  it('needs a file path or embedded PNG data, and keeps edits through JSON', () => {
+    const t = createEmptyTheme();
+    const doc = JSON.parse(serializeTheme(t));
+    doc.assets = { a: { type: 'image' } };
+    expect(parseTheme(doc).ok).toBe(false);
+    doc.assets = { a: { type: 'image', data: 'data:image/jpeg;base64,AAAA' } };
+    expect(parseTheme(doc).ok).toBe(false);
+    doc.assets = {
+      a: { type: 'image', name: 'x.png', data: 'data:image/png;base64,AAAA', width: 2, height: 2 },
+    };
+    doc.components = [
+      {
+        id: 'p',
+        type: 'image',
+        x: 0,
+        y: 0,
+        width: 9,
+        height: 9,
+        props: {
+          asset: 'a',
+          edits: { brightness: 12, strokes: [{ mode: 'erase', size: 0.1, points: [0.5, 0.5] }] },
+        },
+      },
+    ];
+    const r = parseTheme(doc);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const back = parseThemeJson(serializeTheme(r.theme));
+    expect(back.ok && back.theme).toEqual(r.theme);
+    const c = r.theme.components[0]!;
+    if (c.type !== 'image') throw new Error('type');
+    expect(c.props.edits.brightness).toBe(12);
+    expect(c.props.edits.contrast).toBe(0);
+  });
+});
+
 describe('conditions', () => {
   it('accepts nested all/any/not', () => {
     const c = ConditionSchema.parse({

@@ -33,6 +33,12 @@ dynamics) and the `font_sans.wad` SDF atlas, and drives `cluster-render`'s `pane
 `kit/` is the MIT app kit from cauliflowermossgrape/idrive7-apps, vendored so the MGU Store can
 build the app on the unit. Details: `docs/architecture/ARCHITECTURE.md`, `RENDERER.md`.
 
+## Images (added 2026-11-09)
+
+Import (button, drag and drop, paste), embedded PNG assets, full-window non-destructive image editor,
+baking in the compiler and image layers in the car runtime: developed and tested locally (browser and
+fake renderer client). **Image layers have not been tested in a vehicle.**
+
 ## Pending (ordered)
 
 1. **First vehicle test** of the MGU app (maintainer with SSH). Confirm: install from the Store,
@@ -51,6 +57,12 @@ build the app on the unit. Details: `docs/architecture/ARCHITECTURE.md`, `RENDER
 7. Release v0.1.0: tag, Studio installer as release asset, screenshots in README.
 
 ## Known bugs / caveats
+
+- Car: shift lights with `glow` lay out over the grown layer (the `_inset` static is not used by the
+  shader), so they sit slightly wider than in the preview.
+- Car: every text piece uses the theme's first font family; a second family (Classic's `condensed`
+  clock) falls back to it.
+- Image background removal is by color across the whole picture, not by subject; the brush fixes the rest.
 
 - Preview ≠ car: Canvas2D vs RAMSES shaders (anti-aliasing, glow, text). Gradients use two
   stops on the car; radial gradients linear; shadows, dashes, tint, group clip not on car.

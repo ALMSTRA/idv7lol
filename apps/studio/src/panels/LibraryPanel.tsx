@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { LIBRARY, LIBRARY_GROUPS } from '../lib/componentLibrary.js';
 import { useProjectStore } from '../store/project.js';
 import { useT } from '../i18n/index.js';
+import { ImagesPanel } from './ImagesPanel.js';
 
 export function LibraryPanel(): JSX.Element {
   const t = useT();
@@ -19,6 +20,7 @@ export function LibraryPanel(): JSX.Element {
         />
       </div>
       <div className="panel-body">
+        <ImagesPanel />
         {LIBRARY_GROUPS.map((g) => {
           const items = LIBRARY.filter((e) => e.group === g).filter(
             (e) =>
