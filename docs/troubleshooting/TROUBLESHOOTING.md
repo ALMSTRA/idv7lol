@@ -3,15 +3,15 @@
 ## Studio
 
 **The installer warns about an unknown publisher.** The executable is not code-signed (no
-certificate). Click _More info → Run anyway_ if you downloaded it from this project's releases.
+certificate). Click _More info_, then _Run anyway_, if you downloaded it from this project's releases.
 
 **Nothing moves on the canvas.** The simulator is paused: press **Simulate** (F5) or the ▶
 button in the canvas corner. Check the simulator's ignition toggle and that the scenario is not
 _cold start_ at the end (non-looping scenarios pause when done: press Reset).
 
 **A component shows dashes.** Its signal is unavailable in the simulator: it is not part of the
-vehicle profile (Simulator → Vehicle profile), it is dropped (⚡ in the signals table), or
-communication loss is on. The fallback is set in the Inspector → Signal.
+vehicle profile (Simulator > Vehicle profile), it is dropped (⚡ in the signals table), or
+communication loss is on. The fallback is set in the Inspector, under Signal.
 
 **Validation says "enters the keep-clear zone".** The component touches a slanted glass corner.
 Move it right/down (corners end at x ≈ 395 and y ≈ 217).
@@ -58,8 +58,8 @@ factory telltales and the KOMBI keeps its gear bracket. Keep readings out of the
 what you did, and open an issue. cluster-render's upstream documentation describes its
 mapping guard; `cluster-render guard-reset` (root SSH) clears it.
 
-**Restore everything.** App Settings → Show on the cluster: Off restores the factory cluster at
-once. MGU Store → Installed → idv7lol → Remove uninstalls the app. The Store's rollback restores
+**Restore everything.** In the app's Settings, Show on the cluster: Off restores the factory
+cluster at once. MGU Store > Installed > idv7lol > Remove uninstalls the app. The Store's rollback restores
 the previous state of tools it changed.
 
 ## Collecting diagnostics

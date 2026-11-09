@@ -6,10 +6,10 @@ with the car on stable power, and know how to remove the app (last section).
 
 ## What gets installed
 
-- The **idv7lol app** (an OAP app built from source on the head unit by the MGU Store).
-- Its dependency **cluster-render** (the cluster renderer service by Robert Nisipeanu), which the
+- The idv7lol app (an OAP app built from source on the head unit by the MGU Store).
+- Its dependency cluster-render (the cluster renderer service by Robert Nisipeanu), which the
   Store installs from `robertnisipeanu/idrive-apps` when it is not already present.
-- The Store itself needs **mgu-deploy** and **app-privacy**, installed by the Store's own
+- The Store itself needs mgu-deploy and app-privacy, installed by the Store's own
   installer.
 
 The app ships the three bundled themes (Performance, Modern, Classic) compiled in. Themes you
@@ -28,7 +28,7 @@ the Store builds them into the app. A theme-upload path is a planned feature.
 
 ## Procedure (via the MGU Store)
 
-1. In the Store on the car, open **Settings → Sources → Add GitHub repository** and enter
+1. In the Store on the car, open **Settings > Sources > Add GitHub repository** and enter
    `ALMSTRA/idv7lol`. Choose the `main` branch (or a tag once releases exist).
 2. The Store lists **idv7lol**. Open it and press **Install**. The Store installs
    `cluster-render` first if needed, then builds idv7lol from source on the unit (Python +
@@ -49,9 +49,9 @@ the Store builds them into the app. A theme-upload path is a planned feature.
 
 ## Removing
 
-- The app's own Settings → _Show on the cluster: Off_ stops drawing immediately.
-- MGU Store → Installed → idv7lol → **Remove** uninstalls the app; removing `cluster-render` is
-  optional (other apps may use it). The Store's deploy tool can also **roll back**.
+- In the app's own Settings, _Show on the cluster: Off_ stops drawing immediately.
+- MGU Store > Installed > idv7lol > **Remove** uninstalls the app; removing `cluster-render` is
+  optional (other apps may use it). The Store's deploy tool can also roll back.
 - If the head unit misbehaves, the Store's documentation describes SSH-level removal of
   everything it installed.
 

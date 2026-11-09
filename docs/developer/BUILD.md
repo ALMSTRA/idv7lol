@@ -56,13 +56,13 @@ npm run tauri:build
 ```
 
 Produces `apps/studio/src-tauri/target/release/bundle/nsis/idv7lol Studio_<version>_x64-setup.exe`
-(and the bare `idv7lol-studio.exe`). The installer is **not code-signed**: there is no
-certificate; SmartScreen shows a warning on first run. Documented limitation.
+(and the bare `idv7lol-studio.exe`). The installer is not code-signed (there is no
+certificate), so SmartScreen shows a warning on first run.
 
 Icons: replace `apps/studio/app-icon.png` (made from `docs/assets/logo.png`), then
 `npx tauri icon app-icon.png -o src-tauri/icons` inside `apps/studio`.
 
-Font atlases for the Studio's compile step: `npx tsx tools/build/bake-fonts.ts` →
+Font atlases for the Studio's compile step: `npx tsx tools/build/bake-fonts.ts` writes them to
 `apps/studio/public/fonts/`.
 
 ## Themes and the MGU app
@@ -88,7 +88,7 @@ Compiler CLI: `npx tsx packages/theme-compiler/src/cli.ts validate|build|bake-fo
 python kit/tools/build.py --preview-only idv7lol
 ```
 
-Stages the app under `dist/idv7lol/` (javascript, kit runtime, RHMI data) — useful to inspect
+Stages the app under `dist/idv7lol/` (javascript, kit runtime, RHMI data). Handy for checking
 what the Store will build. An installable package needs BMW's proprietary `oap-sdk`, which the
 MGU Store extracts from the head unit itself at install time; it is never part of this
 repository. Developers with a unit can place their own extracted `oap-sdk/` at the repository

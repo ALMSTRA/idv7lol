@@ -26,4 +26,4 @@
 - [ ] No proprietary SDK material, binaries, VINs, tokens or personal logs are included
 - [ ] Third-party code keeps its licence header; new assets are listed in `THIRD_PARTY_NOTICES.md`
 - [ ] Documentation and `CHANGELOG.md` (Unreleased) updated where relevant
-- [ ] The deactivate → factory cluster path still works (runtime changes only)
+- [ ] Deactivating still brings the factory cluster back (runtime changes only)

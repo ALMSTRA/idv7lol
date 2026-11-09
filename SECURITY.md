@@ -19,7 +19,7 @@ is a security issue for this project.
 Please **do not** open a public issue for security problems.
 
 Use GitHub's private vulnerability reporting on this repository
-("Security" tab → "Report a vulnerability"). If that is not available to you, open an issue
+(the "Security" tab, then "Report a vulnerability"). If that is not available to you, open an issue
 titled "Security contact request" without details and a maintainer will reach out.
 
 Include:

@@ -9,7 +9,7 @@ idv7lol is one repository with two runtimes and a shared core.
                  │        └──────────── simulator ────────────┘                             │
                  └───────────────┬──────────────────────────────────┬──────────────────────┘
                                  │                                  │
-                     apps/studio (Tauri 2 + React)         apps/mgu (Node 8 on the car)
+                     apps/studio (Tauri 2 + React)         apps/idv7lol (Node 8 on the car)
                      canvas · inspector · layers           theme loader · SOME/IP signals
                      simulator · validation · build        cluster-render client · menu
 ```
@@ -18,7 +18,7 @@ idv7lol is one repository with two runtimes and a shared core.
 
 | Package           | Responsibility                                                                                                                                                                                                                         | Depends on                                  |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| `vehicle-signals` | What a car can tell us: signal ids, units, ranges, availability, vehicle profiles; the `SignalBus` that carries live values with timestamps and validity                                                                               | —                                           |
+| `vehicle-signals` | What a car can tell us: signal ids, units, ranges, availability, vehicle profiles; the `SignalBus` that carries live values with timestamps and validity                                                                               | none                                        |
 | `theme-schema`    | The theme document (`schemaVersion` 1): components, bindings, conditions, animations, palettes, fonts, assets, display profiles with reserved zones; factories; parsing with readable errors; migrations                               | vehicle-signals, zod                        |
 | `theme-engine`    | Draws a theme on any Canvas2D-like context; evaluates bindings (unit conversion, smoothing, staleness, fallbacks), conditions and animation triggers; geometry for hit-testing and reserved-zone checks; layer-cost estimation         | theme-schema, vehicle-signals               |
 | `simulator`       | A virtual vehicle (throttle, brake, gearbox, thermals, fuel, boost, driving modes) that writes into a `SignalBus`; scenarios; recording and replay; fault injection (signal loss, communication failure)                               | vehicle-signals, theme-schema               |
@@ -29,8 +29,8 @@ runs in the Studio (browser context inside Tauri), in Node tests and in tooling.
 
 ## idv7lol Studio (`apps/studio`)
 
-- **Tauri 2** shell (Rust) for the window, file dialogs, file system, preferences and the
-  installer; **React 19 + TypeScript + Vite** for the UI; **zustand** for state with an
+- Tauri 2 shell (Rust) for the window, file dialogs, file system, preferences and the
+  installer; React 19 + TypeScript + Vite for the UI; zustand for state with an
   undo/redo command history; Canvas2D via the theme engine for the editor canvas and the
   simulator view.
 - Panels: top bar (file, undo/redo, preview, simulate, validate, build, publish), library
@@ -38,19 +38,21 @@ runs in the Studio (browser context inside Tauri), in Node tests and in tooling.
   group, lock, hide, duplicate, snap, guides, rulers, reserved zones), inspector (bound to the
   schema), layers (order, rename, lock, hide, cost), timeline (keyframes), simulator, validation
   and diagnostics console, Build & Deploy.
-- Persistence: `.idv7lol` project folders (theme.json + assets), recent files, preferences in
-  the app data directory. No network required; no telemetry.
+- Persistence: a theme is one `.idv7theme` file (the theme JSON with its images inside). Recent
+  files and preferences live in the app data directory. No network required; no telemetry.
 - i18n: Spanish and English dictionaries, switchable at runtime. Dark and light themes.
 
-## idv7lol MGU app (`apps/mgu`)
+## idv7lol MGU app (`apps/idv7lol`)
 
 - A standard OAP app (`app.json`, `main.js`) built from source by the MGU Store, with its own
-  identifiers (never overwriting Cluster Layouts). Runs on **Node 8**: CommonJS, ES2017
+  identifiers (never overwriting Cluster Layouts). Runs on Node 8: CommonJS, ES2017
   syntax, modules `net`, `events`, `fs`, `path` only.
-- Pieces: `cluster_render_client.js` (MPL-2.0, copied), `signals/` (SOME/IP providers with
-  scaling and availability detection), `engine.js` (piece list → layers, 60 Hz easing, on-change
-  uniforms, fail-safe), `themes/` (compiler output bundled per theme), `menu.js` (activate,
-  deactivate, theme, palette, info, versions, diagnostics, dependencies, reset).
+- Pieces: `main.js` (the app page, buttons, settings and diagnostics screens),
+  `vehicle.js` (the car's signals mapped to catalog ids), `signals.js` (the signal store and the
+  decoders for BMW enum values), `engine.js` (turns the piece list into layers; 60 Hz easing,
+  on-change uniforms, fail-safe), `text.js`, `conditions.js` and `units.js` (helpers that mirror
+  the TypeScript packages), `cluster_render_client.js` (MPL-2.0, copied), and the generated
+  `theme_*.js`, `themes_index.js` and `font_sans.*` (compiler output bundled into the app).
 - Safety: layers only while active and data is live; deactivate drops every layer; the factory
   cluster is untouched underneath; no writes to the vehicle.
 
@@ -72,9 +74,10 @@ runs in the Studio (browser context inside Tauri), in Node tests and in tooling.
 
 ## Extension points
 
-- New component type: schema → engine renderer (+ layer estimate) → compiler mapping → Studio
-  inspector descriptors and library entry → docs.
-- New vehicle profile or signal: `vehicle-signals` catalog/profiles → runtime provider mapping.
+- New component type: add it to the schema, then the engine renderer (with its layer estimate),
+  the compiler mapping, the Studio inspector descriptors and library entry, and the docs.
+- New vehicle profile or signal: add it to the `vehicle-signals` catalog/profiles, then map it in
+  the runtime provider.
 - New theme: `themes/<id>/theme.json` (+ assets) validated in CI.
 - Future: plugin-style component packs, community theme library, WebGL preview using the
   compiler's own shaders, shader editor.

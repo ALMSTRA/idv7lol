@@ -109,7 +109,7 @@ panel).
 ### `indicator.gear`
 
 `style`, `showMode`, `modeStyle`, `modeSignal` (`transmission.mode`), `manualColor`, `mapping`
-(gear text → display text), `background`, `radius`. Default binding `transmission.gear`. Car:
+(gear text to display text), `background`, `radius`. Default binding `transmission.gear`. Car:
 1–3 layers.
 
 ### `indicator.shiftlights`

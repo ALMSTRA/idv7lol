@@ -1,14 +1,13 @@
 # Quick start
 
-Two ways to use idv7lol: as a **theme designer** with the Studio, or as a **developer** working
-on the platform. Installing on a car is a separate step described in
+There are two ways in: design themes with the Studio, or work on the platform itself. Installing on a car is a separate step described in
 [user/DEPLOYMENT.md](user/DEPLOYMENT.md); nothing here touches your vehicle.
 
 ## Designers: idv7lol Studio (Windows)
 
 1. Get the Studio: download the latest `idv7lol Studio_x.y.z_x64-setup.exe` from the GitHub
-   Releases page when one exists, or build it from source (below). The installer is **not
-   code-signed**; Windows SmartScreen will ask you to confirm the first start.
+   Releases page when one exists, or build it from source (below). The installer is not
+   code-signed, so Windows SmartScreen will ask you to confirm the first start.
 2. Start idv7lol Studio from the Start menu.
 3. In the welcome dialog pick a template (Performance, Modern, Classic), the minimal example or
    a blank layout.
@@ -19,7 +18,7 @@ on the platform. Installing on a car is a separate step described in
 6. Press **Validate**: errors (red) must be fixed, warnings (orange) are worth reading. The
    reserved zones of the cluster are drawn on the canvas; keep essential readings out of them.
 7. **Save** your theme (`.idv7theme`, plain JSON).
-8. **Build & Deploy → Compile theme**, then **Export bundle…** to a folder. The bundle holds
+8. In **Build & Deploy**, click **Compile theme**, then **Export bundle…** to a folder. The bundle holds
    the compiled theme, shaders and font atlas the car app loads.
 
 Spanish user guide: [user/GUIA_USUARIO_ES.md](user/GUIA_USUARIO_ES.md). Full manual:

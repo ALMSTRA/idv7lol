@@ -1,4 +1,4 @@
-# idv7lol Studio — user guide
+# idv7lol Studio user guide
 
 idv7lol Studio is a Windows desktop editor for custom BMW iDrive 7 instrument-cluster layouts.
 You design on a 1920×720 canvas that represents the cluster, test with a built-in simulator,
@@ -19,14 +19,14 @@ loads. No GLSL, RAMSES or JavaScript knowledge is needed.
 └──────────────────────────── status bar ─────────────────────────┘
 ```
 
-**Top bar**: the **File** menu (New, Open, Save, Save as, Add images, Export PNG), Save, Undo/Redo,
+The top bar has the **File** menu (New, Open, Save, Save as, Add images, Export PNG), Save, Undo/Redo,
 Add images, Simulate, Validate (shows the error count), Build, three buttons that show or hide the
 panels, and a **…** menu with language, light/dark and help.
 
 Drag the edge of a panel to resize it, and double-click the edge to reset it. In a small window the
 side panels open as drawers over the canvas.
 
-**Status bar**: saved state, selection count, cursor position in layout pixels, renderer layer
+The status bar shows the saved state, selection count, cursor position in layout pixels, renderer layer
 count versus the 64-layer limit, simulated signal health, display profile.
 
 ## Library (left)
@@ -98,18 +98,18 @@ warns when a theme uses too much.
 
 Appears for the selected component.
 
-- **Component**: name, position, size, rotation and anchor, opacity, visible, locked, and the
+- Component: name, position, size, rotation and anchor, opacity, visible, locked, and the
   number of renderer layers the component costs on the car.
-- **Signal**: the catalog signal, display unit, range (min/max used by gauges), smoothing (how
+- Signal: the catalog signal, display unit, range (min/max used by gauges), smoothing (how
   softly the value follows the car) and what to show when the signal is unavailable (dashes,
   hide, keep last, zero). Catalog range and availability are shown; a warning appears if the
   theme's vehicle profile does not provide the signal.
-- **Properties**: everything the component type offers (arc angles, ticks, labels, needle,
+- Properties: everything the component type offers (arc angles, ticks, labels, needle,
   redline, bars, zones, text styles, panels…). Colours are palette tokens (`$accent`, `$text`…)
   or custom values; tokens change with the palette.
-- **Show only when**: a condition on a signal (for example _show the cruise speed only while
+- Show only when: a condition on a signal (for example _show the cruise speed only while
   cruise is active_).
-- **Animations**: attach clips from the Animation tab with a trigger (on load, always, while a
+- Animations: attach clips from the Animation tab with a trigger (on load, always, while a
   condition holds, when it becomes true/false, when a signal changes).
 
 ## Layers
@@ -129,11 +129,11 @@ contrast ratio against the background.
 
 ## Simulator (bottom)
 
-- **Scenario**: idle, cold start, city, highway, track lap, redline, manual shifts, driving
+- Scenario: idle, cold start, city, highway, track lap, redline, manual shifts, driving
   mode changes, signal loss, communication failure, or manual control.
-- **Manual control**: throttle, brake, gear lever, gearbox mode and manual gear, driving mode,
+- Manual control: throttle, brake, gear lever, gearbox mode and manual gear, driving mode,
   cruise speed, outside temperature, ignition, indicators, high beam.
-- **Signals**: live values of the signals the theme uses (or all). ✎ overrides a signal with a
+- Signals: live values of the signals the theme uses (or all). ✎ overrides a signal with a
   value of your own; ⚡ drops it (unavailable), so you can check fallbacks. _Communication loss_
   freezes everything; _latency_ ages every sample.
 - Record / replay runs; export PNG from the top bar.
@@ -153,7 +153,7 @@ and colour tracks are updated by the app; opacity tracks are not played on the c
 
 ## Build & Deploy
 
-The status ladder is honest about where the theme is: _Preview available_, _Validation passed_,
+The status ladder shows how far the theme has got: _Preview available_, _Validation passed_,
 _Package compiled_, _Bundle exported_, _Tested in vehicle_ (only you can confirm that).
 **Compile theme** runs the compiler; **Export bundle…** writes `theme.json`, shaders and the font
 atlas to a folder. Installing on the car is described in [DEPLOYMENT.md](DEPLOYMENT.md).

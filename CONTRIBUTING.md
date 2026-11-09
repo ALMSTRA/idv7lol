@@ -1,23 +1,22 @@
 # Contributing to idv7lol
 
-Thanks for your interest. This document explains how the repository is organised, how to build
-and test it, and the rules every change follows.
+Thanks for helping out. Read the ground rules first; the rest is reference.
 
 ## Ground rules
 
-1. **Safety first.** Nothing in this repository may modify the vehicle's firmware, ECUs,
+1. Safety comes first. Nothing in this repository may modify the vehicle's firmware, ECUs,
    odometer, speed or safety systems, hide factory warnings, or make the cluster restart on
-   purpose. Changes that touch the runtime (`apps/mgu`) must keep the "deactivate → factory
-   cluster returns" path working.
-2. **Honest status.** Distinguish _developed_, _tested locally_, _compiled_, _published_ and
+   purpose. Changes that touch the runtime (`apps/idv7lol`) must keep deactivation working: turn
+   the app off and the factory cluster comes back.
+2. Be honest about status. Distinguish _developed_, _tested locally_, _compiled_, _published_ and
    _tested in a vehicle_. Never describe a feature as working on a car unless someone did it.
-3. **No proprietary material.** Do not commit the BMW SDK, head-unit binaries, vsomeip
+3. No proprietary material. Do not commit the BMW SDK, head-unit binaries, vsomeip
    configs, VINs, logs with personal data, tokens or keys. `.gitignore` blocks the obvious
    paths; please check anyway.
-4. **Licences.** Original code is GPL-3.0-or-later. Code copied from other projects keeps its
+4. Original code is GPL-3.0-or-later. Code copied from other projects keeps its
    licence and header (for example the MPL-2.0 cluster-render client). Fonts and images need a
    compatible licence recorded in `THIRD_PARTY_NOTICES.md`.
-5. **Git hygiene.** One logical change per commit, conventional commit messages
+5. One logical change per commit, conventional commit messages
    (`feat(studio): …`, `fix(engine): …`, `docs: …`), no backup folders or `*.bak` files, no
    force-pushes to `main`.
 
@@ -30,7 +29,7 @@ and test it, and the rules every change follows.
 | `packages/theme-engine`    | platform-neutral Canvas2D renderer, animations, geometry, cost        |
 | `packages/simulator`       | simulated vehicle, scenarios, recording and replay                    |
 | `packages/theme-compiler`  | validation and compilation of themes to the MGU runtime               |
-| `apps/mgu`                 | the idv7lol app that runs on the head unit (Node 8, CommonJS)         |
+| `apps/idv7lol`             | the idv7lol app that runs on the head unit (Node 8, CommonJS)         |
 | `apps/studio`              | idv7lol Studio: Tauri 2 + React desktop editor for Windows            |
 | `themes/`                  | the bundled themes (Performance, Modern, Classic) and examples        |
 | `tools/`                   | build, validation and development scripts                             |

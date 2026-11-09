@@ -8,8 +8,7 @@ updated when the material is added to the repository.
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | cluster-render protocol and JavaScript client         | Robert Nisipeanu, [robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps) `native/cluster-render/js/cluster_render_client.js`, `PROTOCOL.md` | MPL-2.0                   | `apps/idv7lol/cluster_render_client.js` (copied verbatim with header)                                         |
 | Barlow, Barlow Semi Condensed, Barlow Condensed fonts | Jeremy Tribby, [Barlow](https://github.com/jpt/barlow)                                                                                                             | SIL Open Font License 1.1 | `apps/studio/public/fonts/*.r8`, `apps/idv7lol/font_*.wad` (baked SDF atlases); `@fontsource/*` in the Studio |
-
-| MGU App Kit (`kit/`: tools, runtime, platform, icons) | cauliflowermossgrape and contributors, [idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps) | MIT (`kit/LICENSE`) | `kit/` — vendored so the MGU Store can build the app on the head unit |
+| MGU App Kit (`kit/`: tools, runtime, platform, icons) | cauliflowermossgrape and contributors, [idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps)                                                        | MIT (`kit/LICENSE`)       | `kit/` (vendored so the MGU Store can build the app on the head unit)                                         |
 
 The Studio's interface icons come from [Lucide](https://lucide.dev) (ISC licence), through the
 `lucide-react` package.

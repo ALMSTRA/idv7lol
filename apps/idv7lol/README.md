@@ -1,14 +1,15 @@
-# idv7lol — the MGU app
+# idv7lol MGU app
 
 The app that runs on the BMW iDrive 7 head unit and draws a compiled idv7lol theme on the
-instrument cluster through the `cluster-render` service. Built from this repository by the MGU
-Store (`mgu-repo.json` → `kit/tools/build.py idv7lol`). **Not yet tested in a vehicle.**
+instrument cluster through the `cluster-render` service. The MGU Store builds it from this
+repository: `mgu-repo.json` points it at `kit/tools/build.py idv7lol`. **Not yet tested in a
+vehicle.**
 
 | File                                                       | Role                                                                                            |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `app.json`                                                 | manifest for the kit: identity, SOME/IP signals, screen, settings, scaling, `requires`          |
 | `main.js`                                                  | app entry (`kit/mgu.js`): settings, buttons, status/diagnostics pages, wires engine and vehicle |
-| `engine.js`                                                | compiled theme → cluster-render layers; 60 Hz easing, 30 Hz texts/colours, fail-safe            |
+| `engine.js`                                                | turns a compiled theme into cluster-render layers; 60 Hz easing, 30 Hz texts/colours, fail-safe |
 | `vehicle.js`                                               | the car's signals as catalog ids (kit `Car` + extra SOME/IP fields)                             |
 | `signals.js`                                               | `SignalStore` and BMW enum decoders (drive mode, gear)                                          |
 | `text.js`                                                  | glyph layout and number/clock formatting for the SDF text layers                                |
@@ -21,10 +22,10 @@ Store (`mgu-repo.json` → `kit/tools/build.py idv7lol`). **Not yet tested in a 
 Runtime constraints: Node 8 (CommonJS, ES2017 syntax, builtins + `./kit/*` only). ESLint parses
 this folder with `ecmaVersion: 2017`.
 
-Controls on the car: **Show on the cluster** (off by default), **Next theme**, **Palette**,
-**Diagnostics** (status · signals · renderer · about), plus the Settings screen the kit builds
-(show, theme, palette, start-up sweep, clock UTC offset, demo data).
+Controls on the car: Show on the cluster (off by default), Next theme, Palette and Diagnostics
+(status, signals, renderer, about), plus the Settings screen the kit builds (show, theme,
+palette, start-up sweep, clock UTC offset, demo data).
 
-Safety: the layout exists only while enabled **and** car data is live; it is dropped when data
+Safety: the layout exists only while it is enabled and car data is live; it is dropped when data
 goes stale (3 s + 1.5 s grace), when the app stops or when the render service dies. Factory
 telltales and pop-ups stay on top. Nothing is written to the vehicle.

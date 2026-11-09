@@ -1,8 +1,8 @@
 # Renderer: how idv7lol draws on the instrument cluster
 
 This document condenses what idv7lol relies on from the reference implementations
-(`robertnisipeanu/idrive-apps` → `native/cluster-render`, and
-`eroobeeroo/idrive7-cluster-info` → `apps/cluster_layouts`). Nothing here is invented; where
+(`native/cluster-render` in `robertnisipeanu/idrive-apps`, and `apps/cluster_layouts` in
+`eroobeeroo/idrive7-cluster-info`). Nothing here is invented; where
 idv7lol has not verified a fact on a car it says so. Keep it current when the renderer changes.
 
 ## The pipeline
@@ -13,14 +13,14 @@ theme.json ──compiler──▶ pieces (GLSL ES 1.00 + uniforms) ──runtim
                                         SOME/IP vehicle signals ─┘
 ```
 
-- **cluster-render** is a C++ service on the head unit (RAMSES participant, Dcsm2 slots on
+- cluster-render is a C++ service on the head unit (RAMSES participant, Dcsm2 slots on
   iDrive 7). It builds RAMSES scenes from what clients send and publishes them; the cluster's
   own renderer draws them. It is installed as a root tool by the MGU Store.
-- **Clients** (apps) talk to it over the Unix socket `/dev/shm/cluster-render/render.sock`
+- Clients (apps) talk to it over the Unix socket `/dev/shm/cluster-render/render.sock`
   (group `tm_oap_app`, which every OAP app has).
-- **Framing**: `u32 LE length | u8 type | body`; type `J` = JSON, `F` = frame (pixels), `M` =
+- Framing: `u32 LE length | u8 type | body`; type `J` = JSON, `F` = frame (pixels), `M` =
   mesh. Max frame 5,529,664 bytes.
-- **Handshake**: `{"op":"hello","app":"<id>","proto":1}` →
+- Handshake: the client sends `{"op":"hello","app":"<id>","proto":1}` and gets back
   `{"ev":"hello","proto":1,"backend":"id7"|"id8","targets":"map:1088x480,panel:1920x720,hud:800x480","repeat":1}`.
   idv7lol reads `targets` instead of hard-coding sizes; iDrive 8 has no `panel`.
 
@@ -32,7 +32,7 @@ theme.json ──compiler──▶ pieces (GLSL ES 1.00 + uniforms) ──runtim
 | `map`   | 0x100 / 0x010004f0 | 1088×480 at (416,120) | the stock map window under the gauges                                                     |
 | `hud`   | 0x323              | 800×480               | head-up display                                                                           |
 
-idv7lol targets **`panel`**. The panel and the HUD share one scene id: while any app draws on
+idv7lol targets `panel`. The panel and the HUD share one scene id: while any app draws on
 the HUD the panel cannot come up.
 
 ## Operations
@@ -57,7 +57,7 @@ exclusive, time`.
 
 | Limit                    | Value                                                                                               |
 | ------------------------ | --------------------------------------------------------------------------------------------------- |
-| Effect layers per client | **64** (96 for all clients together)                                                                |
+| Effect layers per client | 64 (96 for all clients together)                                                                    |
 | Uniforms per layer       | 32 (reference tests assert ≤ 30)                                                                    |
 | Floats per layer         | 4096; ≤ 1024 per array uniform                                                                      |
 | Animations per layer     | 16                                                                                                  |
@@ -65,7 +65,7 @@ exclusive, time`.
 | Layer geometry           | x,y ±4096; w,h 1..4096; opacity 0..1; rotate ±36000°                                                |
 | Bandwidth                | shared budget, ceiling 5500 KB/s (8000 flashed the cluster black); `budget` events announce the cap |
 
-Reserved uniform names (RAMSES matrices): `u_mvp u_mv u_m u_v u_p u_normal` — never declare
+Reserved uniform names (RAMSES matrices): `u_mvp u_mv u_m u_v u_p u_normal`. Never declare
 them in a shader. A shader that fails to compile is refused at `layer` time
 ("effect did not compile"). **One large shader drawing many pieces made the KOMBI restart**;
 keep one small shader per piece.
@@ -74,11 +74,11 @@ keep one small shader per piece.
 
 - `#version 100`, GLSL ES 1.00, precision qualifiers required (`precision highp float` when
   available, fallback `mediump`).
-- The default vertex shader gives `varying vec2 v_uv` with (0,0) at the layer's **top-left**.
+- The default vertex shader gives `varying vec2 v_uv` with (0,0) at the layer's top-left.
   Fragment shaders convert to pixels with a `u_size` uniform.
 - Blending: SrcAlpha / OneMinusSrcAlpha, no depth. Unpainted (alpha 0) pixels show the factory
   cluster beneath.
-- Text: there is **no font primitive**. The proven method is an R8 signed-distance-field atlas
+- Text: there is no font primitive. The proven method is an R8 signed-distance-field atlas
   (reference: Barlow Semi Condensed, 56×64 cells, 32 columns × 3 rows, spread 8 px) bound as
   `u_font`, with glyph codes and x-centres passed as `vec4[8]` arrays (≤ 32 glyphs per layer);
   glyph height = layer height.
@@ -88,7 +88,7 @@ keep one small shader per piece.
 - Needles/bars: client-side exponential easing at 60 Hz (τ ≈ 30 ms, 0.15 %-of-scale deadband),
   nudged on each fresh sample; texts and colours ≤ 30 Hz and only on change. Measured traffic
   ≈ 2.5 KB/s while driving, 0 when static, ≈ 600 KB at start (atlas + shaders).
-- Fail-safe: layers exist only while the layout is on **and** data is live (3 s stale + 1.5 s
+- Fail-safe: layers exist only while the layout is on and data is live (3 s stale + 1.5 s
   grace); dropping all layers hands the slot back to the stock HMI. The KOMBI watchdog drops
   content ≈ 10 s after a client dies.
 - A start-up "sweep" is a renderer-side `animate` on the value uniform.
@@ -123,8 +123,8 @@ car.**
 
 ## Licensing of what idv7lol copies
 
-- `cluster_render_client.js` and `PROTOCOL.md`: **MPL-2.0** (Robert Nisipeanu). Copied
-  verbatim with header into `apps/mgu`, listed in `THIRD_PARTY_NOTICES.md`.
+- `cluster_render_client.js` and `PROTOCOL.md`: MPL-2.0 (Robert Nisipeanu). Copied
+  verbatim with header into `apps/idv7lol`, listed in `THIRD_PARTY_NOTICES.md`.
 - Barlow fonts: SIL OFL 1.1.
 - Cluster Layouts code (GPL-3.0-or-later) is a reference, not copied; idv7lol writes its own
   engine, shaders and compiler.
@@ -133,8 +133,8 @@ car.**
 
 ## Versions seen
 
-| Component       | Version       | Note                                                                                     |
-| --------------- | ------------- | ---------------------------------------------------------------------------------------- |
-| cluster-render  | 0.4.2 → 0.4.3 | 0.4.2 raised layers 8→64/96; 0.4.3 zero-copy receive; HEAD adds scene files (unreleased) |
-| Cluster Layouts | 0.13.2        | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                |
-| mgu-deploy      | 0.7.11        | pinned by waze-on-cluster                                                                |
+| Component       | Version      | Note                                                                                             |
+| --------------- | ------------ | ------------------------------------------------------------------------------------------------ |
+| cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive; HEAD adds scene files (unreleased) |
+| Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                        |
+| mgu-deploy      | 0.7.11       | pinned by waze-on-cluster                                                                        |

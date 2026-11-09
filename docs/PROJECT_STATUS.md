@@ -2,23 +2,23 @@
 
 _Last updated: 2026-11-09._ Version: **0.1.0-dev** (no release tag yet).
 
-Status words: **developed** (code exists) · **tested locally** (automated tests or PC preview) ·
-**compiled** (artifacts built) · **published** (on GitHub) · **tested in vehicle**.
+Status words: **developed** (code exists), **tested locally** (automated tests or PC preview),
+**compiled** (artifacts built), **published** (on GitHub), **tested in vehicle**.
 
 ## Where things stand
 
-| Area                                                                                                                                                              | Status                                                                                                                                           |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Repository, licence, policies, templates, CI (lint, typecheck, tests, theme validation, secret scan, Windows installer job)                                       | published                                                                                                                                        |
-| `@idv7lol/vehicle-signals` — 61 signals, units, 5 vehicle profiles, SignalBus                                                                                     | tested locally (10 tests), published                                                                                                             |
-| `@idv7lol/theme-schema` — schema v1, 15 component types, bindings, conditions, animations, palettes, display profile with reserved zones                          | tested locally (10 tests), published                                                                                                             |
-| `@idv7lol/theme-engine` — Canvas2D renderer, bindings/smoothing/staleness, animation player, hit testing, zone overlaps, layer cost                               | tested locally (15 tests), published                                                                                                             |
-| `@idv7lol/simulator` — vehicle model, scenarios, faults, recording/replay                                                                                         | tested locally (13 tests), published                                                                                                             |
-| `@idv7lol/theme-compiler` — validation, GLSL piece compiler (10 shaders), SDF font baking, PNG codec, CLI                                                         | tested locally (17 tests), published                                                                                                             |
-| Themes Performance (28 layers), Modern (39), Classic (29), example minimal (5)                                                                                    | validated, compiled into the app, published                                                                                                      |
-| idv7lol Studio (Tauri 2 + React) — canvas, library, inspector, layers, palettes, simulator, validation, timeline, build & deploy, console, i18n es/en, dark/light | developed, tested locally in the browser and as the desktop build; installer **compiled** (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned)       |
-| idv7lol MGU app (Node 8) — engine, signals, menu, diagnostics, kit (MIT) + cluster-render client (MPL-2.0), `mgu-repo.json`                                       | developed; engine tested locally against a fake client (6 tests); kit staging verified with `build.py --preview-only`; **not tested in vehicle** |
-| Documentation (EN) + Spanish user guide                                                                                                                           | published                                                                                                                                        |
+| Area                                                                                                                                                             | Status                                                                                                                                           |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Repository, licence, policies, templates, CI (lint, typecheck, tests, theme validation, secret scan, Windows installer job)                                      | published                                                                                                                                        |
+| `@idv7lol/vehicle-signals`: 61 signals, units, 5 vehicle profiles, SignalBus                                                                                     | tested locally (10 tests), published                                                                                                             |
+| `@idv7lol/theme-schema`: schema v1, 15 component types, bindings, conditions, animations, palettes, display profile with reserved zones                          | tested locally (10 tests), published                                                                                                             |
+| `@idv7lol/theme-engine`: Canvas2D renderer, bindings/smoothing/staleness, animation player, hit testing, zone overlaps, layer cost                               | tested locally (15 tests), published                                                                                                             |
+| `@idv7lol/simulator`: vehicle model, scenarios, faults, recording/replay                                                                                         | tested locally (13 tests), published                                                                                                             |
+| `@idv7lol/theme-compiler`: validation, GLSL piece compiler (10 shaders), SDF font baking, PNG codec, CLI                                                         | tested locally (17 tests), published                                                                                                             |
+| Themes Performance (28 layers), Modern (39), Classic (29), example minimal (5)                                                                                   | validated, compiled into the app, published                                                                                                      |
+| idv7lol Studio (Tauri 2 + React): canvas, library, inspector, layers, palettes, simulator, validation, timeline, build & deploy, console, i18n es/en, dark/light | developed, tested locally in the browser and as the desktop build; installer **compiled** (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned)       |
+| idv7lol MGU app (Node 8): engine, signals, menu, diagnostics, kit (MIT) + cluster-render client (MPL-2.0), `mgu-repo.json`                                       | developed; engine tested locally against a fake client (6 tests); kit staging verified with `build.py --preview-only`; **not tested in vehicle** |
+| Documentation (EN) + Spanish user guide                                                                                                                          | published                                                                                                                                        |
 
 **Nothing has been tested in a vehicle.** The first on-car run must be done parked, by someone
 with SSH access to the head unit, following `docs/user/DEPLOYMENT.md`.
@@ -83,8 +83,7 @@ rebuilt with this work (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned).
 - Car: every text piece uses the theme's first font family; a second family (Classic's `condensed`
   clock) falls back to it.
 - Image background removal is by color across the whole picture, not by subject; the brush fixes the rest.
-
-- Preview ≠ car: Canvas2D vs RAMSES shaders (anti-aliasing, glow, text). Gradients use two
+- The preview is not the car: Canvas2D vs RAMSES shaders (anti-aliasing, glow, text). Gradients use two
   stops on the car; radial gradients linear; shadows, dashes, tint, group clip not on car.
 - Display profile geometry comes from Cluster Layouts (`verified: false` until our own test).
 - Studio: the inspector edits one component at a time (multi-select supports common fields and
@@ -105,7 +104,7 @@ I-step `20w44.1-1-3` (a software identifier, not a renderer version). See
 - Own declarative theme format (schemaVersion 1); the compiler maps it to one small GLSL layer
   per piece (the proven safe pattern; one huge shader restarted a KOMBI upstream).
 - zod 4 with `.prefault({})` for nested defaults; types inferred from schemas.
-- Text on the car via an R8 SDF atlas (Barlow, OFL) baked by our own TrueType→SDF pipeline;
+- Text on the car via an R8 SDF atlas (Barlow, OFL) baked by our own TrueType-to-SDF pipeline;
   digits first in the glyph order so shaders can draw numerals.
 - Studio: Tauri 2 + React 19 + Vite 8 + zustand; no telemetry; fonts bundled from @fontsource.
 - The MGU app embeds compiled themes as JS modules + `.wad` atlas (kit ships top-level files);

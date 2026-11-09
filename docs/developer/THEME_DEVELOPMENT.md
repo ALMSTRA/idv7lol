@@ -1,8 +1,7 @@
 # Theme development
 
 A theme is a JSON document (`theme.json`, or `.idv7theme` when saved from the Studio) that the
-Studio edits and the compiler turns into cluster layers. This page covers writing and
-maintaining themes by hand or in the Studio. The exact field list is in the zod schemas of
+Studio edits and the compiler turns into cluster layers. The exact field list is in the zod schemas of
 `packages/theme-schema/src/` (`theme.ts`, `components.ts`, `bindings.ts`, `animation.ts`).
 
 ## Anatomy
@@ -114,8 +113,8 @@ glyphs per line, characters outside the atlas (digits, Latin letters, `- ° / . 
 ## Workflow
 
 1. Edit `themes/<id>/theme.json` (or save from the Studio into that folder).
-2. `npm run themes:validate` — must be clean.
-3. `npx tsx tools/build/build-mgu-themes.ts` — regenerates `apps/idv7lol/theme_*.js` and the
+2. `npm run themes:validate`. It has to come back clean.
+3. `npx tsx tools/build/build-mgu-themes.ts` regenerates `apps/idv7lol/theme_*.js` and the
    theme/palette choices in `apps/idv7lol/app.json`. Commit the generated files: the Store
    builds the app from the repository on the head unit.
 4. Open it in the Studio and run the scenarios _track_, _signal-loss_ and _comm-failure_.

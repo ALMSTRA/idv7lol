@@ -20,31 +20,25 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 - Animated pictures: GIF, animated WebP, APNG and short videos (up to 12 s, 15 fps, 120 frames, no
   sound) import as a sprite sheet, play in the editor and compile to one atlas that the renderer
   loops by itself, with nothing sent per frame. Tested locally; not tested in a vehicle.
-
-### Added
-
 - Optional free templates in the Studio's welcome window: conversions of the seven Cluster Layouts by
   eroobeeroo (GPL-3.0-or-later), with credits and differences in `themes/community/README.md`.
-
-### Changed
-
-- Studio interface: the supplied idv7lol logo and its colours, one icon set instead of text symbols,
-  a File menu and a shorter toolbar, resizable panels that remember their size, and drawers in small
-  windows. Tested locally in a browser.
-
-### Fixed
-
-- The validator skipped the factory zones when a theme did not list them in its own layout.
-
-- Studio desktop build: HTML5 drag and drop was disabled by Tauri's `dragDropEnabled`.
-- Compiled `theme.json` was written before image sizes were settled.
-
+- Monorepo foundation: npm workspaces, TypeScript project references, Vitest, ESLint, Prettier,
+  GPL-3.0-or-later licence, contribution and security policies, issue and PR templates, CI.
+- `@idv7lol/vehicle-signals`: signal catalog (60+ signals with units, ranges, availability),
+  unit conversion, vehicle profiles (combustion, turbo, M, PHEV, BEV) and a timestamped signal
+  bus. Tested locally.
+- `@idv7lol/theme-schema`: versioned theme document format (schemaVersion 1) with 15 component
+  types, bindings, conditions, keyframe animations, palettes per driving mode, display profile
+  of the iDrive 7 cluster with its reserved zones. Tested locally.
+- `@idv7lol/theme-engine`: Canvas2D renderer for every component type, binding evaluation
+  with smoothing and staleness, animation player with triggers, hit testing, reserved-zone
+  overlap detection, layer-cost estimation against the cluster-render limits. Tested locally.
 - `@idv7lol/simulator`: virtual vehicle model, scenarios (idle, cold start, city, highway,
   track, redline, manual shifts, drive modes, signal loss, communication failure), overrides,
   faults, latency, recording and replay. Tested locally.
-- `@idv7lol/theme-compiler`: validation with readable findings, component → GLSL layer
-  compiler (10 shaders), exact renderer layer budget, TrueType/WOFF → SDF atlas baking, PNG
-  codec, bundle writer and CLI. Tested locally.
+- `@idv7lol/theme-compiler`: validation with readable findings, compiler from components
+  to GLSL layers (10 shaders), exact renderer layer budget, SDF atlas baking from TrueType/WOFF,
+  PNG codec, bundle writer and CLI. Tested locally.
 - Themes: IDV7LOL Performance, Modern, Classic and a minimal example; all validate clean.
 - idv7lol Studio (Tauri 2 + React): canvas editor, library, inspector, layers, palettes,
   simulator, validation, animation clips, Build & Deploy, console, welcome templates, undo/redo,
@@ -58,14 +52,14 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   development, component API, generated signals reference, build, deployment, compatibility,
   troubleshooting.
 
-- Monorepo foundation: npm workspaces, TypeScript project references, Vitest, ESLint, Prettier,
-  GPL-3.0-or-later licence, contribution and security policies, issue and PR templates, CI.
-- `@idv7lol/vehicle-signals`: signal catalog (60+ signals with units, ranges, availability),
-  unit conversion, vehicle profiles (combustion, turbo, M, PHEV, BEV) and a timestamped signal
-  bus. Tested locally.
-- `@idv7lol/theme-schema`: versioned theme document format (schemaVersion 1) with 15 component
-  types, bindings, conditions, keyframe animations, palettes per driving mode, display profile
-  of the iDrive 7 cluster with its reserved zones. Tested locally.
-- `@idv7lol/theme-engine`: Canvas2D renderer for every component type, binding evaluation
-  with smoothing and staleness, animation player with triggers, hit testing, reserved-zone
-  overlap detection, layer-cost estimation against the cluster-render limits. Tested locally.
+### Changed
+
+- Studio interface: the supplied idv7lol logo and its colours, one icon set instead of text symbols,
+  a File menu and a shorter toolbar, resizable panels that remember their size, and drawers in small
+  windows. Tested locally in a browser.
+
+### Fixed
+
+- The validator skipped the factory zones when a theme did not list them in its own layout.
+- Studio desktop build: HTML5 drag and drop was disabled by Tauri's `dragDropEnabled`.
+- Compiled `theme.json` was written before image sizes were settled.
