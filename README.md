@@ -2,61 +2,63 @@
 
 # idv7lol
 
-**Open-source custom digital cluster platform for BMW iDrive 7 (MGU), with a visual theme
-editor for Windows.**
+Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus a Windows editor to design them.
 
-idv7lol lets you design your own instrument-cluster layout on a PC, simulate it with live
-vehicle data, validate it against the real limits of the cluster renderer, and build a package
-that the [MGU Store](https://github.com/robertnisipeanu/mgu-store) can install on the car. The
-car keeps its factory instrumentation whenever idv7lol is off.
+You draw your cluster on the PC, drive it with a simulated car to see how it behaves, check it
+against the limits of the cluster renderer, and build a package that the
+[MGU Store](https://github.com/robertnisipeanu/mgu-store) can install. When idv7lol is switched
+off, the car shows its factory cluster again.
 
-> **Disclaimer.** idv7lol is an unofficial, experimental hobby project. It is not affiliated
-> with, endorsed by or supported by BMW AG. Changing what your instrument cluster shows can
-> distract you and can void warranties or break local rules. Use it parked or on a closed
-> course, keep the factory warnings in view, and read [SECURITY.md](SECURITY.md).
+> **Disclaimer.** This is an unofficial hobby project. It has nothing to do with BMW AG. Changing
+> what your cluster shows can distract you, and it may affect your warranty or break local rules.
+> Use it parked or on a closed course, keep the factory warnings visible, and read
+> [SECURITY.md](SECURITY.md) first.
 
-|         |                                                                                                                                         |
-| ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Licence | GPL-3.0-or-later (third-party parts keep their own licences, see `THIRD_PARTY_NOTICES.md`)                                              |
-| Target  | BMW iDrive 7 / MGU head units with the open-source `cluster-render` service                                                             |
-| Desktop | Windows 10/11 x64 (idv7lol Studio, Tauri 2 + React)                                                                                     |
-| Status  | **0.1.0 in development.** Everything runs on a PC; nothing is tested in a car yet. See [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) |
+**Status: 0.1.0, in development.** Everything runs on a PC. Nothing has been tested in a car yet.
+Details in [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
-## What is in the box
+## Screenshots
 
-- **idv7lol Studio** (Windows): drag-and-drop editor with canvas, component library, inspector,
-  layers, palettes, animation timeline, simulator, validation and Build & Deploy.
-- **Theme engine**: a platform-neutral renderer that draws every component from a declarative
-  theme document, used by the Studio canvas and the simulator.
-- **Theme compiler**: validates a theme (schema, signals, reserved zones, layer budget) and
-  emits the JavaScript, shaders and font assets the MGU app runs on the car.
-- **Simulator**: a virtual car with throttle, brake, gears, temperatures, driving modes, signal
-  loss and recorded scenarios.
-- **idv7lol MGU app**: the app that runs on the head unit, draws the active theme through
-  `cluster-render`, and lets you activate, deactivate and switch themes from the iDrive menu.
-- **Three themes** to start from: _Performance_, _Modern_ and _Classic_. All editable.
+The editor with the Performance theme, while the simulator runs a track lap:
 
-## Status
+![idv7lol Studio editing the Performance theme](docs/assets/screenshots/editor.jpg)
 
-Status words are deliberate: **developed** (code exists), **tested locally** (automated tests
-or PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested in vehicle**.
+| Starting points                                                         | Image editor                                                             |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| ![Welcome window with templates](docs/assets/screenshots/templates.jpg) | ![Image editor with a picture](docs/assets/screenshots/image-editor.jpg) |
 
-| Area                                                     | Status                                                                             |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Signal catalog, units, vehicle profiles                  | developed · tested locally · published                                             |
-| Theme document format (schema v1)                        | developed · tested locally · published                                             |
-| Theme engine (Canvas2D renderer, animations)             | developed · tested locally · published                                             |
-| Simulator (vehicle model, scenarios, faults, recording)  | developed · tested locally · published                                             |
-| Theme compiler → GLSL layers, SDF fonts, validation, CLI | developed · tested locally · published                                             |
-| Bundled themes (Performance, Modern, Classic)            | validated · compiled into the app · published                                      |
-| idv7lol Studio (Windows)                                 | developed · tested locally · installer compiled (unsigned)                         |
-| idv7lol MGU app (Node 8 runtime)                         | developed · engine tested locally with a fake renderer · staged with the kit build |
-| Tested in a vehicle                                      | **no** — see [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)                      |
+One of the free community templates, Digital Dash:
 
-## Quick start (developers)
+![Digital Dash community template](docs/assets/screenshots/community-template.jpg)
 
-Requirements: Node.js 20+ (24 recommended), npm 10+. For the desktop app also Rust stable
-(MSVC), Visual Studio Build Tools 2022 (C++ workload) and WebView2.
+These are screenshots of the Studio running in a browser on a PC. They are not photos of a car.
+
+## What you get
+
+- **idv7lol Studio**, the Windows editor. Drag gauges, bars, readouts and text onto the layout,
+  import pictures, GIFs or short videos and edit them, try it with the simulator, and build.
+- **Themes to start from.** Performance, Modern and Classic, plus seven free community layouts
+  converted from eroobeeroo's Cluster Layouts (GPL, credited in each theme).
+- **The car app**, which runs on the head unit, draws the active theme through `cluster-render`,
+  and lets you turn it on or off and switch themes from the iDrive menu.
+- **The pieces behind them:** a signal catalog, the theme format, a renderer for the PC preview,
+  a simulator and the compiler that turns a theme into what the car runs.
+
+## Where things stand
+
+| Part                                         | State                                             |
+| -------------------------------------------- | ------------------------------------------------- |
+| Signals, theme format, engine, simulator     | written, covered by tests, published              |
+| Compiler (GLSL layers, SDF fonts, validator) | written, covered by tests, published              |
+| Bundled themes                               | pass validation, compiled into the car app        |
+| idv7lol Studio for Windows                   | tested on a PC, unsigned installer built          |
+| Car app (Node 8)                             | tested against a fake renderer only, not on a car |
+| Tested in a vehicle                          | **no**                                            |
+
+## Building it
+
+You need Node.js 20 or newer (24 works best) and npm 10. For the desktop app you also need Rust
+(MSVC toolchain), Visual Studio Build Tools 2022 with the C++ workload, and WebView2.
 
 ```bash
 git clone https://github.com/ALMSTRA/idv7lol.git
@@ -74,38 +76,43 @@ npm test
 npm run tauri:dev
 ```
 
-More in [docs/QUICKSTART.md](docs/QUICKSTART.md), [docs/developer/BUILD.md](docs/developer/BUILD.md)
-and the Spanish user guide [docs/user/GUIA_USUARIO_ES.md](docs/user/GUIA_USUARIO_ES.md).
+There is more in [docs/QUICKSTART.md](docs/QUICKSTART.md) and
+[docs/developer/BUILD.md](docs/developer/BUILD.md). Spanish speakers can start with
+[docs/user/GUIA_USUARIO_ES.md](docs/user/GUIA_USUARIO_ES.md).
 
-## How it works, in one paragraph
+## How it works
 
-A theme is a JSON document (`themes/<id>/theme.json`) listing components (gauges, bars,
-readouts, gear indicator, shift lights, texts, shapes…), each bound to a catalog signal such
-as `engine.rpm`, styled with palette tokens and optionally animated. The Studio edits that
-document and renders it with the theme engine. The compiler turns the same document into what
-the car understands: one small GLSL ES 1.00 fragment-shader layer per piece (the renderer
-allows 64 per app), a signed-distance-field glyph atlas for text, and a Node 8 runtime that
-reads SOME/IP vehicle signals and streams uniforms to `cluster-render`, which hands the
-scene to the cluster's own RAMSES renderer. Deactivating the app drops the layers and the
-factory cluster is visible again.
+A theme is a JSON file (`themes/<id>/theme.json`) with a list of components. Each one reads a
+signal such as `engine.rpm` and takes its colours from the theme's palette. The Studio edits that
+file and draws it on a canvas. For the car, the compiler turns the same file into one small GLSL
+ES 1.00 shader layer per piece (the renderer allows 64 per app), a glyph atlas for text, and data
+for a Node 8 app. That app reads vehicle signals over SOME/IP and feeds them to `cluster-render`,
+which passes the scene to the cluster's own RAMSES renderer. Turning the app off removes the
+layers, and the factory cluster comes back.
 
-## Documentation
+## Docs
 
-- [Architecture](docs/architecture/ARCHITECTURE.md) · [Renderer](docs/architecture/RENDERER.md)
-- [Theme development](docs/developer/THEME_DEVELOPMENT.md) · [Component API](docs/developer/COMPONENT_API.md) · [Signals](docs/developer/SIGNALS.md)
-- [Build](docs/developer/BUILD.md) · [Deployment](docs/user/DEPLOYMENT.md) · [Compatibility](docs/compatibility/COMPATIBILITY.md) · [Troubleshooting](docs/troubleshooting/TROUBLESHOOTING.md)
-- [Project status](docs/PROJECT_STATUS.md) · [Changelog](CHANGELOG.md)
+- [Architecture](docs/architecture/ARCHITECTURE.md) and [renderer notes](docs/architecture/RENDERER.md)
+- [Making themes](docs/developer/THEME_DEVELOPMENT.md), [components](docs/developer/COMPONENT_API.md)
+  and [signals](docs/developer/SIGNALS.md)
+- [Building](docs/developer/BUILD.md), [installing on the car](docs/user/DEPLOYMENT.md),
+  [compatibility](docs/compatibility/COMPATIBILITY.md) and
+  [troubleshooting](docs/troubleshooting/TROUBLESHOOTING.md)
+- [Project status](docs/PROJECT_STATUS.md) and [changelog](CHANGELOG.md)
 
-## Acknowledgements
+## Thanks
 
-idv7lol stands on the work of the iDrive 7 custom-app community:
-[cauliflowermossgrape/idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps) (the
-app kit and GPU renderer), [robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps)
-(`cluster-render`) and [robertnisipeanu/mgu-store](https://github.com/robertnisipeanu/mgu-store)
-(the Store), and [eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info)
-(Cluster Layouts, which proved that full custom layouts work on the KOMBI). Thank you.
+This would not exist without the iDrive 7 custom-app community:
+[cauliflowermossgrape/idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps) for the
+app kit and GPU renderer, [robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps)
+for `cluster-render`, [robertnisipeanu/mgu-store](https://github.com/robertnisipeanu/mgu-store) for
+the Store, and [eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info)
+for Cluster Layouts, which showed that full custom layouts work on the KOMBI.
 
-## Contributing
+## License and contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Questions go to GitHub Discussions; vulnerabilities to
-the private security form (see [SECURITY.md](SECURITY.md)).
+GPL-3.0-or-later. Third-party parts keep their own licences, listed in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+Contributions are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). Ask questions in GitHub
+Discussions. Report security problems privately as described in [SECURITY.md](SECURITY.md).
