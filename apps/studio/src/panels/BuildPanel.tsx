@@ -1,4 +1,4 @@
-import { Cpu } from 'lucide-react';
+import { CircleHelp, Cpu, Download } from 'lucide-react';
 import { useState } from 'react';
 import { compileTheme, type CompileResult } from '@idv7lol/theme-compiler';
 import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
@@ -89,14 +89,14 @@ export function BuildPanel(): JSX.Element {
             <Cpu size={14} /> {t('build.compile')}
           </button>
           <button onClick={exportBundle} disabled={!c || stale}>
-            ⇩ {t('build.exportBundle')}
+            <Download size={14} /> {t('build.exportBundle')}
           </button>
           <button
             onClick={() =>
               openExternal('https://github.com/ALMSTRA/idv7lol/blob/main/docs/user/DEPLOYMENT.md')
             }
           >
-            ? {t('build.howToInstall')}
+            <CircleHelp size={14} /> {t('build.howToInstall')}
           </button>
         </div>
         {!isTauri && <div className="hint">{t('build.noTauri')}</div>}

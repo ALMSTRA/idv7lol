@@ -68,7 +68,9 @@ export function SimulatorPanel(): JSX.Element {
             {sim.running ? <Pause size={14} /> : <Play size={14} />}
             {sim.running ? t('sim.pause') : t('sim.play')}
           </button>
-          <button onClick={() => sim.reset()}>↺ {t('sim.reset')}</button>
+          <button onClick={() => sim.reset()}>
+            <RotateCcw size={14} /> {t('sim.reset')}
+          </button>
           <button
             className={sim.recording ? 'danger active' : ''}
             onClick={() => sim.toggleRecording()}

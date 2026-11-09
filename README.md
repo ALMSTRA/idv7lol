@@ -19,19 +19,23 @@ Details in [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
 ## Screenshots
 
-The editor with the Performance theme, while the simulator runs a track lap:
+The editor with the Performance theme while the simulator drives a track lap:
 
 ![idv7lol Studio editing the Performance theme](docs/assets/screenshots/editor.jpg)
 
-| Starting points                                                         | Image editor                                                             |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| ![Welcome window with templates](docs/assets/screenshots/templates.jpg) | ![Image editor with a picture](docs/assets/screenshots/image-editor.jpg) |
+The welcome window, where you start from a template, open a theme or begin with an empty layout:
 
-One of the free community templates, Digital Dash:
+![Welcome window with the bundled and community templates](docs/assets/screenshots/welcome.jpg)
 
-![Digital Dash community template](docs/assets/screenshots/community-template.jpg)
+| Image editor                                              | Build & Deploy                                                             |
+| --------------------------------------------------------- | -------------------------------------------------------------------------- |
+| ![Image editor](docs/assets/screenshots/image-editor.jpg) | ![Compiling a theme for the car](docs/assets/screenshots/build-deploy.jpg) |
 
-These are screenshots of the Studio running in a browser on a PC. They are not photos of a car.
+| Light mode, Classic theme                                               | Community template: Digital Dash                                |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------- |
+| ![Classic theme in light mode](docs/assets/screenshots/light-theme.jpg) | ![Digital Dash](docs/assets/screenshots/community-template.jpg) |
+
+These are screenshots of the Studio running on a PC. They are not photos of a car.
 
 ## What you get
 
