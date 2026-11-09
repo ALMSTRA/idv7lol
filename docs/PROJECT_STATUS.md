@@ -51,6 +51,14 @@ The interface now uses the project logo, one icon set, a File menu, resizable pa
 small windows: tested locally in a browser.
 
 
+## Community templates (added 2026-11-09)
+
+`themes/community/` holds hand conversions of the seven Cluster Layouts by eroobeeroo
+(GPL-3.0-or-later), offered as optional templates in the Studio. All seven pass validation with no
+errors or warnings and compile. They are not bundled into the car app, and their differences from the
+originals are listed in `themes/community/README.md`. **Not tested in a vehicle.** The installer was
+rebuilt with this work (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned).
+
 ## Pending (ordered)
 
 1. **First vehicle test** of the MGU app (maintainer with SSH). Confirm: install from the Store,
