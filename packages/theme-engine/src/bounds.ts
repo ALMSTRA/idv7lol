@@ -1,3 +1,4 @@
+import { getDisplayProfile } from '@idv7lol/theme-schema';
 import type { Component, Rect, ReservedZone, Theme } from '@idv7lol/theme-schema';
 import { DEG, anchorFraction } from './math.js';
 
@@ -192,11 +193,20 @@ export interface ZoneOverlap {
 }
 
 /** Every component that touches a reserved zone of the theme's layout. */
+/** The theme's zones plus its display's: a theme cannot opt out of the factory areas. */
+export function effectiveZones(theme: Theme): ReservedZone[] {
+  const zones = new Map(theme.layout.reservedZones.map((z) => [z.id, z]));
+  for (const z of getDisplayProfile(theme.target.display)?.reservedZones ?? [])
+    if (!zones.has(z.id)) zones.set(z.id, z);
+  return [...zones.values()];
+}
+
 export function reservedZoneOverlaps(theme: Theme): ZoneOverlap[] {
   const out: ZoneOverlap[] = [];
+  const zones = effectiveZones(theme);
   for (const f of flattenComponents(theme.components)) {
     if (f.component.type === 'group') continue;
-    for (const zone of theme.layout.reservedZones) {
+    for (const zone of zones) {
       if (overlapsZone(f.component, f.absX, f.absY, zone))
         out.push({ componentId: f.component.id, zone });
     }

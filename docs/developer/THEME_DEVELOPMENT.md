@@ -44,7 +44,7 @@ maintaining themes by hand or in the Studio. The exact field list is in the zod 
   [SIGNALS.md](SIGNALS.md)). The validator warns when a component binds a signal the profile
   lacks.
 - `layout.reservedZones` is optional; when omitted the Studio fills it from the display profile.
-  The validator always checks against the display profile's zones.
+  The validator always checks the display profile's zones as well as any listed in the theme.
 - Every palette must define the nine required tokens. Components reference colours as `$token`
   or literal `#rrggbb`.
 

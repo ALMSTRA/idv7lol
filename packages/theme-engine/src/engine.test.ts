@@ -303,6 +303,18 @@ describe('geometry and cost', () => {
     );
   });
 
+  it('checks the display profile zones even when a theme leaves them out', () => {
+    const theme = createEmptyTheme({ id: 'z', name: 'Z' });
+    const bare = {
+      ...theme,
+      layout: { ...theme.layout, reservedZones: [] },
+      components: [createComponent('rect', { id: 'cowl', x: 800, y: 10, width: 100, height: 50 })],
+    };
+    expect(reservedZoneOverlaps(bare).map((o) => `${o.componentId}:${o.zone.id}`)).toContain(
+      'cowl:cowl',
+    );
+  });
+
   it('estimates layer cost and flags budgets', () => {
     const many = Array.from({ length: 20 }, (_, i) =>
       createComponent('gauge.arc', {
