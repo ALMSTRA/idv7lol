@@ -218,7 +218,7 @@ describe('MGU engine', () => {
     const colors = t.client.uniforms('u_color').filter((u) => u.ref === gearPiece);
     const lastColor = colors[colors.length - 1]!.v as number[];
     // manualColor is $accent (night: #3f8cff) → blue dominant
-    expect(lastColor[2]).toBeGreaterThan(lastColor[0]);
+    expect(lastColor[2]!).toBeGreaterThan(lastColor[0]!);
     expect(t.client.uniforms('u_text').some((u) => (u.v as number[])[0] === 3)).toBe(true); // '3' is glyph code 3
   });
 });
