@@ -64,7 +64,7 @@ export function ValidationTabBadge(): JSX.Element | null {
 export function LiveStats(): JSX.Element {
   const t = useT();
   const ref = useRef<HTMLSpanElement>(null);
-  const [label] = useState(() => t('sim.health'));
+  const label = t('sim.health');
   useEffect(() => {
     let frames = perf.frames;
     let ms = perf.renderMs;
