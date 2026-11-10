@@ -258,6 +258,17 @@ export function App(): JSX.Element {
           target.isContentEditable);
       const mod = e.ctrlKey || e.metaKey;
       const p = useProjectStore.getState();
+      // While the welcome window is up, nothing acts on the theme behind it.
+      if (useUiStore.getState().welcomeOpen) {
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          useUiStore.getState().setWelcomeOpen(false);
+        } else if (mod && e.key.toLowerCase() === 'o') {
+          e.preventDefault();
+          void doOpen();
+        }
+        return;
+      }
       if (mod && e.key.toLowerCase() === 's') {
         e.preventDefault();
         void doSave(e.shiftKey);
