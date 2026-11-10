@@ -4,6 +4,7 @@ import type {
   Binding,
   Color,
   Component,
+  Condition,
   Fill,
   Gradient,
   TextStyle,
@@ -65,6 +66,22 @@ interface Ctx {
   images: CompiledImage[];
   assetRefs: PieceBuild['assetRefs'];
   z: number;
+  /** What each component takes from the groups around it: their opacity and conditions. */
+  inherited: Map<string, { opacity: number; when: Condition[] }>;
+}
+
+/** The component's own opacity and condition, combined with its groups'. */
+function effective(ctx: Ctx, c: Component): { opacity: number; visibleWhen?: Condition } {
+  const inh = ctx.inherited.get(c.id);
+  const when = [...(inh?.when ?? []), ...(c.visibleWhen ? [c.visibleWhen] : [])];
+  return {
+    opacity: c.opacity * (inh?.opacity ?? 1),
+    ...(when.length === 1
+      ? { visibleWhen: when[0]! }
+      : when.length
+        ? { visibleWhen: { all: when } }
+        : {}),
+  };
 }
 
 const TRANSPARENT: Color = 'transparent';
@@ -189,7 +206,7 @@ function basePiece(
     h: Math.max(1, Math.round(rect.h)),
     z: ctx.z++,
     rotation: c.rotation,
-    opacity: c.opacity,
+    opacity: effective(ctx, c).opacity,
     usesFont: false,
     usesTime: false,
     statics: {},
@@ -197,7 +214,8 @@ function basePiece(
     dynamics: [],
     animations: animationsOf(ctx, c),
   };
-  if (c.visibleWhen) piece.visibleWhen = c.visibleWhen;
+  const when = effective(ctx, c).visibleWhen;
+  if (when) piece.visibleWhen = when;
   if (c.rotation !== 0) {
     // Pivot: the component's anchor point, expressed from this layer's top-left.
     piece.statics['_pivot'] = [f.absX + fx * c.width - rect.x, f.absY + fy * c.height - rect.y];
@@ -482,11 +500,10 @@ function buildImage(ctx: Ctx, f: FlatComponent): void {
     iw: Math.max(1, Math.min(RENDERER_LIMITS.imageMaxWidth, Math.round(c.width))),
     ih: Math.max(1, Math.min(RENDERER_LIMITS.imageMaxHeight, Math.round(c.height))),
     file: `images/${c.id}.rgba`,
-    opacity: c.opacity,
+    ...effective(ctx, c),
     rotation: c.rotation,
     pivotX: fx * c.width,
     pivotY: fy * c.height,
-    ...(c.visibleWhen ? { visibleWhen: c.visibleWhen } : {}),
   });
   if (asset.animation) {
     const a = asset.animation;
@@ -1108,11 +1125,41 @@ function buildStatusPanel(ctx: Ctx, f: FlatComponent): void {
 /* -------------------------------------------------------------------------- */
 
 export function buildPieces(theme: Theme): PieceBuild {
-  const ctx: Ctx = { theme, findings: [], pieces: [], images: [], assetRefs: [], z: 0 };
+  const ctx: Ctx = {
+    theme,
+    findings: [],
+    pieces: [],
+    images: [],
+    assetRefs: [],
+    z: 0,
+    inherited: new Map(),
+  };
   const flat = flattenComponents(theme.components);
+  const hidden = new Set<string>();
   for (const f of flat) {
     const c = f.component;
-    if (!c.visible) continue;
+    // A hidden group hides everything in it, as in the editor.
+    if (!c.visible || f.parents.some((p) => hidden.has(p))) {
+      hidden.add(c.id);
+      continue;
+    }
+    const parent = f.parents[f.parents.length - 1];
+    const up = parent ? ctx.inherited.get(parent) : undefined;
+    if (up) ctx.inherited.set(c.id, up);
+    if (c.type === 'group') {
+      const own = effective(ctx, c);
+      ctx.inherited.set(c.id, {
+        opacity: own.opacity,
+        when: own.visibleWhen ? [own.visibleWhen] : [],
+      });
+      if (c.rotation !== 0)
+        warn(
+          ctx,
+          'group.rotation',
+          'A rotated group is drawn unrotated on the car; rotate its components instead.',
+          c.id,
+        );
+    }
     switch (c.type) {
       case 'rect':
       case 'ellipse':

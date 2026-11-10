@@ -89,6 +89,28 @@ describe('validateTheme', () => {
     ).toBe(true);
   });
 
+  it("applies a group's visibility, opacity and condition to what is inside it", () => {
+    const when = { signal: 'engine.rpm', op: 'gt' as const, value: 1000 };
+    const inner = createComponent('rect', { id: 'inner', x: 0, y: 0, width: 50, height: 50 });
+    const group = (extra: object) =>
+      createComponent('group', {
+        id: 'g',
+        x: 300,
+        y: 300,
+        width: 100,
+        height: 100,
+        ...extra,
+        props: { children: [{ ...inner, opacity: 0.5 }], clip: false },
+      });
+    const hidden = compileTheme(theme([group({ visible: false })]));
+    expect(hidden.compiled!.pieces.some((p) => p.componentId === 'inner')).toBe(false);
+
+    const faded = compileTheme(theme([group({ opacity: 0.5, visibleWhen: when })]));
+    const piece = faded.compiled!.pieces.find((p) => p.componentId === 'inner')!;
+    expect(piece.opacity).toBeCloseTo(0.25);
+    expect(piece.visibleWhen).toEqual(when);
+  });
+
   it('judges a wide rev arc by what it paints, not by its square box', () => {
     const arc = createComponent('gauge.arc', {
       id: 'revs',
