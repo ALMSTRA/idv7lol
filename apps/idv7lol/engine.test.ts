@@ -113,7 +113,7 @@ const compiled = compileTheme(performanceTheme, {
 const fonts = { sans: { metrics: baked.metrics, pixels: Buffer.from(baked.pixels) } };
 const quiet = { info: () => undefined, warn: () => undefined };
 
-function setup(opts: { enabled?: boolean; live?: boolean } = {}) {
+function setup(opts: { enabled?: boolean; live?: boolean; theme?: CompiledTheme } = {}) {
   let now = 100_000;
   const store = new SignalStore();
   const client = new FakeClient();
@@ -121,7 +121,7 @@ function setup(opts: { enabled?: boolean; live?: boolean } = {}) {
   const engine = new ClusterEngine({
     client,
     log: quiet,
-    theme: compiled,
+    theme: opts.theme ?? compiled,
     fonts,
     signals: store,
     enabled: () => state.enabled,
@@ -144,6 +144,22 @@ function setup(opts: { enabled?: boolean; live?: boolean } = {}) {
 }
 
 describe('MGU engine', () => {
+  it('drops what it built and stays off when a theme fails halfway, without retrying', () => {
+    const broken = structuredClone(compiled);
+    const bad = broken.pieces[Math.floor(broken.pieces.length / 2)]!;
+    (bad as { statics: unknown }).statics = undefined;
+    const t = setup({ theme: broken });
+    t.feed({ 'engine.rpm': 3000 });
+    t.advance(50);
+    expect(t.engine.shown).toBe(false);
+    expect(t.client.layers.size).toBe(0);
+    const made = t.client.count('layer');
+    expect(made).toBeGreaterThan(0);
+    t.advance(500);
+    expect(t.client.count('layer')).toBe(made);
+    expect(t.client.count('pixels')).toBe(1);
+  });
+
   it('builds one layer per compiled piece plus the font atlas, and tears down when disabled', () => {
     const t = setup();
     t.feed({

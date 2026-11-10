@@ -180,6 +180,7 @@ class ClusterEngine {
   }
 
   rebuild() {
+    this.failed = null;
     const was = this.shown;
     this.setShown(false);
     if (was) this.setShown(true);
@@ -207,6 +208,7 @@ class ClusterEngine {
       target: this.targetState || 'unknown',
       palette: this.paletteId(),
       theme: this.theme.id,
+      failed: this.failed === this.theme,
       messages: this.messages,
     };
   }
@@ -215,9 +217,34 @@ class ClusterEngine {
 
   setShown(want) {
     if (want === this.shown) return;
-    if (want) this._build();
-    else this._teardown();
-    this.shown = want;
+    if (!want) {
+      this._teardown();
+      this.shown = false;
+      return;
+    }
+    // A theme that failed once stays off until it changes: retrying every tick
+    // would resend its layers and pictures 60 times a second.
+    if (this.failed === this.theme) return;
+    this._made = [];
+    try {
+      this._build();
+      this.shown = true;
+    } catch (e) {
+      this.log.warn('layout failed, the factory cluster stays: ' + ((e && e.stack) || e));
+      this._made.reverse().forEach((ref) => this.cr.drop(ref));
+      this.pieces = [];
+      this.images = [];
+      this.assets = {};
+      this.failed = this.theme;
+    }
+    this._made = null;
+  }
+
+  /** Create a renderer object and remember it, so a build that fails halfway can drop it. */
+  _make(kind, opts) {
+    const ref = this.cr[kind](opts);
+    if (ref && this._made) this._made.push(ref);
+    return ref;
   }
 
   _build() {
@@ -234,7 +261,7 @@ class ClusterEngine {
         return;
       }
       const m = f.metrics;
-      const ref = this.cr.asset({
+      const ref = this._make('asset', {
         target,
         format: 'r8',
         w: m.cols * m.cellW,
@@ -271,7 +298,7 @@ class ClusterEngine {
         }
       }
       if (piece.usesTime) opts.time = true;
-      const ref = this.cr.effect(opts);
+      const ref = this._make('effect', opts);
       const st = {
         piece,
         ref,
@@ -323,7 +350,7 @@ class ClusterEngine {
       }
       if (img.sprite) {
         // The renderer plays the frames by itself: nothing is sent per frame.
-        st.asset = this.cr.asset({
+        st.asset = this._make('asset', {
           target,
           format: 'rgba8',
           w: img.iw,
@@ -346,7 +373,7 @@ class ClusterEngine {
           sprite.px = img.pivotX;
           sprite.py = img.pivotY;
         }
-        st.ref = st.asset ? this.cr.effect(sprite) : 0;
+        st.ref = st.asset ? this._make('effect', sprite) : 0;
         if (!st.ref) {
           this.log.warn('animation refused: ' + img.key);
           return st;
@@ -395,7 +422,7 @@ class ClusterEngine {
         opts.px = img.pivotX;
         opts.py = img.pivotY;
       }
-      st.ref = this.cr.image(opts);
+      st.ref = this._make('image', opts);
       if (st.ref) {
         this.cr.pixels(st.ref, null, pixels);
         this.messages++;
