@@ -507,6 +507,9 @@ input[type='checkbox'] {
   font-size: 11px;
   color: var(--text-faint);
 }
+.hint.warning {
+  color: var(--warning);
+}
 .empty {
   padding: 24px 14px;
   color: var(--text-muted);

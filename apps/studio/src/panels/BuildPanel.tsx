@@ -7,6 +7,7 @@ import {
   packageFileName,
   type CompileResult,
 } from '@idv7lol/theme-compiler';
+import type { Theme } from '@idv7lol/theme-schema';
 import { gzip } from '../lib/gzip.js';
 import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
@@ -25,6 +26,8 @@ import {
 
 interface BuildState {
   result: CompileResult | null;
+  /** The theme object that was compiled; edits replace it, so a different one means stale. */
+  source: Theme | null;
   exportedTo: string | null;
   busy: boolean;
 }
@@ -34,9 +37,14 @@ export function BuildPanel(): JSX.Element {
   const theme = useProjectStore((s) => s.theme);
   const report = useValidation();
   const log = useUiStore((s) => s.logMessage);
-  const [state, setState] = useState<BuildState>({ result: null, exportedTo: null, busy: false });
-  const stale =
-    state.result && state.result.compiled && state.result.compiled.compiledAt < '' ? true : false;
+  const [state, setState] = useState<BuildState>({
+    result: null,
+    source: null,
+    exportedTo: null,
+    busy: false,
+  });
+  const stale = state.result !== null && state.source !== theme;
+  const blocked = stale || !report || !report.ok;
 
   const compile = async () => {
     setState((s) => ({ ...s, busy: true }));
@@ -50,7 +58,7 @@ export function BuildPanel(): JSX.Element {
           fonts[fam] = { pixels: px, metrics: JSON.parse(new TextDecoder().decode(mt)) as object };
       }
       const result = compileTheme(theme, { fonts, images: await decodeThemeImages(theme) });
-      setState({ result, exportedTo: null, busy: false });
+      setState({ result, source: theme, exportedTo: null, busy: false });
       if (result.compiled)
         log(
           'info',
@@ -64,16 +72,22 @@ export function BuildPanel(): JSX.Element {
   };
 
   const exportBundle = async () => {
-    if (!state.result?.compiled) return;
-    const folder = isTauri ? await pickFolder(t('build.exportBundle')) : null;
-    if (isTauri && !folder) return;
-    const path = await writeBundleFiles(folder, state.result.compiled.id, state.result.files);
-    setState((s) => ({ ...s, exportedTo: path }));
-    log('info', t('build.exportedTo', { path }));
+    if (!state.result?.compiled || blocked) return;
+    try {
+      const folder = isTauri ? await pickFolder(t('build.exportBundle')) : null;
+      if (isTauri && !folder) return;
+      const path = await writeBundleFiles(folder, state.result.compiled.id, state.result.files);
+      setState((s) => ({ ...s, exportedTo: path }));
+      log('info', t('build.exportedTo', { path }));
+    } catch (e) {
+      const message = t('build.exportFailed', { error: (e as Error).message });
+      log('error', message);
+      useUiStore.getState().showToast(message);
+    }
   };
 
   const saveForCar = async () => {
-    if (!state.result?.compiled) return;
+    if (!state.result?.compiled || blocked) return;
     try {
       const pkg = buildThemePackage(state.result);
       const data = await gzip(encodeThemePackage(pkg));
@@ -84,7 +98,9 @@ export function BuildPanel(): JSX.Element {
       log('info', message);
       useUiStore.getState().showToast(message);
     } catch (e) {
-      log('error', `${t('build.saveUsb')}: ${(e as Error).message}`);
+      const message = `${t('build.saveUsb')}: ${(e as Error).message}`;
+      log('error', message);
+      useUiStore.getState().showToast(message);
     }
   };
 
@@ -92,7 +108,7 @@ export function BuildPanel(): JSX.Element {
   const steps = [
     { key: 'preview', state: 'done' },
     { key: 'tests', state: !report ? '' : report.ok ? 'done' : 'fail' },
-    { key: 'compiled', state: c ? 'done' : state.result ? 'fail' : '' },
+    { key: 'compiled', state: c && !stale ? 'done' : state.result && !c ? 'fail' : '' },
     { key: 'exported', state: state.exportedTo ? 'done' : '' },
     { key: 'installed', state: '' },
   ] as const;
@@ -118,10 +134,10 @@ export function BuildPanel(): JSX.Element {
           >
             <Cpu size={14} /> {t('build.compile')}
           </button>
-          <button className="primary" onClick={saveForCar} disabled={!c || stale}>
+          <button className="primary" onClick={saveForCar} disabled={!c || blocked}>
             <Usb size={14} /> {t('build.saveUsb')}
           </button>
-          <button onClick={exportBundle} disabled={!c || stale}>
+          <button onClick={exportBundle} disabled={!c || blocked}>
             <Download size={14} /> {t('build.exportBundle')}
           </button>
           <button
@@ -132,6 +148,7 @@ export function BuildPanel(): JSX.Element {
             <CircleHelp size={14} /> {t('build.howToInstall')}
           </button>
         </div>
+        {c && stale && <div className="hint warning">{t('build.stale')}</div>}
         <div className="hint">{t(isTauri ? 'build.usbHint' : 'build.usbHintBrowser')}</div>
         {!isTauri && <div className="hint">{t('build.noTauri')}</div>}
         {state.exportedTo && (

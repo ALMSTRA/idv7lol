@@ -235,6 +235,8 @@ export const en = {
     compile: 'Compile theme',
     exportBundle: 'Export bundle…',
     exportedTo: 'Bundle written to {path}',
+    stale: 'The theme changed after compiling. Compile it again before saving.',
+    exportFailed: 'Export failed: {error}',
     noTauri:
       'Exporting a folder needs the desktop app; in a browser the bundle downloads as separate files.',
     layers: 'Renderer layers',

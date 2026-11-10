@@ -242,6 +242,8 @@ export const es: Dictionary = {
     compile: 'Compilar tema',
     exportBundle: 'Exportar bundle…',
     exportedTo: 'Bundle escrito en {path}',
+    stale: 'El tema cambió después de compilar. Vuelve a compilarlo antes de guardar.',
+    exportFailed: 'Falló la exportación: {error}',
     noTauri:
       'Exportar a una carpeta requiere la aplicación de escritorio; en un navegador el bundle se descarga como archivos sueltos.',
     layers: 'Capas del renderer',
