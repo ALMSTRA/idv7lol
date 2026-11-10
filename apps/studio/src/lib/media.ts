@@ -39,6 +39,46 @@ const canvasOf = (w: number, h: number): HTMLCanvasElement => {
 
 const yieldToUi = (): Promise<void> => new Promise((r) => setTimeout(r, 0));
 
+/**
+ * Scale for keeping `count` frames of `w`×`h`: the same limits the sheet has,
+ * applied while decoding so a long or large video never sits in memory at full
+ * size (120 frames of 1080p would be about 1 GB).
+ */
+export function frameScale(w: number, h: number, count: number): number {
+  if (w < 1 || h < 1) return 1;
+  return Math.min(
+    1,
+    MAX_FRAME_SIDE / Math.max(w, h),
+    Math.sqrt(MAX_SHEET_PIXELS / (Math.max(1, count) * w * h)),
+  );
+}
+
+/** Draw a frame into a new canvas at `scale`. */
+function shrink(src: CanvasImageSource, w: number, h: number, scale: number): HTMLCanvasElement {
+  const c = canvasOf(Math.max(2, Math.round(w * scale)), Math.max(2, Math.round(h * scale)));
+  const ctx = c.getContext('2d')!;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(src, 0, 0, c.width, c.height);
+  return c;
+}
+
+/** Reject when `p` takes longer than `ms`, so a stuck video can't hang the import. */
+function within<T>(p: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms);
+    p.then(
+      (v) => {
+        clearTimeout(timer);
+        resolve(v);
+      },
+      (e: unknown) => {
+        clearTimeout(timer);
+        reject(e instanceof Error ? e : new Error(String(e)));
+      },
+    );
+  });
+}
+
 /** Decode GIF, animated WebP or APNG frames. Null when the file is a still image. */
 async function decodeAnimatedImage(
   file: File,
@@ -55,6 +95,7 @@ async function decodeAnimatedImage(
     const step = Math.max(1, total / MAX_FRAMES);
     const frames: CanvasImageSource[] = [];
     const durations: number[] = [];
+    const kept = Math.ceil(total / step);
     let width = 0;
     let height = 0;
     let next = 0;
@@ -62,10 +103,11 @@ async function decodeAnimatedImage(
       const { image } = await decoder.decode({ frameIndex: i });
       const ms = Math.max(20, (image.duration ?? 100_000) / 1000);
       if (i >= Math.floor(next)) {
-        width = image.displayWidth;
-        height = image.displayHeight;
-        const c = canvasOf(width, height);
-        c.getContext('2d')!.drawImage(image, 0, 0);
+        const w = image.displayWidth;
+        const h = image.displayHeight;
+        const c = shrink(image, w, h, frameScale(w, h, kept));
+        width = c.width;
+        height = c.height;
         frames.push(c);
         durations.push(ms);
         next += step;
@@ -90,34 +132,41 @@ async function decodeVideo(file: File, progress: (p: number) => void): Promise<D
   video.preload = 'auto';
   video.src = url;
   try {
-    await new Promise<void>((resolve, reject) => {
-      video.onloadeddata = () => resolve();
-      video.onerror = () => reject(new Error('This video format cannot be read here'));
-    });
+    await within(
+      new Promise<void>((resolve, reject) => {
+        video.onloadeddata = () => resolve();
+        video.onerror = () => reject(new Error('This video format cannot be read here'));
+      }),
+      20_000,
+      'This video took too long to open',
+    );
     const seconds = Math.min(video.duration, MAX_VIDEO_SECONDS);
+    if (!(seconds > 0)) throw new Error('This video has no length');
     const fps = Math.min(MAX_VIDEO_FPS, MAX_FRAMES / seconds);
     const count = Math.max(2, Math.floor(seconds * fps));
-    const frames: CanvasImageSource[] = [];
+    const frames: HTMLCanvasElement[] = [];
     const ms = Math.round(1000 / fps);
+    const scale = frameScale(video.videoWidth, video.videoHeight, count);
     for (let i = 0; i < count; i++) {
-      video.currentTime = i / fps;
-      await new Promise<void>((resolve) => {
+      const seeked = new Promise<void>((resolve) => {
         video.onseeked = () => resolve();
       });
-      const c = canvasOf(video.videoWidth, video.videoHeight);
-      c.getContext('2d')!.drawImage(video, 0, 0);
-      frames.push(c);
+      video.currentTime = i / fps;
+      await within(seeked, 10_000, 'This video stopped responding while reading frames');
+      frames.push(shrink(video, video.videoWidth, video.videoHeight, scale));
       progress((i + 1) / count);
       if (i % 2 === 0) await yieldToUi();
     }
     return {
       frames,
       durations: frames.map(() => ms),
-      width: video.videoWidth,
-      height: video.videoHeight,
+      width: frames[0]!.width,
+      height: frames[0]!.height,
       trimmed: video.duration > MAX_VIDEO_SECONDS,
     };
   } finally {
+    video.removeAttribute('src');
+    video.load();
     URL.revokeObjectURL(url);
   }
 }
