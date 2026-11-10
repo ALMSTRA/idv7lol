@@ -10,6 +10,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+## [0.2.0-beta.1] - 2026-11-10
+
+First pre-release: idv7lol Studio 0.2.0 for Windows and the car app 0.2.0. Experimental and
+**not tested in a vehicle**.
+
 ### Added
 
 - Car preview in the Studio: a canvas toggle runs the car app's own engine against a WebGL stand-in

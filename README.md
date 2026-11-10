@@ -14,8 +14,12 @@ off, the car shows its factory cluster again.
 > Use it parked or on a closed course, keep the factory warnings visible, and read
 > [SECURITY.md](SECURITY.md) first.
 
-**Status: 0.1.0, in development.** Everything runs on a PC. Nothing has been tested in a car yet.
-Details in [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+**Status: 0.2.0-beta.1, an experimental pre-release.** Everything runs on a PC. Nothing has been
+tested in a car yet. Details in [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+
+**Download:** the Windows installer of idv7lol Studio is on the
+[Releases page](https://github.com/ALMSTRA/idv7lol/releases). It isn't signed, so Windows
+SmartScreen warns the first time; choose _More info_ and _Run anyway_.
 
 ## Screenshots
 
@@ -56,7 +60,7 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
 | Signals, theme format, engine, simulator     | written, covered by tests, published              |
 | Compiler (GLSL layers, SDF fonts, validator) | written, covered by tests, published              |
 | Bundled themes                               | pass validation, compiled into the car app        |
-| idv7lol Studio for Windows                   | tested on a PC, unsigned installer built          |
+| idv7lol Studio for Windows                   | tested on a PC, unsigned installer released       |
 | Car app (Node 8)                             | tested against a fake renderer only, not on a car |
 | Tested in a vehicle                          | **no**                                            |
 
