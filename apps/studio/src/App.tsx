@@ -61,10 +61,19 @@ import {
 export function App(): JSX.Element {
   useEffect(() => {
     restorePanes();
-    // Small windows start with the side panels closed; they open as drawers.
+    // Small windows close the side panels, which then open as drawers. Widening
+    // the window again brings back what was open before, not everything.
     const narrow = window.matchMedia('(max-width: 1000px)');
-    const apply = () =>
-      useUiStore.setState({ leftOpen: !narrow.matches, rightOpen: !narrow.matches });
+    let wide = { leftOpen: true, rightOpen: true };
+    const apply = () => {
+      if (narrow.matches) {
+        const s = useUiStore.getState();
+        wide = { leftOpen: s.leftOpen, rightOpen: s.rightOpen };
+        useUiStore.setState({ leftOpen: false, rightOpen: false });
+      } else {
+        useUiStore.setState(wide);
+      }
+    };
     if (narrow.matches) apply();
     narrow.addEventListener('change', apply);
     return () => narrow.removeEventListener('change', apply);
