@@ -12,10 +12,30 @@ with the car on stable power, and know how to remove the app (last section).
 - The Store itself needs mgu-deploy and app-privacy, installed by the Store's own
   installer.
 
-The app ships the three bundled themes (Performance, Modern, Classic) compiled in. Themes you
-export from the Studio are not yet installable separately: add them to the repository (or your
-fork) under `themes/<id>/theme.json` and rebuild (`npx tsx tools/build/build-mgu-themes.ts`), so
-the Store builds them into the app. A theme-upload path is a planned feature.
+The app ships the three bundled themes (Performance, Modern, Classic) compiled in. From version
+0.2.0 it also installs your own themes from a USB stick (next section). To change the built-in
+ones instead, add them to the repository or your fork under `themes/<id>/theme.json` and rebuild
+(`npx tsx tools/build/build-mgu-themes.ts`), so the Store builds them into the app.
+
+## Your own themes from a USB stick
+
+1. In the Studio, **Build & Deploy** > **Compile theme** > **Save for the car (USB)**, and pick the
+   stick. The file lands in `idv7lol/themes/<theme>.idv7pkg`. Any FAT32 or exFAT stick works; several
+   themes can sit in that folder.
+2. Open the idv7lol app on the car and plug the stick in. The app looks at `/media/<label>` (and
+   `/run/media/<user>/<label>`) every 5 seconds, checks each new package and copies the good ones to
+   its data folder. The status page shows "Installed from USB: …" or why a file was refused.
+3. **Next theme** now cycles through the built-in themes and the installed ones. Installing never
+   changes what the cluster shows.
+4. **Remove USB theme** deletes the theme being shown, if it came from a stick.
+
+What the app checks before installing: package format and minimum app version, file size (32 MB),
+at most 64 layers and 15 animations, image sizes, renderer memory (16 MiB), that every layer is on
+the 1920×720 panel, and that every layer names a shader the app ships. Packages carry no shaders;
+the app uses its own copy. Unknown fonts fall back to the app's font. At most 20 themes.
+
+**Not tested in a vehicle.** That the app can read the stick at `/media` is inferred from Cluster
+Layouts, which writes its logs there; confirm it on the first car test.
 
 ## Requirements
 

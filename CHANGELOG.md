@@ -12,6 +12,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- Themes from a USB stick: the Studio's **Save for the car (USB)** writes a `.idv7pkg` package to
+  `idv7lol/themes/` on a stick, and the car app (0.2.0) finds, checks and installs it by itself,
+  with **Remove USB theme** to delete it. Packages carry no shaders. Tested locally; not tested in a
+  vehicle.
+
 - Images in the Studio: import from the computer by button, drag and drop or paste; assets embedded
   in the theme; full-window non-destructive editor with adjustments, looks, crop, rotate and flip,
   background removal, erase/restore brush, effects, compare, undo and a live view on the cluster.

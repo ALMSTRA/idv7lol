@@ -22,10 +22,19 @@ vehicle.**
 Runtime constraints: Node 8 (CommonJS, ES2017 syntax, builtins + `./kit/*` only). ESLint parses
 this folder with `ecmaVersion: 2017`.
 
-Controls on the car: Show on the cluster (off by default), Next theme, Palette and Diagnostics
+Controls on the car: Show on the cluster (off by default), Next theme, Remove USB theme, Palette and Diagnostics
 (status, signals, renderer, about), plus the Settings screen the kit builds (show, theme,
 palette, start-up sweep, clock UTC offset, demo data).
 
 Safety: the layout exists only while it is enabled and car data is live; it is dropped when data
 goes stale (3 s + 1.5 s grace), when the app stops or when the render service dies. Factory
 telltales and pop-ups stay on top. Nothing is written to the vehicle.
+
+## Themes from a USB stick
+
+`usb_themes.js` looks for `idv7lol/themes/*.idv7pkg` on the mounted sticks (`/media/<label>`,
+`/run/media/<user>/<label>`) every 5 s. Each new package is checked (format, minimum app version,
+size, layers, animations, images, renderer memory, panel bounds, known shaders) and copied to
+`<data>/themes/<id>/`. Installed themes are listed as `usb:<id>` after the built-in ones. Packages
+carry no GLSL: the app fills in shaders from `shaders.js`, which `tools/build/build-mgu-themes.ts`
+generates with every shader the compiler can emit.

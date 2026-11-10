@@ -155,8 +155,10 @@ and colour tracks are updated by the app; opacity tracks are not played on the c
 
 The status ladder shows how far the theme has got: _Preview available_, _Validation passed_,
 _Package compiled_, _Bundle exported_, _Tested in vehicle_ (only you can confirm that).
-**Compile theme** runs the compiler; **Export bundle…** writes `theme.json`, shaders and the font
-atlas to a folder. Installing on the car is described in [DEPLOYMENT.md](DEPLOYMENT.md).
+**Compile theme** runs the compiler. **Save for the car (USB)** asks for your USB stick and saves
+the theme there as `idv7lol/themes/<theme>.idv7pkg`; the car app installs it by itself when the
+stick is plugged in. **Export bundle…** writes `theme.json`, shaders and the font atlas to a folder,
+for developers. Installing on the car is described in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Files
 

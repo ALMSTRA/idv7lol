@@ -58,6 +58,13 @@ errors or warnings and compile. They are not bundled into the car app, and their
 originals are listed in `themes/community/README.md`. **Not tested in a vehicle.** The installer was
 rebuilt with this work (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned).
 
+## Themes from a USB stick (added 2026-11-09)
+
+Studio button, `.idv7pkg` package format and car app 0.2.0 import from `/media/<label>`: developed and
+tested locally (unit tests on fake sticks, and the three bundled themes plus a community one packaged
+and accepted). **Not tested in a vehicle.** The first car test must confirm that the app can read a
+stick, that the new button appears, and that an installed theme draws like a built-in one.
+
 ## Pending (ordered)
 
 1. **First vehicle test** of the MGU app (maintainer with SSH). Confirm: install from the Store,

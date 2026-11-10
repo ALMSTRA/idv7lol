@@ -108,14 +108,30 @@ needs root SSH access once; its README explains how.
 No internet on the head unit? Copy the repository to a USB stick and add it in the Store with
 **Add from USB**. The Store builds it the same way.
 
-### Your own theme
+### Your own theme, with a USB stick
 
-The car app has its themes built in, so a theme from the Studio can't be copied over on its own
-yet. For now:
+Once idv7lol 0.2.0 or newer is on the car, your own themes go over on a USB stick. No GitHub, no
+rebuild and no internet.
 
-1. Fork this repository on GitHub.
-2. Save your theme from the Studio and put it in your fork as `themes/<your-theme>/theme.json`.
-3. Check it and generate the car files:
+1. In the Studio, open **Build & Deploy**, press **Compile theme**, then **Save for the car (USB)**
+   and pick your USB stick. The theme is saved as `idv7lol/themes/<theme>.idv7pkg` on the stick.
+2. Plug the stick into the car with the idv7lol app open. Within a few seconds the app finds the
+   theme, checks it and installs it. The app page says what it installed, or why a file was
+   refused.
+3. Press **Next theme** until your theme shows. Nothing changes on the cluster before that.
+4. To delete it, show it and press **Remove USB theme**. Themes built into the app can't be removed.
+
+The car checks every package before installing it: layer count, image sizes, renderer memory,
+that everything sits on the panel and that it only names shaders the app already has. Packages
+carry no shader code of their own. Up to 20 themes can be installed this way.
+
+Nobody has tried this on a car yet. In particular, it is not confirmed that the app can read the
+stick. Cluster Layouts writes its logs to sticks in the same place, which is a good sign.
+
+### Changing the built-in themes
+
+To change the themes that come inside the app, fork this repository, put the theme in your fork as
+`themes/<your-theme>/theme.json`, check it and regenerate the car files:
 
 ```bash
 npm run themes:validate
@@ -125,8 +141,7 @@ npm run themes:validate
 npx tsx tools/build/build-mgu-themes.ts
 ```
 
-4. Commit and push to your fork.
-5. In the Store, add your fork as a source instead of `ALMSTRA/idv7lol` and install from there.
+Then commit, push, and add your fork in the Store instead of `ALMSTRA/idv7lol`.
 
 On the car, fuel level, range and the 12 V battery are not read yet and show dashes. Opacity
 animations don't play there either. The current list of known limits is in the deployment guide.
