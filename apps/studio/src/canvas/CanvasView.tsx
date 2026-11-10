@@ -963,11 +963,13 @@ function drawRulers(
   theme: Theme,
 ): void {
   ctx.save();
-  ctx.fillStyle = 'rgba(20,23,30,0.92)';
+  // Follow the app's light or dark scheme.
+  const light = document.documentElement.dataset['theme'] === 'light';
+  ctx.fillStyle = light ? 'rgba(244,246,249,0.95)' : 'rgba(20,23,30,0.92)';
   ctx.fillRect(0, 0, W, RULER);
   ctx.fillRect(0, 0, RULER, H);
-  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.strokeStyle = light ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.25)';
+  ctx.fillStyle = light ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)';
   ctx.font = '9px system-ui, sans-serif';
   ctx.lineWidth = 1;
   const step = v.zoom > 1.5 ? 50 : v.zoom > 0.6 ? 100 : v.zoom > 0.3 ? 200 : 500;
@@ -996,7 +998,7 @@ function drawRulers(
     ctx.fillText(String(y), 0, 0);
     ctx.restore();
   }
-  ctx.fillStyle = 'rgba(20,23,30,1)';
+  ctx.fillStyle = light ? 'rgba(244,246,249,1)' : 'rgba(20,23,30,1)';
   ctx.fillRect(0, 0, RULER, RULER);
   ctx.restore();
 }

@@ -275,6 +275,9 @@ export function App(): JSX.Element {
         } else if (mod && e.key.toLowerCase() === 'o') {
           e.preventDefault();
           void doOpen();
+        } else if (e.key === 'F5' || (mod && /^[snrp]$/i.test(e.key))) {
+          // Keep the browser's reload, save-page and print from firing behind the window.
+          e.preventDefault();
         }
         return;
       }
@@ -376,6 +379,12 @@ export function App(): JSX.Element {
         }
       }
       if (e.key === 'Escape') {
+        // In a narrow window, Escape first closes an open drawer.
+        const ui = useUiStore.getState();
+        if (window.matchMedia('(max-width: 1000px)').matches && (ui.leftOpen || ui.rightOpen)) {
+          useUiStore.setState({ leftOpen: false, rightOpen: false });
+          return;
+        }
         // Inside a group, Escape steps out to the group first.
         if (!p.selectParent()) p.select([]);
         return;

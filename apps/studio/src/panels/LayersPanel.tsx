@@ -102,7 +102,7 @@ export function LayersPanel(): JSX.Element {
                 openLayerMenu(e.clientX, e.clientY, c.id);
               }}
             >
-              <span className="type" title={c.type}>
+              <span className="type" title={t(`components.${c.type}`)}>
                 <TypeIcon type={c.type} size={14} />
               </span>
               <span className="name">
