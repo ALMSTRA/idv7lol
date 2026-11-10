@@ -82,6 +82,68 @@ export function componentBounds(c: Component, absX: number, absY: number): Rect 
   };
 }
 
+/**
+ * Where an arc or arc gauge actually paints, when that is less than its box: a
+ * wide rev arc whose centre sits low only draws the upper half of its square.
+ * Other components, rotated ones and gauges with a needle or centre text paint
+ * across the whole box, so this returns the box.
+ */
+export function paintedBounds(c: Component, absX: number, absY: number): Rect {
+  const box = componentBounds(c, absX, absY);
+  if (c.rotation || (c.type !== 'arc' && c.type !== 'gauge.arc')) return box;
+  const R = Math.min(c.width, c.height) / 2;
+  let inner: number;
+  let outer = R;
+  if (c.type === 'arc') {
+    if (c.props.fill) return box;
+    inner = R - c.props.stroke.width;
+    outer = R + c.props.stroke.width / 2;
+  } else {
+    const p = c.props;
+    if (p.needle.show || p.valueText.show) return box;
+    // Same radii as the gauge renderer: redline, band, ticks, then labels, from the outside in.
+    let r = R;
+    if (p.redline.show && p.redline.placement === 'outer') r -= p.redline.width + 4;
+    r -= Math.max(p.track.show ? p.track.width : 0, p.fill.show ? p.fill.width : 0);
+    inner = r;
+    if (p.ticks.major > 0) {
+      const tickOuter = r - p.ticks.inset - 4;
+      inner = Math.min(inner, tickOuter - p.ticks.majorLength);
+      if (p.labels.show)
+        inner = Math.min(
+          inner,
+          tickOuter - p.ticks.majorLength - p.labels.inset - p.labels.style.size,
+        );
+    }
+    inner = Math.max(0, inner);
+    if (p.glow.show) outer += p.glow.blur;
+  }
+  const sweep = Math.max(-360, Math.min(360, c.props.sweepAngle));
+  if (Math.abs(sweep) >= 360) return box;
+  const cx = absX + c.width / 2;
+  const cy = absY + c.height / 2;
+  const a0 = Math.min(c.props.startAngle, c.props.startAngle + sweep);
+  const a1 = Math.max(c.props.startAngle, c.props.startAngle + sweep);
+  const angles = [a0, a1];
+  for (let k = Math.ceil(a0 / 90) * 90; k <= a1; k += 90) angles.push(k);
+  const pts: Array<{ x: number; y: number }> = [];
+  for (const a of angles) {
+    const rad = a * DEG;
+    for (const r of [inner, outer])
+      pts.push({ x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) });
+  }
+  const minX = Math.max(box.x, Math.min(...pts.map((p) => p.x)));
+  const minY = Math.max(box.y, Math.min(...pts.map((p) => p.y)));
+  const maxX = Math.min(box.x + box.width, Math.max(...pts.map((p) => p.x)));
+  const maxY = Math.min(box.y + box.height, Math.max(...pts.map((p) => p.y)));
+  return {
+    x: minX,
+    y: minY,
+    width: Math.max(1e-6, maxX - minX),
+    height: Math.max(1e-6, maxY - minY),
+  };
+}
+
 /** Is the layout point inside the component's rotated box? */
 export function pointInComponent(
   c: Component,
@@ -168,7 +230,16 @@ export function overlapsZone(
   absY: number,
   zone: ReservedZone,
 ): boolean {
-  const corners = componentCorners(c, absX, absY);
+  // Rotated boxes keep their exact corners; unrotated arcs use what they paint.
+  const painted = paintedBounds(c, absX, absY);
+  const corners = c.rotation
+    ? componentCorners(c, absX, absY)
+    : [
+        { x: painted.x, y: painted.y },
+        { x: painted.x + painted.width, y: painted.y },
+        { x: painted.x + painted.width, y: painted.y + painted.height },
+        { x: painted.x, y: painted.y + painted.height },
+      ];
   const poly = zone.polygon ?? [
     { x: zone.x, y: zone.y },
     { x: zone.x + zone.width, y: zone.y },
@@ -234,7 +305,7 @@ export function outOfBounds(theme: Theme): string[] {
   const out: string[] = [];
   const layout = { x: 0, y: 0, width: theme.layout.width, height: theme.layout.height };
   for (const f of flattenComponents(theme.components)) {
-    const b = componentBounds(f.component, f.absX, f.absY);
+    const b = paintedBounds(f.component, f.absX, f.absY);
     if (
       b.x < layout.x - 0.5 ||
       b.y < layout.y - 0.5 ||

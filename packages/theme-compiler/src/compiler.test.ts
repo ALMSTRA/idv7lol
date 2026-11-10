@@ -89,6 +89,23 @@ describe('validateTheme', () => {
     ).toBe(true);
   });
 
+  it('judges a wide rev arc by what it paints, not by its square box', () => {
+    const arc = createComponent('gauge.arc', {
+      id: 'revs',
+      x: 530,
+      y: 160,
+      width: 860,
+      height: 860,
+      props: { startAngle: 180, sweepAngle: 180, needle: { show: false } },
+    });
+    const r = validateTheme(theme([arc]));
+    expect(r.warnings.filter((w) => w.componentId === 'revs')).toEqual([]);
+    // The same box drawn as a full circle reaches the bottom telltales and leaves the panel.
+    const full = { ...arc, props: { ...arc.props, sweepAngle: 360 } } as typeof arc;
+    const codes = validateTheme(theme([full])).warnings.map((w) => w.code);
+    expect(codes).toContain('layout.out-of-bounds');
+  });
+
   it("doesn't let a theme relax a factory zone by reusing its id", () => {
     const base = createEmptyTheme({ id: 'spec', name: 'Spec' });
     const t = theme(
