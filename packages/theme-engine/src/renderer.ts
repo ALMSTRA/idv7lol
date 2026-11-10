@@ -2,6 +2,7 @@ import type { Component, Theme } from '@idv7lol/theme-schema';
 import type { Canvas2DLike } from './canvas.js';
 import { AnimationPlayer, applyPropOverrides } from './animation.js';
 import { DEG, anchorFraction } from './math.js';
+import { effectiveZones } from './bounds.js';
 import { RenderContext, type RenderOptions } from './render-context.js';
 import { rendererFor } from './components/index.js';
 import { EngineState, resolvePalette, selectPaletteId } from './state.js';
@@ -125,7 +126,7 @@ export function drawComponent(rc: RenderContext, c: Component, stats: RenderStat
 /** Hatch the reserved zones of the layout so authors see where factory content lands. */
 export function drawReservedZones(rc: RenderContext): void {
   const { ctx } = rc;
-  for (const z of rc.theme.layout.reservedZones) {
+  for (const z of effectiveZones(rc.theme)) {
     const color =
       z.kind === 'keep-clear' ? '255, 60, 60' : z.kind === 'info' ? '80, 160, 255' : '255, 170, 0';
     ctx.save();

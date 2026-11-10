@@ -89,6 +89,35 @@ describe('validateTheme', () => {
     ).toBe(true);
   });
 
+  it("doesn't let a theme relax a factory zone by reusing its id", () => {
+    const base = createEmptyTheme({ id: 'spec', name: 'Spec' });
+    const t = theme(
+      [createComponent('value.digital', { id: 'corner', x: 0, y: 0, width: 200, height: 100 })],
+      {
+        layout: {
+          ...base.layout,
+          reservedZones: [
+            ...base.layout.reservedZones,
+            {
+              id: 'glass-corner-left',
+              name: 'Mine',
+              kind: 'info',
+              x: 1900,
+              y: 700,
+              width: 10,
+              height: 10,
+            },
+          ],
+        },
+      },
+    );
+    const r = validateTheme(t);
+    const corner = r.errors.filter(
+      (e) => e.code === 'layout.keep-clear' && e.componentId === 'corner',
+    );
+    expect(corner).toHaveLength(1);
+  });
+
   it('warns about profile availability and glyph coverage', () => {
     const t = theme(
       [

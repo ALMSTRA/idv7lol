@@ -192,12 +192,27 @@ export interface ZoneOverlap {
   zone: ReservedZone;
 }
 
-/** The theme's zones plus its display's: a theme cannot opt out of the factory areas. */
+const zoneShape = (z: ReservedZone): string =>
+  JSON.stringify([z.kind, z.x, z.y, z.width, z.height, z.polygon ?? null]);
+
+/**
+ * The display's zones plus the theme's own. The display's always come first and
+ * as they are, so a theme can add zones but cannot redefine or relax the factory
+ * ones by reusing their id. A theme zone with the same shape as one already
+ * listed is dropped so it doesn't report twice.
+ */
 export function effectiveZones(theme: Theme): ReservedZone[] {
-  const zones = new Map(theme.layout.reservedZones.map((z) => [z.id, z]));
-  for (const z of getDisplayProfile(theme.target.display)?.reservedZones ?? [])
-    if (!zones.has(z.id)) zones.set(z.id, z);
-  return [...zones.values()];
+  const out: ReservedZone[] = [];
+  const seen = new Set<string>();
+  const add = (z: ReservedZone): void => {
+    const key = zoneShape(z);
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(z);
+  };
+  for (const z of getDisplayProfile(theme.target.display)?.reservedZones ?? []) add(z);
+  for (const z of theme.layout.reservedZones) add(z);
+  return out;
 }
 
 /** Every component that touches a reserved zone of the theme's layout. */
