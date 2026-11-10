@@ -10,8 +10,18 @@ const DEFAULTS: Record<Pane, number> = { left: 240, right: 300, bottom: 240 };
 
 const sizes = { ...DEFAULTS };
 
-function apply(pane: Pane, size: number): void {
-  const [min, max] = LIMITS[pane];
+/** The CSS also caps each panel to part of the window (styles.css); use the same cap here. */
+const SHARE: Record<Pane, () => number> = {
+  left: () => window.innerWidth * 0.22,
+  right: () => window.innerWidth * 0.26,
+  bottom: () => window.innerHeight * 0.42,
+};
+
+function apply(pane: Pane, size: number, fitWindow = false): void {
+  const [min, limit] = LIMITS[pane];
+  // While dragging, stop where the panel stops growing on screen, so dragging
+  // back responds at once instead of crossing a dead zone first.
+  const max = fitWindow ? Math.max(min, Math.min(limit, SHARE[pane]())) : limit;
   sizes[pane] = Math.round(Math.min(max, Math.max(min, size)));
   document.documentElement.style.setProperty(`--pane-${pane}`, `${sizes[pane]}px`);
 }
@@ -68,18 +78,19 @@ export function Splitter({ pane }: { pane: Pane }): JSX.Element {
         if (!grow) return;
         e.preventDefault();
         e.stopPropagation();
-        apply(pane, sizes[pane] + grow * 16);
+        apply(pane, Math.min(sizes[pane], SHARE[pane]()) + grow * 16, true);
         save();
       }}
       onPointerDown={(e) => {
         const el = e.currentTarget;
         const start = vertical ? e.clientX : e.clientY;
-        const from = sizes[pane];
+        // Start from the size on screen, which a narrower window may have capped.
+        const from = Math.min(sizes[pane], SHARE[pane]());
         el.setPointerCapture(e.pointerId);
         el.classList.add('dragging');
         const move = (ev: PointerEvent) => {
           const delta = (vertical ? ev.clientX : ev.clientY) - start;
-          apply(pane, from + delta * (vertical ? direction : -1));
+          apply(pane, from + delta * (vertical ? direction : -1), true);
         };
         const up = () => {
           el.removeEventListener('pointermove', move);
