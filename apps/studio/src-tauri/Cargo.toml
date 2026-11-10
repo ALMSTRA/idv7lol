@@ -1,6 +1,6 @@
 [package]
 name = "idv7lol-studio"
-version = "0.1.0"
+version = "0.2.0"
 description = "idv7lol Studio: visual editor, simulator and build tool for BMW iDrive 7 custom clusters"
 authors = ["idv7lol contributors"]
 license = "GPL-3.0-or-later"
