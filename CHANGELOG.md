@@ -12,6 +12,17 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- Car preview in the Studio: a canvas toggle runs the car app's own engine against a WebGL stand-in
+  for cluster-render, so a theme can be seen drawn by the car's shaders before it goes to the car.
+  Tested locally; the car's RAMSES renderer can still differ.
+- Supercar Track theme: a wide segmented rev arc, a huge gear in the middle, oil, water and fuel
+  columns and speed bottom right, with Track and Corsa palettes. Validates clean, 43 of 64 layers.
+- My pieces: save components, pictures included, and reuse them in any theme.
+- Resize several selected components at once; group and ungroup inside groups, with Escape stepping
+  out to the group; edit text right on the canvas (double-click, Enter or F2).
+- A test that runs every theme in the repository through the car path: compile, USB package, the
+  car app's checks and the car's engine.
+
 - Themes from a USB stick: the Studio's **Save for the car (USB)** writes a `.idv7pkg` package to
   `idv7lol/themes/` on a stick, and the car app (0.2.0) finds, checks and installs it by itself,
   with **Remove USB theme** to delete it. Packages carry no shaders. Tested locally; not tested in a
@@ -64,6 +75,22 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   windows. Tested locally in a browser.
 
 ### Fixed
+
+- A theme could relax the display's reserved zones by redeclaring one with the same id.
+- Save for the car and Export bundle could use a compile older than the latest edits.
+- USB packages: a shader named like an Object property (`constructor`) passed the check, and
+  malformed animations were not refused. A new copy of the theme on show is now reloaded.
+- The car app retried a theme that failed to build on every tick, resending its layers.
+- Importing a long or large video could take gigabytes before the frames were scaled down.
+- On the car, segmented arcs drew as solid bands and the first and last arc numerals were cut;
+  animated pictures could bleed between frames on wide sheets.
+- Hidden groups still showed on the car; group opacity and conditions now reach their components.
+- The Inspector showed raw keys such as `components.gauge.arc` instead of the component's name.
+- Shortcuts acted on the theme behind the welcome window; Escape now closes it.
+- Two quick image imports could take the same name, and the second replaced the first.
+- Animation speed in the editor now matches the car; flush edges no longer count as covering a
+  reserved zone; wide rev arcs are judged by the area they paint; an animation needs one duration
+  per frame.
 
 - The validator skipped the factory zones when a theme did not list them in its own layout.
 - Studio desktop build: HTML5 drag and drop was disabled by Tauri's `dragDropEnabled`.

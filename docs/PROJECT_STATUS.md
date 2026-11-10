@@ -72,15 +72,16 @@ stick, that the new button appears, and that an installed theme draws like a bui
    the unit's libramses, bandwidth, the three themes. Record in `COMPATIBILITY.md`.
 2. Map more signals on the car: fuel level/range (`KombiIF`, member-name discovery), 12 V
    battery, cruise, lights, hybrid values (shared tmpfs from eDrive Live as Cluster Layouts does).
-3. Theme upload path so Studio exports can be installed without rebuilding the app (e.g. the app
-   reading `data/themes/*.json` placed by a USB import or a future Store feature).
-4. Studio: multi-select resize, nested group editing, inline text editing, custom component
-   presets library (save/load), WebGL preview using the compiler's own shaders, PNG export of
-   scenario sequences, project folders with assets (images).
+3. Theme upload path: done for USB sticks (car app 0.2.0); a download path with a short code needs
+   a web service and stays planned.
+4. Studio: PNG export of scenario sequences, project folders with assets. Done on 2026-11-09:
+   multi-select resize, nested group editing, inline text editing, My pieces, and a car preview
+   that runs the car's engine and shaders with WebGL.
 5. Car runtime: opacity animations (needs a `u_alpha` in shaders), conditional transform clips,
    custom telltale icons, image layers upload path, `budget` event handling (lower rates).
 6. Diagnostics: export report from Studio; QR/USB log export on the car (Cluster Layouts style).
-7. Release v0.1.0: tag, Studio installer as release asset, screenshots in README.
+7. Release: screenshots are in the README; a first pre-release with the Studio installer is
+   planned as v0.2.0-beta.1, marked experimental and not tested in a vehicle.
 
 ## Known bugs / caveats
 
@@ -119,7 +120,7 @@ I-step `20w44.1-1-3` (a software identifier, not a renderer version). See
 
 ## Development commands
 
-See [developer/BUILD.md](developer/BUILD.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Tests: `npm test` (89 passing).
+See [developer/BUILD.md](developer/BUILD.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Tests: `npm test` (122 passing).
 
 ## Next milestone
 
