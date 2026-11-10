@@ -114,7 +114,8 @@ Necesitas idv7lol 0.2.0 o más nuevo instalado en el auto.
 2. Con la app idv7lol abierta en el auto, conecta la memoria. En unos segundos la app encuentra el
    tema, lo revisa y lo instala. En su pantalla te dice qué instaló o por qué rechazó un archivo.
 3. Pulsa **Next theme** hasta que aparezca tu tema. El tablero no cambia hasta que lo eliges.
-4. Para borrarlo, muéstralo y pulsa **Remove USB theme**. Los temas que vienen con la app no se borran.
+4. Para borrarlo, muéstralo y pulsa **Remove USB theme**. Los temas que vienen con la app no se borran. Si el
+   archivo sigue en la memoria, se vuelve a instalar la próxima vez que la conectes.
 
 La app revisa cada tema antes de instalarlo y los paquetes no traen código gráfico propio. Caben
 hasta 20 temas. Esto todavía no se ha probado en un auto.

@@ -27,7 +27,8 @@ ones instead, add them to the repository or your fork under `themes/<id>/theme.j
    its data folder. The status page shows "Installed from USB: …" or why a file was refused.
 3. **Next theme** now cycles through the built-in themes and the installed ones. Installing never
    changes what the cluster shows.
-4. **Remove USB theme** deletes the theme being shown, if it came from a stick.
+4. **Remove USB theme** deletes the theme being shown, if it came from a stick. Take the file off
+   the stick too, or it installs again the next time the stick is plugged in.
 
 What the app checks before installing: package format and minimum app version, file size (32 MB),
 at most 64 layers and 15 animations, image sizes, renderer memory (16 MiB), that every layer is on

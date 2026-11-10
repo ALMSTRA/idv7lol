@@ -119,7 +119,8 @@ rebuild and no internet.
    theme, checks it and installs it. The app page says what it installed, or why a file was
    refused.
 3. Press **Next theme** until your theme shows. Nothing changes on the cluster before that.
-4. To delete it, show it and press **Remove USB theme**. Themes built into the app can't be removed.
+4. To delete it, show it and press **Remove USB theme**. Themes built into the app can't be removed. If the
+   file is still on the stick, it installs again the next time you plug the stick in.
 
 The car checks every package before installing it: layer count, image sizes, renderer memory,
 that everything sits on the panel and that it only names shaders the app already has. Packages
