@@ -215,6 +215,14 @@ export const en = {
     showInfos: 'Show notes',
   },
   build: {
+    saveUsb: 'Save for the car (USB)',
+    savedUsb: 'Saved {path}. Plug the stick into the car: the theme installs by itself.',
+    downloadedUsb:
+      'Downloaded {path}. Copy it to idv7lol/themes on a USB stick and plug it into the car.',
+    usbHint:
+      'Compile, press Save for the car and pick your USB stick. The car app finds the theme on its own; choose it with Next theme.',
+    usbHintBrowser:
+      'Compile and press Save for the car. Copy the file to idv7lol/themes on a USB stick; the car app finds it on its own.',
     status: 'Status',
     steps: {
       preview: 'Preview available',

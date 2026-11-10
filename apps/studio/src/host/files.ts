@@ -112,6 +112,32 @@ export async function writeBundleFiles(
   return themeId;
 }
 
+/**
+ * Save a theme package for the car. On the desktop you pick the USB stick and
+ * the file goes to idv7lol/themes/ on it, where the car app looks; in a
+ * browser it downloads and you copy it there yourself. Returns where it went,
+ * or null when cancelled.
+ */
+export async function saveThemePackage(
+  data: Uint8Array,
+  fileName: string,
+  title: string,
+): Promise<string | null> {
+  if (isTauri) {
+    const folder = await pickFolder(title);
+    if (!folder) return null;
+    const { mkdir, writeFile, exists } = await import('@tauri-apps/plugin-fs');
+    const sep = folder.includes('\\') ? '\\' : '/';
+    const dir = [folder.replace(/[\\/]+$/, ''), 'idv7lol', 'themes'].join(sep);
+    if (!(await exists(dir))) await mkdir(dir, { recursive: true });
+    const full = `${dir}${sep}${fileName}`;
+    await writeFile(full, data);
+    return full;
+  }
+  downloadBlob(new Blob([data as Uint8Array<ArrayBuffer>]), fileName);
+  return fileName;
+}
+
 export async function savePng(blob: Blob, suggestedName: string): Promise<boolean> {
   if (isTauri) {
     const { save } = await import('@tauri-apps/plugin-dialog');

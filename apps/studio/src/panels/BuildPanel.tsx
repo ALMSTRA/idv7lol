@@ -1,13 +1,27 @@
-import { CircleHelp, Cpu, Download } from 'lucide-react';
+import { CircleHelp, Cpu, Download, Usb } from 'lucide-react';
 import { useState } from 'react';
-import { compileTheme, type CompileResult } from '@idv7lol/theme-compiler';
+import {
+  buildThemePackage,
+  compileTheme,
+  encodeThemePackage,
+  packageFileName,
+  type CompileResult,
+} from '@idv7lol/theme-compiler';
+import { gzip } from '../lib/gzip.js';
 import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
 import { useT } from '../i18n/index.js';
 import { useValidation } from '../lib/useValidation.js';
 import { decodeThemeImages } from '../lib/imageStore.js';
-import { fetchStatic, isTauri, openExternal, pickFolder, writeBundleFiles } from '../host/files.js';
+import {
+  fetchStatic,
+  isTauri,
+  openExternal,
+  pickFolder,
+  saveThemePackage,
+  writeBundleFiles,
+} from '../host/files.js';
 
 interface BuildState {
   result: CompileResult | null;
@@ -58,6 +72,22 @@ export function BuildPanel(): JSX.Element {
     log('info', t('build.exportedTo', { path }));
   };
 
+  const saveForCar = async () => {
+    if (!state.result?.compiled) return;
+    try {
+      const pkg = buildThemePackage(state.result);
+      const data = await gzip(encodeThemePackage(pkg));
+      const where = await saveThemePackage(data, packageFileName(pkg.id), t('build.saveUsb'));
+      if (!where) return;
+      setState((s) => ({ ...s, exportedTo: where }));
+      const message = t(isTauri ? 'build.savedUsb' : 'build.downloadedUsb', { path: where });
+      log('info', message);
+      useUiStore.getState().showToast(message);
+    } catch (e) {
+      log('error', `${t('build.saveUsb')}: ${(e as Error).message}`);
+    }
+  };
+
   const c = state.result?.compiled;
   const steps = [
     { key: 'preview', state: 'done' },
@@ -88,6 +118,9 @@ export function BuildPanel(): JSX.Element {
           >
             <Cpu size={14} /> {t('build.compile')}
           </button>
+          <button className="primary" onClick={saveForCar} disabled={!c || stale}>
+            <Usb size={14} /> {t('build.saveUsb')}
+          </button>
           <button onClick={exportBundle} disabled={!c || stale}>
             <Download size={14} /> {t('build.exportBundle')}
           </button>
@@ -99,6 +132,7 @@ export function BuildPanel(): JSX.Element {
             <CircleHelp size={14} /> {t('build.howToInstall')}
           </button>
         </div>
+        <div className="hint">{t(isTauri ? 'build.usbHint' : 'build.usbHintBrowser')}</div>
         {!isTauri && <div className="hint">{t('build.noTauri')}</div>}
         {state.exportedTo && (
           <div className="hint">{t('build.exportedTo', { path: state.exportedTo })}</div>

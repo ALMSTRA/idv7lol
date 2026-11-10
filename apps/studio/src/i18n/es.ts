@@ -150,7 +150,7 @@ export const es: Dictionary = {
     notes: 'Notas',
     signalInfo: 'Catálogo: {min}–{max} {unit}, {availability}',
     notInProfile: 'No disponible en el perfil de vehículo actual',
-    layersCost: '{n} capa(s) del renderer en el coche',
+    layersCost: '{n} capa(s) del renderer en el auto',
   },
   layers: {
     empty: 'Aún no hay componentes. Arrastra uno desde la biblioteca.',
@@ -170,7 +170,7 @@ export const es: Dictionary = {
     snap: 'Ajustar',
     rulers: 'Reglas',
     fit: 'Ajustar a la ventana',
-    note: 'La vista previa la dibuja el motor del Studio; el coche renderiza con RAMSES y habrá pequeñas diferencias (suavizado, brillo, tipografía).',
+    note: 'La vista previa la dibuja el motor del Studio; el auto renderiza con RAMSES y habrá pequeñas diferencias (suavizado, brillo, tipografía).',
     alignLeft: 'Alinear a la izquierda',
     alignCenter: 'Centrar horizontalmente',
     alignRight: 'Alinear a la derecha',
@@ -222,6 +222,14 @@ export const es: Dictionary = {
     showInfos: 'Mostrar notas',
   },
   build: {
+    saveUsb: 'Guardar para el auto (USB)',
+    savedUsb: 'Se guardó {path}. Conecta la memoria al auto: el tema se instala solo.',
+    downloadedUsb:
+      'Se descargó {path}. Cópialo a idv7lol/themes en una memoria USB y conéctala al auto.',
+    usbHint:
+      'Compila, pulsa Guardar para el auto y elige tu memoria USB. La app del auto encuentra el tema sola; lo eliges con Next theme en el auto.',
+    usbHintBrowser:
+      'Compila y pulsa Guardar para el auto. Copia el archivo a idv7lol/themes en una memoria USB; la app del auto lo encuentra sola.',
     status: 'Estado',
     steps: {
       preview: 'Vista previa disponible',
@@ -230,7 +238,7 @@ export const es: Dictionary = {
       exported: 'Bundle exportado',
       installed: 'Probado en el vehículo',
     },
-    installedNote: 'Solo tú puedes confirmarlo, tras instalarlo en el coche aparcado.',
+    installedNote: 'Solo tú puedes confirmarlo, tras instalarlo en el auto estacionado.',
     compile: 'Compilar tema',
     exportBundle: 'Exportar bundle…',
     exportedTo: 'Bundle escrito en {path}',
@@ -242,10 +250,10 @@ export const es: Dictionary = {
     signals: 'Señales',
     fonts: 'Atlas de fuentes',
     warnings: 'Avisos',
-    howToInstall: 'Cómo instalarlo en el coche',
+    howToInstall: 'Cómo instalarlo en el auto',
     deps: 'Dependencias en la unidad',
     depsNote:
-      'idv7lol necesita el MGU Store con cluster-render ≥ 0.4.2. El Studio no puede comprobar qué hay instalado en tu coche.',
+      'idv7lol necesita el MGU Store con cluster-render ≥ 0.4.2. El Studio no puede comprobar qué hay instalado en tu auto.',
   },
   timeline: {
     clips: 'Clips',
@@ -264,7 +272,7 @@ export const es: Dictionary = {
     usedBy: 'Usado por {n} componente(s)',
     none: 'Aún no hay clips. Crea uno y asígnalo a un componente desde el inspector.',
     carNote:
-      'En el coche, las pistas de transformación y opacidad las reproduce el renderer; las de color las actualiza la app hasta 30 veces por segundo.',
+      'En el auto, las pistas de transformación y opacidad las reproduce el renderer; las de color las actualiza la app hasta 30 veces por segundo.',
   },
   palettes: {
     add: 'Añadir paleta',
@@ -272,7 +280,7 @@ export const es: Dictionary = {
     remove: 'Eliminar',
     default: 'Paleta por defecto',
     byMode: 'Paleta según modo de conducción',
-    allowManual: 'Permitir selección manual en el coche',
+    allowManual: 'Permitir selección manual en el auto',
     tokens: 'Colores',
     addToken: 'Añadir color',
     contrast: 'Contraste del texto',
