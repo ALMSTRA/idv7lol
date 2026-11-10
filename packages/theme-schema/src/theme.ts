@@ -61,14 +61,19 @@ export const FontSchema = z.object({
 export type Font = z.infer<typeof FontSchema>;
 
 /** Frames of an animated picture, laid out in a grid inside the embedded PNG. */
-export const AssetAnimationSchema = z.object({
-  frames: z.number().int().min(2).max(255),
-  columns: z.number().int().positive(),
-  frameWidth: z.number().int().positive(),
-  frameHeight: z.number().int().positive(),
-  /** Display time of each frame in milliseconds. */
-  durations: z.array(z.number().positive()),
-});
+export const AssetAnimationSchema = z
+  .object({
+    frames: z.number().int().min(2).max(255),
+    columns: z.number().int().positive(),
+    frameWidth: z.number().int().positive(),
+    frameHeight: z.number().int().positive(),
+    /** Display time of each frame in milliseconds. */
+    durations: z.array(z.number().positive().max(60_000)),
+  })
+  .refine((a) => a.durations.length === a.frames, {
+    message: 'an animation needs one duration per frame',
+    path: ['durations'],
+  });
 export type AssetAnimation = z.infer<typeof AssetAnimationSchema>;
 
 export const AssetSchema = z

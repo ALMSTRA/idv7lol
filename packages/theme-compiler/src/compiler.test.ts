@@ -41,6 +41,28 @@ describe('validateTheme', () => {
     expect(r.layers).toBeGreaterThanOrEqual(5);
   });
 
+  it('refuses an animation whose durations do not match its frames', () => {
+    const t = theme([], {
+      assets: {
+        anim: {
+          type: 'image',
+          path: 'anim.png',
+          animation: {
+            frames: 3,
+            columns: 3,
+            frameWidth: 8,
+            frameHeight: 8,
+            durations: [100, 100],
+          },
+        },
+      },
+    });
+    const r = validateTheme(t);
+    expect(
+      r.errors.some((e) => e.code.startsWith('schema.') && /durations/.test(e.path ?? '')),
+    ).toBe(true);
+  });
+
   it('reports schema errors with paths', () => {
     const r = validateTheme({ schemaVersion: 1, id: 'x' });
     expect(r.ok).toBe(false);
