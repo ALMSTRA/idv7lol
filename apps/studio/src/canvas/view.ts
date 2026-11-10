@@ -157,6 +157,42 @@ export function resizeRect(
   };
 }
 
+/** Where one selected component started when a group resize began. */
+export interface ScaleItem {
+  id: string;
+  absX: number;
+  absY: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * New boxes for components resized together: each keeps its place and size
+ * relative to the selection box, which goes from `from` to `to`.
+ */
+export function scaleItems(
+  from: Rect,
+  to: Rect,
+  items: readonly ScaleItem[],
+): Map<string, Partial<Rect>> {
+  const kx = from.width > 0 ? to.width / from.width : 1;
+  const ky = from.height > 0 ? to.height / from.height : 1;
+  const out = new Map<string, Partial<Rect>>();
+  for (const it of items) {
+    const ax = to.x + (it.absX - from.x) * kx;
+    const ay = to.y + (it.absY - from.y) * ky;
+    out.set(it.id, {
+      x: Math.round(it.x + ax - it.absX),
+      y: Math.round(it.y + ay - it.absY),
+      width: Math.max(4, Math.round(it.width * kx)),
+      height: Math.max(4, Math.round(it.height * ky)),
+    });
+  }
+  return out;
+}
+
 export interface Guide {
   axis: 'x' | 'y';
   pos: number;

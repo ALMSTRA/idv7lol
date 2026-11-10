@@ -47,6 +47,8 @@ import {
   marqueeSelect,
   normalizeRect,
   resizeRect,
+  scaleItems,
+  type ScaleItem,
   selectionGeometry,
   snapBox,
   toLayout,
@@ -71,6 +73,14 @@ type Mode =
       moved: boolean;
     }
   | { kind: 'resize'; handle: HandleId; sx: number; sy: number; id: string; start: Rect }
+  | {
+      kind: 'resize-many';
+      handle: HandleId;
+      sx: number;
+      sy: number;
+      bbox: Rect;
+      items: ScaleItem[];
+    }
   | {
       kind: 'rotate';
       id: string;
@@ -294,6 +304,26 @@ export function CanvasView(): JSX.Element {
           };
           return;
         }
+        if (!single) {
+          // Several components: scale them together inside the selection box.
+          // A child whose group is also selected moves with the group.
+          const ids = new Set(sel);
+          const items: ScaleItem[] = geo.items
+            .filter((it) => !it.component.locked && !it.parents.some((p) => ids.has(p)))
+            .map((it) => ({
+              id: it.component.id,
+              absX: it.absX,
+              absY: it.absY,
+              x: it.component.x,
+              y: it.component.y,
+              width: it.component.width,
+              height: it.component.height,
+            }));
+          if (!items.length) return;
+          store.beginTxn();
+          modeRef.current = { kind: 'resize-many', handle: h, sx, sy, bbox: geo.bbox, items };
+          return;
+        }
         if (single && !single.component.locked) {
           store.beginTxn();
           modeRef.current = {
@@ -423,6 +453,14 @@ export function CanvasView(): JSX.Element {
         store.setTheme(applyRects(th, new Map([[m.id, r]])), false);
         return;
       }
+      case 'resize-many': {
+        const dx = (sx - m.sx) / v.zoom;
+        const dy = (sy - m.sy) / v.zoom;
+        // Proportions stay unless Shift is held, as with pictures.
+        const box = resizeRect(m.bbox, m.handle, dx, dy, !e.shiftKey);
+        store.setTheme(applyRects(th, scaleItems(m.bbox, box, m.items)), false);
+        return;
+      }
       case 'rotate': {
         const a = (Math.atan2(sy - m.cy, sx - m.cx) * 180) / Math.PI;
         let rot = m.startRotation + (a - m.startAngle);
@@ -449,7 +487,12 @@ export function CanvasView(): JSX.Element {
       const b = toLayout(v, m.ex, m.ey);
       const r = normalizeRect(a.x, a.y, b.x, b.y);
       if (r.width > 2 || r.height > 2) store.select(marqueeSelect(themeRef.current, r), m.additive);
-    } else if (m.kind === 'move' || m.kind === 'resize' || m.kind === 'rotate') {
+    } else if (
+      m.kind === 'move' ||
+      m.kind === 'resize' ||
+      m.kind === 'resize-many' ||
+      m.kind === 'rotate'
+    ) {
       store.endTxn();
     }
     guidesRef.current = [];
@@ -810,7 +853,7 @@ function drawOverlays(
       );
     }
     // size label
-    if (mode.kind === 'move' || mode.kind === 'resize') {
+    if (mode.kind === 'move' || mode.kind === 'resize' || mode.kind === 'resize-many') {
       const label =
         mode.kind === 'move'
           ? `${Math.round(geo.bbox.x)}, ${Math.round(geo.bbox.y)}`
