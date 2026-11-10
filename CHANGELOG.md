@@ -91,6 +91,12 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 - Animation speed in the editor now matches the car; flush edges no longer count as covering a
   reserved zone; wide rev arcs are judged by the area they paint; an animation needs one duration
   per frame.
+- Simulator: manual control kept a fault scenario's dropped signals, and the signal health read
+  100 % during communication loss.
+- Bring to front and Send to back swapped several selected components and ignored grouped ones;
+  Build & Deploy forgot the compile when switching tabs; renaming a saved piece inserted it twice;
+  menus now work from the keyboard; panel splitters had a dead zone; the Inspector fields, the
+  simulator and the Build tab are now in Spanish; rulers follow light mode.
 
 - The validator skipped the factory zones when a theme did not list them in its own layout.
 - Studio desktop build: HTML5 drag and drop was disabled by Tauri's `dragDropEnabled`.
