@@ -7,11 +7,17 @@ function MenuList({
   x,
   y,
   level,
+  keyboard = false,
+  onBack,
 }: {
   items: MenuItem[];
   x: number;
   y: number;
   level: number;
+  /** Opened from the keyboard: take the focus and start on the first item. */
+  keyboard?: boolean;
+  /** Close this submenu and give the focus back to its parent. */
+  onBack?: () => void;
 }): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
   const close = useUiStore((s) => s.closeMenu);
@@ -19,6 +25,7 @@ function MenuList({
   const [open, setOpen] = useState<number | null>(null);
   const [subAt, setSubAt] = useState({ x: 0, y: 0 });
   const [active, setActive] = useState(-1);
+  const [subByKey, setSubByKey] = useState(false);
 
   // Keep the menu on screen, whatever its size.
   useLayoutEffect(() => {
@@ -34,8 +41,8 @@ function MenuList({
     const ny =
       y + r.height > innerHeight - margin ? Math.max(margin, innerHeight - r.height - margin) : y;
     setPos({ x: Math.max(margin, nx), y: ny });
-    if (level === 0) el.focus();
-  }, [x, y, level]);
+    if (level === 0 || keyboard) el.focus();
+  }, [x, y, level, keyboard]);
 
   const enabled = items
     .map((it, i) => (!it.separator && !it.disabled ? i : -1))
@@ -45,11 +52,16 @@ function MenuList({
     close();
     it.onSelect?.();
   };
-  const showSub = (i: number, el: HTMLElement) => {
+  const showSub = (i: number, el: HTMLElement, byKey = false) => {
     const r = el.getBoundingClientRect();
     setSubAt({ x: r.right - 2, y: r.top - 4 });
+    setSubByKey(byKey);
     setOpen(i);
   };
+  // A submenu opened from the keyboard starts on its first item.
+  useEffect(() => {
+    if (keyboard) setActive(enabled[0] ?? -1);
+  }, [keyboard]);
   const onKey = (e: React.KeyboardEvent) => {
     e.stopPropagation();
     if (e.key === 'Escape') close();
@@ -57,17 +69,25 @@ function MenuList({
       e.preventDefault();
       const at = enabled.indexOf(active);
       const dir = e.key === 'ArrowDown' ? 1 : -1;
-      setActive(enabled[(at + dir + enabled.length) % enabled.length] ?? -1);
+      // Nothing highlighted yet: Down starts at the top, Up at the bottom.
+      const next =
+        at < 0 ? (dir > 0 ? 0 : enabled.length - 1) : (at + dir + enabled.length) % enabled.length;
+      setActive(enabled[next] ?? -1);
     } else if (e.key === 'Enter' && active >= 0) {
       e.preventDefault();
       const it = items[active]!;
       if (it.items) {
         const el = ref.current!.children[active] as HTMLElement;
-        showSub(active, el);
+        showSub(active, el, true);
       } else run(it);
     } else if (e.key === 'ArrowRight' && active >= 0 && items[active]!.items) {
-      showSub(active, ref.current!.children[active] as HTMLElement);
-    } else if (e.key === 'ArrowLeft') setOpen(null);
+      e.preventDefault();
+      showSub(active, ref.current!.children[active] as HTMLElement, true);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (onBack) onBack();
+      else setOpen(null);
+    }
   };
 
   return (
@@ -108,7 +128,17 @@ function MenuList({
         )}
       </div>
       {open !== null && items[open]?.items && (
-        <MenuList items={items[open]!.items!} x={subAt.x} y={subAt.y} level={level + 1} />
+        <MenuList
+          items={items[open]!.items!}
+          x={subAt.x}
+          y={subAt.y}
+          level={level + 1}
+          keyboard={subByKey}
+          onBack={() => {
+            setOpen(null);
+            ref.current?.focus();
+          }}
+        />
       )}
     </>
   );
