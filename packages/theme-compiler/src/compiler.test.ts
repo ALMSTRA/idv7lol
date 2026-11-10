@@ -150,6 +150,19 @@ describe('validateTheme', () => {
     expect(codes).toContain('layout.out-of-bounds');
   });
 
+  it('lets a component sit flush against a zone', () => {
+    // The top cowl ends at y = 128; this box starts exactly there.
+    const flush = createComponent('value.digital', {
+      id: 'flush',
+      x: 800,
+      y: 128,
+      width: 200,
+      height: 80,
+    });
+    const r = validateTheme(theme([flush]));
+    expect(r.warnings.filter((w) => w.componentId === 'flush')).toEqual([]);
+  });
+
   it("doesn't let a theme relax a factory zone by reusing its id", () => {
     const base = createEmptyTheme({ id: 'spec', name: 'Spec' });
     const t = theme(

@@ -220,7 +220,9 @@ function segmentsIntersect(
   if (d === 0) return false;
   const u = ((p3.x - p1.x) * (p4.y - p3.y) - (p3.y - p1.y) * (p4.x - p3.x)) / d;
   const v = ((p3.x - p1.x) * (p2.y - p1.y) - (p3.y - p1.y) * (p2.x - p1.x)) / d;
-  return u >= 0 && u <= 1 && v >= 0 && v <= 1;
+  // Strict: segments that only touch at an end don't count, so sitting flush
+  // against a zone's edge isn't reported as covering it.
+  return u > 0 && u < 1 && v > 0 && v < 1;
 }
 
 /** Does a component's rotated box overlap a reserved zone (rect or polygon)? */
