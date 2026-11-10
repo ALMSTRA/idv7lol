@@ -66,6 +66,8 @@ export interface ProjectState {
   ): void;
   moveSelected(dx: number, dy: number, record?: boolean): void;
   reorder(id: string, direction: 'up' | 'down' | 'top' | 'bottom'): void;
+  /** Move every selected component, inside its own group, in one undo step. */
+  reorderSelected(direction: 'up' | 'down' | 'top' | 'bottom'): void;
   moveToIndex(id: string, index: number): void;
   groupSelected(): void;
   ungroupSelected(): void;
@@ -544,6 +546,37 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       return out;
     };
     s.setTheme({ ...s.theme, components: reorderIn(s.theme.components) });
+  },
+  reorderSelected: (direction) => {
+    const s = get();
+    const sel = new Set(s.selection);
+    // The end of a list is the front of the stack.
+    const arrange = (list: Component[]): Component[] => {
+      const out = list.map((c) =>
+        c.type === 'group'
+          ? ({ ...c, props: { ...c.props, children: arrange(c.props.children) } } as Component)
+          : c,
+      );
+      if (!out.some((c) => sel.has(c.id))) return out;
+      if (direction === 'top' || direction === 'bottom') {
+        const picked = out.filter((c) => sel.has(c.id));
+        const rest = out.filter((c) => !sel.has(c.id));
+        return direction === 'top' ? [...rest, ...picked] : [...picked, ...rest];
+      }
+      // One step each, starting from the side they move towards, so they keep their order.
+      if (direction === 'up') {
+        for (let i = out.length - 2; i >= 0; i--)
+          if (sel.has(out[i]!.id) && !sel.has(out[i + 1]!.id))
+            [out[i], out[i + 1]] = [out[i + 1]!, out[i]!];
+      } else {
+        for (let i = 1; i < out.length; i++)
+          if (sel.has(out[i]!.id) && !sel.has(out[i - 1]!.id))
+            [out[i], out[i - 1]] = [out[i - 1]!, out[i]!];
+      }
+      return out;
+    };
+    const components = arrange(s.theme.components);
+    s.setTheme({ ...s.theme, components });
   },
   moveToIndex: (id, index) => {
     const s = get();

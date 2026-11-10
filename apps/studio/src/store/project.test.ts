@@ -69,3 +69,35 @@ describe('groups inside groups', () => {
     expect(get().selectParent()).toBe(false);
   });
 });
+
+describe('ordering', () => {
+  const order = (get: typeof useProjectStore.getState) => get().theme.components.map((c) => c.id);
+
+  it('brings several components to the front keeping their order, in one undo step', () => {
+    const get = load([box('a', 0, 0), box('b', 0, 0), box('c', 0, 0)]);
+    get().select(['a', 'b']);
+    get().reorderSelected('top');
+    expect(order(get)).toEqual(['c', 'a', 'b']);
+    get().undo();
+    expect(order(get)).toEqual(['a', 'b', 'c']);
+    get().select(['b', 'c']);
+    get().reorderSelected('bottom');
+    expect(order(get)).toEqual(['b', 'c', 'a']);
+  });
+
+  it('moves components inside a group', () => {
+    const g = createComponent('group', {
+      id: 'g',
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      props: { children: [box('x', 0, 0), box('y', 0, 0)], clip: false },
+    });
+    const get = load([g]);
+    get().select(['x']);
+    get().reorderSelected('up');
+    const grp = findComponent(get().theme.components, 'g');
+    expect(grp?.type === 'group' && grp.props.children.map((c) => c.id)).toEqual(['y', 'x']);
+  });
+});

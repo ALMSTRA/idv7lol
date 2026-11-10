@@ -322,7 +322,7 @@ export function App(): JSX.Element {
         e.preventDefault();
         const up = e.code === 'BracketRight';
         const dir = e.shiftKey ? (up ? 'top' : 'bottom') : up ? 'up' : 'down';
-        p.selection.forEach((id) => useProjectStore.getState().reorder(id, dir));
+        p.reorderSelected(dir);
         return;
       }
       if (mod && !e.shiftKey && e.key.toLowerCase() === 'l') {

@@ -15,13 +15,7 @@ const tr = (key: string, vars?: Record<string, string | number>) =>
   translate(useUiStore.getState().lang, key, vars);
 
 function reorderSelected(dir: 'up' | 'down' | 'top' | 'bottom'): void {
-  const p = useProjectStore.getState();
-  const order = p.theme.components.map((c) => c.id).filter((id) => p.selection.includes(id));
-  // Moving towards the top starts from the frontmost, so the group keeps its order.
-  const list = dir === 'up' || dir === 'top' ? order : [...order].reverse();
-  const sequence =
-    dir === 'top' ? [...list].reverse() : dir === 'bottom' ? [...list].reverse() : list;
-  sequence.forEach((id) => useProjectStore.getState().reorder(id, dir));
+  useProjectStore.getState().reorderSelected(dir);
 }
 
 function setOnSelection(patch: Partial<Component>): void {
