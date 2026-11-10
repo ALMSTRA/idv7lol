@@ -209,4 +209,22 @@ describe('recording and replay', () => {
     expect(sim2.bus.get('engine.rpm')?.value).toBe(finalRecorded);
     expect(() => parseRecording('{"formatVersion":2}')).toThrow();
   });
+
+  it("leaves a scenario's faults behind when going back to manual control", () => {
+    const sim = new Simulator({ profileId: 'turbo-ice' });
+    sim.loadScenario('comm-failure');
+    sim.setCommLoss(true);
+    sim.dropSignal('engine.oil.temp', true);
+    sim.toManual();
+    expect(sim.publisher.faults.commLoss).toBe(false);
+    expect(sim.publisher.faults.dropped.size).toBe(0);
+  });
+
+  it('reports no signal health while communication is lost', () => {
+    const sim = new Simulator({ profileId: 'turbo-ice' });
+    sim.setCommLoss(true);
+    sim.tick(1000);
+    sim.tick(1100);
+    expect(sim.bus.get('system.signal.health')?.value).toBe(0);
+  });
 });

@@ -122,6 +122,11 @@ export class Simulator {
   }
 
   toManual(): void {
+    // Faults a scenario injected end with it; manual control starts clean.
+    if (this.mode === 'scenario') {
+      this.publisher.faults.dropped.clear();
+      this.publisher.faults.commLoss = false;
+    }
     this.mode = 'manual';
     this.scenario = null;
     this.replayer = null;

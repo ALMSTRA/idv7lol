@@ -112,7 +112,11 @@ export class SignalPublisher {
   }
 
   publish(bus: SignalBus, model: VehicleModel, now: number, wall: Date = new Date()): string[] {
-    if (this.faults.commLoss) return [];
+    if (this.faults.commLoss) {
+      // Nothing arrives, so the values go stale; the health reading says so.
+      bus.set('system.signal.health', 0, now);
+      return [];
+    }
     const values = modelSignals(model, wall);
     const written: string[] = [];
     const at = now - this.faults.latencyMs;
