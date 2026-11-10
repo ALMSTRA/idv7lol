@@ -11,13 +11,25 @@ type Paths<T> = T extends string
   : { [K in keyof T & string]: T[K] extends string ? K : Join<K, Paths<T[K]>> }[keyof T & string];
 export type TKey = Paths<Dictionary>;
 
+/**
+ * Walk a dotted key. Some keys hold dots themselves (component types such as
+ * `gauge.arc`), so each step tries the longest name that exists first.
+ */
 function lookup(dict: Dictionary, key: string): string | undefined {
-  let cur: unknown = dict;
-  for (const part of key.split('.')) {
+  const walk = (cur: unknown, parts: string[]): string | undefined => {
+    if (!parts.length) return typeof cur === 'string' ? cur : undefined;
     if (!cur || typeof cur !== 'object') return undefined;
-    cur = (cur as Record<string, unknown>)[part];
-  }
-  return typeof cur === 'string' ? cur : undefined;
+    const obj = cur as Record<string, unknown>;
+    for (let n = parts.length; n >= 1; n--) {
+      const name = parts.slice(0, n).join('.');
+      if (Object.prototype.hasOwnProperty.call(obj, name)) {
+        const found = walk(obj[name], parts.slice(n));
+        if (found !== undefined) return found;
+      }
+    }
+    return undefined;
+  };
+  return walk(dict, key.split('.'));
 }
 
 export function translate(
