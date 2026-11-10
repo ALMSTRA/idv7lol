@@ -7,6 +7,7 @@ import {
   AlignStartHorizontal,
   AlignStartVertical,
   AlignVerticalDistributeCenter,
+  CarFront,
   Grid3x3,
   Group,
   Info,
@@ -19,10 +20,12 @@ import {
   Shield,
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { CarPreview } from '../preview/CarPreview.js';
 import type { Component, Theme } from '@idv7lol/theme-schema';
 import {
   EngineState,
   ThemeEngine,
+  drawZones,
   flattenComponents,
   findComponent,
   hitTest,
@@ -141,6 +144,7 @@ export function CanvasView(): JSX.Element {
       showGrid: s.showGrid,
       snap: s.snap,
       showRulers: s.showRulers,
+      carPreview: s.carPreview,
       toggle: s.toggle,
     })),
   );
@@ -235,11 +239,17 @@ export function CanvasView(): JSX.Element {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, th.layout.width, th.layout.height);
       ctx.shadowBlur = 0;
-      engine.render(ctx, th, now, {
-        images: imageResolver,
-        showReservedZones: uiState.showZones,
-        showBounds: uiState.showBounds,
-      });
+      if (uiState.carPreview) {
+        // The car's engine draws underneath (CarPreview); leave the layout see-through.
+        ctx.clearRect(0, 0, th.layout.width, th.layout.height);
+        if (uiState.showZones) drawZones(ctx, th);
+      } else {
+        engine.render(ctx, th, now, {
+          images: imageResolver,
+          showReservedZones: uiState.showZones,
+          showBounds: uiState.showBounds,
+        });
+      }
       ctx.restore();
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -626,6 +636,7 @@ export function CanvasView(): JSX.Element {
       }}
       onDrop={onDrop}
     >
+      {ui.carPreview && <CarPreview view={view} editorEngine={engine} />}
       {editingText && <TextEditor id={editingText} view={view} />}
       <canvas
         ref={canvasRef}
@@ -666,6 +677,13 @@ export function CanvasView(): JSX.Element {
           onClick={() => ui.toggle('showRulers')}
         >
           <Ruler size={15} />
+        </button>
+        <button
+          className={`icon ${ui.carPreview ? 'active' : ''}`}
+          title={t('canvas.carPreview')}
+          onClick={() => ui.toggle('carPreview')}
+        >
+          <CarFront size={15} />
         </button>
         <span className="sep" style={{ width: 1, background: 'var(--border)', margin: '0 4px' }} />
         <button

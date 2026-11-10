@@ -125,8 +125,12 @@ export function drawComponent(rc: RenderContext, c: Component, stats: RenderStat
 
 /** Hatch the reserved zones of the layout so authors see where factory content lands. */
 export function drawReservedZones(rc: RenderContext): void {
-  const { ctx } = rc;
-  for (const z of effectiveZones(rc.theme)) {
+  drawZones(rc.ctx, rc.theme);
+}
+
+/** The same hatching, for hosts that draw the layout some other way. */
+export function drawZones(ctx: Canvas2DLike, theme: Theme): void {
+  for (const z of effectiveZones(theme)) {
     const color =
       z.kind === 'keep-clear' ? '255, 60, 60' : z.kind === 'info' ? '80, 160, 255' : '255, 170, 0';
     ctx.save();

@@ -42,6 +42,8 @@ interface UiState {
   gridSize: number;
   showRulers: boolean;
   showBounds: boolean;
+  /** Draw the canvas with the car's engine and shaders (WebGL) instead of the editor's renderer. */
+  carPreview: boolean;
   /** Manual palette for the preview (null = automatic by driving mode). */
   previewPalette: string | null;
   welcomeOpen: boolean;
@@ -63,7 +65,8 @@ interface UiState {
       | 'showGrid'
       | 'snap'
       | 'showRulers'
-      | 'showBounds',
+      | 'showBounds'
+      | 'carPreview',
   ): void;
   setRightTab(tab: RightTab): void;
   setBottomTab(tab: BottomTab): void;
@@ -129,6 +132,7 @@ export const useUiStore = create<UiState>((set, get) => {
     snap: prefs.snap ?? true,
     gridSize: prefs.gridSize ?? 10,
     showRulers: prefs.showRulers ?? true,
+    carPreview: false,
     showBounds: false,
     previewPalette: null,
     welcomeOpen: true,

@@ -2,7 +2,6 @@ import { CircleHelp, Cpu, Download, Usb } from 'lucide-react';
 import { useState } from 'react';
 import {
   buildThemePackage,
-  compileTheme,
   encodeThemePackage,
   packageFileName,
   type CompileResult,
@@ -14,9 +13,8 @@ import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
 import { useT } from '../i18n/index.js';
 import { useValidation } from '../lib/useValidation.js';
-import { decodeThemeImages } from '../lib/imageStore.js';
+import { compileForCar } from '../lib/carCompile.js';
 import {
-  fetchStatic,
   isTauri,
   openExternal,
   pickFolder,
@@ -49,15 +47,7 @@ export function BuildPanel(): JSX.Element {
   const compile = async () => {
     setState((s) => ({ ...s, busy: true }));
     try {
-      const families = new Set(Object.values(theme.fonts).map((f) => f.family));
-      const fonts: Record<string, { pixels: Uint8Array; metrics: object }> = {};
-      for (const fam of families) {
-        const px = await fetchStatic(`/fonts/${fam}.r8`);
-        const mt = await fetchStatic(`/fonts/${fam}.json`);
-        if (px && mt)
-          fonts[fam] = { pixels: px, metrics: JSON.parse(new TextDecoder().decode(mt)) as object };
-      }
-      const result = compileTheme(theme, { fonts, images: await decodeThemeImages(theme) });
+      const result = await compileForCar(theme);
       setState({ result, source: theme, exportedTo: null, busy: false });
       if (result.compiled)
         log(
