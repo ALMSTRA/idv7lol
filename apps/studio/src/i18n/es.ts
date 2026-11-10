@@ -49,7 +49,8 @@ export const es: Dictionary = {
     pieceCount: '{n} piezas',
     piecesEmpty:
       'Haz clic derecho en una pieza y elige Guardar como pieza para usarla en cualquier tema.',
-    pieceHint: 'Haz clic o arrástrala para añadirla. Doble clic en el nombre para renombrarla.',
+    pieceHint: 'Haz clic o arrástrala para añadirla.',
+    renamePiece: 'Renombrar',
     removePiece: 'Quitar de Mis piezas',
     savedPiece: '"{name}" guardada en Mis piezas',
     piecesFull: 'No hay espacio para guardar esta pieza. Quita algunas piezas guardadas primero.',

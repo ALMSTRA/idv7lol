@@ -6,7 +6,7 @@ import { useT } from '../i18n/index.js';
 import { ImagesPanel } from './ImagesPanel.js';
 import { usePiecesStore } from '../lib/savedPieces.js';
 import { TypeIcon } from '../ui/componentIcons.js';
-import { X } from 'lucide-react';
+import { Pencil, X } from 'lucide-react';
 
 function MyPieces({ query }: { query: string }): JSX.Element | null {
   const t = useT();
@@ -51,16 +51,18 @@ function MyPieces({ query }: { query: string }): JSX.Element | null {
               }}
             />
           ) : (
-            <span
-              className="label"
-              onDoubleClick={(e) => {
-                e.stopPropagation();
-                setRenaming(p.id);
-              }}
-            >
-              {p.name}
-            </span>
+            <span className="label">{p.name}</span>
           )}
+          <button
+            className="icon library-remove"
+            title={t('library.renamePiece')}
+            onClick={(e) => {
+              e.stopPropagation();
+              setRenaming(p.id);
+            }}
+          >
+            <Pencil size={13} />
+          </button>
           <button
             className="icon library-remove"
             title={t('library.removePiece')}
