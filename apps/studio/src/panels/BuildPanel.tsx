@@ -1,5 +1,5 @@
 import { CircleHelp, Cpu, Download, Usb } from 'lucide-react';
-import { useState } from 'react';
+import { create } from 'zustand';
 import {
   buildThemePackage,
   encodeThemePackage,
@@ -30,17 +30,22 @@ interface BuildState {
   busy: boolean;
 }
 
+const useBuildStore = create<BuildState>(() => ({
+  result: null,
+  source: null,
+  exportedTo: null,
+  busy: false,
+}));
+
 export function BuildPanel(): JSX.Element {
   const t = useT();
   const theme = useProjectStore((s) => s.theme);
   const report = useValidation();
   const log = useUiStore((s) => s.logMessage);
-  const [state, setState] = useState<BuildState>({
-    result: null,
-    source: null,
-    exportedTo: null,
-    busy: false,
-  });
+  // Kept outside the panel, so switching bottom tabs doesn't lose the compile.
+  const state = useBuildStore();
+  const setState = (u: BuildState | ((s: BuildState) => BuildState)) =>
+    useBuildStore.setState(typeof u === 'function' ? u(useBuildStore.getState()) : u, true);
   const stale = state.result !== null && state.source !== theme;
   const blocked = stale || !report || !report.ok;
 
@@ -68,7 +73,9 @@ export function BuildPanel(): JSX.Element {
       if (isTauri && !folder) return;
       const path = await writeBundleFiles(folder, state.result.compiled.id, state.result.files);
       setState((s) => ({ ...s, exportedTo: path }));
-      log('info', t('build.exportedTo', { path }));
+      const message = t(isTauri ? 'build.exportedTo' : 'build.exportDownloaded', { path });
+      log('info', message);
+      useUiStore.getState().showToast(message);
     } catch (e) {
       const message = t('build.exportFailed', { error: (e as Error).message });
       log('error', message);
@@ -200,9 +207,11 @@ export function BuildPanel(): JSX.Element {
                 <tr>
                   <th>{t('build.fonts')}</th>
                   <td>
-                    {state.result!.files.filter((f) => f.path.startsWith('fonts/')).length
-                      ? c.fonts.join(', ')
-                      : `${c.fonts.join(', ')} (atlas missing)`}
+                    {!c.fonts.length
+                      ? '—'
+                      : state.result!.files.filter((f) => f.path.startsWith('fonts/')).length
+                        ? c.fonts.join(', ')
+                        : `${c.fonts.join(', ')} (atlas missing)`}
                   </td>
                 </tr>
                 <tr>

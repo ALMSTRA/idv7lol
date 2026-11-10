@@ -249,6 +249,7 @@ export const en = {
     compile: 'Compile theme',
     exportBundle: 'Export bundle…',
     exportedTo: 'Bundle written to {path}',
+    exportDownloaded: 'Bundle files for {path} downloaded',
     stale: 'The theme changed after compiling. Compile it again before saving.',
     exportFailed: 'Export failed: {error}',
     noTauri:

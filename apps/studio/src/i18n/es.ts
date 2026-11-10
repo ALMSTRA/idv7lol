@@ -257,6 +257,7 @@ export const es: Dictionary = {
     compile: 'Compilar tema',
     exportBundle: 'Exportar bundle…',
     exportedTo: 'Bundle escrito en {path}',
+    exportDownloaded: 'Archivos del bundle de {path} descargados',
     stale: 'El tema cambió después de compilar. Vuelve a compilarlo antes de guardar.',
     exportFailed: 'Falló la exportación: {error}',
     noTauri:
