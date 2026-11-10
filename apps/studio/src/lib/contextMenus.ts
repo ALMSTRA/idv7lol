@@ -4,6 +4,7 @@ import { allIds, useProjectStore } from '../store/project.js';
 import { useUiStore, type MenuItem } from '../store/ui.js';
 import { translate } from '../i18n/index.js';
 import { LIBRARY, LIBRARY_GROUPS } from './componentLibrary.js';
+import { usePiecesStore } from './savedPieces.js';
 import { browseAndPlace, replaceImage } from './imageActions.js';
 import { copyImageToSystem, copySelection, cutSelection, pasteFromMenu } from './clipboard.js';
 
@@ -72,6 +73,15 @@ function alignItems(count: number): MenuItem {
   };
 }
 
+function savePiece(): void {
+  const r = usePiecesStore.getState().saveSelection();
+  if (!r) return;
+  const ui = useUiStore.getState();
+  ui.showToast(
+    r === 'full' ? tr('library.piecesFull') : tr('library.savedPiece', { name: r.name }),
+  );
+}
+
 function selectionItems(at?: Point): MenuItem[] {
   const p = useProjectStore.getState();
   const comps = p.selection
@@ -122,6 +132,7 @@ function selectionItems(at?: Point): MenuItem[] {
       shortcut: 'Ctrl+D',
       onSelect: () => useProjectStore.getState().duplicateSelected(),
     },
+    { label: tr('ctx.savePiece'), onSelect: savePiece },
     SEP,
     arrangeItems(),
     alignItems(comps.length),

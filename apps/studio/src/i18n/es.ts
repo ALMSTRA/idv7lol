@@ -45,6 +45,14 @@ export const es: Dictionary = {
       decor: 'Decoración',
     },
     hint: 'Arrastra al lienzo o haz clic para añadir en el centro.',
+    myPieces: 'Mis piezas',
+    pieceCount: '{n} piezas',
+    piecesEmpty:
+      'Haz clic derecho en una pieza y elige Guardar como pieza para usarla en cualquier tema.',
+    pieceHint: 'Haz clic o arrástrala para añadirla. Doble clic en el nombre para renombrarla.',
+    removePiece: 'Quitar de Mis piezas',
+    savedPiece: '"{name}" guardada en Mis piezas',
+    piecesFull: 'No hay espacio para guardar esta pieza. Quita algunas piezas guardadas primero.',
   },
   components: {
     'gauge.arc': 'Indicador circular',
@@ -402,6 +410,7 @@ export const es: Dictionary = {
   },
   ctx: {
     editText: 'Editar texto',
+    savePiece: 'Guardar como pieza',
     cut: 'Cortar',
     copy: 'Copiar',
     paste: 'Pegar',

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CarPreview } from '../preview/CarPreview.js';
+import { usePiecesStore } from '../lib/savedPieces.js';
 import type { Component, Theme } from '@idv7lol/theme-schema';
 import {
   EngineState,
@@ -597,6 +598,11 @@ export function CanvasView(): JSX.Element {
       useProjectStore
         .getState()
         .placeAsset(assetId, { x: Math.round(dropAt.x), y: Math.round(dropAt.y) });
+      return;
+    }
+    const piece = e.dataTransfer.getData('application/x-idv7lol-piece');
+    if (piece) {
+      usePiecesStore.getState().insert(piece, { x: Math.round(dropAt.x), y: Math.round(dropAt.y) });
       return;
     }
     const id = e.dataTransfer.getData('application/x-idv7lol-library');

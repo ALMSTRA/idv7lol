@@ -43,6 +43,13 @@ export const en = {
       decor: 'Decoration',
     },
     hint: 'Drag onto the canvas or click to add at the centre.',
+    myPieces: 'My pieces',
+    pieceCount: '{n} pieces',
+    piecesEmpty: 'Right-click components and choose Save as piece to reuse them in any theme.',
+    pieceHint: 'Click or drag to add. Double-click the name to rename it.',
+    removePiece: 'Remove from My pieces',
+    savedPiece: 'Saved "{name}" to My pieces',
+    piecesFull: 'Not enough space to save this piece. Remove some saved pieces first.',
   },
   components: {
     'gauge.arc': 'Circular gauge',
@@ -395,6 +402,7 @@ export const en = {
   },
   ctx: {
     editText: 'Edit text',
+    savePiece: 'Save as piece',
     cut: 'Cut',
     copy: 'Copy',
     paste: 'Paste',

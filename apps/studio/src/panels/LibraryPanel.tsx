@@ -4,6 +4,78 @@ import { LIBRARY, LIBRARY_GROUPS } from '../lib/componentLibrary.js';
 import { useProjectStore } from '../store/project.js';
 import { useT } from '../i18n/index.js';
 import { ImagesPanel } from './ImagesPanel.js';
+import { usePiecesStore } from '../lib/savedPieces.js';
+import { TypeIcon } from '../ui/componentIcons.js';
+import { X } from 'lucide-react';
+
+function MyPieces({ query }: { query: string }): JSX.Element | null {
+  const t = useT();
+  const pieces = usePiecesStore((s) => s.pieces);
+  const [renaming, setRenaming] = useState<string | null>(null);
+  const shown = pieces.filter((p) => !query || p.name.toLowerCase().includes(query));
+  if (query && !shown.length) return null;
+  return (
+    <div>
+      <div className="library-group">{t('library.myPieces')}</div>
+      {!pieces.length && <div className="hint library-empty">{t('library.piecesEmpty')}</div>}
+      {shown.map((p) => (
+        <div
+          key={p.id}
+          className="library-item"
+          draggable={renaming !== p.id}
+          onDragStart={(ev) => {
+            ev.dataTransfer.setData('application/x-idv7lol-piece', p.id);
+            ev.dataTransfer.effectAllowed = 'copy';
+          }}
+          onClick={() => renaming !== p.id && usePiecesStore.getState().insert(p.id)}
+          title={t('library.pieceHint')}
+        >
+          <span className="glyph">
+            <TypeIcon type={p.components.length > 1 ? 'group' : p.components[0]!.type} />
+          </span>
+          {renaming === p.id ? (
+            <input
+              className="library-rename"
+              autoFocus
+              defaultValue={p.name}
+              maxLength={48}
+              onClick={(e) => e.stopPropagation()}
+              onBlur={(e) => {
+                usePiecesStore.getState().rename(p.id, e.target.value);
+                setRenaming(null);
+              }}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                if (e.key === 'Escape') setRenaming(null);
+              }}
+            />
+          ) : (
+            <span
+              className="label"
+              onDoubleClick={(e) => {
+                e.stopPropagation();
+                setRenaming(p.id);
+              }}
+            >
+              {p.name}
+            </span>
+          )}
+          <button
+            className="icon library-remove"
+            title={t('library.removePiece')}
+            onClick={(e) => {
+              e.stopPropagation();
+              usePiecesStore.getState().remove(p.id);
+            }}
+          >
+            <X size={13} />
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function LibraryPanel(): JSX.Element {
   const t = useT();
@@ -22,6 +94,7 @@ export function LibraryPanel(): JSX.Element {
       </div>
       <div className="panel-body">
         <ImagesPanel />
+        <MyPieces query={query} />
         {LIBRARY_GROUPS.map((g) => {
           const items = LIBRARY.filter((e) => e.group === g).filter(
             (e) =>

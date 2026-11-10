@@ -463,6 +463,20 @@ input[type='checkbox'] {
   flex: 1;
   min-width: 0;
 }
+.library-item .library-remove {
+  opacity: 0;
+}
+.library-item:hover .library-remove,
+.library-item .library-remove:focus-visible {
+  opacity: 1;
+}
+.library-rename {
+  flex: 1;
+  min-width: 0;
+}
+.library-empty {
+  padding: 2px 16px 8px;
+}
 .library-item .label small {
   display: block;
   color: var(--text-muted);
