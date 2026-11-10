@@ -3,9 +3,24 @@ import { useUiStore } from '../store/ui.js';
 import { translate } from '../i18n/index.js';
 import { ensureSource, importFiles, pickImageFiles } from './imageStore.js';
 
+/**
+ * Imports run one after another: each picks asset names from the theme as it is
+ * when it starts, so two quick pastes must not both take the same name.
+ */
+let queue: Promise<unknown> = Promise.resolve();
+function inTurn<T>(job: () => Promise<T>): Promise<T> {
+  const run = queue.then(job);
+  queue = run.catch(() => undefined);
+  return run;
+}
+
 /** Import image files and place each on the layout, at `at` when given. */
-export async function importAndPlace(files: File[], at?: { x: number; y: number }): Promise<void> {
-  if (!files.length) return;
+export function importAndPlace(files: File[], at?: { x: number; y: number }): Promise<void> {
+  if (!files.length) return Promise.resolve();
+  return inTurn(() => importNow(files, at));
+}
+
+async function importNow(files: File[], at?: { x: number; y: number }): Promise<void> {
   const ui = useUiStore.getState();
   const progress = (name: string, f: number) =>
     ui.setBusy(translate(ui.lang, 'image.processing', { name, pct: Math.round(f * 100) }));
@@ -38,6 +53,10 @@ export async function browseAndPlace(): Promise<void> {
 export async function replaceImage(componentId: string): Promise<void> {
   const files = await pickImageFiles(false);
   if (!files.length) return;
+  return inTurn(() => replaceNow(componentId, files));
+}
+
+async function replaceNow(componentId: string, files: File[]): Promise<void> {
   const ui = useUiStore.getState();
   const { images, failed } = await importFiles(files, useProjectStore.getState().theme.assets);
   const img = images[0];
