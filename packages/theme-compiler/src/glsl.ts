@@ -639,7 +639,9 @@ uniform float u_frame;
 uniform float u_opacity;
 void main() {
   float f = floor(u_frame + 0.5);
-  vec2 cell = vec2(mod(f, u_cells.x), floor(f / u_cells.x));
+  // Row first, with half a frame of margin, so mediump rounding can't pick the wrong row.
+  float row = floor((f + 0.5) / u_cells.x);
+  vec2 cell = vec2(f - row * u_cells.x, row);
   vec2 uv = (cell + clamp(v_uv, u_texel, vec2(1.0) - u_texel)) / u_cells;
   vec4 c = texture2D(u_atlas, uv);
   gl_FragColor = vec4(c.rgb, c.a * u_opacity);

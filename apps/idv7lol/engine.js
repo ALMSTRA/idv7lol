@@ -383,7 +383,9 @@ class ClusterEngine {
         const sp = img.sprite;
         this.cr.uniform(st.ref, 'u_size', [img.w, img.h]);
         this.cr.uniform(st.ref, 'u_cells', [sp.columns, sp.rows]);
-        this.cr.uniform(st.ref, 'u_texel', [r3(0.5 / sp.cellW), r3(0.5 / sp.cellH)]);
+        // Half a texel of a cell; six decimals, so it doesn't round to 0 on wide cells.
+        const r6 = (v) => Math.round(v * 1e6) / 1e6;
+        this.cr.uniform(st.ref, 'u_texel', [r6(0.5 / sp.cellW), r6(0.5 / sp.cellH)]);
         this.cr.uniform(st.ref, 'u_opacity', [img.opacity]);
         this.cr.uniform(st.ref, 'u_frame', [0]);
         let t = 0;
