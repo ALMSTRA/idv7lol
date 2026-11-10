@@ -188,6 +188,8 @@ export const en = {
     distributeV: 'Distribute vertically',
   },
   sim: {
+    filter: 'filter…',
+    usedByTheme: 'used by theme',
     scenario: 'Scenario',
     manual: 'Manual control',
     play: 'Play',

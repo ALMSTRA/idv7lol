@@ -1,5 +1,5 @@
 import { en, type Dictionary } from './en.js';
-import { es } from './es.js';
+import { ES_FIELD_LABELS, es } from './es.js';
 import { useUiStore } from '../store/ui.js';
 
 export type Lang = 'en' | 'es';
@@ -48,4 +48,9 @@ export function translate(
 export function useT(): (key: TKey | string, vars?: Record<string, string | number>) => string {
   const lang = useUiStore((s) => s.lang);
   return (key, vars) => translate(lang, key, vars);
+}
+
+/** An Inspector field or section name, from inspector/descriptors.ts, in the UI language. */
+export function fieldLabel(lang: Lang, label: string): string {
+  return lang === 'es' ? (ES_FIELD_LABELS[label] ?? label) : label;
 }

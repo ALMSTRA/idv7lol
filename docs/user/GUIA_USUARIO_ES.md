@@ -21,7 +21,7 @@ GLSL, RAMSES ni JavaScript.
    circuito, pérdida de señal…).
 6. Presiona **Validar**. Corrige los errores (en rojo) y lee los avisos (en naranja).
 7. Guarda con **Guardar** (`.idv7theme`).
-8. En **Build & Deploy**, usa **Compilar tema** y después **Exportar bundle…**. Cómo instalarlo en
+8. En **Compilar y enviar**, usa **Compilar tema** y después **Exportar bundle…**. Cómo instalarlo en
    el auto está en [DEPLOYMENT.md](DEPLOYMENT.md) (en inglés).
 
 ## La ventana
@@ -62,7 +62,7 @@ GLSL, RAMSES ni JavaScript.
 - **Animación**: clips con duración, curva, repetición y pistas con fotogramas clave. En el auto,
   el renderer reproduce las pistas de rotación y escala, y la app actualiza las de color. La
   opacidad todavía no.
-- **Build & Deploy**: la escalera de estado distingue _Vista previa disponible_, _Validación
+- **Compilar y enviar**: la escalera de estado distingue _Vista previa disponible_, _Validación
   superada_, _Paquete compilado_, _Bundle exportado_ y _Probado en el vehículo_ (esto último
   solo lo puedes marcar tú, con el auto estacionado).
 
@@ -109,7 +109,7 @@ pierden nitidez; Validación te avisa. Las animaciones no se han probado en un v
 
 Necesitas idv7lol 0.2.0 o más nuevo instalado en el auto.
 
-1. En el Studio abre **Build & Deploy**, pulsa **Compilar tema** y luego **Guardar para el auto
+1. En el Studio abre **Compilar y enviar**, pulsa **Compilar tema** y luego **Guardar para el auto
    (USB)**. Elige tu memoria USB: el tema se guarda en `idv7lol/themes/` dentro de ella.
 2. Con la app idv7lol abierta en el auto, conecta la memoria. En unos segundos la app encuentra el
    tema, lo revisa y lo instala. En su pantalla te dice qué instaló o por qué rechazó un archivo.

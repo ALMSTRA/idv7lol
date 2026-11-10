@@ -15,13 +15,28 @@ import { collectSignals } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
 import { simulator, useSimStore } from '../store/sim.js';
 import { useUiStore } from '../store/ui.js';
-import { useT } from '../i18n/index.js';
+import { useT, type Lang } from '../i18n/index.js';
+import { ES_PROFILES, ES_SCENARIOS } from '../i18n/es.js';
 import { Select } from '../inspector/fields.js';
 
 const DRIVE_MODES = ['ECO_PRO', 'COMFORT', 'SPORT', 'SPORT_PLUS', 'ADAPTIVE', 'TRACK'];
 
+/** A scenario's name and description in the UI language (English comes from the simulator). */
+function scenarioText(
+  lang: Lang,
+  s: { id: string; name: string; description: string } | undefined,
+): [string, string] {
+  if (!s) return ['', ''];
+  return (lang === 'es' && ES_SCENARIOS[s.id]) || [s.name, s.description];
+}
+
+function profileName(lang: Lang, p: { id: string; name: string }): string {
+  return (lang === 'es' && ES_PROFILES[p.id]) || p.name;
+}
+
 export function SimulatorPanel(): JSX.Element {
   const t = useT();
+  const lang = useUiStore((s) => s.lang);
   const sim = useSimStore();
   const theme = useProjectStore((s) => s.theme);
   const ui = useUiStore();
@@ -53,12 +68,19 @@ export function SimulatorPanel(): JSX.Element {
           value={sim.scenarioId ?? ''}
           options={[
             { value: '', label: t('sim.manual') },
-            ...SCENARIOS.map((s) => ({ value: s.id, label: s.name })),
+            ...SCENARIOS.map((s) => ({ value: s.id, label: scenarioText(lang, s)[0] })),
           ]}
           onChange={(v) => sim.loadScenario(v || null)}
         />
         {sim.scenarioId && (
-          <div className="hint">{SCENARIOS.find((s) => s.id === sim.scenarioId)?.description}</div>
+          <div className="hint">
+            {
+              scenarioText(
+                lang,
+                SCENARIOS.find((s) => s.id === sim.scenarioId),
+              )[1]
+            }
+          </div>
         )}
         <div className="sim-buttons">
           <button
@@ -102,7 +124,7 @@ export function SimulatorPanel(): JSX.Element {
           >
             {PROFILES.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name}
+                {profileName(lang, p)}
               </option>
             ))}
           </select>
@@ -279,7 +301,7 @@ export function SimulatorPanel(): JSX.Element {
         <div className="sim-buttons">
           <input
             type="search"
-            placeholder="filter…"
+            placeholder={t('sim.filter')}
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             style={{ width: 160 }}
@@ -290,7 +312,7 @@ export function SimulatorPanel(): JSX.Element {
               checked={onlyUsed}
               onChange={(e) => setOnlyUsed(e.target.checked)}
             />{' '}
-            used by theme
+            {t('sim.usedByTheme')}
           </label>
           <label>
             <input

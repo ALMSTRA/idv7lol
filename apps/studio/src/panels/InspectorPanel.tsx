@@ -16,7 +16,7 @@ import { getProfile, getSignal, profileHasSignal, unitSymbol } from '@idv7lol/ve
 import { buildPieces } from '@idv7lol/theme-compiler';
 import { findComponent, resolveColor } from '@idv7lol/theme-engine';
 import { useProjectStore, useThemeForPanels } from '../store/project.js';
-import { useT } from '../i18n/index.js';
+import { fieldLabel, useT } from '../i18n/index.js';
 import { useUiStore } from '../store/ui.js';
 import { replaceImage } from '../lib/imageActions.js';
 import { imageResolver, subscribeImages } from '../lib/imageStore.js';
@@ -75,6 +75,7 @@ function Section({
 
 export function InspectorPanel(): JSX.Element {
   const t = useT();
+  const lang = useUiStore((s) => s.lang);
   const theme = useThemeForPanels();
   const selection = useProjectStore((s) => s.selection);
   const comps = useMemo(
@@ -106,7 +107,7 @@ export function InspectorPanel(): JSX.Element {
       )}
       {c.type === 'group' && (
         <Section title={t('components.group')}>
-          <Field label="Clip">
+          <Field label={fieldLabel(lang, 'Clip')}>
             <Checkbox value={c.props.clip} onChange={(clip) => updateProps(c.id, { clip })} />
           </Field>
         </Section>
@@ -439,11 +440,13 @@ function PropsSections({
   onProps: (patch: Record<string, unknown>) => void;
 }): JSX.Element {
   const t = useT();
+  const lang = useUiStore((s) => s.lang);
+  const fl = (label: string) => fieldLabel(lang, label);
   const sections = DESCRIPTORS[c.type];
   return (
     <>
       {sections.map((sec, i) => (
-        <Section key={sec.title} title={sec.title} defaultOpen={i < 3}>
+        <Section key={sec.title} title={fl(sec.title)} defaultOpen={i < 3}>
           {sec.fields.map((f) => (
             <PropField
               key={f.path}
@@ -473,11 +476,13 @@ function PropField({
   onChange: (v: unknown) => void;
   addZoneLabel: string;
 }): JSX.Element | null {
+  const lang = useUiStore((s) => s.lang);
+  const fl = (label: string) => fieldLabel(lang, label);
   const value = getPath(c.props, f.path);
   switch (f.kind) {
     case 'number':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <NumberInput
             value={typeof value === 'number' ? value : 0}
             min={f.min}
@@ -489,13 +494,13 @@ function PropField({
       );
     case 'bool':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <Checkbox value={!!value} onChange={onChange} />
         </Field>
       );
     case 'text':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <input
             type="text"
             value={typeof value === 'string' ? value : ''}
@@ -505,13 +510,13 @@ function PropField({
       );
     case 'select':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <Select value={String(value ?? '')} options={f.options ?? []} onChange={onChange} />
         </Field>
       );
     case 'color':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <ColorInput
             value={value as string | undefined}
             onChange={onChange}
@@ -522,7 +527,7 @@ function PropField({
       );
     case 'fill':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <FillInput
             value={value as never}
             onChange={onChange}
@@ -533,19 +538,19 @@ function PropField({
       );
     case 'stroke':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <StrokeInput value={value as never} onChange={onChange} theme={theme} />
         </Field>
       );
     case 'textstyle':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <TextStyleInput value={value as TextStyle} onChange={onChange} theme={theme} />
         </Field>
       );
     case 'zones':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <ZonesInput
             value={(value as Zone[]) ?? []}
             onChange={onChange}
@@ -556,19 +561,19 @@ function PropField({
       );
     case 'colors':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <ColorsListInput value={(value as string[]) ?? []} onChange={onChange} theme={theme} />
         </Field>
       );
     case 'unit':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <UnitSelect value={value as never} signalId={c.binding?.signal} onChange={onChange} />
         </Field>
       );
     case 'format':
       return (
-        <Field label={f.label} hint={f.hint}>
+        <Field label={fl(f.label)} hint={f.hint}>
           <FormatInput value={String(value ?? '0')} onChange={onChange} />
         </Field>
       );
