@@ -1417,6 +1417,10 @@ table.plain th {
   overflow: hidden;
   border-color: var(--ie-line);
 }
+.ie-looks button.on {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
 .ie-looks img {
   width: 100%;
   height: 76px;

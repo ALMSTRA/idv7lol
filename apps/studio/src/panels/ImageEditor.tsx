@@ -63,6 +63,16 @@ const LOOK_FIELDS = [
   'vignette',
 ] as const;
 
+/** The look whose settings the picture has right now, if any. */
+function currentLook(e: ImageEdits): string | undefined {
+  const rec = e as unknown as Record<string, unknown>;
+  const clean = CLEAN as unknown as Record<string, unknown>;
+  return LOOKS.find((l) => {
+    const look = l.edits as Record<string, unknown>;
+    return LOOK_FIELDS.every((f) => rec[f] === (f in look ? look[f] : clean[f]));
+  })?.id;
+}
+
 function withLook(e: ImageEdits, look: Partial<ImageEdits>): ImageEdits {
   const out = { ...e } as Record<string, unknown>;
   for (const f of LOOK_FIELDS) out[f] = CLEAN[f];
@@ -800,7 +810,12 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
           {tool === 'looks' && (
             <div className="ie-looks">
               {LOOKS.map((l) => (
-                <button key={l.id} onClick={() => change(withLook(editsRef.current, l.edits))}>
+                <button
+                  key={l.id}
+                  className={currentLook(edits) === l.id ? 'on' : undefined}
+                  aria-pressed={currentLook(edits) === l.id}
+                  onClick={() => change(withLook(editsRef.current, l.edits))}
+                >
                   {lookThumbs[l.id] && <img src={lookThumbs[l.id]} alt="" />}
                   <span>{t(`image.look.${l.id}`)}</span>
                 </button>
