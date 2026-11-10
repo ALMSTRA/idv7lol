@@ -2,7 +2,7 @@
   "id": "idv7lol",
   "title": "idv7lol",
   "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "startType": "autostart",
   "vendor": "custom",
   "loggingId": "IDV7",
@@ -48,6 +48,7 @@
       "buttons": [
         ["BTN_SHOW", "Show on the cluster"],
         ["BTN_THEME", "Next theme"],
+        ["BTN_REMOVE", "Remove USB theme"],
         ["BTN_PALETTE", "Palette"],
         ["BTN_DIAG", "Diagnostics"]
       ]

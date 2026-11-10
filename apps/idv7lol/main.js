@@ -22,22 +22,33 @@ const { ClusterRender } = require('./cluster_render_client');
 const { ClusterEngine } = require('./engine');
 const { startVehicle } = require('./vehicle');
 const index = require('./themes_index');
+const SHADERS = require('./shaders');
+const { ThemeLibrary, UsbWatcher, PREFIX } = require('./usb_themes');
 
 const W = 1600,
   H = 520;
 const APP_ID = 'idv7lol';
 
-function loadTheme(id) {
-  const entry = index.themes.find((t) => t.id === id) || index.themes[0];
-  if (!entry) throw new Error('no themes bundled');
-  const theme = require('./' + entry.module);
+function loadFonts(theme) {
   const fonts = {};
   theme.fonts.forEach((fam) => {
     const metrics = require('./font_' + fam);
     const pixels = fs.readFileSync(path.join(__dirname, 'font_' + fam + '.wad'));
     fonts[fam] = { metrics, pixels };
   });
-  return { entry, theme, fonts };
+  return fonts;
+}
+
+/** A bundled theme by id, or one installed from USB by its "usb:<id>" key. */
+function loadTheme(key, library) {
+  if (library && String(key).indexOf(PREFIX) === 0) {
+    const got = library.load(key);
+    return { key, theme: got.theme, fonts: loadFonts(got.theme), imageDir: got.imageDir };
+  }
+  const entry = index.themes.find((t) => t.id === key) || index.themes[0];
+  if (!entry) throw new Error('no themes bundled');
+  const theme = require('./' + entry.module);
+  return { key: entry.id, theme, fonts: loadFonts(theme), imageDir: __dirname };
 }
 
 mgu.run({
@@ -52,7 +63,16 @@ mgu.run({
     const utcOffset = () => Number(settings.get('utcOffset')) || 0;
     const vehicle = startVehicle(ctx, { redline: 7000 });
 
-    let current = loadTheme(settings.get('theme'));
+    const library = new ThemeLibrary({ dataDir: ctx.dataDir || process.cwd(), log });
+    const themeKeys = () => index.themes.map((t) => t.id).concat(library.list().map((t) => t.key));
+    let current;
+    try {
+      current = loadTheme(settings.get('theme'), library);
+    } catch (e) {
+      log.warn('theme ' + settings.get('theme') + ' failed, using the first bundled one: ' + e);
+      current = loadTheme(index.themes[0].id);
+    }
+    let usbNote = 'Copy themes to idv7lol/themes on a USB stick and plug it in.';
     const paletteId = () => {
       const manual = settings.get('palette');
       const sel = current.theme.paletteSelection;
@@ -80,7 +100,7 @@ mgu.run({
       enabled: showing,
       live: vehicle.live,
       signals: vehicle.store,
-      loadImage: (img) => fs.readFileSync(path.join(__dirname, img.file)),
+      loadImage: (img) => fs.readFileSync(path.join(current.imageDir, img.file)),
       sweep: () => settings.get('sweep') !== 'off',
       utcOffsetMinutes: utcOffset,
     });
@@ -102,7 +122,7 @@ mgu.run({
     settings.onChange((k) => {
       if (k === 'theme') {
         try {
-          current = loadTheme(settings.get('theme'));
+          current = loadTheme(settings.get('theme'), library);
           engine.setTheme(current.theme, current.fonts);
           log.info('theme: ' + current.theme.id);
         } catch (e) {
@@ -122,11 +142,44 @@ mgu.run({
       return render();
     });
     ui.onClick('BTN_THEME', () => {
-      const ids = index.themes.map((t) => t.id);
-      const i = ids.indexOf(settings.get('theme'));
+      const ids = themeKeys();
+      const i = ids.indexOf(current.key);
       settings.set('theme', ids[(i + 1) % ids.length]);
       return render();
     });
+    ui.onClick('BTN_REMOVE', () => {
+      if (current.key.indexOf(PREFIX) !== 0) {
+        usbNote = 'Only themes installed from USB can be removed. This one is built in.';
+        return render();
+      }
+      const name = current.theme.name;
+      library.remove(current.key);
+      settings.set('theme', index.themes[0].id);
+      usbNote = 'Removed ' + name + '.';
+      return render();
+    });
+
+    // Themes on a USB stick install by themselves; the driver picks them with Next theme.
+    const usb = new UsbWatcher({
+      library,
+      log,
+      appVersion: version,
+      shaders: SHADERS,
+      fonts: index.fonts.length ? index.fonts : ['sans'],
+      onChange: (results) => {
+        const ok = results.filter((r) => r.ok).map((r) => r.theme.name);
+        const bad = results.filter((r) => !r.ok);
+        usbNote =
+          (ok.length ? 'Installed from USB: ' + ok.join(', ') + '. Press Next theme.' : '') +
+          (bad.length
+            ? (ok.length ? '  ' : '') +
+              'Refused ' +
+              bad.map((r) => r.file + ' (' + r.reason + ')').join(', ')
+            : '');
+        render().catch(() => {});
+      },
+    });
+    usb.start();
     ui.onClick('BTN_PALETTE', () => {
       const ids = ['auto'].concat(Object.keys(current.theme.palettes));
       const i = ids.indexOf(settings.get('palette'));
@@ -203,14 +256,17 @@ mgu.run({
               ((vehicle.store.get('transmission.mode') || {}).value || '-'),
           ],
           ['Providers', vs.providers || '-'],
+          ['USB themes', library.list().length + ' installed  ·  ' + usbNote],
           [
             'Safety',
             'Experimental software. Factory warnings stay on top. Deactivate here or uninstall from the MGU Store to restore everything.',
           ],
         ];
         lines.forEach(([k, v], i) => {
-          text(k, 48, 140 + i * 50, 20, t.dim, { font: 'bold' });
-          text(v, 300, 140 + i * 50, i === 6 ? 16 : 19, t.text, { font: 'label' });
+          text(k, 48, 140 + i * 44, 20, t.dim, { font: 'bold' });
+          text(v, 300, 140 + i * 44, k === 'Safety' || k === 'USB themes' ? 16 : 19, t.text, {
+            font: 'label',
+          });
         });
       } else if (page === 1) {
         text(

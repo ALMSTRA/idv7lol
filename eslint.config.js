@@ -10,6 +10,7 @@ export default tseslint.config(
       '**/src-tauri/target/**',
       '**/src-tauri/gen/**',
       'kit/**',
+      'local/**',
       'apps/idv7lol/cluster_render_client.js',
       'apps/idv7lol/theme_*.js',
       'apps/idv7lol/font_*.js',
@@ -54,7 +55,10 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
+      ],
     },
   },
 );
