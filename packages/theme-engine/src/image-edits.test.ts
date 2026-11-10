@@ -155,6 +155,9 @@ describe('animated sheets', () => {
     expect(frameAt(a, 150)).toBe(1);
     expect(frameAt(a, 399)).toBe(2);
     expect(frameAt(a, 400)).toBe(0);
+    // At 4× speed each frame lasts a quarter, but never less than 20 ms, as on the car.
+    expect(frameAt(a, 30, 4)).toBe(1);
+    expect(frameAt({ ...a, durations: [40, 40, 40] }, 25, 4)).toBe(1);
   });
   it('slices frames out of the sheet', () => {
     const sheet = gradient(4, 4);

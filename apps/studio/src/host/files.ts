@@ -93,7 +93,7 @@ export async function writeBundleFiles(
   if (isTauri && folder) {
     const { mkdir, writeFile, writeTextFile, exists } = await import('@tauri-apps/plugin-fs');
     const sep = folder.includes('\\') ? '\\' : '/';
-    const base = `${folder}${sep}${themeId}`;
+    const base = `${folder.replace(/[\\/]+$/, '')}${sep}${themeId}`;
     for (const f of files) {
       const parts = f.path.split('/');
       const dir = [base, ...parts.slice(0, -1)].join(sep);

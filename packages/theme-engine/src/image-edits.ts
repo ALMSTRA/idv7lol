@@ -598,13 +598,17 @@ export function frameRaster(sheet: Raster, a: AssetAnimation, index: number): Ra
   return out;
 }
 
-/** The frame showing at a time, looping. */
-export function frameAt(a: AssetAnimation, timeMs: number): number {
+/**
+ * The frame showing at a time, looping. `speed` divides each frame's time the
+ * way the compiler does for the car, never below 20 ms a frame.
+ */
+export function frameAt(a: AssetAnimation, timeMs: number, speed = 1): number {
+  const dur = (i: number) => Math.max(20, Math.round((a.durations[i] ?? 100) / speed));
   let total = 0;
-  for (let i = 0; i < a.frames; i++) total += a.durations[i] ?? 100;
+  for (let i = 0; i < a.frames; i++) total += dur(i);
   let t = ((timeMs % total) + total) % total;
   for (let i = 0; i < a.frames; i++) {
-    t -= a.durations[i] ?? 100;
+    t -= dur(i);
     if (t < 0) return i;
   }
   return a.frames - 1;

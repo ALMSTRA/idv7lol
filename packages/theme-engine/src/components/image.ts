@@ -8,7 +8,7 @@ export const imageRenderer: ComponentRenderer<ImageComponent> = {
     const { ctx } = rc;
     const p = c.props;
     const animation = rc.theme.assets[p.asset]?.animation;
-    const frame = animation ? frameAt(animation, rc.now * p.speed) : undefined;
+    const frame = animation ? frameAt(animation, rc.now, p.speed) : undefined;
     const img = rc.options.images?.get(p.asset, p.edits, (color) => rc.color(color), frame);
     if (!img) {
       // Placeholder: dashed box with a cross, so a missing asset is obvious.
