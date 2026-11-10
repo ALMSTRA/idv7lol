@@ -73,7 +73,8 @@
       "options": [
         ["idv7lol-classic", "IDV7LOL Classic"],
         ["idv7lol-modern", "IDV7LOL Modern"],
-        ["idv7lol-performance", "IDV7LOL Performance"]
+        ["idv7lol-performance", "IDV7LOL Performance"],
+        ["idv7lol-supercar-track", "Supercar Track"]
       ]
     },
     {
@@ -87,7 +88,8 @@
         ["sport", "Palette: sport"],
         ["night", "Palette: night"],
         ["eco", "Palette: eco"],
-        ["track", "Palette: track"]
+        ["track", "Palette: track"],
+        ["corsa", "Palette: corsa"]
       ]
     },
     {

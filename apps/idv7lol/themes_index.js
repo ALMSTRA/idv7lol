@@ -30,6 +30,15 @@ module.exports = {
         "sport",
         "track"
       ]
+    },
+    {
+      "id": "idv7lol-supercar-track",
+      "name": "Supercar Track",
+      "module": "theme_idv7lol_supercar_track",
+      "palettes": [
+        "track",
+        "corsa"
+      ]
     }
   ],
   "fonts": [
