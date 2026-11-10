@@ -169,6 +169,16 @@ mgu.run({
       onChange: (results) => {
         const ok = results.filter((r) => r.ok).map((r) => r.theme.name);
         const bad = results.filter((r) => !r.ok);
+        // A new copy of the theme on show replaced its files: reload it so the
+        // layout and its pictures come from the same version.
+        if (results.some((r) => r.ok && r.theme.key === current.key)) {
+          try {
+            current = loadTheme(current.key, library);
+            engine.setTheme(current.theme, current.fonts);
+          } catch (e) {
+            log.warn('theme reload failed: ' + e);
+          }
+        }
         usbNote =
           (ok.length ? 'Installed from USB: ' + ok.join(', ') + '. Press Next theme.' : '') +
           (bad.length

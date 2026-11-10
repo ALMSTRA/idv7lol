@@ -54,8 +54,22 @@ function compareVersions(a, b) {
 }
 
 const isNum = (v) => typeof v === 'number' && isFinite(v);
+const isCount = (v) => isNum(v) && v >= 1 && Math.floor(v) === v;
+// Own keys only: a name like "constructor" must not find Object.prototype.
+const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
 const ID_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const IMAGE_RE = /^images\/[A-Za-z0-9_.-]{1,96}\.rgba$/;
+
+/** Why an animation's frame grid doesn't fit its atlas, or '' when it does. */
+function badSprite(sp, iw, ih) {
+  if (!sp || typeof sp !== 'object') return 'no frame data';
+  if (![sp.columns, sp.rows, sp.cellW, sp.cellH, sp.frames].every(isCount)) return 'bad grid';
+  if (sp.frames > sp.columns * sp.rows) return 'more frames than cells';
+  if (sp.columns * sp.cellW > iw || sp.rows * sp.cellH > ih) return 'grid larger than the sheet';
+  if (!Array.isArray(sp.durations) || sp.durations.length !== sp.frames) return 'bad durations';
+  if (!sp.durations.every((d) => isNum(d) && d > 0 && d <= 60000)) return 'bad durations';
+  return '';
+}
 
 function fail(reason) {
   const e = new Error(reason);
@@ -111,8 +125,14 @@ function readPackage(buf, opts) {
 
   const shaders = {};
   theme.pieces.forEach((p, i) => {
-    if (!p || typeof p.shader !== 'string' || !opts.shaders[p.shader])
+    if (
+      !p ||
+      typeof p.shader !== 'string' ||
+      !has(opts.shaders, p.shader) ||
+      typeof opts.shaders[p.shader] !== 'string'
+    )
       fail('layer ' + i + ' uses an unknown shader');
+    if (!p.statics || typeof p.statics !== 'object') fail('layer ' + i + ' is incomplete');
     if (!inside(p)) fail('layer ' + i + ' is outside the panel');
     shaders[p.shader] = opts.shaders[p.shader];
   });
@@ -125,13 +145,14 @@ function readPackage(buf, opts) {
     if (!img || typeof img.file !== 'string' || !IMAGE_RE.test(img.file))
       fail('image ' + i + ' has a bad file name');
     if (!inside(img)) fail('image ' + i + ' is outside the panel');
-    if (!isNum(img.iw) || !isNum(img.ih) || img.iw < 1 || img.ih < 1)
-      fail('image ' + i + ' has no size');
+    if (!isCount(img.iw) || !isCount(img.ih)) fail('image ' + i + ' has no size');
     if (img.sprite) {
       sprites++;
       if (img.iw > LIMITS.atlasSide || img.ih > LIMITS.atlasSide)
         fail('animation ' + i + ' too large');
-      if (!opts.shaders.sprite) fail('this app version cannot play animations');
+      const why = badSprite(img.sprite, img.iw, img.ih);
+      if (why) fail('animation ' + i + ': ' + why);
+      if (!has(opts.shaders, 'sprite')) fail('this app version cannot play animations');
       shaders.sprite = opts.shaders.sprite;
     } else if (img.iw > LIMITS.width || img.ih > LIMITS.height) {
       fail('image ' + i + ' too large');

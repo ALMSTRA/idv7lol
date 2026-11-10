@@ -126,6 +126,27 @@ describe('themes from a USB stick', () => {
   it('refuses packages that could hurt or don’t fit', () => {
     const cases: Array<[string, (p: ThemePackage) => void, RegExp]> = [
       ['shader.idv7pkg', (p) => (p.theme.pieces[0]!.shader = 'evil' as never), /unknown shader/],
+      [
+        'proto.idv7pkg',
+        (p) => (p.theme.pieces[0]!.shader = 'constructor' as never),
+        /unknown shader/,
+      ],
+      [
+        'sprite.idv7pkg',
+        (p) => {
+          const img = p.theme.images[0]!;
+          img.sprite = { columns: 1, rows: 1, cellW: 64, cellH: 64, frames: 2, durations: [100] };
+        },
+        /animation 0: more frames than cells/,
+      ],
+      [
+        'durations.idv7pkg',
+        (p) => {
+          const img = p.theme.images[0]!;
+          img.sprite = { columns: 2, rows: 1, cellW: 32, cellH: 64, frames: 2, durations: [100] };
+        },
+        /animation 0: bad durations/,
+      ],
       ['version.idv7pkg', (p) => (p.minAppVersion = '9.0.0'), /needs idv7lol 9\.0\.0/],
       ['path.idv7pkg', (p) => (p.theme.images[0]!.file = '../../escape.rgba'), /bad file name/],
       ['pixels.idv7pkg', (p) => (p.images[p.theme.images[0]!.file] = 'AAAA'), /wrong size/],
