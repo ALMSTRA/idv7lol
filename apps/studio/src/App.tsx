@@ -346,8 +346,18 @@ export function App(): JSX.Element {
         }
         return;
       }
+      const onCanvasOrPage = !target || target === document.body || target.tagName === 'CANVAS';
+      if ((e.key === 'Enter' || e.key === 'F2') && onCanvasOrPage && p.selection.length === 1) {
+        const c = findComponent(p.theme.components, p.selection[0]!);
+        if (c?.type === 'text') {
+          e.preventDefault();
+          useUiStore.getState().setEditingText(c.id);
+          return;
+        }
+      }
       if (e.key === 'Escape') {
-        p.select([]);
+        // Inside a group, Escape steps out to the group first.
+        if (!p.selectParent()) p.select([]);
         return;
       }
       if (e.key.startsWith('Arrow') && p.selection.length) {

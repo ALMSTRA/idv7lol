@@ -47,6 +47,8 @@ interface UiState {
   welcomeOpen: boolean;
   /** Component whose picture is open in the image editor. */
   imageEditorFor: string | null;
+  /** Text component being edited in place on the canvas. */
+  editingText: string | null;
   log: LogEntry[];
   cursor: { x: number; y: number } | null;
 
@@ -68,6 +70,7 @@ interface UiState {
   setPreviewPalette(id: string | null): void;
   setWelcomeOpen(open: boolean): void;
   setImageEditorFor(id: string | null): void;
+  setEditingText(id: string | null): void;
   setCursor(c: { x: number; y: number } | null): void;
   logMessage(level: LogEntry['level'], text: string): void;
   clearLog(): void;
@@ -130,6 +133,7 @@ export const useUiStore = create<UiState>((set, get) => {
     previewPalette: null,
     welcomeOpen: true,
     imageEditorFor: null,
+    editingText: null,
     menu: null,
     busy: null,
     toast: null,
@@ -158,6 +162,7 @@ export const useUiStore = create<UiState>((set, get) => {
     setPreviewPalette: (previewPalette) => set({ previewPalette }),
     setWelcomeOpen: (welcomeOpen) => set({ welcomeOpen }),
     setImageEditorFor: (imageEditorFor) => set({ imageEditorFor }),
+    setEditingText: (editingText) => set({ editingText }),
     setCursor: (cursor) => set({ cursor }),
     logMessage: (level, text) =>
       set({ log: [...get().log.slice(-299), { at: Date.now(), level, text }] }),
@@ -165,4 +170,5 @@ export const useUiStore = create<UiState>((set, get) => {
   };
 });
 
-document.documentElement.dataset['theme'] = useUiStore.getState().scheme;
+if (typeof document !== 'undefined')
+  document.documentElement.dataset['theme'] = useUiStore.getState().scheme;

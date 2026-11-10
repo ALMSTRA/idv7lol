@@ -82,7 +82,22 @@ function selectionItems(at?: Point): MenuItem[] {
   const allLocked = comps.every((c) => c.locked);
   const allHidden = comps.every((c) => !c.visible);
   const topGroup = comps.some((c) => c.type === 'group');
+  const inGroup =
+    comps.length === 1 &&
+    flattenComponents(p.theme.components).some(
+      (f) => f.component.id === first?.id && f.parents.length > 0,
+    );
+  const text = comps.length === 1 && first?.type === 'text' ? first : null;
   const items: MenuItem[] = [];
+  if (text) {
+    items.push(
+      {
+        label: tr('ctx.editText'),
+        onSelect: () => useUiStore.getState().setEditingText(text.id),
+      },
+      SEP,
+    );
+  }
   if (image) {
     items.push(
       {
@@ -121,6 +136,12 @@ function selectionItems(at?: Point): MenuItem[] {
       shortcut: 'Ctrl+Shift+G',
       disabled: !topGroup,
       onSelect: () => useProjectStore.getState().ungroupSelected(),
+    },
+    {
+      label: tr('layers.selectParent'),
+      shortcut: 'Esc',
+      disabled: !inGroup,
+      onSelect: () => useProjectStore.getState().selectParent(),
     },
     SEP,
     {

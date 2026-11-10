@@ -156,6 +156,8 @@ export const en = {
     delete: 'Delete',
     group: 'Group selection',
     ungroup: 'Ungroup',
+    groupMixed: 'Only components in the same group can be grouped together.',
+    selectParent: 'Select group',
   },
   canvas: {
     zones: 'Reserved zones',
@@ -388,6 +390,7 @@ export const en = {
     brushTip: 'Paint on the image. The [ and ] keys change the size.',
   },
   ctx: {
+    editText: 'Edit text',
     cut: 'Cut',
     copy: 'Copy',
     paste: 'Paste',

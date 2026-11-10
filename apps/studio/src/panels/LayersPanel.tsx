@@ -2,7 +2,7 @@ import { TypeIcon } from '../ui/componentIcons.js';
 import { Eye, EyeOff, Group, Lock, LockOpen, Ungroup } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { Component } from '@idv7lol/theme-schema';
-import { RENDERER_LIMITS } from '@idv7lol/theme-engine';
+import { findComponent, RENDERER_LIMITS } from '@idv7lol/theme-engine';
 import { buildPieces } from '@idv7lol/theme-compiler';
 import { useProjectStore, useThemeForPanels } from '../store/project.js';
 import { useT } from '../i18n/index.js';
@@ -67,9 +67,7 @@ export function LayersPanel(): JSX.Element {
         <button
           className="icon ghost"
           title={t('layers.ungroup')}
-          disabled={
-            !selection.some((id) => theme.components.find((c) => c.id === id)?.type === 'group')
-          }
+          disabled={!selection.some((id) => findComponent(theme.components, id)?.type === 'group')}
           onClick={() => useProjectStore.getState().ungroupSelected()}
         >
           <Ungroup size={14} />

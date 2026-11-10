@@ -12,6 +12,8 @@ import {
 } from '@idv7lol/theme-schema';
 import { findComponent, flattenComponents } from '@idv7lol/theme-engine';
 import type { ImportedImage } from '../lib/imageStore.js';
+import { useUiStore } from './ui.js';
+import { translate } from '../i18n/index.js';
 
 const HISTORY_LIMIT = 100;
 
@@ -67,6 +69,8 @@ export interface ProjectState {
   moveToIndex(id: string, index: number): void;
   groupSelected(): void;
   ungroupSelected(): void;
+  /** Select the group holding the selected component. False when it has none. */
+  selectParent(): boolean;
   align(mode: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom'): void;
   distribute(axis: 'h' | 'v'): void;
 }
@@ -166,6 +170,21 @@ function cloneWithNewIds(c: Component, taken: Set<string>): Component {
   if (copy.type === 'group')
     copy.props.children = copy.props.children.map((ch) => cloneWithNewIds(ch, taken));
   return copy;
+}
+
+/** Apply `fn` to the list of children at `path` (group ids from the root). */
+function updateList(
+  components: Component[],
+  path: readonly string[],
+  fn: (list: Component[]) => Component[],
+): Component[] {
+  if (!path.length) return fn(components);
+  const [head, ...rest] = path;
+  return components.map((c) =>
+    c.id === head && c.type === 'group'
+      ? { ...c, props: { ...c.props, children: updateList(c.props.children, rest, fn) } }
+      : c,
+  );
 }
 
 function selectedTopLevel(theme: Theme, selection: string[]): Component[] {
@@ -538,11 +557,18 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   },
   groupSelected: () => {
     const s = get();
-    const items = selectedTopLevel(s.theme, s.selection);
-    // Only top-level components can be grouped in this version.
-    const topIds = new Set(s.theme.components.map((c) => c.id));
-    const members = items.filter((c) => topIds.has(c.id));
-    if (members.length < 2) return;
+    // Components are grouped with their siblings: all of them must share a parent.
+    const sel = new Set(s.selection);
+    const flat = flattenComponents(s.theme.components).filter(
+      (f) => sel.has(f.component.id) && !f.parents.some((p) => sel.has(p)),
+    );
+    if (flat.length < 2) return;
+    const path = flat[0]!.parents;
+    if (flat.some((f) => f.parents.join('/') !== path.join('/'))) {
+      useUiStore.getState().showToast(translate(useUiStore.getState().lang, 'layers.groupMixed'));
+      return;
+    }
+    const members = flat.map((f) => f.component);
     const minX = Math.min(...members.map((c) => c.x));
     const minY = Math.min(...members.map((c) => c.y));
     const maxX = Math.max(...members.map((c) => c.x + c.width));
@@ -561,30 +587,48 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       },
     });
     const memberIds = new Set(members.map((c) => c.id));
-    const firstIndex = s.theme.components.findIndex((c) => memberIds.has(c.id));
-    const rest = s.theme.components.filter((c) => !memberIds.has(c.id));
-    rest.splice(firstIndex, 0, group);
-    s.setTheme({ ...s.theme, components: rest });
+    const components = updateList(s.theme.components, path, (list) => {
+      // The group takes the place of the frontmost member, so nothing jumps behind others.
+      let at = -1;
+      list.forEach((c, i) => {
+        if (memberIds.has(c.id)) at = i;
+      });
+      const rest = list.filter((c) => !memberIds.has(c.id));
+      rest.splice(at - (members.length - 1), 0, group);
+      return rest;
+    });
+    s.setTheme({ ...s.theme, components });
     set({ selection: [gid] });
   },
   ungroupSelected: () => {
     const s = get();
-    const groups = s.theme.components.filter(
-      (c) => s.selection.includes(c.id) && c.type === 'group',
-    );
-    if (!groups.length) return;
-    const out: Component[] = [];
+    const sel = new Set(s.selection);
     const newSel: string[] = [];
-    for (const c of s.theme.components) {
-      if (c.type === 'group' && groups.includes(c)) {
-        for (const ch of c.props.children) {
-          out.push({ ...ch, x: ch.x + c.x, y: ch.y + c.y } as Component);
+    let changed = false;
+    const expand = (list: Component[]): Component[] =>
+      list.flatMap((c): Component[] => {
+        if (c.type !== 'group') return [c];
+        const children = expand(c.props.children);
+        if (!sel.has(c.id)) return [{ ...c, props: { ...c.props, children } }];
+        changed = true;
+        return children.map((ch) => {
           newSel.push(ch.id);
-        }
-      } else out.push(c);
-    }
-    s.setTheme({ ...s.theme, components: out });
+          return { ...ch, x: ch.x + c.x, y: ch.y + c.y } as Component;
+        });
+      });
+    const components = expand(s.theme.components);
+    if (!changed) return;
+    s.setTheme({ ...s.theme, components });
     set({ selection: newSel });
+  },
+  selectParent: () => {
+    const s = get();
+    if (s.selection.length !== 1) return false;
+    const f = flattenComponents(s.theme.components).find((x) => x.component.id === s.selection[0]);
+    const parent = f?.parents[f.parents.length - 1];
+    if (!parent) return false;
+    set({ selection: [parent] });
+    return true;
   },
   align: (mode) => {
     const s = get();

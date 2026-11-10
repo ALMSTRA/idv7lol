@@ -163,6 +163,8 @@ export const es: Dictionary = {
     delete: 'Eliminar',
     group: 'Agrupar selección',
     ungroup: 'Desagrupar',
+    groupMixed: 'Solo se pueden agrupar piezas que están en el mismo grupo.',
+    selectParent: 'Seleccionar grupo',
   },
   canvas: {
     zones: 'Zonas reservadas',
@@ -395,6 +397,7 @@ export const es: Dictionary = {
     brushTip: 'Pinta sobre la imagen. Las teclas [ y ] cambian el tamaño.',
   },
   ctx: {
+    editText: 'Editar texto',
     cut: 'Cortar',
     copy: 'Copiar',
     paste: 'Pegar',

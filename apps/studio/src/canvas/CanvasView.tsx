@@ -145,6 +145,7 @@ export function CanvasView(): JSX.Element {
     })),
   );
   const running = useSimStore((s) => s.running);
+  const editingText = useUiStore((s) => s.editingText);
 
   // Read at use, so edits and drags never re-render this component.
   const themeRef = useMemo(
@@ -565,6 +566,10 @@ export function CanvasView(): JSX.Element {
     const p = toLayout(viewRef.current, sx, sy);
     const hit = hitTest(themeRef.current, p.x, p.y, { respectLocks: true });
     if (hit?.component.type === 'image') useUiStore.getState().setImageEditorFor(hit.component.id);
+    if (hit?.component.type === 'text') {
+      useProjectStore.getState().select([hit.component.id]);
+      useUiStore.getState().setEditingText(hit.component.id);
+    }
   };
 
   const onDrop = (e: React.DragEvent) => {
@@ -621,6 +626,7 @@ export function CanvasView(): JSX.Element {
       }}
       onDrop={onDrop}
     >
+      {editingText && <TextEditor id={editingText} view={view} />}
       <canvas
         ref={canvasRef}
         style={{ cursor }}
@@ -980,4 +986,48 @@ export function renderToCanvas(theme: Theme, scale = 1): HTMLCanvasElement {
   ctx.scale(scale, scale);
   engine.render(ctx, theme, performance.now(), { images: imageResolver });
   return canvas;
+}
+
+/** In-place editor for a text component, laid over it on the canvas. */
+function TextEditor({ id, view }: { id: string; view: View }): JSX.Element | null {
+  const theme = useProjectStore((s) => s.theme);
+  const close = () => useUiStore.getState().setEditingText(null);
+  const flat = flattenComponents(theme.components).find((f) => f.component.id === id);
+  const c = flat?.component;
+  const [value, setValue] = useState(c?.type === 'text' ? c.props.text : '');
+  const done = useRef(false);
+  if (!flat || c?.type !== 'text') return null;
+  const tl = toScreen(view, flat.absX, flat.absY);
+  const commit = () => {
+    if (done.current) return;
+    done.current = true;
+    if (value !== c.props.text) useProjectStore.getState().updateProps(id, { text: value });
+    close();
+  };
+  return (
+    <input
+      className="canvas-text-edit"
+      autoFocus
+      maxLength={200}
+      value={value}
+      style={{
+        left: tl.x,
+        top: tl.y,
+        width: Math.max(80, c.width * view.zoom),
+        height: Math.max(22, c.height * view.zoom),
+        fontSize: Math.max(11, Math.min(48, c.height * view.zoom * 0.55)),
+        transform: c.rotation ? `rotate(${c.rotation}deg)` : undefined,
+      }}
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === 'Enter') commit();
+        if (e.key === 'Escape') {
+          done.current = true;
+          close();
+        }
+      }}
+    />
+  );
 }
