@@ -119,7 +119,7 @@ void main() {
 
 /** Track, value arc, redline and zones of a circular gauge. */
 export const ARC_BAND_FS = `${PRELUDE}${COMMON}
-uniform vec4 u_arc;    // startDeg, sweepDeg, 0, 0
+uniform vec4 u_arc;    // startDeg, sweepDeg, trackRoundCaps, 0
 uniform vec4 u_geo;    // outerR, trackWidth, fillWidth, bandCentreR
 uniform float u_value; // 0..1
 uniform vec4 u_track;
@@ -146,6 +146,21 @@ float arcDist(vec2 p, float r, float a0, float a1, float halfW) {
   vec2 e = vec2(cos(ea), sin(ea)) * r;
   return length(p - e) - halfW;
 }
+float arcDistButt(vec2 p, float r, float a0, float a1, float halfW) {
+  // the same band with square ends: the gaps between segments stay open
+  float lo = min(a0, a1);
+  float span = abs(a1 - a0);
+  float rel = mod(angDeg(p) - lo, 360.0);
+  float len = length(p);
+  float radial = abs(len - r) - halfW;
+  float along = rel <= span
+    ? -radians(min(rel, span - rel)) * len
+    : radians(min(rel - span, 360.0 - rel)) * len;
+  return max(radial, along);
+}
+float bandDist(vec2 p, float r, float a0, float a1, float halfW, float round) {
+  return round > 0.5 ? arcDist(p, r, a0, a1, halfW) : arcDistButt(p, r, a0, a1, halfW);
+}
 void main() {
   vec2 p = px() - u_size * 0.5;
   float a0 = u_arc.x;
@@ -154,17 +169,17 @@ void main() {
   // redline outer ring
   if (u_red.w > 0.5 && u_red.z < 0.5 && u_red.x < 1.0) {
     float r = u_geo.x - u_red.y * 0.5;
-    float d = arcDist(p, r, a0 + sw * u_red.x, a0 + sw, u_red.y * 0.5);
+    float d = arcDistButt(p, r, a0 + sw * u_red.x, a0 + sw, u_red.y * 0.5);
     col = over(col, vec4(u_redc.rgb, u_redc.a * cov(d)));
   }
   // track
   if (u_geo.y > 0.0) {
-    float d = arcDist(p, u_geo.w, a0, a0 + sw, u_geo.y * 0.5);
+    float d = bandDist(p, u_geo.w, a0, a0 + sw, u_geo.y * 0.5, u_arc.z);
     col = over(col, vec4(u_track.rgb, u_track.a * cov(d)));
   }
   // redline on track
   if (u_red.w > 0.5 && u_red.z > 0.5 && u_red.x < 1.0) {
-    float d = arcDist(p, u_geo.w, a0 + sw * u_red.x, a0 + sw, max(u_geo.y, u_red.y) * 0.5);
+    float d = arcDistButt(p, u_geo.w, a0 + sw * u_red.x, a0 + sw, max(u_geo.y, u_red.y) * 0.5);
     col = over(col, vec4(u_redc.rgb, u_redc.a * cov(d)));
   }
   // value fill
@@ -179,7 +194,7 @@ void main() {
     }
     float d;
     if (u_seg.x < 0.5) {
-      d = arcDist(p, u_geo.w, a0, a0 + sw * u_value, u_geo.z * 0.5);
+      d = bandDist(p, u_geo.w, a0, a0 + sw * u_value, u_geo.z * 0.5, u_seg.w);
     } else {
       float segs = max(u_seg.y, 1.0);
       float segSw = sw / segs;
@@ -189,7 +204,7 @@ void main() {
       float g = u_seg.z * 0.5;
       float sa = a0 + segSw * idx + sign(sw) * g;
       float sb = a0 + segSw * (idx + 1.0) - sign(sw) * g;
-      d = arcDist(p, u_geo.w, sa, sb, u_geo.z * 0.5);
+      d = bandDist(p, u_geo.w, sa, sb, u_geo.z * 0.5, u_seg.w);
     }
     if (u_glow.x > 0.5) {
       float gd = d / max(u_glow.y, 1.0);
@@ -244,7 +259,10 @@ void main() {
   }
   // numerals at major ticks
   if (u_labels.x > 0.5) {
-    float mi = floor(rel / asw * major + 0.5);
+    // Past either end of the arc, the nearest end's numeral still owns the pixel,
+    // so the first and last numerals aren't cut along the arc's edge.
+    float lrel = rel <= asw ? rel : (rel - asw < 360.0 - rel ? asw : 0.0);
+    float mi = floor(lrel / asw * major + 0.5);
     if (mi >= 0.0 && mi <= major && mod(mi, u_labels.y) < 0.5) {
       float la = radians(a0 + sw * (mi / major));
       vec2 centre = vec2(cos(la), sin(la)) * u_labels.z;

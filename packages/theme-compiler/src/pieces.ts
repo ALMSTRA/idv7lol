@@ -555,7 +555,7 @@ function buildArcGauge(ctx: Ctx, f: FlatComponent, c: ArcGaugeComponent): void {
   const bandR = outer - bandWidth / 2;
 
   const band = basePiece(ctx, f, `${c.id}:band`, 'arc-band', square);
-  band.statics['u_arc'] = [p.startAngle, p.sweepAngle, 0, 0];
+  band.statics['u_arc'] = [p.startAngle, p.sweepAngle, p.track.cap === 'round' ? 1 : 0, 0];
   band.statics['u_geo'] = [R, trackWidth, fillWidth, bandR];
   band.statics['u_value'] = [0];
   band.statics['u_red'] = [
