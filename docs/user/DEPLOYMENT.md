@@ -77,8 +77,11 @@ What you lose, and what to expect:
 - Not touched: the rest of the car's software, other modules and the navigation maps (they live
   on another partition).
 
-Other owners report the same after the flash; it is not one car's fault, and it happens again on
-every flash. So:
+Other owners report the same after the flash (for example idrive7-8-ssh-root issues #5, #17 and
+#41); it is not one car's fault, and it happens again on every flash. The unlock tool's own
+README has a "Back up your coding before flashing" section; read it first:
+[cauliflowermossgrape/idrive7-8-ssh-root](https://github.com/cauliflowermossgrape/idrive7-8-ssh-root).
+So:
 
 1. Before flashing, back up the head unit's coding (BimmerCode or E-Sys) and note your settings.
 2. Have a way to recode ready (BimmerCode, E-Sys or a workshop) before you start.
