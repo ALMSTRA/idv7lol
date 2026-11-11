@@ -32,7 +32,7 @@ export default tseslint.config(
   },
   {
     // The MGU runtime runs on the head unit's Node 8: plain CommonJS, ES2017 syntax only.
-    files: ['apps/idv7lol/**/*.js'],
+    files: ['apps/idv7lol/**/*.js', 'tools/development/car-node8-check.cjs'],
     languageOptions: {
       ecmaVersion: 2017,
       sourceType: 'script',

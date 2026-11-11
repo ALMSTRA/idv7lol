@@ -37,6 +37,30 @@ jobs:
       - name: Build Studio front end
         run: npm run build -w @idv7lol/studio
 
+  car-node8:
+    name: Car app on Node ${{ matrix.node }}
+    # The head unit runs Node 8 (8.9.4 on 2019 units, 8.16.2 on newer firmware). The main suite
+    # runs on Node 24, so the car's modules are also built and checked on both 8.x versions.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['8.9.4', '8.16.2']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: USB packages of every theme
+        run: npx tsx tools/development/make-test-packages.ts "$RUNNER_TEMP/pkgs"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Build every theme with the car's engine
+        run: node tools/development/car-node8-check.cjs "$RUNNER_TEMP/pkgs"
+
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest
