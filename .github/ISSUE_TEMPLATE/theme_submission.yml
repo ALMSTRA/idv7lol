@@ -1,0 +1,45 @@
+name: Share a theme
+description: Send a cluster layout you made in idv7lol Studio. No car needed.
+title: 'Theme: '
+labels: [theme]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing a layout! In the Studio, **File > Share with the community** saves the
+        theme (`.idv7theme.json`) and a picture of it (`.png`) and opens this form. Drag both files
+        into the box below. On older Studio versions, use **File > Save** and **File > Export PNG**,
+        and zip the `.idv7theme` file, since GitHub doesn't take that extension.
+  - type: textarea
+    id: files
+    attributes:
+      label: Theme file and picture
+      description: Drag the theme file and the `.png` here.
+    validations:
+      required: true
+  - type: textarea
+    id: about
+    attributes:
+      label: About the layout
+      description: What it's inspired by, which drive modes or palettes it uses, anything worth knowing.
+  - type: dropdown
+    id: tested
+    attributes:
+      label: Where did you try it?
+      options:
+        - Only in the Studio (simulator)
+        - On a car with iDrive 7 (MGU)
+    validations:
+      required: true
+  - type: input
+    id: credit
+    attributes:
+      label: Name for the credits
+      description: As it should appear in the theme. Leave empty to use your GitHub name.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Licence
+      options:
+        - label: I made this layout (or have the right to share it), and it can be published under GPL-3.0-or-later like the rest of idv7lol. It doesn't use logos, pictures or fonts I'm not allowed to share.
+          required: true

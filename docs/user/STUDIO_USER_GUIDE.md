@@ -96,7 +96,9 @@ warns when a theme uses too much.
 
 ## Inspector (right)
 
-Appears for the selected component.
+Appears for the selected component. With nothing selected it shows **Theme details**: name, id,
+author, version, licence and description of the theme. Give a theme your own id before you share
+it or put it on the car, so it doesn't replace a template with the same id.
 
 - Component: name, position, size, rotation and anchor, opacity, visible, locked, and the
   number of renderer layers the component costs on the car.
@@ -160,7 +162,16 @@ the theme there as `idv7lol/themes/<theme>.idv7pkg`; the car app installs it by 
 stick is plugged in. **Export bundle…** writes `theme.json`, shaders and the font atlas to a folder,
 for developers. Installing on the car is described in [DEPLOYMENT.md](DEPLOYMENT.md).
 
+## Sharing a theme
+
+**File > Share with the community** checks that the theme has no validation errors and an
+author, saves `<id>.idv7theme.json` and a picture `<id>.png` to a folder you pick, and opens the
+theme form on GitHub in your browser. Attach both files there. Nothing is uploaded by the Studio.
+You don't need a car for this; see "Sharing a layout" in
+[CONTRIBUTING.md](../../CONTRIBUTING.md).
+
 ## Files
 
 - `.idv7theme`: your theme (JSON, the same format as `themes/*/theme.json` in the repository).
+  `.idv7theme.json` and `.json` open too.
 - Preferences (language, grid, zones) are kept locally; nothing is sent anywhere.

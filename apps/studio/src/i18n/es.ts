@@ -11,6 +11,7 @@ export const es: Dictionary = {
     saveAs: 'Guardar como…',
     import: 'Importar…',
     export: 'Exportar PNG',
+    share: 'Compartir con la comunidad…',
     undo: 'Deshacer',
     redo: 'Rehacer',
     preview: 'Previsualizar',
@@ -23,6 +24,16 @@ export const es: Dictionary = {
     dark: 'Oscuro',
     light: 'Claro',
     help: 'Ayuda',
+  },
+  share: {
+    pick: 'Elige una carpeta para el tema y su imagen',
+    needsFix: 'Corrige los {n} errores de Validación antes de compartir.',
+    needsAuthor:
+      'Primero pon tu nombre como autor: haz clic en una parte vacía del lienzo y llena Datos del tema en el Inspector.',
+    needsId:
+      '"{id}" es el id de una plantilla. Ponle un id propio en Datos del tema (haz clic en una parte vacía del lienzo).',
+    saved: 'Se guardó {files}. Adjunta los dos al formulario de GitHub que se acaba de abrir.',
+    failed: 'No se pudieron guardar los archivos para compartir: {error}',
   },
   panels: {
     library: 'Biblioteca',
@@ -113,6 +124,15 @@ export const es: Dictionary = {
   },
   inspector: {
     nothing: 'Selecciona un componente para editarlo.',
+    themeDetails: 'Datos del tema',
+    themeId: 'Id',
+    themeIdHint: 'Minúsculas, números y guiones, empezando por una letra.',
+    author: 'Autor',
+    authorHint: 'Tu nombre o apodo, para los créditos',
+    version: 'Versión',
+    versionHint: 'Una versión como 1.0.0.',
+    license: 'Licencia',
+    description: 'Descripción',
     multiple: '{n} componentes seleccionados',
     common: 'Componente',
     name: 'Nombre',

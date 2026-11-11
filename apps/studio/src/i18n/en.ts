@@ -9,6 +9,7 @@ export const en = {
     saveAs: 'Save as…',
     import: 'Import…',
     export: 'Export PNG',
+    share: 'Share with the community…',
     undo: 'Undo',
     redo: 'Redo',
     preview: 'Preview',
@@ -21,6 +22,16 @@ export const en = {
     dark: 'Dark',
     light: 'Light',
     help: 'Help',
+  },
+  share: {
+    pick: 'Choose a folder for the theme and its picture',
+    needsFix: 'Fix the {n} errors in Validation before sharing.',
+    needsAuthor:
+      'Add your name as the author first: click an empty part of the canvas and fill in Theme details in the Inspector.',
+    needsId:
+      '"{id}" is a template\'s id. Give the theme its own id in Theme details (click an empty part of the canvas).',
+    saved: 'Saved {files}. Attach both to the GitHub form that just opened.',
+    failed: 'Could not save the files to share: {error}',
   },
   panels: {
     library: 'Library',
@@ -110,6 +121,15 @@ export const en = {
   },
   inspector: {
     nothing: 'Select a component to edit it.',
+    themeDetails: 'Theme details',
+    themeId: 'Id',
+    themeIdHint: 'Lowercase letters, digits and dashes, starting with a letter.',
+    author: 'Author',
+    authorHint: 'Your name or nickname, for the credits',
+    version: 'Version',
+    versionHint: 'A version like 1.0.0.',
+    license: 'Licence',
+    description: 'Description',
     multiple: '{n} components selected',
     common: 'Component',
     name: 'Name',

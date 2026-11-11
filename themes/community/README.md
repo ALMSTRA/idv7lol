@@ -1,5 +1,11 @@
 # Community themes
 
+Layouts shared by people who use idv7lol, plus the converted Cluster Layouts below. To share one,
+see "Sharing a layout" in [CONTRIBUTING.md](../../CONTRIBUTING.md). Every folder here shows up in
+the Studio's welcome window as a template; each shared theme carries its author and licence.
+
+## Cluster Layouts conversions
+
 Hand conversions of the seven cluster layouts from
 [eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info)
 (`apps/cluster_layouts/`, Cluster Layouts 0.13.2) to idv7lol's declarative theme format.

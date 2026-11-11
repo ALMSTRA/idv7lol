@@ -86,7 +86,13 @@ export function InspectorPanel(): JSX.Element {
   const update = useProjectStore((s) => s.updateComponent);
   const updateProps = useProjectStore((s) => s.updateProps);
 
-  if (comps.length === 0) return <div className="empty">{t('inspector.nothing')}</div>;
+  if (comps.length === 0)
+    return (
+      <div>
+        <div className="empty">{t('inspector.nothing')}</div>
+        <ThemeDetails theme={theme} />
+      </div>
+    );
   if (comps.length > 1) {
     return (
       <div>
@@ -130,6 +136,113 @@ export function InspectorPanel(): JSX.Element {
         />
       </Section>
     </div>
+  );
+}
+
+const THEME_ID = /^[a-z][a-z0-9-]{0,47}$/;
+const VERSION = /^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/;
+
+/** A text field that only writes back a value the pattern accepts, when it loses focus. */
+function CheckedText({
+  value,
+  pattern,
+  hint,
+  onCommit,
+}: {
+  value: string;
+  pattern: RegExp;
+  hint: string;
+  onCommit: (v: string) => void;
+}): JSX.Element {
+  const [draft, setDraft] = useState(value);
+  useEffect(() => setDraft(value), [value]);
+  const ok = pattern.test(draft);
+  return (
+    <>
+      <input
+        type="text"
+        value={draft}
+        aria-invalid={!ok}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={() => (ok && draft !== value ? onCommit(draft) : setDraft(value))}
+      />
+      {!ok && (
+        <div className="hint" style={{ color: 'var(--warning)' }}>
+          {hint}
+        </div>
+      )}
+    </>
+  );
+}
+
+/** Name, author and licence of the theme, shown when nothing is selected. */
+function ThemeDetails({ theme }: { theme: Theme }): JSX.Element {
+  const t = useT();
+  const live = (patch: Partial<Theme>) =>
+    useProjectStore.getState().setTheme({ ...useProjectStore.getState().theme, ...patch }, false);
+  const begin = () => useProjectStore.getState().beginTxn();
+  const record = () => useProjectStore.getState().endTxn();
+  const commit = (patch: Partial<Theme>) => useProjectStore.getState().patchTheme(patch);
+  return (
+    <Section title={t('inspector.themeDetails')}>
+      <Field label={t('inspector.name')}>
+        <input
+          type="text"
+          value={theme.name}
+          maxLength={64}
+          onChange={(e) => e.target.value.trim() && live({ name: e.target.value })}
+          onFocus={begin}
+          onBlur={record}
+        />
+      </Field>
+      <Field label={t('inspector.themeId')}>
+        <CheckedText
+          value={theme.id}
+          pattern={THEME_ID}
+          hint={t('inspector.themeIdHint')}
+          onCommit={(id) => commit({ id })}
+        />
+      </Field>
+      <Field label={t('inspector.author')}>
+        <input
+          type="text"
+          value={theme.author}
+          maxLength={80}
+          placeholder={t('inspector.authorHint')}
+          onChange={(e) => live({ author: e.target.value })}
+          onFocus={begin}
+          onBlur={record}
+        />
+      </Field>
+      <Field label={t('inspector.version')}>
+        <CheckedText
+          value={theme.version}
+          pattern={VERSION}
+          hint={t('inspector.versionHint')}
+          onCommit={(version) => commit({ version })}
+        />
+      </Field>
+      <Field label={t('inspector.license')}>
+        <input
+          type="text"
+          value={theme.license}
+          maxLength={80}
+          onChange={(e) => live({ license: e.target.value })}
+          onFocus={begin}
+          onBlur={record}
+        />
+      </Field>
+      <Field label={t('inspector.description')}>
+        <textarea
+          rows={3}
+          value={theme.description}
+          maxLength={500}
+          onChange={(e) => live({ description: e.target.value })}
+          onFocus={begin}
+          onBlur={record}
+        />
+      </Field>
+    </Section>
   );
 }
 

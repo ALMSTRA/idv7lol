@@ -10,6 +10,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+### Added
+
+- Studio: **Theme details** in the Inspector when nothing is selected (name, id, author, version,
+  licence, description), with undo. Tested locally in the browser.
+- Studio: **File > Share with the community** checks the theme (no errors, an author, an id that
+  isn't a template's), saves it with a picture and opens the new theme form on GitHub. Nothing is
+  uploaded by the Studio. Tested locally in the browser; the desktop folder dialog is not tried yet.
+- A "Share a theme" issue form and a "Sharing a layout (no car needed)" section in CONTRIBUTING.
+
 ### Changed
 
 - First vehicle test: on a 2021 X4 M Competition (iDrive 7) the car app installed from the MGU

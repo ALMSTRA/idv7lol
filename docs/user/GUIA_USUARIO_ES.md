@@ -120,6 +120,15 @@ Necesitas idv7lol 0.2.0 o más nuevo instalado en el auto.
 La app revisa cada tema antes de instalarlo y los paquetes no traen código gráfico propio. Caben
 hasta 20 temas. Esto todavía no se ha probado en un auto.
 
+## Compartir tu tema con la comunidad
+
+No necesitas un auto para diseñar ni para compartir. Haz clic en una parte vacía del lienzo y
+llena **Datos del tema** en el Inspector: nombre, un id propio, tu nombre como autor y una
+descripción. Luego **Archivo > Compartir con la comunidad…** revisa que no haya errores, guarda el
+tema (`<id>.idv7theme.json`) y una imagen (`<id>.png`) en la carpeta que elijas y abre el
+formulario de GitHub en el navegador. Adjunta ahí los dos archivos. El Studio no sube nada por su
+cuenta.
+
 ## Diferencias entre la vista previa y el auto
 
 La vista previa la dibuja el motor del Studio en Canvas 2D. El auto dibuja cada pieza como un

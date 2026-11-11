@@ -88,6 +88,23 @@ npm run tauri:dev
 4. Add the inspector descriptors and library entry in the Studio.
 5. Document it in `docs/developer/COMPONENT_API.md`.
 
+## Sharing a layout (no car needed)
+
+You don't need an iDrive 7 car to design layouts. The Studio's simulator drives a theme the way
+the car would, the car preview draws it with the car app's own shaders, and the validator checks
+it against the renderer's limits and the areas reserved for factory warnings.
+
+1. Design it in the Studio. Fix everything the **Validation** tab marks as an error.
+2. Click an empty part of the canvas and fill in **Theme details** in the Inspector: a name, a
+   short id of your own, your name as author and a description.
+3. **File > Share with the community** saves the theme and a picture of it and opens the
+   [theme form](https://github.com/ALMSTRA/idv7lol/issues/new?template=theme_submission.yml).
+   Attach both files there.
+
+Shared layouts go to `themes/community/<id>/` and show up in the Studio's welcome window with
+your credit. They are published under GPL-3.0-or-later, so only use pictures and logos you are
+allowed to share. Each one is tried on a car before it's called car-tested.
+
 ## Adding a theme
 
 See `docs/developer/THEME_DEVELOPMENT.md`. Themes live in `themes/<id>/theme.json` and are

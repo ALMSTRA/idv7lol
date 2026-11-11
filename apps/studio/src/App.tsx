@@ -19,8 +19,9 @@ import { useProjectStore } from './store/project.js';
 import { restorePanes, Splitter } from './ui/Splitter.js';
 import { useUiStore, type MenuItem } from './store/ui.js';
 import { useSimStore } from './store/sim.js';
-import { useT } from './i18n/index.js';
+import { translate, useT } from './i18n/index.js';
 import { perf } from './lib/perf.js';
+import { shareBlock, shareTheme } from './lib/share.js';
 import { CanvasView, renderToCanvas } from './canvas/CanvasView.js';
 import { LibraryPanel } from './panels/LibraryPanel.js';
 import { InspectorPanel } from './panels/InspectorPanel.js';
@@ -206,6 +207,33 @@ export function App(): JSX.Element {
     const canvas = renderToCanvas(useProjectStore.getState().theme, 1);
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
     if (blob) await savePng(blob, useProjectStore.getState().theme.id);
+  }, []);
+
+  const doShare = useCallback(async () => {
+    const { showToast } = useUiStore.getState();
+    const say = (key: string, vars?: Record<string, string | number>) =>
+      translate(useUiStore.getState().lang, key, vars);
+    const theme = useProjectStore.getState().theme;
+    const block = shareBlock(theme);
+    if (block) {
+      showToast(
+        block.reason === 'errors'
+          ? say('share.needsFix', { n: block.count })
+          : block.reason === 'id'
+            ? say('share.needsId', { id: block.id })
+            : say('share.needsAuthor'),
+      );
+      return;
+    }
+    try {
+      const canvas = renderToCanvas(theme, 1);
+      const png = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      if (!png) throw new Error('no picture');
+      const names = await shareTheme(theme, png, say('share.pick'));
+      if (names) showToast(say('share.saved', { files: names.join(', ') }));
+    } catch (e) {
+      showToast(say('share.failed', { error: e instanceof Error ? e.message : String(e) }));
+    }
   }, []);
 
   /* ----- launch args (double-clicked file) ----- */
@@ -427,6 +455,8 @@ export function App(): JSX.Element {
     { separator: true },
     { label: t('image.add'), onSelect: () => void browseAndPlace() },
     { label: t('menu.export'), onSelect: () => void doExportPng() },
+    { separator: true },
+    { label: t('menu.share'), onSelect: () => void doShare() },
   ];
   const moreMenu = (): MenuItem[] => [
     {
