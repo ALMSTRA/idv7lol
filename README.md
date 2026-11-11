@@ -211,7 +211,10 @@ Full licence details are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ### Made with Claude Code
 
-By the author's own estimate, about 70% of this project was written with the help of
-[Claude Code](https://claude.com/claude-code), and the rest by hand.
+[Claude Code](https://claude.com/claude-code) measured its own share from its session logs on
+2026-11-11: about **80%** of the code and docs match lines it wrote (60% counting the themes'
+data files, which scripts and the Studio produce). The rest is the author's own work, or was
+reformatted or generated afterwards. Vendored code (`kit/`, the renderer client) and generated
+files are left out of the count.
 
 <p align="center"><img src="docs/assets/claude-code.gif" alt="A Claude Code session working on idv7lol: segmenting the rev arc on the car and running the tests" width="600"></p>
