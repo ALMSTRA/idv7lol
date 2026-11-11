@@ -2,12 +2,14 @@ import {
   REQUIRED_PALETTE_TOKENS,
   getDisplayProfile,
   parseTheme,
+  type Binding,
   type Color,
   type Component,
   type Condition,
   type Fill,
 } from '@idv7lol/theme-schema';
 import {
+  arcLabelOverlap,
   contrastRatio,
   flattenComponents,
   outOfBounds,
@@ -15,7 +17,13 @@ import {
   reservedZoneOverlaps,
   RENDERER_LIMITS,
 } from '@idv7lol/theme-engine';
-import { getProfile, getSignal, profileHasSignal, sameDimension } from '@idv7lol/vehicle-signals';
+import {
+  convert,
+  getProfile,
+  getSignal,
+  profileHasSignal,
+  sameDimension,
+} from '@idv7lol/vehicle-signals';
 import { buildPieces } from './pieces.js';
 import { lintShader, SHADERS } from './glsl.js';
 import { missingGlyphs } from './font/glyphs.js';
@@ -32,6 +40,26 @@ const INFORMATIVE_TYPES = new Set<Component['type']>([
   'telltale',
   'status.panel',
 ]);
+
+/** A gauge's range as the engine works it out: the binding's, else the signal's in the shown unit. */
+function bindingRange(b: Binding | undefined): { min: number; max: number } {
+  if (!b) return { min: 0, max: 100 };
+  const def = getSignal(b.signal);
+  const shown = (v: number) => {
+    let out = v;
+    if (def && b.unit && b.unit !== def.unit) {
+      try {
+        out = convert(out, def.unit, b.unit);
+      } catch {
+        /* a unit of another kind is reported elsewhere */
+      }
+    }
+    return out * b.scale + b.offset;
+  };
+  const lo = def ? shown(def.min) : 0;
+  const hi = def ? shown(def.max) : 1;
+  return { min: b.min ?? Math.min(lo, hi), max: b.max ?? Math.max(lo, hi) };
+}
 
 class Collector {
   findings: Finding[] = [];
@@ -328,6 +356,20 @@ export function validateTheme(doc: unknown): ValidationReport {
           'text.glyphs',
           `"${text.slice(0, 24)}" uses characters the car font cannot draw: ${missing.map((m) => `"${m}"`).join(' ')}.`,
           { componentId: cid, hint: 'They are skipped on the car; the preview still shows them.' },
+        );
+    }
+    // gauge numerals running into each other (a 0–260 km/h dial labelled at every tick)
+    if (c.type === 'gauge.arc') {
+      const { min, max } = bindingRange(c.binding);
+      const pair = arcLabelOverlap(c, min, max);
+      if (pair)
+        out.warning(
+          'gauge.labels-overlap',
+          `Numerals of "${cid}" run into each other ("${pair[0]}" and "${pair[1]}").`,
+          {
+            componentId: cid,
+            hint: 'Label fewer ticks (Labels › every), use a divisor, shrink the numerals or make the gauge bigger.',
+          },
         );
     }
     // legibility: text colour vs layout background in each palette

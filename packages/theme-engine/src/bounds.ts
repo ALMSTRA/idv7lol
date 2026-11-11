@@ -1,6 +1,7 @@
 import { getDisplayProfile } from '@idv7lol/theme-schema';
 import type { Component, Rect, ReservedZone, Theme } from '@idv7lol/theme-schema';
-import { DEG, anchorFraction } from './math.js';
+import { DEG, anchorFraction, polar } from './math.js';
+import { formatNumber } from './format.js';
 
 export interface FlatComponent {
   component: Component;
@@ -142,6 +143,49 @@ export function paintedBounds(c: Component, absX: number, absY: number): Rect {
     width: Math.max(1e-6, maxX - minX),
     height: Math.max(1e-6, maxY - minY),
   };
+}
+
+/** Width of one character of gauge numerals, as a share of the font size (Barlow digits). */
+const NUMERAL_WIDTH = 0.56;
+/** Height of a numeral's ink, as a share of the font size. */
+const NUMERAL_HEIGHT = 0.72;
+
+/**
+ * The first two neighbouring numerals of an arc gauge that would overlap, using the
+ * renderer's label radius and an estimate of each numeral's box, or null. In km/h a
+ * 0–260 dial with a label at every major tick is the usual case.
+ */
+export function arcLabelOverlap(
+  c: Extract<Component, { type: 'gauge.arc' }>,
+  min: number,
+  max: number,
+): [string, string] | null {
+  const p = c.props;
+  if (!p.labels.show || p.ticks.major <= 0) return null;
+  let r = Math.min(c.width, c.height) / 2;
+  if (p.redline.show && p.redline.placement === 'outer') r -= p.redline.width + 4;
+  r -= Math.max(p.track.show ? p.track.width : 0, p.fill.show ? p.fill.width : 0);
+  const radius = r - p.ticks.inset - 4 - p.ticks.majorLength - p.labels.inset;
+  if (radius <= 0) return null;
+  const size = p.labels.style.size;
+  const labels: Array<{ text: string; x: number; y: number; w: number }> = [];
+  for (let i = 0; i <= p.ticks.major; i += p.labels.every) {
+    const n = i / p.ticks.major;
+    const text = formatNumber((min + (max - min) * n) / p.labels.divisor, p.labels.format);
+    const pt = polar(0, 0, radius, p.startAngle + p.sweepAngle * n);
+    labels.push({ text, x: pt.x, y: pt.y, w: text.length * size * NUMERAL_WIDTH });
+  }
+  // On a full circle the last numeral sits on the first one by design; don't count that pair.
+  const closed = Math.abs(p.sweepAngle) >= 360;
+  for (let i = 1; i < labels.length; i++) {
+    const a = labels[i - 1]!;
+    const b = labels[i]!;
+    if (closed && i === labels.length - 1 && Math.hypot(a.x - b.x, a.y - b.y) < 1) continue;
+    const apartX = Math.abs(a.x - b.x) < (a.w + b.w) / 2;
+    const apartY = Math.abs(a.y - b.y) < size * NUMERAL_HEIGHT;
+    if (apartX && apartY) return [a.text, b.text];
+  }
+  return null;
 }
 
 /** Is the layout point inside the component's rotated box? */

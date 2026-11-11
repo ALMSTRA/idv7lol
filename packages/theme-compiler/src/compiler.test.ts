@@ -163,6 +163,30 @@ describe('validateTheme', () => {
     expect(r.warnings.filter((w) => w.componentId === 'flush')).toEqual([]);
   });
 
+  it('warns when gauge numerals run into each other', () => {
+    // A 0–260 km/h dial labelled at all 14 ticks, the case Cluster Layouts users hit (#5).
+    const crowded = createComponent('gauge.arc', {
+      id: 'speedo',
+      x: 700,
+      y: 200,
+      width: 300,
+      height: 300,
+      binding: { signal: 'vehicle.speed', min: 0, max: 260 },
+      props: { ticks: { major: 13 }, labels: { every: 1, style: { size: 26 } } },
+    });
+    const codes = (c: typeof crowded) =>
+      validateTheme(theme([c]))
+        .warnings.filter((w) => w.componentId === 'speedo')
+        .map((w) => w.code);
+    expect(codes(crowded)).toContain('gauge.labels-overlap');
+    // Every second numeral fits.
+    const sparse = {
+      ...crowded,
+      props: { ...crowded.props, labels: { ...crowded.props.labels, every: 2 } },
+    } as typeof crowded;
+    expect(codes(sparse)).not.toContain('gauge.labels-overlap');
+  });
+
   it('treats the zones reported by other projects as hints only', () => {
     // Inside the M-car box and the bottom strip, but clear of every factory zone.
     const inBox = createComponent('value.digital', {

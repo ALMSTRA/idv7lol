@@ -30,6 +30,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 - Display profile: zones other cluster projects report from their cars, shown in the Studio as
   hints only (no findings): the bottom strip below y 646 where the cluster draws black boxes,
   two boxes on M cars, and the driver camera notch. Not measured by idv7lol yet.
+- Validator: warns when the numerals of an arc gauge run into each other, such as a 0–260 km/h
+  dial labelled at every tick (reported for another cluster app, idrive7-cluster-info #5).
 
 ### Fixed
 
