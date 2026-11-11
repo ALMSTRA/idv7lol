@@ -32,17 +32,40 @@ run `npx tsx tools/build/bake-fonts.ts` before `npm run build` / `tauri build`.
 
 ## Car app
 
-**The app does not appear in the Store.** Check the source (`ALMSTRA/idv7lol`, branch `main`)
-and that `mgu-repo.json` is at the repository root. The Store shows a source error when a
-component cannot be used.
+**The app does not appear in the Store.** Check the source (`ALMSTRA/idv7lol`, **Branch**
+channel, `main`). The Tags channel skips pre-release tags such as `v0.2.0-beta.1`, so idv7lol
+isn't listed there. The Store shows a source error when a component cannot be used.
+
+**The Store says "coding is missing: it holds default values".** The head unit has no coding,
+usually because the SSH unlock flash erased it. MainApp doesn't start on default coding, so no
+app can be installed (mgu-store #102). Code the head unit again (BimmerCode, E-Sys or a
+workshop), then retry. See "Before you install the MGU Store" in
+[DEPLOYMENT.md](../user/DEPLOYMENT.md).
 
 **Install fails with a signal/interface error.** A field declared in `apps/idv7lol/app.json`
-`signals` does not exist in this car's SOME/IP catalog. Optional interfaces (`_optional`) do not
-block; a mandatory one does. Open an issue with the error text and your car model; the fix is
-to mark the interface optional or remove it.
+`signals` does not exist in this car's SOME/IP catalog. Since the kit build of November 2026 the
+Store build leaves out fields and interfaces the unit lacks and logs what was left out
+(idrive7-apps #145), so update to the latest idv7lol first. If it still fails, open an issue with
+the error text and your car model.
+
+**Installed, but no tile in the apps menu.** Some iDrive 7 units report HMI version 3, and older
+Store versions gave apps marked only `ID7` no tile there (mgu-store #255). Update the Store's
+tools, then reinstall idv7lol.
+
+**An update installed, but the app behaves like the old version.** Older Store versions could
+run a cached copy of the previous code when the new bundle had the same length (mgu-store #261).
+Update the Store's tools and restart the head unit.
+
+**The head unit boot-loops after the Store's first install (firmware 030.016).** A file
+permission problem fixed in the Store's deploy tool (mgu-store #173, #185). Follow the Store's
+README to recover, and use its current version.
+
+**A Store update shows for idv7lol after every commit.** Fixed from November 2026: the Branch
+channel now offers an update only when the car app or the kit changes (`build.shared` in
+`mgu-repo.json`, mgu-store #205).
 
 **The app page says "not connected".** cluster-render is not installed or not running. Install
-it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.5.1+.
+it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.5.2+.
 
 **"Waiting for live car data".** No signal has arrived: with the engine off and the car asleep
 the bus is silent. Start the car, or set _Demo data: On_ to check the layout.
@@ -56,7 +79,18 @@ factory telltales and the KOMBI keeps its gear bracket. Keep readings out of the
 
 **The cluster restarted.** Stop using the app (Show on the cluster: Off), note the theme and
 what you did, and open an issue. cluster-render's upstream documentation describes its
-mapping guard; `cluster-render guard-reset` (root SSH) clears it.
+mapping guard; `cluster-render guard-reset` (root SSH) clears it. Another project saw a cluster
+restart twice from one heavy shader, with brake, ABS and stability warnings until the car slept
+(idrive7-apps #120); idv7lol keeps one small shader per piece for that reason.
+
+**The layout and a HUD app no longer show at the same time.** After two strikes on the panel's
+own scene id, cluster-render's guard keeps the panel on the HUD's id, and then the two can't
+show together. It stays that way until `cluster-render guard-reset` (root SSH) or a new
+cluster-render version (idrive-apps #128).
+
+**The factory gauges flash for a moment when switching themes.** The app drops the old layout
+before building the new one, and an empty panel hands the cluster back for an instant. Another
+cluster app reports the same (idrive7-cluster-info #9).
 
 **Restore everything.** In the app's Settings, Show on the cluster: Off restores the factory
 cluster at once. MGU Store > Installed > idv7lol > Remove uninstalls the app. The Store's rollback restores

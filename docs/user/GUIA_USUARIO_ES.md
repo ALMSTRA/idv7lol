@@ -145,5 +145,14 @@ Performance y Supercar Track y, al apagarla, volvió el tablero de fábrica. Los
 imágenes y las animaciones todavía no se han probado en un auto. Revisa `docs/PROJECT_STATUS.md`
 antes de instalar.
 
+**Antes de instalar MGU Store, ojo:** el flasheo que activa el SSH borra la codificación del head
+unit. Se pierden sus ajustes (idioma, mosaicos, pantalla y lo codificado con BimmerCode), el Store
+no deja instalar nada ("coding is missing: it holds default values") hasta volver a codificar
+(con BimmerCode o E-Sys), y casi siempre se borran las llaves de BMW Digital Key. Activar el modo
+debug también reinicia el perfil de conductor, la memoria del asiento y la sesión de BMW ID. Haz
+un respaldo de la codificación antes, ten a la mano cómo recodificar y flashea una sola vez: si
+el SSH falla después, usa los pasos de enable o persist de la herramienta, que no flashean. Los
+detalles están en `docs/user/DEPLOYMENT.md`.
+
 Al agregar la fuente `ALMSTRA/idv7lol` en MGU Store, elige el canal **Branch** con `main`. El canal
 Tags no muestra idv7lol por ahora, porque ignora las versiones preliminares como `v0.2.0-beta.1`.

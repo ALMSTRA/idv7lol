@@ -102,6 +102,11 @@ You need a BMW with an iDrive 7 (MGU) head unit and the
 [MGU Store](https://github.com/robertnisipeanu/mgu-store) installed on it. Installing the Store
 needs root SSH access once; its README explains how.
 
+> **Heads-up before the SSH unlock:** the flash that enables SSH erases the head unit's coding.
+> Its settings reset, the Store refuses to install until the unit is coded again (BimmerCode or
+> E-Sys), and Digital Key pairings are usually lost. Back up your coding first and flash only once.
+> Details in [DEPLOYMENT.md](docs/user/DEPLOYMENT.md#before-you-install-the-mgu-store-the-ssh-unlock-erases-the-head-units-coding).
+
 1. In the Store on the car, open **Settings**, then **Sources**, then **Add GitHub repository**,
    and enter `ALMSTRA/idv7lol` with the **Branch** channel and `main`. Don't pick Tags: the Store
    skips pre-release tags like `v0.2.0-beta.1`, so idv7lol doesn't show up there yet.

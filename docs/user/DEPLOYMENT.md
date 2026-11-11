@@ -49,6 +49,44 @@ Layouts, which writes its logs there; it still has to be confirmed on a car.
 - Internet on the head unit for the Store (mgu-uplink) or a USB stick with the repository
   checkout.
 
+## Before you install the MGU Store: the SSH unlock erases the head unit's coding
+
+Getting root SSH (needed once for the Store) means flashing a debug software image onto the head
+unit. That flash replaces one software part and **does not code the unit afterwards**, so the head
+unit is left on its default values. BMW's own tools (ISTA, E-Sys) always code right after
+programming; the unlock does only the first half.
+
+What it looked like on the car idv7lol was tested on, before and after the flash:
+
+| Part                                   | Before        | After                              |
+| -------------------------------------- | ------------- | ---------------------------------- |
+| CAFD (the head unit's coding)          | `006.036.022` | `FFFFFFFF_255.255.255` (no coding) |
+| SWFL `000056EA` (the part it replaces) | `016.012.001` | `030.016.002` (the debug image)    |
+
+What you lose, and what to expect:
+
+- **The head unit's settings and coding**: language, menu tiles, display settings and anything
+  BMW or BimmerCode had coded. The screen comes back looking "unconfigured".
+- **The Store won't install anything until the unit is coded again.** Its installer refuses with
+  "coding is missing: it holds default values", because MainApp doesn't start on default coding
+  (mgu-store #102). Recoding the head unit fixes it; on the test car BimmerCode did it.
+- Turning debug mode on (the flash does, and so does each later enable) resets the driver
+  profile, seat memory and the BMW ID session.
+- **BMW Digital Key**: owners report that the paired keys are erased in most cases. Plan to pair
+  them again.
+- Not touched: the rest of the car's software, other modules and the navigation maps (they live
+  on another partition).
+
+Other owners report the same after the flash; it is not one car's fault, and it happens again on
+every flash. So:
+
+1. Before flashing, back up the head unit's coding (BimmerCode or E-Sys) and note your settings.
+2. Have a way to recode ready (BimmerCode, E-Sys or a workshop) before you start.
+3. Flash once. If SSH stops working later, use the unlock tool's enable or persist steps, which
+   don't flash, instead of flashing again.
+
+This is about installing the Store, not idv7lol: idv7lol itself doesn't flash or code anything.
+
 ## Procedure (via the MGU Store)
 
 1. In the Store on the car, open **Settings > Sources > Add GitHub repository** and enter
