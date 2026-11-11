@@ -2,8 +2,9 @@
 
 The app that runs on the BMW iDrive 7 head unit and draws a compiled idv7lol theme on the
 instrument cluster through the `cluster-render` service. The MGU Store builds it from this
-repository: `mgu-repo.json` points it at `kit/tools/build.py idv7lol`. **Not yet tested in a
-vehicle.**
+repository: `mgu-repo.json` points it at `kit/tools/build.py idv7lol`. **Tested in a vehicle**
+on one car (2021 X4 M Competition): it installs, draws, and hands the cluster back when turned
+off. USB themes, images and animations are not confirmed on a car yet.
 
 | File                                                       | Role                                                                                            |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |

@@ -106,4 +106,6 @@ with read-only tokens.
 
 Tag `vX.Y.Z` only for documented, tested milestones. Attach the Studio installer from the CI
 artifact. The MGU Store reads the repository tree (`mgu-repo.json`) on a branch or tag; no
-release asset is needed for the car app.
+release asset is needed for the car app. Its Tags channel skips tags with a pre-release suffix, so
+`v0.2.0-beta.1` is not offered there; until a plain version tag exists, the car installs from the
+Branch channel (`main`).

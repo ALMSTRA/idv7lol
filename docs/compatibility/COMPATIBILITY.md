@@ -1,14 +1,14 @@
 # Compatibility
 
 Status words: **developed**, **tested locally**, **compiled**, **published**, **tested in
-vehicle**. Nothing below has reached _tested in vehicle_ yet.
+vehicle**. Only what the _Tested in vehicle_ section lists has reached that state.
 
 ## Head units
 
-| Platform                  | Status                    | Notes                                                                                        |
-| ------------------------- | ------------------------- | -------------------------------------------------------------------------------------------- |
-| BMW iDrive 7 (MGU, "ID7") | developed, tested locally | target of this project; `cluster-render` `panel` 1920×720                                    |
-| BMW iDrive 8 (MGU, "ID8") | not supported             | cluster-render has no `panel` target on ID8 (only `map` 874×749); the app logs and stays off |
+| Platform                  | Status            | Notes                                                                                        |
+| ------------------------- | ----------------- | -------------------------------------------------------------------------------------------- |
+| BMW iDrive 7 (MGU, "ID7") | tested in vehicle | target of this project; `cluster-render` `panel` 1920×720; one car so far (see below)        |
+| BMW iDrive 8 (MGU, "ID8") | not supported     | cluster-render has no `panel` target on ID8 (only `map` 874×749); the app logs and stays off |
 
 The development car reports software `20w44.1-1-3`. That identifier names the head-unit
 software release (I-step), **not** the renderer or the cluster. Capabilities are detected at run
@@ -44,5 +44,17 @@ only affect validation and simulation; the car app reads whatever the unit provi
 
 ## Tested in vehicle
 
-None yet. When a run happens, record here: date, car (model, year, drivetrain), I-step,
-cluster-render version, theme, result, issues.
+Record each run here: date, car (model, year, drivetrain), I-step, cluster-render version, theme,
+result, issues.
+
+| Date          | Car                               | I-step       | cluster-render | Themes                      | Result                                                                                |
+| ------------- | --------------------------------- | ------------ | -------------- | --------------------------- | ------------------------------------------------------------------------------------- |
+| November 2026 | X4 M Competition (F98), 2021, ICE | not recorded | not recorded   | Performance, Supercar Track | installs from the Store (Branch channel, `main`), draws, turning off restores factory |
+
+Not checked in that run: telltales and pop-ups on top, values against the factory gauges, other
+themes and palettes, USB themes, images and animations.
+
+## Installing from the Store
+
+Add `ALMSTRA/idv7lol` with the **Branch** channel (`main`). The Tags channel skips pre-release
+tags such as `v0.2.0-beta.1`, so idv7lol is not listed there until a plain version tag exists.

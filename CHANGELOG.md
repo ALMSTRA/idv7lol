@@ -10,6 +10,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+### Changed
+
+- First vehicle test: on a 2021 X4 M Competition (iDrive 7) the car app installed from the MGU
+  Store, drew the Performance and Supercar Track themes, and turning it off restored the factory
+  cluster. Status, compatibility and deployment docs now say so, and list what is still
+  unconfirmed on a car.
+- Docs: install from the Store with the Branch channel (`main`). The Tags channel skips
+  pre-release tags such as `v0.2.0-beta.1`.
+
 ## [0.2.0-beta.1] - 2026-11-10
 
 First pre-release: idv7lol Studio 0.2.0 for Windows and the car app 0.2.0. Experimental and

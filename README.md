@@ -14,8 +14,11 @@ off, the car shows its factory cluster again.
 > Use it parked or on a closed course, keep the factory warnings visible, and read
 > [SECURITY.md](SECURITY.md) first.
 
-**Status: 0.2.0-beta.1, an experimental pre-release.** Everything runs on a PC. Nothing has been
-tested in a car yet. Details in [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
+**Status: 0.2.0-beta.1, an experimental pre-release.** First car test done: on a 2021 X4 M
+Competition (iDrive 7) the app installed from the MGU Store, drew the Performance and Supercar
+Track themes on the cluster, and switching it off brought the factory cluster back. USB themes,
+pictures and animations haven't been tried on a car yet. Details in
+[docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
 **Download:** the Windows installer of idv7lol Studio is on the
 [Releases page](https://github.com/ALMSTRA/idv7lol/releases). It isn't signed, so Windows
@@ -55,14 +58,14 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
 
 ## Where things stand
 
-| Part                                         | State                                             |
-| -------------------------------------------- | ------------------------------------------------- |
-| Signals, theme format, engine, simulator     | written, covered by tests, published              |
-| Compiler (GLSL layers, SDF fonts, validator) | written, covered by tests, published              |
-| Bundled themes                               | pass validation, compiled into the car app        |
-| idv7lol Studio for Windows                   | tested on a PC, unsigned installer released       |
-| Car app (Node 8)                             | tested against a fake renderer only, not on a car |
-| Tested in a vehicle                          | **no**                                            |
+| Part                                         | State                                        |
+| -------------------------------------------- | -------------------------------------------- |
+| Signals, theme format, engine, simulator     | written, covered by tests, published         |
+| Compiler (GLSL layers, SDF fonts, validator) | written, covered by tests, published         |
+| Bundled themes                               | pass validation, compiled into the car app   |
+| idv7lol Studio for Windows                   | tested on a PC, unsigned installer released  |
+| Car app (Node 8)                             | installs and draws on a car (one car so far) |
+| Tested in a vehicle                          | **yes**, X4 M Competition 2021, two themes   |
 
 ## Building it
 
@@ -91,16 +94,17 @@ There is more in [docs/QUICKSTART.md](docs/QUICKSTART.md) and
 
 ## Putting it on the car
 
-> Nobody has run this on a car yet. Read these as the intended steps, do them parked with the car
-> on stable power, and know how to remove the app before you start (last step below). The full
-> guide is [docs/user/DEPLOYMENT.md](docs/user/DEPLOYMENT.md).
+> These steps have worked on one car so far. Do them parked with the car on stable power, and know
+> how to remove the app before you start (last step below). The full guide is
+> [docs/user/DEPLOYMENT.md](docs/user/DEPLOYMENT.md).
 
 You need a BMW with an iDrive 7 (MGU) head unit and the
 [MGU Store](https://github.com/robertnisipeanu/mgu-store) installed on it. Installing the Store
 needs root SSH access once; its README explains how.
 
 1. In the Store on the car, open **Settings**, then **Sources**, then **Add GitHub repository**,
-   and enter `ALMSTRA/idv7lol` with the `main` branch.
+   and enter `ALMSTRA/idv7lol` with the **Branch** channel and `main`. Don't pick Tags: the Store
+   skips pre-release tags like `v0.2.0-beta.1`, so idv7lol doesn't show up there yet.
 2. Open **idv7lol** in the list and press **Install**. The Store installs `cluster-render` first if
    it is missing, then builds idv7lol on the head unit. That takes about a minute.
 3. Restart the head unit if the Store asks for it.
@@ -131,8 +135,8 @@ The car checks every package before installing it: layer count, image sizes, ren
 that everything sits on the panel and that it only names shaders the app already has. Packages
 carry no shader code of their own. Up to 20 themes can be installed this way.
 
-Nobody has tried this on a car yet. In particular, it is not confirmed that the app can read the
-stick. Cluster Layouts writes its logs to sticks in the same place, which is a good sign.
+The USB path hasn't been tried on a car yet. In particular, it is not confirmed that the app can
+read the stick. Cluster Layouts writes its logs to sticks in the same place, which is a good sign.
 
 ### Changing the built-in themes
 

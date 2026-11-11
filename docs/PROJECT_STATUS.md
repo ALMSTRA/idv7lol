@@ -1,27 +1,38 @@
 # Project status
 
-_Last updated: 2026-11-09._ Version: **0.1.0-dev** (no release tag yet).
+_Last updated: 2026-11-11._ Version: **0.2.0-beta.1** (pre-release; the Store installs from the
+`main` branch, see Compatibility).
 
 Status words: **developed** (code exists), **tested locally** (automated tests or PC preview),
 **compiled** (artifacts built), **published** (on GitHub), **tested in vehicle**.
 
 ## Where things stand
 
-| Area                                                                                                                                                             | Status                                                                                                                                           |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Repository, licence, policies, templates, CI (lint, typecheck, tests, theme validation, secret scan, Windows installer job)                                      | published                                                                                                                                        |
-| `@idv7lol/vehicle-signals`: 61 signals, units, 5 vehicle profiles, SignalBus                                                                                     | tested locally (10 tests), published                                                                                                             |
-| `@idv7lol/theme-schema`: schema v1, 15 component types, bindings, conditions, animations, palettes, display profile with reserved zones                          | tested locally (10 tests), published                                                                                                             |
-| `@idv7lol/theme-engine`: Canvas2D renderer, bindings/smoothing/staleness, animation player, hit testing, zone overlaps, layer cost                               | tested locally (15 tests), published                                                                                                             |
-| `@idv7lol/simulator`: vehicle model, scenarios, faults, recording/replay                                                                                         | tested locally (13 tests), published                                                                                                             |
-| `@idv7lol/theme-compiler`: validation, GLSL piece compiler (10 shaders), SDF font baking, PNG codec, CLI                                                         | tested locally (17 tests), published                                                                                                             |
-| Themes Performance (28 layers), Modern (39), Classic (29), example minimal (5)                                                                                   | validated, compiled into the app, published                                                                                                      |
-| idv7lol Studio (Tauri 2 + React): canvas, library, inspector, layers, palettes, simulator, validation, timeline, build & deploy, console, i18n es/en, dark/light | developed, tested locally in the browser and as the desktop build; installer **compiled** (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned)       |
-| idv7lol MGU app (Node 8): engine, signals, menu, diagnostics, kit (MIT) + cluster-render client (MPL-2.0), `mgu-repo.json`                                       | developed; engine tested locally against a fake client (6 tests); kit staging verified with `build.py --preview-only`; **not tested in vehicle** |
-| Documentation (EN) + Spanish user guide                                                                                                                          | published                                                                                                                                        |
+| Area                                                                                                                                                             | Status                                                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Repository, licence, policies, templates, CI (lint, typecheck, tests, theme validation, secret scan, Windows installer job)                                      | published                                                                                                                                               |
+| `@idv7lol/vehicle-signals`: 61 signals, units, 5 vehicle profiles, SignalBus                                                                                     | tested locally (10 tests), published                                                                                                                    |
+| `@idv7lol/theme-schema`: schema v1, 15 component types, bindings, conditions, animations, palettes, display profile with reserved zones                          | tested locally (10 tests), published                                                                                                                    |
+| `@idv7lol/theme-engine`: Canvas2D renderer, bindings/smoothing/staleness, animation player, hit testing, zone overlaps, layer cost                               | tested locally (15 tests), published                                                                                                                    |
+| `@idv7lol/simulator`: vehicle model, scenarios, faults, recording/replay                                                                                         | tested locally (13 tests), published                                                                                                                    |
+| `@idv7lol/theme-compiler`: validation, GLSL piece compiler (10 shaders), SDF font baking, PNG codec, CLI                                                         | tested locally (17 tests), published                                                                                                                    |
+| Themes Performance (28 layers), Modern (39), Classic (29), example minimal (5)                                                                                   | validated, compiled into the app, published                                                                                                             |
+| idv7lol Studio (Tauri 2 + React): canvas, library, inspector, layers, palettes, simulator, validation, timeline, build & deploy, console, i18n es/en, dark/light | developed, tested locally in the browser and as the desktop build; installer **compiled** (`idv7lol Studio_0.1.0_x64-setup.exe`, unsigned)              |
+| idv7lol MGU app (Node 8): engine, signals, menu, diagnostics, kit (MIT) + cluster-render client (MPL-2.0), `mgu-repo.json`                                       | **tested in vehicle** (install, Performance and Supercar Track drawn, turning off restores the factory cluster); USB themes, images, animations not yet |
+| Documentation (EN) + Spanish user guide                                                                                                                          | published                                                                                                                                               |
 
-**Nothing has been tested in a vehicle.** The first on-car run must be done parked, by someone
-with SSH access to the head unit, following `docs/user/DEPLOYMENT.md`.
+## First vehicle test (November 2026)
+
+Car: BMW X4 M Competition (F98), 2021, iDrive 7. Installed from the MGU Store (`ALMSTRA/idv7lol`,
+Branch channel, `main`). Confirmed on the car:
+
+- the Store installs the app;
+- the Performance and Supercar Track themes draw on the cluster;
+- turning **Show on the cluster** off brings the factory cluster back.
+
+Not checked in this run, so still unconfirmed: that factory telltales and pop-ups stay on top,
+that each value matches the factory gauges, the Modern and Classic themes, palettes, USB themes,
+image layers and animations. The I-step and the cluster-render version were not recorded.
 
 ## Architecture (short)
 
@@ -67,9 +78,10 @@ stick, that the new button appears, and that an installed theme draws like a bui
 
 ## Pending (ordered)
 
-1. **First vehicle test** of the MGU app (maintainer with SSH). Confirm: install from the Store,
-   layout up/down, telltales on top, deactivate restores the factory cluster, shader compile on
-   the unit's libramses, bandwidth, the three themes. Record in `COMPATIBILITY.md`.
+1. **More vehicle tests.** Install, drawing and turning off are confirmed on one car. Still to
+   confirm: telltales and pop-ups on top, values against the factory gauges, Modern and Classic,
+   palettes, a USB theme, a theme with pictures or an animation, and the I-step and cluster-render
+   version. Record them in `COMPATIBILITY.md`.
 2. Map more signals on the car: fuel level/range (`KombiIF`, member-name discovery), 12 V
    battery, cruise, lights, hybrid values (shared tmpfs from eDrive Live as Cluster Layouts does).
 3. Theme upload path: done for USB sticks (car app 0.2.0); a download path with a short code needs
@@ -80,8 +92,8 @@ stick, that the new button appears, and that an installed theme draws like a bui
 5. Car runtime: opacity animations (needs a `u_alpha` in shaders), conditional transform clips,
    custom telltale icons, image layers upload path, `budget` event handling (lower rates).
 6. Diagnostics: export report from Studio; QR/USB log export on the car (Cluster Layouts style).
-7. Release: screenshots are in the README; a first pre-release with the Studio installer is
-   planned as v0.2.0-beta.1, marked experimental and not tested in a vehicle.
+7. Release: v0.2.0-beta.1 is out with the Studio installer. The Store's Tags channel skips
+   pre-release tags, so the next car release needs a plain version tag to be installable from Tags.
 
 ## Known bugs / caveats
 
@@ -124,4 +136,4 @@ See [developer/BUILD.md](developer/BUILD.md) and [CONTRIBUTING.md](../CONTRIBUTI
 
 ## Next milestone
 
-Vehicle test (pending item 1) and the remaining signal providers (item 2); then tag v0.1.0.
+The rest of the vehicle checks (pending item 1) and the remaining signal providers (item 2).

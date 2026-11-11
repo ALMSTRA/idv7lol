@@ -130,6 +130,11 @@ las sombras no existen en el auto. El validador avisa en cada caso.
 
 ## Estado del proyecto
 
-Todo lo descrito funciona en el Studio y en las pruebas automáticas. La app del auto existe y
-está probada con un cliente simulado, pero **todavía no se ha probado en un vehículo real**.
-Revisa `docs/PROJECT_STATUS.md` antes de instalar.
+Todo lo descrito funciona en el Studio y en las pruebas automáticas. La app del auto **ya se probó
+en un auto**: en un X4 M Competition 2021 (iDrive 7) se instaló desde MGU Store, dibujó los temas
+Performance y Supercar Track y, al apagarla, volvió el tablero de fábrica. Los temas por USB, las
+imágenes y las animaciones todavía no se han probado en un auto. Revisa `docs/PROJECT_STATUS.md`
+antes de instalar.
+
+Al agregar la fuente `ALMSTRA/idv7lol` en MGU Store, elige el canal **Branch** con `main`. El canal
+Tags no muestra idv7lol por ahora, porque ignora las versiones preliminares como `v0.2.0-beta.1`.

@@ -1,8 +1,10 @@
 # Deployment: installing idv7lol on the car
 
-**Status: developed and tested locally; not yet tested in a vehicle.** Read this as the intended
-procedure. Until someone confirms it on a car, treat every step as experimental, do it parked,
-with the car on stable power, and know how to remove the app (last section).
+**Status: first vehicle test done.** On a 2021 BMW X4 M Competition (F98, iDrive 7) the app
+installed from the Store, drew the Performance and Supercar Track themes on the cluster, and
+turning it off brought the factory cluster back. Everything else in this guide (USB themes,
+images, animations, the other themes) has not been tried on a car yet. Do it parked, with the car
+on stable power, and know how to remove the app (last section).
 
 ## What gets installed
 
@@ -36,7 +38,7 @@ the 1920×720 panel, and that every layer names a shader the app ships. Packages
 the app uses its own copy. Unknown fonts fall back to the app's font. At most 20 themes.
 
 **Not tested in a vehicle.** That the app can read the stick at `/media` is inferred from Cluster
-Layouts, which writes its logs there; confirm it on the first car test.
+Layouts, which writes its logs there; it still has to be confirmed on a car.
 
 ## Requirements
 
@@ -50,7 +52,8 @@ Layouts, which writes its logs there; confirm it on the first car test.
 ## Procedure (via the MGU Store)
 
 1. In the Store on the car, open **Settings > Sources > Add GitHub repository** and enter
-   `ALMSTRA/idv7lol`. Choose the `main` branch (or a tag once releases exist).
+   `ALMSTRA/idv7lol`. Choose the **Branch** channel with `main`. The Tags channel doesn't list
+   idv7lol yet: it skips pre-release tags such as `v0.2.0-beta.1`.
 2. The Store lists **idv7lol**. Open it and press **Install**. The Store installs
    `cluster-render` first if needed, then builds idv7lol from source on the unit (Python +
    Node, about a minute) and installs it.
@@ -83,8 +86,9 @@ in the Store (_Add from USB_). The Store builds the app the same way.
 
 ## Known limits of this release
 
-- Not tested in a vehicle yet; the first on-car run should be done by a maintainer with SSH
-  access to recover if needed.
+- Tested on one car so far (X4 M, see above). Not confirmed on a car yet: USB themes, image layers
+  and animations, the Modern and Classic themes, and the community templates. Keep SSH access
+  at hand in case you need to recover.
 - Signals mapped on the car: engine speed, speed, coolant, oil, torque, accelerations, gear and
   gearbox mode, drive mode, boost (sport display cars), outside temperature, gearbox oil. Fuel
   level, range and 12 V battery are not mapped yet and show dashes.
