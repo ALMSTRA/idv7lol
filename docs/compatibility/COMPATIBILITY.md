@@ -19,7 +19,7 @@ time from cluster-render's `hello` (`backend`, `targets`), never assumed from th
 | Component                                    | Minimum                           | Source                      |
 | -------------------------------------------- | --------------------------------- | --------------------------- |
 | MGU Store (mgu-deploy, app-privacy, updater) | current                           | robertnisipeanu/mgu-store   |
-| cluster-render                               | 0.5.1 (panel's own scene id)      | robertnisipeanu/idrive-apps |
+| cluster-render                               | 0.5.2 (see RENDERER.md)           | robertnisipeanu/idrive-apps |
 | Node.js on the unit                          | 8.7+ (8.16.2 on current firmware) | BMW firmware                |
 | Python on the unit (build from source)       | mgu-python                        | installed by the Store      |
 

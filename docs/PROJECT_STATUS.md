@@ -115,7 +115,7 @@ stick, that the new button appears, and that an installed theme draws like a bui
 
 ## Compatibility
 
-iDrive 7 (MGU) only; cluster-render ≥ 0.5.1; Node 8 on the unit. Development car: iDrive 7,
+iDrive 7 (MGU) only; cluster-render ≥ 0.5.2; Node 8 on the unit. Development car: iDrive 7,
 I-step `20w44.1-1-3` (a software identifier, not a renderer version). See
 `docs/compatibility/COMPATIBILITY.md`.
 

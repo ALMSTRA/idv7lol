@@ -29,11 +29,23 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
-- Car app: requires cluster-render 0.5.1 or newer, where the panel has its own scene id and can
-  show together with a HUD app. The renderer client is refreshed from upstream (0.5.5; it only
+- Car app: requires cluster-render 0.5.2 or newer. From 0.5.1 the panel has its own scene id and
+  can show together with a HUD app; 0.5.2 fixes a crash after a renderer-side animation is
+  stopped (idrive-apps #132), which the car app does. The renderer client is refreshed from upstream (0.5.5; it only
   adds the `yield` field, which idv7lol doesn't use). Checked locally: the client loads and
   parses as ES2017, and every theme still passes the car path test. Not tried on a car with
   0.5.x yet.
+- Car app build: the kit's `build.py` is refreshed from upstream (MIT). On the head unit it now
+  leaves out SOME/IP fields, accesses and instances the unit's firmware lacks and logs them,
+  instead of BMW's installer refusing the whole app (idrive7-apps #145). Checked locally against
+  a made-up interface catalog; not tried on a car.
+- `mgu-repo.json` names `build.shared` (`kit`, `oap-sdk`), so on the Branch channel a Studio or
+  docs commit is no longer offered to cars as an idv7lol update (mgu-store #205).
+- CI builds every theme and every USB package with the car app's modules on Node 8.9.4 and
+  8.16.2, the versions head units run.
+- Docs: a warning before installing the MGU Store that the SSH unlock flash erases the head
+  unit's coding (what is lost, recoding, Digital Key, flash only once), and install problems
+  reported upstream in the troubleshooting guide.
 - Renderer and compatibility docs follow cluster-render 0.5.x: the panel's scene id, panel and
   HUD together, `yield`, the new limits, and the iDrive 8 targets.
 - First vehicle test: on a 2021 X4 M Competition (iDrive 7) the car app installed from the MGU

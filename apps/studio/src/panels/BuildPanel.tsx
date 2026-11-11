@@ -157,7 +157,7 @@ export function BuildPanel(): JSX.Element {
           <tbody>
             <tr>
               <td>cluster-render</td>
-              <td>≥ 0.5.1</td>
+              <td>≥ 0.5.2</td>
               <td>robertnisipeanu/idrive-apps</td>
             </tr>
             <tr>

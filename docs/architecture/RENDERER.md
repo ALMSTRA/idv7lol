@@ -38,8 +38,13 @@ idv7lol targets `panel`. Since cluster-render 0.5.1 the panel has its own scene 
 0x010004f8, so the panel and the HUD can show at the same time (upstream: "reported on one
 car"). If the cluster refuses that id, or the mapping guard turns it off, the panel falls back
 to 0x01000400, the HUD's, and then the two can't show together, as before 0.5.1
-(`cluster-render.conf`, `panel_scene_id` / `panel_fallback_scene_id`). idv7lol requires
-cluster-render 0.5.1 or newer for this reason.
+(`cluster-render.conf`, `panel_scene_id` / `panel_fallback_scene_id`). The guard keeps the
+fallback once the panel's id has had two strikes, until `cluster-render guard-reset` (root, SSH)
+or a new cluster-render version (idrive-apps #128, #54).
+
+idv7lol requires cluster-render **0.5.2** or newer: before 0.5.2, stopping a renderer-side
+animation left RAMSES 19's animation system broken, and the next request for the target crashed
+the service (idrive-apps #132, fixed in 0.5.2). The car app starts and stops animations.
 
 ## iDrive 8 (not supported by idv7lol)
 

@@ -334,7 +334,7 @@ export const es: Dictionary = {
     howToInstall: 'Cómo instalarlo en el auto',
     deps: 'Dependencias en la unidad',
     depsNote:
-      'idv7lol necesita el MGU Store con cluster-render ≥ 0.5.1. El Studio no puede comprobar qué hay instalado en tu auto.',
+      'idv7lol necesita el MGU Store con cluster-render ≥ 0.5.2. El Studio no puede comprobar qué hay instalado en tu auto.',
   },
   timeline: {
     clips: 'Clips',
