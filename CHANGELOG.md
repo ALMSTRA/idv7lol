@@ -18,6 +18,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   isn't a template's), saves it with a picture and opens the new theme form on GitHub. Nothing is
   uploaded by the Studio. Tested locally in the browser; the desktop folder dialog is not tried yet.
 - A "Share a theme" issue form and a "Sharing a layout (no car needed)" section in CONTRIBUTING.
+- Studio library: 23 more entries. **Blocks** add several arranged components at once (speed and
+  gear, turn signal pair, temperature columns, data row, modes); new gauges (sweep and half-moon
+  tachometers, lateral G meter, oil column, oil pressure, torque ring), readouts (driving mode,
+  outside temperature, odometer, torque), a big gear, a 15-LED shift bar and six telltales. Every
+  entry is tested to validate and compile for the car.
 - Display profile: zones other cluster projects report from their cars, shown in the Studio as
   hints only (no findings): the bottom strip below y 646 where the cluster draws black boxes,
   two boxes on M cars, and the driver camera notch. Not measured by idv7lol yet.

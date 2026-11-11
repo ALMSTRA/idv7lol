@@ -36,6 +36,7 @@ import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
 import { simulator, useSimStore } from '../store/sim.js';
 import { libraryEntry } from '../lib/componentLibrary.js';
+import { placeLibraryEntry } from '../lib/libraryActions.js';
 import { useT } from '../i18n/index.js';
 import { perf } from '../lib/perf.js';
 import { openCanvasMenu } from '../lib/contextMenus.js';
@@ -611,9 +612,7 @@ export function CanvasView(): JSX.Element {
     if (!entry) return;
     const { sx, sy } = screenPoint(e);
     const p = toLayout(viewRef.current, sx, sy);
-    useProjectStore
-      .getState()
-      .addComponent(entry.type, { x: Math.round(p.x), y: Math.round(p.y) }, entry.overrides);
+    placeLibraryEntry(entry, { x: Math.round(p.x), y: Math.round(p.y) });
   };
 
   const zoomTo = (z: number) => {

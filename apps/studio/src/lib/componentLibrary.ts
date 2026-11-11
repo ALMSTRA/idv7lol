@@ -1,19 +1,242 @@
 import type { ComponentType } from '@idv7lol/theme-schema';
 
-export type LibraryGroup = 'gauges' | 'readouts' | 'indicators' | 'text' | 'decor';
+export type LibraryGroup = 'blocks' | 'gauges' | 'readouts' | 'indicators' | 'text' | 'decor';
+
+export interface LibraryPart {
+  type: ComponentType;
+  /** createComponent overrides; x and y are relative to the block's top-left. */
+  overrides: Record<string, unknown>;
+}
 
 export interface LibraryEntry {
   id: string;
   group: LibraryGroup;
+  /** For a block, the type its icon shows (`group`). */
   type: ComponentType;
   /** i18n keys under `presets.` */
   nameKey: string;
   descKey?: string;
   /** Overrides passed to createComponent (size, binding, props…). */
   overrides: Record<string, unknown>;
+  /** Several components added together, already arranged. */
+  parts?: LibraryPart[];
 }
 
+const label = (text: string, x: number, y: number, w: number, extra: object = {}): LibraryPart => ({
+  type: 'text',
+  overrides: {
+    x,
+    y,
+    width: w,
+    height: 24,
+    props: {
+      text,
+      style: {
+        size: 16,
+        weight: 'medium',
+        color: '$text-muted',
+        align: 'center',
+        letterSpacing: 2,
+      },
+      ...extra,
+    },
+  },
+});
+
+const telltale = (
+  id: string,
+  icon: string,
+  signal: string,
+  nameKey: string,
+  onColor: string,
+): LibraryEntry => ({
+  id,
+  group: 'indicators',
+  type: 'telltale',
+  nameKey,
+  overrides: { width: 48, height: 48, binding: { signal }, props: { icon, onColor } },
+});
+
+const modeText = (signal: string, size: number, w: number, h: number) => ({
+  width: w,
+  height: h,
+  binding: { signal, fallback: 'hide' },
+  props: {
+    text: '{value}',
+    style: { size, weight: 'bold', color: '$text', align: 'center', uppercase: true },
+  },
+});
+
+/** Blocks: a few components arranged together, added in one go. */
+const BLOCKS: LibraryEntry[] = [
+  {
+    id: 'block-speed-gear',
+    group: 'blocks',
+    type: 'group',
+    nameKey: 'blockSpeedGear',
+    descKey: 'blockSpeedGearDesc',
+    overrides: {},
+    parts: [
+      {
+        type: 'value.digital',
+        overrides: {
+          x: 0,
+          y: 10,
+          width: 300,
+          height: 160,
+          binding: { signal: 'vehicle.speed' },
+          props: { format: '0', unit: 'kmh', showUnit: true, valueStyle: { size: 120 } },
+        },
+      },
+      { type: 'indicator.gear', overrides: { x: 320, y: 0, width: 150, height: 170 } },
+      { type: 'text', overrides: { x: 320, y: 176, ...modeText('drive.mode', 20, 150, 28) } },
+    ],
+  },
+  {
+    id: 'block-turn-pair',
+    group: 'blocks',
+    type: 'group',
+    nameKey: 'blockTurnPair',
+    descKey: 'blockTurnPairDesc',
+    overrides: {},
+    parts: [
+      {
+        type: 'telltale',
+        overrides: {
+          x: 0,
+          y: 0,
+          width: 56,
+          height: 56,
+          binding: { signal: 'light.turn.left' },
+          props: { icon: 'turn-left', hideWhenOff: true },
+        },
+      },
+      {
+        type: 'telltale',
+        overrides: {
+          x: 504,
+          y: 0,
+          width: 56,
+          height: 56,
+          binding: { signal: 'light.turn.right' },
+          props: { icon: 'turn-right', hideWhenOff: true },
+        },
+      },
+    ],
+  },
+  {
+    id: 'block-temps-columns',
+    group: 'blocks',
+    type: 'group',
+    nameKey: 'blockTemps',
+    descKey: 'blockTempsDesc',
+    overrides: {},
+    parts: [
+      label('OIL', 0, 0, 70),
+      {
+        type: 'gauge.bar',
+        overrides: {
+          x: 12,
+          y: 30,
+          width: 46,
+          height: 220,
+          binding: { signal: 'engine.oil.temp', min: 50, max: 170, smoothing: 0.3 },
+          props: {
+            orientation: 'vertical',
+            fill: {
+              mode: 'segments',
+              segments: 14,
+              segmentGap: 3,
+              zones: [{ from: 130, to: 170, color: '$danger' }],
+            },
+          },
+        },
+      },
+      label('WATER', 90, 0, 70),
+      {
+        type: 'gauge.bar',
+        overrides: {
+          x: 102,
+          y: 30,
+          width: 46,
+          height: 220,
+          binding: { signal: 'engine.coolant.temp', min: 50, max: 130, smoothing: 0.3 },
+          props: {
+            orientation: 'vertical',
+            fill: {
+              mode: 'segments',
+              segments: 14,
+              segmentGap: 3,
+              zones: [{ from: 115, to: 130, color: '$danger' }],
+            },
+          },
+        },
+      },
+      label('°C', 0, 256, 160),
+    ],
+  },
+  {
+    id: 'block-info-row',
+    group: 'blocks',
+    type: 'group',
+    nameKey: 'blockInfoRow',
+    descKey: 'blockInfoRowDesc',
+    overrides: {},
+    parts: (
+      [
+        ['Oil', 'engine.oil.temp', 'celsius', '0'],
+        ['Coolant', 'engine.coolant.temp', 'celsius', '0'],
+        ['Boost', 'engine.boost', 'bar', '0.0'],
+      ] as const
+    ).map(([name, signal, unit, format], i) => ({
+      type: 'value.digital' as const,
+      overrides: {
+        x: i * 196,
+        y: 0,
+        width: 180,
+        height: 110,
+        binding: { signal, unit, smoothing: 0.3 },
+        props: {
+          format,
+          unit,
+          showUnit: true,
+          label: name,
+          valueStyle: { size: 44, weight: 'medium', align: 'left' },
+          unitStyle: { size: 16, align: 'left' },
+          labelStyle: { size: 16, align: 'left', letterSpacing: 2 },
+          background: '$surface',
+          radius: 10,
+          padding: 14,
+        },
+      },
+    })),
+  },
+  {
+    id: 'block-mode-strip',
+    group: 'blocks',
+    type: 'group',
+    nameKey: 'blockModes',
+    descKey: 'blockModesDesc',
+    overrides: {},
+    parts: [
+      { type: 'text', overrides: { x: 0, y: 0, ...modeText('drive.mode', 24, 200, 36) } },
+      {
+        type: 'line',
+        overrides: {
+          x: 210,
+          y: 4,
+          width: 2,
+          height: 28,
+          props: { direction: 'vertical', stroke: { color: '$track', width: 2 } },
+        },
+      },
+      { type: 'text', overrides: { x: 222, y: 0, ...modeText('transmission.mode', 24, 120, 36) } },
+    ],
+  },
+];
+
 export const LIBRARY: LibraryEntry[] = [
+  ...BLOCKS,
   {
     id: 'tachometer',
     group: 'gauges',
@@ -166,6 +389,132 @@ export const LIBRARY: LibraryEntry[] = [
     },
   },
   {
+    id: 'sweep-tach',
+    group: 'gauges',
+    type: 'gauge.arc',
+    nameKey: 'sweepTach',
+    descKey: 'sweepTachDesc',
+    overrides: {
+      width: 640,
+      height: 640,
+      binding: { signal: 'engine.rpm', min: 0, max: 8000, smoothing: 0.06 },
+      props: {
+        startAngle: 190,
+        sweepAngle: 160,
+        track: { width: 36 },
+        fill: {
+          width: 36,
+          mode: 'segments',
+          segments: 64,
+          segmentGap: 1,
+          zones: [{ from: 6500, to: 8000, color: '$danger' }],
+        },
+        ticks: { major: 9, minor: 1 },
+        labels: { divisor: 1000, style: { size: 34 } },
+        redline: { show: true, from: 6500 },
+      },
+    },
+  },
+  {
+    id: 'half-tach',
+    group: 'gauges',
+    type: 'gauge.arc',
+    nameKey: 'halfTach',
+    descKey: 'halfTachDesc',
+    overrides: {
+      width: 420,
+      height: 420,
+      binding: { signal: 'engine.rpm', min: 0, max: 7000, smoothing: 0.06 },
+      props: {
+        startAngle: 180,
+        sweepAngle: 180,
+        fill: { cap: 'round', zones: [{ from: 6000, to: 7000, color: '$danger' }] },
+        ticks: { major: 8, minor: 1 },
+        labels: { divisor: 1000 },
+        valueText: { show: true, format: '0', offsetY: -30, style: { size: 48 } },
+      },
+    },
+  },
+  {
+    id: 'g-meter',
+    group: 'gauges',
+    type: 'gauge.arc',
+    nameKey: 'gMeter',
+    descKey: 'gMeterDesc',
+    overrides: {
+      width: 260,
+      height: 260,
+      binding: { signal: 'chassis.accel.lat', min: -1.5, max: 1.5, smoothing: 0.2 },
+      props: {
+        startAngle: 210,
+        sweepAngle: 120,
+        fill: { show: false },
+        ticks: { major: 7, minor: 1 },
+        labels: { show: false },
+        needle: { show: true, width: 4, length: 0.8, cap: { radius: 7 } },
+        valueText: { show: true, format: '0.00', showUnit: true, offsetY: 40, style: { size: 32 } },
+      },
+    },
+  },
+  {
+    id: 'oil-column',
+    group: 'gauges',
+    type: 'gauge.bar',
+    nameKey: 'oilColumn',
+    descKey: 'oilColumnDesc',
+    overrides: {
+      width: 46,
+      height: 220,
+      binding: { signal: 'engine.oil.temp', min: 50, max: 170, smoothing: 0.3 },
+      props: {
+        orientation: 'vertical',
+        fill: {
+          mode: 'segments',
+          segments: 14,
+          segmentGap: 3,
+          zones: [{ from: 130, to: 170, color: '$danger' }],
+        },
+      },
+    },
+  },
+  {
+    id: 'oil-pressure',
+    group: 'gauges',
+    type: 'gauge.bar',
+    nameKey: 'oilPressure',
+    descKey: 'oilPressureDesc',
+    overrides: {
+      width: 360,
+      height: 14,
+      binding: { signal: 'engine.oil.pressure', min: 0, max: 6, smoothing: 0.3 },
+      props: {
+        fill: { zones: [{ from: 0, to: 1, color: '$danger' }] },
+        ticks: { show: true, count: 7 },
+      },
+    },
+  },
+  {
+    id: 'torque-ring',
+    group: 'gauges',
+    type: 'gauge.arc',
+    nameKey: 'torqueRing',
+    descKey: 'torqueRingDesc',
+    overrides: {
+      width: 240,
+      height: 240,
+      binding: { signal: 'engine.torque', min: 0, max: 700, smoothing: 0.1 },
+      props: {
+        startAngle: 135,
+        sweepAngle: 270,
+        track: { width: 14 },
+        fill: { width: 14, cap: 'round' },
+        ticks: { major: 0 },
+        labels: { show: false },
+        valueText: { show: true, format: '0', showUnit: true, style: { size: 48 } },
+      },
+    },
+  },
+  {
     id: 'speed',
     group: 'readouts',
     type: 'value.digital',
@@ -248,6 +597,61 @@ export const LIBRARY: LibraryEntry[] = [
     overrides: { width: 200, height: 48 },
   },
   {
+    id: 'drive-mode',
+    group: 'readouts',
+    type: 'text',
+    nameKey: 'driveMode',
+    descKey: 'driveModeDesc',
+    overrides: modeText('drive.mode', 24, 200, 36),
+  },
+  {
+    id: 'outside-temp',
+    group: 'readouts',
+    type: 'text',
+    nameKey: 'outsideTemp',
+    descKey: 'outsideTempDesc',
+    overrides: {
+      width: 140,
+      height: 36,
+      binding: { signal: 'environment.outside.temp' },
+      props: { text: '{value}{unit}', format: '0.0', style: { size: 28, weight: 'bold' } },
+    },
+  },
+  {
+    id: 'odometer',
+    group: 'readouts',
+    type: 'text',
+    nameKey: 'odometer',
+    descKey: 'odometerDesc',
+    overrides: {
+      width: 240,
+      height: 36,
+      binding: { signal: 'vehicle.odometer' },
+      props: { text: '{value} {unit}', format: '000000', style: { size: 26, weight: 'bold' } },
+    },
+  },
+  {
+    id: 'torque',
+    group: 'readouts',
+    type: 'value.digital',
+    nameKey: 'torque',
+    descKey: 'torqueDesc',
+    overrides: {
+      width: 200,
+      height: 100,
+      binding: { signal: 'engine.torque', smoothing: 0.1 },
+      props: { format: '0', unit: 'nm', showUnit: true, label: 'Torque', valueStyle: { size: 48 } },
+    },
+  },
+  {
+    id: 'big-gear',
+    group: 'indicators',
+    type: 'indicator.gear',
+    nameKey: 'bigGear',
+    descKey: 'bigGearDesc',
+    overrides: { width: 260, height: 300 },
+  },
+  {
     id: 'gear',
     group: 'indicators',
     type: 'indicator.gear',
@@ -292,6 +696,25 @@ export const LIBRARY: LibraryEntry[] = [
       props: { icon: 'turn-right' },
     },
   },
+  telltale('high-beam', 'high-beam', 'light.high.beam', 'highBeam', '$accent'),
+  telltale('low-beam', 'low-beam', 'light.low.beam', 'lowBeam', '$success'),
+  telltale('fog-rear', 'fog-rear', 'light.fog.rear', 'fogRear', '$warning'),
+  telltale('parking-brake', 'parking-brake', 'chassis.handbrake', 'parkingBrake', '$danger'),
+  telltale('cruise', 'cruise', 'vehicle.cruise.active', 'cruise', '$success'),
+  telltale('fuel-low', 'fuel', 'fuel.low', 'fuelLow', '$warning'),
+  {
+    id: 'shift-led',
+    group: 'indicators',
+    type: 'indicator.shiftlights',
+    nameKey: 'shiftLed',
+    descKey: 'shiftLedDesc',
+    overrides: {
+      width: 900,
+      height: 20,
+      binding: { signal: 'engine.rpm', min: 0, max: 8000 },
+      props: { count: 15, shape: 'rect', gap: 4, from: 4500, to: 7000, flashAbove: 7200 },
+    },
+  },
   {
     id: 'text',
     group: 'text',
@@ -330,7 +753,14 @@ export const LIBRARY: LibraryEntry[] = [
   },
 ];
 
-export const LIBRARY_GROUPS: LibraryGroup[] = ['gauges', 'readouts', 'indicators', 'text', 'decor'];
+export const LIBRARY_GROUPS: LibraryGroup[] = [
+  'blocks',
+  'gauges',
+  'readouts',
+  'indicators',
+  'text',
+  'decor',
+];
 
 export function libraryEntry(id: string): LibraryEntry | undefined {
   return LIBRARY.find((e) => e.id === id);

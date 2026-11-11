@@ -51,7 +51,7 @@ export function EntryIcon({
   entry: LibraryEntry;
   size?: number;
 }): JSX.Element {
-  if (entry.id.includes('left')) return <ArrowLeft size={size} />;
-  if (entry.id.includes('right')) return <ArrowRight size={size} />;
+  if (entry.id === 'turn-left') return <ArrowLeft size={size} />;
+  if (entry.id === 'turn-right') return <ArrowRight size={size} />;
   return <TypeIcon type={entry.type} size={size} />;
 }

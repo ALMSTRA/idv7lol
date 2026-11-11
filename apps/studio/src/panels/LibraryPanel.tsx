@@ -1,7 +1,7 @@
 import { EntryIcon } from '../ui/componentIcons.js';
 import { useState } from 'react';
 import { LIBRARY, LIBRARY_GROUPS } from '../lib/componentLibrary.js';
-import { useProjectStore } from '../store/project.js';
+import { placeLibraryEntry } from '../lib/libraryActions.js';
 import { useT } from '../i18n/index.js';
 import { ImagesPanel } from './ImagesPanel.js';
 import { usePiecesStore } from '../lib/savedPieces.js';
@@ -82,7 +82,6 @@ function MyPieces({ query }: { query: string }): JSX.Element | null {
 export function LibraryPanel(): JSX.Element {
   const t = useT();
   const [q, setQ] = useState('');
-  const add = useProjectStore((s) => s.addComponent);
   const query = q.trim().toLowerCase();
   return (
     <>
@@ -117,7 +116,7 @@ export function LibraryPanel(): JSX.Element {
                     ev.dataTransfer.setData('application/x-idv7lol-library', e.id);
                     ev.dataTransfer.effectAllowed = 'copy';
                   }}
-                  onClick={() => add(e.type, undefined, e.overrides)}
+                  onClick={() => placeLibraryEntry(e)}
                   title={t('library.hint')}
                 >
                   <span className="glyph">
