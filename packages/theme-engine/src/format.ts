@@ -55,6 +55,15 @@ export function formatNumber(value: number, fmt = '0'): string {
   return `${f.prefix}${sign}${int}${frac ? '.' + frac : ''}${f.suffix}`;
 }
 
+/**
+ * How an enum value reads on the cluster: the catalog's ids are written for code
+ * (`SPORT_PLUS`, `ECO_PRO`), the car's own cluster says SPORT+ and ECO PRO.
+ * The car app's text.js has the same rule.
+ */
+export function enumText(value: string): string {
+  return value.replace(/_PLUS$/, '+').replace(/_/g, ' ');
+}
+
 /** Placeholder shown for stale or unavailable values, matching the format's width. */
 export function formatDash(fmt = '0'): string {
   const f = parseFormat(fmt);

@@ -35,6 +35,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- Driving mode texts read SPORT+ and ECO PRO instead of `SPORT_PLUS` and `ECO_PRO`, in the
+  Studio and on the car (the same rule in both engines, checked by a test).
 - Car app: switching themes no longer leaves the panel empty for a moment. The old layout's
   bottom layer stays until the new one is up, so the factory gauges don't flash in between
   (reported for another cluster app, idrive7-cluster-info #9). Tested locally with the car's

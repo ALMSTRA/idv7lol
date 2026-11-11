@@ -20,7 +20,7 @@
  * Nothing here writes to the vehicle. The client (cluster_render_client.js)
  * replays layers by itself after a reconnect.
  */
-const { layoutLine, formatNumber, formatDash, formatClock } = require('./text');
+const { layoutLine, formatNumber, formatDash, formatClock, enumText } = require('./text');
 const { convert } = require('./units');
 const conditions = require('./conditions');
 
@@ -762,7 +762,7 @@ class ClusterEngine {
     const valid = !!s && s.valid && now - s.at <= this._staleMs(binding);
     if (valid) {
       if (typeof s.value === 'string' && !isFinite(Number(s.value)))
-        return { show: true, text: s.value, value: undefined };
+        return { show: true, text: enumText(s.value), value: undefined };
       const v = this._value(binding, now);
       return { show: true, text: formatNumber(v, format), value: v };
     }
@@ -777,7 +777,9 @@ class ClusterEngine {
               show: true,
               text:
                 typeof s.value === 'string'
-                  ? s.value
+                  ? isFinite(Number(s.value))
+                    ? s.value
+                    : enumText(s.value)
                   : formatNumber(this._valueOf(binding, s), format),
               value: undefined,
             }

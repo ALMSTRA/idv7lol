@@ -65,6 +65,13 @@ function formatDash(fmt) {
   return f.prefix + '----'.slice(0, Math.min(width, 4)) + f.suffix;
 }
 
+/** An enum value as the cluster shows it: SPORT_PLUS reads SPORT+, ECO_PRO reads ECO PRO. */
+function enumText(value) {
+  return String(value)
+    .replace(/_PLUS$/, '+')
+    .replace(/_/g, ' ');
+}
+
 function pad2(n) {
   return (n < 10 ? '0' : '') + n;
 }
@@ -146,4 +153,12 @@ function layoutLine(parts, metrics, boxW, align, tracking, scale2, tabular) {
   return { codes, centres, width: total };
 }
 
-module.exports = { codeOf, formatNumber, formatDash, formatClock, layoutLine, MAX_GLYPHS };
+module.exports = {
+  codeOf,
+  formatNumber,
+  formatDash,
+  formatClock,
+  layoutLine,
+  enumText,
+  MAX_GLYPHS,
+};

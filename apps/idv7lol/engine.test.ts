@@ -441,4 +441,15 @@ describe('text helpers (Node 8 port)', () => {
     expect(codes).toHaveLength(7);
     expect(codes.slice(3).every((c: number) => c >= 1000)).toBe(true);
   });
+
+  it('shows enum values like the Studio does (SPORT+, ECO PRO)', async () => {
+    const { enumText } = require('./text.js') as { enumText: (v: string) => string };
+    const engine = await import('@idv7lol/theme-engine');
+    const { SIGNALS } = await import('@idv7lol/vehicle-signals');
+    const values = SIGNALS.flatMap((s) => s.enumValues ?? []);
+    expect(values).toContain('SPORT_PLUS');
+    for (const v of values) expect(enumText(v), v).toBe(engine.enumText(v));
+    expect(enumText('SPORT_PLUS')).toBe('SPORT+');
+    expect(enumText('ECO_PRO')).toBe('ECO PRO');
+  });
 });

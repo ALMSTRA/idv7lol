@@ -14,7 +14,7 @@ import { resolveColor } from './color.js';
 import { DEG } from './math.js';
 import type { AnimationPlayer } from './animation.js';
 import type { EngineState, EvaluatedBinding } from './state.js';
-import { formatDash, formatNumber } from './format.js';
+import { enumText, formatDash, formatNumber } from './format.js';
 
 export interface Box {
   x: number;
@@ -167,7 +167,7 @@ export class RenderContext {
     const live = eb.valid && !eb.stale;
     if (live) {
       if (eb.text !== undefined && !Number.isFinite(Number(eb.text))) {
-        return { show: true, value: undefined, text: eb.text };
+        return { show: true, value: undefined, text: enumText(eb.text) };
       }
       return { show: true, value: eb.value, text: formatNumber(eb.value, format) };
     }
@@ -178,7 +178,16 @@ export class RenderContext {
         return { show: true, value: 0, text: formatNumber(0, format) };
       case 'last':
         if (eb.sample)
-          return { show: true, value: eb.value, text: eb.text ?? formatNumber(eb.value, format) };
+          return {
+            show: true,
+            value: eb.value,
+            text:
+              eb.text === undefined
+                ? formatNumber(eb.value, format)
+                : Number.isFinite(Number(eb.text))
+                  ? eb.text
+                  : enumText(eb.text),
+          };
         return { show: true, value: undefined, text: formatDash(format) };
       case 'dash':
       default:
