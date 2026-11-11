@@ -42,6 +42,18 @@ The welcome window, where you start from a template, open a theme or begin with 
 | ----------------------------------------------------------------------- | --------------------------------------------------------------- |
 | ![Classic theme in light mode](docs/assets/screenshots/light-theme.jpg) | ![Digital Dash](docs/assets/screenshots/community-template.jpg) |
 
+| Template: Rally Dash                                  | Template: Night Minimal (Sport palette)                     |
+| ----------------------------------------------------- | ----------------------------------------------------------- |
+| ![Rally Dash](docs/assets/screenshots/rally-dash.jpg) | ![Night Minimal](docs/assets/screenshots/night-minimal.jpg) |
+
+| Car preview: the car app's own engine and shaders       | Library blocks next to Supercar Track                         |
+| ------------------------------------------------------- | ------------------------------------------------------------- |
+| ![Car preview](docs/assets/screenshots/car-preview.jpg) | ![Library blocks](docs/assets/screenshots/library-blocks.jpg) |
+
+Theme details and sharing a theme with the community:
+
+![Theme details and File › Share with the community](docs/assets/screenshots/theme-details-share.jpg)
+
 These are screenshots of the Studio running on a PC. They are not photos of a car.
 
 ## What you get
