@@ -208,3 +208,10 @@ idv7lol is built on top of other people's open-source work. Thank you to all of 
   cluster font, and **[Lucide](https://lucide.dev)** (ISC) for the editor's icons.
 
 Full licence details are in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+### Made with Claude Code
+
+By the author's own estimate, about 70% of this project was written with the help of
+[Claude Code](https://claude.com/claude-code), and the rest by hand.
+
+<p align="center"><img src="docs/assets/claude-code.gif" alt="A Claude Code session working on idv7lol: segmenting the rev arc on the car and running the tests" width="600"></p>
