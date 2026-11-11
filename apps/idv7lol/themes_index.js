@@ -22,6 +22,16 @@ module.exports = {
       ]
     },
     {
+      "id": "idv7lol-night-minimal",
+      "name": "Night Minimal",
+      "module": "theme_idv7lol_night_minimal",
+      "palettes": [
+        "night",
+        "amber",
+        "sport"
+      ]
+    },
+    {
       "id": "idv7lol-performance",
       "name": "IDV7LOL Performance",
       "module": "theme_idv7lol_performance",
@@ -29,6 +39,16 @@ module.exports = {
         "night",
         "sport",
         "track"
+      ]
+    },
+    {
+      "id": "idv7lol-rally-dash",
+      "name": "Rally Dash",
+      "module": "theme_idv7lol_rally_dash",
+      "palettes": [
+        "rally",
+        "stage",
+        "ice"
       ]
     },
     {

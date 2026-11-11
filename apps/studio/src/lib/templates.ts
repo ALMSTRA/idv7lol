@@ -3,6 +3,8 @@ import performance from '../../../../themes/performance/theme.json';
 import modern from '../../../../themes/modern/theme.json';
 import classic from '../../../../themes/classic/theme.json';
 import supercarTrack from '../../../../themes/supercar-track/theme.json';
+import nightMinimal from '../../../../themes/night-minimal/theme.json';
+import rallyDash from '../../../../themes/rally-dash/theme.json';
 import minimal from '../../../../themes/examples/minimal/theme.json';
 
 export interface Template {
@@ -24,6 +26,8 @@ export const TEMPLATES: Template[] = [
   { id: 'modern', doc: modern },
   { id: 'classic', doc: classic },
   { id: 'supercar-track', doc: supercarTrack },
+  { id: 'night-minimal', doc: nightMinimal },
+  { id: 'rally-dash', doc: rallyDash },
   { id: 'minimal', doc: minimal },
   ...Object.entries(
     import.meta.glob<unknown>('../../../../themes/community/*/theme.json', {

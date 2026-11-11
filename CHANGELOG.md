@@ -23,6 +23,10 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   tachometers, lateral G meter, oil column, oil pressure, torque ring), readouts (driving mode,
   outside temperature, odometer, torque), a big gear, a 15-LED shift bar and six telltales. Every
   entry is tested to validate and compile for the car.
+- Two new themes, also bundled in the car app: **Night Minimal** (a thin rev arc over a big speed,
+  quiet side readouts; Night, Amber and Sport palettes, 17 layers) and **Rally Dash** (a 15-LED
+  shift strip and rev bar across the top, a huge gear, six data cards; Rally, Stage and Ice
+  palettes, 34 layers). Both validate clean and pass the car path test; not tried on a car.
 - Display profile: zones other cluster projects report from their cars, shown in the Studio as
   hints only (no findings): the bottom strip below y 646 where the cluster draws black boxes,
   two boxes on M cars, and the driver camera notch. Not measured by idv7lol yet.

@@ -48,7 +48,8 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
 
 - **idv7lol Studio**, the Windows editor. Drag gauges, bars, readouts and text onto the layout,
   import pictures, GIFs or short videos and edit them, try it with the simulator, and build.
-- **Themes to start from.** Performance, Modern, Classic and Supercar Track (a wide rev arc and a
+- **Themes to start from.** Performance, Modern, Classic, Night Minimal (a calm night layout),
+  Rally Dash (LED strip, rev bar, huge gear and data cards) and Supercar Track (a wide rev arc and a
   huge gear, in the style of Italian supercar track clusters), plus seven free community layouts
   converted from eroobeeroo's Cluster Layouts (GPL, credited in each theme).
 - **The car app**, which runs on the head unit, draws the active theme through `cluster-render`,

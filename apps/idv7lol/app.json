@@ -73,7 +73,9 @@
       "options": [
         ["idv7lol-classic", "IDV7LOL Classic"],
         ["idv7lol-modern", "IDV7LOL Modern"],
+        ["idv7lol-night-minimal", "Night Minimal"],
         ["idv7lol-performance", "IDV7LOL Performance"],
+        ["idv7lol-rally-dash", "Rally Dash"],
         ["idv7lol-supercar-track", "Supercar Track"]
       ]
     },
@@ -89,6 +91,9 @@
         ["night", "Palette: night"],
         ["eco", "Palette: eco"],
         ["track", "Palette: track"],
+        ["rally", "Palette: rally"],
+        ["stage", "Palette: stage"],
+        ["ice", "Palette: ice"],
         ["corsa", "Palette: corsa"]
       ]
     },
