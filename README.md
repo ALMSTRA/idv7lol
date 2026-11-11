@@ -218,3 +218,7 @@ reformatted or generated afterwards. Vendored code (`kit/`, the renderer client)
 files are left out of the count.
 
 <p align="center"><img src="docs/assets/claude-code.gif" alt="A Claude Code session working on idv7lol: segmenting the rev arc on the car and running the tests" width="600"></p>
+
+And the tokens it took to get here:
+
+<p align="center"><img src="https://gifdb.com/images/thumbnail/spongebob-fire-gif-h4xrvu291i9tohcs.gif" alt="SpongeBob in front of a fire" width="320"></p>
