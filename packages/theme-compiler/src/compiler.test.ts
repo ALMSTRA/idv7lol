@@ -163,6 +163,29 @@ describe('validateTheme', () => {
     expect(r.warnings.filter((w) => w.componentId === 'flush')).toEqual([]);
   });
 
+  it('treats the zones reported by other projects as hints only', () => {
+    // Inside the M-car box and the bottom strip, but clear of every factory zone.
+    const inBox = createComponent('value.digital', {
+      id: 'in-m-box',
+      x: 800,
+      y: 295,
+      width: 200,
+      height: 80,
+    });
+    const low = createComponent('value.digital', {
+      id: 'low',
+      x: 100,
+      y: 650,
+      width: 300,
+      height: 60,
+    });
+    const r = validateTheme(theme([inBox, low]));
+    const mine = [...r.errors, ...r.warnings, ...r.infos].filter(
+      (f) => f.componentId === 'in-m-box' || f.componentId === 'low',
+    );
+    expect(mine.filter((f) => f.code.startsWith('layout.'))).toEqual([]);
+  });
+
   it("doesn't let a theme relax a factory zone by reusing its id", () => {
     const base = createEmptyTheme({ id: 'spec', name: 'Spec' });
     const t = theme(

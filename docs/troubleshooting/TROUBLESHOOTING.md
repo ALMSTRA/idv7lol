@@ -42,7 +42,7 @@ block; a mandatory one does. Open an issue with the error text and your car mode
 to mark the interface optional or remove it.
 
 **The app page says "not connected".** cluster-render is not installed or not running. Install
-it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.4.2+.
+it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.5.1+.
 
 **"Waiting for live car data".** No signal has arrived: with the engine off and the car asleep
 the bus is silent. Start the car, or set _Demo data: On_ to check the layout.

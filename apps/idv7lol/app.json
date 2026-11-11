@@ -173,6 +173,6 @@
     }
   },
   "requires": {
-    "cluster-render": "0.4.2"
+    "cluster-render": "0.5.1"
   }
 }

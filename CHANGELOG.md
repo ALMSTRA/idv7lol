@@ -18,9 +18,19 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   isn't a template's), saves it with a picture and opens the new theme form on GitHub. Nothing is
   uploaded by the Studio. Tested locally in the browser; the desktop folder dialog is not tried yet.
 - A "Share a theme" issue form and a "Sharing a layout (no car needed)" section in CONTRIBUTING.
+- Display profile: zones other cluster projects report from their cars, shown in the Studio as
+  hints only (no findings): the bottom strip below y 646 where the cluster draws black boxes,
+  two boxes on M cars, and the driver camera notch. Not measured by idv7lol yet.
 
 ### Changed
 
+- Car app: requires cluster-render 0.5.1 or newer, where the panel has its own scene id and can
+  show together with a HUD app. The renderer client is refreshed from upstream (0.5.5; it only
+  adds the `yield` field, which idv7lol doesn't use). Checked locally: the client loads and
+  parses as ES2017, and every theme still passes the car path test. Not tried on a car with
+  0.5.x yet.
+- Renderer and compatibility docs follow cluster-render 0.5.x: the panel's scene id, panel and
+  HUD together, `yield`, the new limits, and the iDrive 8 targets.
 - First vehicle test: on a 2021 X4 M Competition (iDrive 7) the car app installed from the MGU
   Store, drew the Performance and Supercar Track themes, and turning it off restored the factory
   cluster. Status, compatibility and deployment docs now say so, and list what is still

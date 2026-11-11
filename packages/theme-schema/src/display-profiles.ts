@@ -69,7 +69,7 @@ export const DISPLAY_PROFILES: readonly DisplayProfile[] = [
     notes:
       'cluster-render "panel" target: slot 0x203, 1920×720, drawn above the factory gauges and below the ' +
       'factory telltales and pop-ups. The reserved zones mirror those used by Cluster Layouts on real cars. ' +
-      'Not yet verified on a car by idv7lol itself.',
+      'idv7lol has drawn on one car (a 2021 X4 M) but has not measured these zones there yet.',
     reservedZones: [
       {
         id: 'cowl',
@@ -116,6 +116,45 @@ export const DISPLAY_PROFILES: readonly DisplayProfile[] = [
         y: 120,
         width: 1088,
         height: 480,
+      },
+      // The zones below are reported by other cluster projects from their cars and photos
+      // (Cluster Layouts' STRIP_Y and M boxes, bimmer-lab issue #5, cruzen991). idv7lol hasn't
+      // measured them, so they are drawn as hints and never raise findings.
+      {
+        id: 'bottom-strip',
+        name: 'Bottom strip (black boxes reported below y 646)',
+        kind: 'info',
+        x: 0,
+        y: 646,
+        width: 1920,
+        height: 74,
+      },
+      {
+        id: 'm-box-left',
+        name: 'M cars: cluster box (approx. ±10 px)',
+        kind: 'info',
+        x: 793,
+        y: 289,
+        width: 246,
+        height: 92,
+      },
+      {
+        id: 'm-box-right',
+        name: 'M cars: cluster box (approx. ±10 px)',
+        kind: 'info',
+        x: 1223,
+        y: 328,
+        width: 171,
+        height: 78,
+      },
+      {
+        id: 'driver-camera',
+        name: 'Driver camera notch (cars with it, to y ≈ 147)',
+        kind: 'info',
+        x: 740,
+        y: 128,
+        width: 440,
+        height: 19,
       },
     ],
   },

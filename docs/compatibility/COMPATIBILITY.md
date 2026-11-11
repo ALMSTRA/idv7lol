@@ -5,10 +5,10 @@ vehicle**. Only what the _Tested in vehicle_ section lists has reached that stat
 
 ## Head units
 
-| Platform                  | Status            | Notes                                                                                        |
-| ------------------------- | ----------------- | -------------------------------------------------------------------------------------------- |
-| BMW iDrive 7 (MGU, "ID7") | tested in vehicle | target of this project; `cluster-render` `panel` 1920×720; one car so far (see below)        |
-| BMW iDrive 8 (MGU, "ID8") | not supported     | cluster-render has no `panel` target on ID8 (only `map` 874×749); the app logs and stays off |
+| Platform                  | Status            | Notes                                                                                                                                                 |
+| ------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BMW iDrive 7 (MGU, "ID7") | tested in vehicle | target of this project; `cluster-render` `panel` 1920×720; one car so far (see below)                                                                 |
+| BMW iDrive 8 (MGU, "ID8") | not supported     | no full-cluster target on ID8: `map` 874×749, `hud`, `guide`, `widget`/`popup` (centre only); the Store won't install idv7lol there (`mguHmi` is ID7) |
 
 The development car reports software `20w44.1-1-3`. That identifier names the head-unit
 software release (I-step), **not** the renderer or the cluster. Capabilities are detected at run
@@ -19,7 +19,7 @@ time from cluster-render's `hello` (`backend`, `targets`), never assumed from th
 | Component                                    | Minimum                           | Source                      |
 | -------------------------------------------- | --------------------------------- | --------------------------- |
 | MGU Store (mgu-deploy, app-privacy, updater) | current                           | robertnisipeanu/mgu-store   |
-| cluster-render                               | 0.4.2 (64 layers/app)             | robertnisipeanu/idrive-apps |
+| cluster-render                               | 0.5.1 (panel's own scene id)      | robertnisipeanu/idrive-apps |
 | Node.js on the unit                          | 8.7+ (8.16.2 on current firmware) | BMW firmware                |
 | Python on the unit (build from source)       | mgu-python                        | installed by the Store      |
 

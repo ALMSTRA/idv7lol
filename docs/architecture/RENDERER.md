@@ -22,18 +22,33 @@ theme.json ──compiler──▶ pieces (GLSL ES 1.00 + uniforms) ──runtim
   mesh. Max frame 5,529,664 bytes.
 - Handshake: the client sends `{"op":"hello","app":"<id>","proto":1}` and gets back
   `{"ev":"hello","proto":1,"backend":"id7"|"id8","targets":"map:1088x480,panel:1920x720,hud:800x480","repeat":1}`.
-  idv7lol reads `targets` instead of hard-coding sizes; iDrive 8 has no `panel`.
+  idv7lol reads `targets` instead of hard-coding sizes (other apps can change a target's size in
+  the service's config). iDrive 8 has no `panel`; its hello lists
+  `map:874x749,hud:353x203,guide:702x213,widget:2240x896,popup:2240x896` (`PROTOCOL.md`).
 
 ## Targets (iDrive 7)
 
 | Target  | Slot / scene       | Size                  | Where                                                                                     |
 | ------- | ------------------ | --------------------- | ----------------------------------------------------------------------------------------- |
-| `panel` | 0x203 / 0x01000400 | 1920×720              | the whole cluster, _above_ the stock gauges and _below_ the factory telltales and pop-ups |
+| `panel` | 0x203 / 0x010004f8 | 1920×720              | the whole cluster, _above_ the stock gauges and _below_ the factory telltales and pop-ups |
 | `map`   | 0x100 / 0x010004f0 | 1088×480 at (416,120) | the stock map window under the gauges                                                     |
-| `hud`   | 0x323              | 800×480               | head-up display                                                                           |
+| `hud`   | 0x323 / 0x01000400 | 800×480               | head-up display                                                                           |
 
-idv7lol targets `panel`. The panel and the HUD share one scene id: while any app draws on
-the HUD the panel cannot come up.
+idv7lol targets `panel`. Since cluster-render 0.5.1 the panel has its own scene id,
+0x010004f8, so the panel and the HUD can show at the same time (upstream: "reported on one
+car"). If the cluster refuses that id, or the mapping guard turns it off, the panel falls back
+to 0x01000400, the HUD's, and then the two can't show together, as before 0.5.1
+(`cluster-render.conf`, `panel_scene_id` / `panel_fallback_scene_id`). idv7lol requires
+cluster-render 0.5.1 or newer for this reason.
+
+## iDrive 8 (not supported by idv7lol)
+
+There is no full-cluster target on iDrive 8: the factory gauges always stay. The largest area is
+the `widget`/`popup` canvas of 2240×896, of which only the middle is visible (about x 400–1720,
+y 143–765, with a notch at the top), and only when the driver picks the widget. Limits and the
+GLSL ES 1.00 shaders are the same as on iDrive 7. Upstream verified drawing there on one M4; the
+MGU Store says iDrive 8 "is not yet tested on a real car". A port of idv7lol would be a
+centre-widget theme type, not a full layout. See `docs/compatibility/COMPATIBILITY.md`.
 
 ## Operations
 
@@ -43,7 +58,9 @@ ignored (forward compatible).
 
 - `layer` kinds: `effect` (fragment-shader quad, what idv7lol uses), `image` (RGBA8, dirty
   rects), `video`, `mesh`. Fields include `target, x, y, w, h, z, class, opacity, rotate,
-exclusive, time`.
+exclusive, time`, plus `guide_hold` (iDrive 7 `map` only) and `yield` (0.5.3, targets with
+  yield slots, today `hud`: 0 keeps the layer over the stock HMI's pop-ups). idv7lol uses
+  neither; on `panel` the factory telltales and pop-ups always stay on top.
 - `asset`: `r8`/`rgba8` textures ≤ 2048², sampled by effects (`bind`). idv7lol uploads one R8
   glyph atlas.
 - `uniform`: `v` = 1–4 numbers, or with `type` (`float|vec2|vec3|vec4|mat4`) arrays up to 1024
@@ -62,13 +79,18 @@ exclusive, time`.
 | Floats per layer         | 4096; ≤ 1024 per array uniform                                                                      |
 | Animations per layer     | 16                                                                                                  |
 | Assets                   | 16 per client / 32 total, ≤ 16 MiB CPU pixel memory                                                 |
+| Video layers             | 2 (0.5.x)                                                                                           |
+| Clients / binds          | 16 clients; 32 binds (0.5.x)                                                                        |
 | Layer geometry           | x,y ±4096; w,h 1..4096; opacity 0..1; rotate ±36000°                                                |
 | Bandwidth                | shared budget, ceiling 5500 KB/s (8000 flashed the cluster black); `budget` events announce the cap |
+| Bandwidth floor          | 2000 KB/s (0.5.x); the HUD gets its own share, up to half, without raising the ceiling              |
 
 Reserved uniform names (RAMSES matrices): `u_mvp u_mv u_m u_v u_p u_normal`. Never declare
 them in a shader. A shader that fails to compile is refused at `layer` time
 ("effect did not compile"). **One large shader drawing many pieces made the KOMBI restart**;
-keep one small shader per piece.
+keep one small shader per piece. Two other cluster projects report the same with heavy
+full-screen shaders (the cluster display restarted; locking the car for about two minutes
+brought it back). A flat full-panel background, like idv7lol's, has run fine on a car.
 
 ## Shaders
 
@@ -107,8 +129,18 @@ Factory content drawn over the panel, from the Cluster Layouts geometry (`layout
 | Stock map window            | 416, 120, 1088, 480           | info       |
 
 They are encoded in `packages/theme-schema/src/display-profiles.ts` and enforced by the
-validator (errors for keep-clear, warnings for factory). **Not yet verified by idv7lol on a
-car.**
+validator (errors for keep-clear, warnings for factory). idv7lol has drawn on one car (a 2021
+X4 M) but has **not measured these zones there yet**.
+
+Other projects report more, measured on their cars or from photos. idv7lol shows them in the
+Studio as hints (info zones, no findings) until someone checks them:
+
+| Zone                         | Rect (x, y, w, h)  | Source                                                                                                 |
+| ---------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------ |
+| Bottom strip                 | 0, 646, 1920, 74   | Cluster Layouts ends layouts at `STRIP_Y = 646` so the cluster doesn't draw black boxes; bimmer-lab #5 |
+| M cars: two cluster boxes    | 793, 289, 246, 92  | Cluster Layouts `M_BOXES`, "from one photo of a car" (±10 px)                                          |
+|                              | 1223, 328, 171, 78 |                                                                                                        |
+| Driver camera notch (if any) | 740, 128, 440, 19  | cruzen991/Cluster: the notch reaches y ≈ 147                                                           |
 
 ## Recovery and risks
 
@@ -127,7 +159,9 @@ car.**
   verbatim with header into `apps/idv7lol`, listed in `THIRD_PARTY_NOTICES.md`.
 - Barlow fonts: SIL OFL 1.1.
 - Cluster Layouts code (GPL-3.0-or-later) is a reference, not copied; idv7lol writes its own
-  engine, shaders and compiler.
+  engine, shaders and compiler. Since commit `10cefda` Cluster Layouts is PolyForm
+  Noncommercial: nothing from later versions is copied or converted, and the community
+  templates come from the earlier GPL version.
 - Proprietary and never redistributed: BMW rootfs, `libramses`, `libvsomeip3`, vsomeip
   configs, the OAP SDK.
 
@@ -135,6 +169,8 @@ car.**
 
 | Component       | Version      | Note                                                                                             |
 | --------------- | ------------ | ------------------------------------------------------------------------------------------------ |
-| cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive; HEAD adds scene files (unreleased) |
+| cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive                                     |
+| cluster-render  | 0.5.0–0.5.5  | 0.5.0 scene files (off by default); 0.5.1 panel's own scene id; 0.5.3 `yield`; 0.5.4–0.5.5 fixes |
 | Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                        |
+| Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`               |
 | mgu-deploy      | 0.7.11       | pinned by waze-on-cluster                                                                        |
