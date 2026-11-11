@@ -88,9 +88,10 @@ own scene id, cluster-render's guard keeps the panel on the HUD's id, and then t
 show together. It stays that way until `cluster-render guard-reset` (root SSH) or a new
 cluster-render version (idrive-apps #128).
 
-**The factory gauges flash for a moment when switching themes.** The app drops the old layout
-before building the new one, and an empty panel hands the cluster back for an instant. Another
-cluster app reports the same (idrive7-cluster-info #9).
+**The factory gauges flash for a moment when switching themes.** An empty panel hands the
+cluster back for an instant (seen by another cluster app, idrive7-cluster-info #9). Since the
+fix of November 2026 idv7lol keeps the old layout's background until the new layout is up, so
+this should not happen; if it still does, note the two themes and open an issue.
 
 **Restore everything.** In the app's Settings, Show on the cluster: Off restores the factory
 cluster at once. MGU Store > Installed > idv7lol > Remove uninstalls the app. The Store's rollback restores

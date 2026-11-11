@@ -27,6 +27,13 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   hints only (no findings): the bottom strip below y 646 where the cluster draws black boxes,
   two boxes on M cars, and the driver camera notch. Not measured by idv7lol yet.
 
+### Fixed
+
+- Car app: switching themes no longer leaves the panel empty for a moment. The old layout's
+  bottom layer stays until the new one is up, so the factory gauges don't flash in between
+  (reported for another cluster app, idrive7-cluster-info #9). Tested locally with the car's
+  engine; not tried on a car.
+
 ### Changed
 
 - Car app: requires cluster-render 0.5.2 or newer. From 0.5.1 the panel has its own scene id and

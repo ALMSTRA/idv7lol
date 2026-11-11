@@ -192,6 +192,32 @@ describe('MGU engine', () => {
     expect(t.client.layers.size).toBe(0);
   });
 
+  it('switches theme without leaving the panel empty, so the factory gauges never flash', () => {
+    const modern = compileTheme(
+      JSON.parse(
+        readFileSync(new URL('../../themes/modern/theme.json', import.meta.url), 'utf8'),
+      ) as unknown,
+      { fonts: { sans: { pixels: baked.pixels, metrics: baked.metrics } } },
+    ).compiled as CompiledTheme;
+    const t = setup();
+    t.feed({ 'engine.rpm': 3000, 'vehicle.speed': 80 });
+    t.advance(50);
+    expect(t.engine.shown).toBe(true);
+    // Count the effect layers left after every drop while the theme is swapped.
+    const effects = () => [...t.client.layers.values()].filter((l) => l.kind === 'effect').length;
+    let fewest = Infinity;
+    const drop = t.client.drop.bind(t.client);
+    t.client.drop = (ref: number) => {
+      drop(ref);
+      fewest = Math.min(fewest, effects());
+    };
+    (t.engine as unknown as { setTheme(th: unknown, f: unknown): void }).setTheme(modern, fonts);
+    expect(t.engine.shown).toBe(true);
+    expect(fewest).toBeGreaterThan(0);
+    // The held layer is gone once the new layout is up: only the new theme's layers remain.
+    expect(effects()).toBe(modern.pieces.length);
+  });
+
   it('eases values and sends only changes; hides the layout when data goes stale', () => {
     const t = setup();
     t.feed({ 'engine.rpm': 1000 });

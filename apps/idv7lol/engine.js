@@ -31,6 +31,8 @@ const EPS = 0.0015;
 const ANGLE_EPS = 0.05;
 const LIVE_GRACE_MS = 1500;
 const SWEEP_MS = 700;
+// cluster-render's layer limit for one client (docs/architecture/RENDERER.md).
+const LAYERS_PER_CLIENT = 64;
 
 const ICON_P_CODE = 'P';
 const SECONDARY_START = '\u0001';
@@ -172,18 +174,40 @@ class ClusterEngine {
 
   /** Swap the theme (and fonts); rebuilds when shown. */
   setTheme(theme, fonts) {
-    const was = this.shown;
-    this.setShown(false);
-    this.theme = theme;
-    if (fonts) this.fonts = fonts;
-    if (was) this.setShown(true);
+    this._swap(theme, fonts);
   }
 
   rebuild() {
     this.failed = null;
+    this._swap(this.theme, null);
+  }
+
+  /**
+   * Replace the layout while it is shown. An empty panel hands the cluster back to the factory
+   * gauges for a moment, which shows as a flash between two layouts (seen by another cluster
+   * app, eroobeeroo/idrive7-cluster-info #9). So the old layout's bottom layer, its background as
+   * a rule, stays until the new one is up, when the new layout leaves room for it.
+   */
+  _swap(theme, fonts) {
     const was = this.shown;
+    const room = theme.pieces.length + (theme.images || []).length < LAYERS_PER_CLIENT;
+    const hold = was && room ? this._bottomLayer() : null;
+    if (hold) this.pieces = this.pieces.filter((p) => p !== hold);
     this.setShown(false);
+    this.theme = theme;
+    if (fonts) this.fonts = fonts;
     if (was) this.setShown(true);
+    if (hold) this.cr.drop(hold.ref);
+  }
+
+  /** The lowest effect layer that needs no texture, or null. */
+  _bottomLayer() {
+    let best = null;
+    this.pieces.forEach((p) => {
+      if (!p.ref || p.piece.usesFont) return;
+      if (!best || p.piece.z < best.piece.z) best = p;
+    });
+    return best;
   }
 
   palette() {
