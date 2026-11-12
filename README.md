@@ -24,6 +24,10 @@ pictures and animations haven't been tried on a car yet. Details in
 [Releases page](https://github.com/ALMSTRA/idv7lol/releases). It isn't signed, so Windows
 SmartScreen warns the first time; choose _More info_ and _Run anyway_.
 
+**On a Mac:** there is a build for Apple silicon and Intel Macs (macOS 10.15 or newer). It is
+compiled but not tested on a Mac yet; how to get it and open it the first time is in
+[docs/user/INSTALL_MAC.md](docs/user/INSTALL_MAC.md).
+
 ## Screenshots
 
 The editor with the Performance theme while the simulator drives a track lap:

@@ -9,6 +9,12 @@ GLSL, RAMSES ni JavaScript.
 > Aviso: idv7lol es software experimental y no oficial. No está afiliado a BMW. Prueba siempre
 > con el auto estacionado, mantén a la vista los testigos de fábrica y lee `SECURITY.md`.
 
+**En Mac:** hay una versión para Mac con Apple silicon o Intel (macOS 10.15 o más nuevo). Está
+compilada pero todavía no se ha probado en un Mac. Como no está notarizada por Apple, la primera
+vez macOS pide permiso: en macOS 14 o anterior, clic derecho sobre la app > **Abrir**; en macOS 15,
+ábrela una vez y luego ve a **Ajustes del Sistema > Privacidad y seguridad > Abrir igualmente**.
+Los detalles están en `docs/user/INSTALL_MAC.md`.
+
 ## Pasos básicos
 
 1. Abre idv7lol Studio y elige una plantilla (Performance, Modern, Classic, Night Minimal, Rally

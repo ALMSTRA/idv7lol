@@ -12,6 +12,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- idv7lol Studio for macOS: CI builds one universal `.dmg` (Apple silicon and Intel, macOS 10.15
+  or newer), signed ad hoc, and checks its architectures, signature and the `.idv7theme`
+  association. Double-clicking a theme in Finder opens it. Compiled, not tested on a Mac; how to
+  open it the first time is in `docs/user/INSTALL_MAC.md`.
+
 - Studio: **Theme details** in the Inspector when nothing is selected (name, id, author, version,
   licence, description), with undo. Tested locally in the browser.
 - Studio: **File > Share with the community** checks the theme (no errors, an author, an id that

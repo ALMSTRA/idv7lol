@@ -36,11 +36,12 @@ only affect validation and simulation; the car app reads whatever the unit provi
 
 ## Studio
 
-| OS             | Status                                           |
-| -------------- | ------------------------------------------------ |
-| Windows 11 x64 | developed, tested locally (dev build)            |
-| Windows 10 x64 | expected to work (WebView2 required), not tested |
-| macOS / Linux  | no desktop build is provided                     |
+| OS             | Status                                                                                                   |
+| -------------- | -------------------------------------------------------------------------------------------------------- |
+| Windows 11 x64 | developed, tested locally (dev build)                                                                    |
+| Windows 10 x64 | expected to work (WebView2 required), not tested                                                         |
+| macOS 10.15+   | compiled in CI (universal: Apple silicon and Intel), not tested on a Mac; see `docs/user/INSTALL_MAC.md` |
+| Linux          | no desktop build is provided                                                                             |
 
 ## Tested in vehicle
 
