@@ -10,6 +10,16 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+### Fixed
+
+- Needles turn the way their scale runs on the car and in the Studio's car preview. The needle
+  shader built its rotation the wrong way round, so a needle sent to angle _a_ was drawn at _−a_:
+  mirrored top to bottom against its ticks, its band and the editor's own drawing. A dial at zero
+  pointed to the upper left instead of the lower left; in Performance the boost needle sat as far
+  below the horizontal as the end of the arc was above it. `apps/idv7lol/shaders.js` and the two
+  bundled themes with needles (Classic, Performance) are regenerated. Tested locally (a unit test
+  on the shader's matrix, and the car preview); not tested in a vehicle.
+
 ## [0.2.0-beta.3] - 2026-11-12
 
 Third pre-release: idv7lol Studio in three more languages, and the car app on the Store's Releases
