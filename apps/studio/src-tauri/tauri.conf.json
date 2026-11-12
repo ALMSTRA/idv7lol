@@ -49,6 +49,10 @@
         "role": "Editor"
       }
     ],
+    "macOS": {
+      "signingIdentity": "-",
+      "minimumSystemVersion": "10.15"
+    },
     "windows": {
       "nsis": {
         "installMode": "currentUser",

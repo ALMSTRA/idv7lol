@@ -247,6 +247,20 @@ export function App(): JSX.Element {
     })().catch(() => undefined);
   }, []);
 
+  /* ----- files macOS asks to open while the Studio runs (double-click in Finder) ----- */
+  useEffect(() => {
+    if (!isTauri) return;
+    let stop: (() => void) | undefined;
+    (async () => {
+      const { listen } = await import('@tauri-apps/api/event');
+      stop = await listen<string[]>('open-files', (e) => {
+        const file = e.payload.find((a) => /\.(idv7theme|json)$/i.test(a));
+        if (file) void doOpenPath(file);
+      });
+    })().catch(() => undefined);
+    return () => stop?.();
+  }, []);
+
   /* ----- window title & unload guard ----- */
   useEffect(() => {
     document.title = `${project.dirty ? '• ' : ''}${project.themeName} — idv7lol Studio`;
