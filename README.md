@@ -220,7 +220,10 @@ Discussions. Report security problems privately as described in [SECURITY.md](SE
 
 ## Credits
 
-idv7lol is built on top of other people's open-source work. Thank you to all of them.
+idv7lol is made by [@1vs1m88](https://www.instagram.com/1vs1m88/) on Instagram: say hi there,
+or show what your cluster looks like.
+
+It is built on top of other people's open-source work. Thank you to all of them.
 
 - **[eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info)**:
   Cluster Layouts proved that a fully custom layout works on the KOMBI, and it is the project this
