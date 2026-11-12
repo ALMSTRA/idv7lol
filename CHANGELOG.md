@@ -19,6 +19,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   below the horizontal as the end of the arc was above it. `apps/idv7lol/shaders.js` and the two
   bundled themes with needles (Classic, Performance) are regenerated. Tested locally (a unit test
   on the shader's matrix, and the car preview); not tested in a vehicle.
+- In the editor, the `turn-left` and `turn-right` telltales point the way they are named. They
+  were swapped there; the car's shader already drew them right. Tested locally.
 
 ## [0.2.0-beta.3] - 2026-11-12
 
