@@ -10,6 +10,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+### Added
+
+- The car app installs from the MGU Store's **Releases** channel too, the one the Store offers
+  first once the repository has releases. A `catalog` release lists a ready package of the app,
+  built by `tools/build/build-store-catalog.py` without BMW's SDK (the head unit makes that module
+  from one of its own apps). Its layout matches packages that install from the Store on the test
+  car; this one hasn't been tried on a car yet. Before, a source added on Releases showed "no
+  catalog release".
+
 ## [0.2.0-beta.2] - 2026-11-11
 
 Second pre-release: idv7lol Studio 0.2.0 for Windows and, new, for macOS, plus the car app from

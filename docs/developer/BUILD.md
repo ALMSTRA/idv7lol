@@ -105,7 +105,22 @@ with read-only tokens.
 ## Releases
 
 Tag `vX.Y.Z` only for documented, tested milestones. Attach the Studio installer from the CI
-artifact. The MGU Store reads the repository tree (`mgu-repo.json`) on a branch or tag; no
-release asset is needed for the car app. Its Tags channel skips tags with a pre-release suffix, so
-`v0.2.0-beta.1` is not offered there; until a plain version tag exists, the car installs from the
-Branch channel (`main`).
+artifact. The MGU Store reads the repository tree (`mgu-repo.json`) on a branch or tag. Its Tags
+channel skips tags with a pre-release suffix, so `v0.2.0-beta.2` is not offered there.
+
+On the **Releases** channel, which the Store offers first once a repository has releases, it
+reads the `catalog.json` of a release named `catalog`. After a car-app change, rebuild that
+release:
+
+```bash
+python tools/build/build-store-catalog.py
+```
+
+```bash
+gh release upload catalog dist/catalog/* --clobber
+```
+
+The script runs `kit/tools/build.py` with an empty stand-in for BMW's oap-sdk and takes it out of
+the package again: the head unit makes that module from one of its own apps (mgu-store
+`docs/PUBLISHING.md`, "Releases"). The `catalog` release is a normal release that is not marked
+latest, so the Studio pre-releases stay at the top of the Releases page.

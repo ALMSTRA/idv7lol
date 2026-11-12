@@ -135,8 +135,10 @@ needs root SSH access once; its README explains how.
 > Details in [DEPLOYMENT.md](docs/user/DEPLOYMENT.md#before-you-install-the-mgu-store-the-ssh-unlock-erases-the-head-units-coding).
 
 1. In the Store on the car, open **Settings**, then **Sources**, then **Add GitHub repository**,
-   and enter `ALMSTRA/idv7lol` with the **Branch** channel and `main`. Don't pick Tags: the Store
-   skips pre-release tags like `v0.2.0-beta.1`, so idv7lol doesn't show up there yet.
+   and enter `ALMSTRA/idv7lol`. The Store offers **Releases** first: that works (it reads the
+   `catalog` release, a ready package), and so does **Branch** `main` (the Store builds the app on
+   the head unit from the latest code). Don't pick Tags: it skips pre-release tags like
+   `v0.2.0-beta.2`.
 2. Open **idv7lol** in the list and press **Install**. The Store installs `cluster-render` first if
    it is missing, then builds idv7lol on the head unit. That takes about a minute.
 3. Restart the head unit if the Store asks for it.

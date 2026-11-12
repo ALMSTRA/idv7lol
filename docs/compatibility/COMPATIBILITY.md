@@ -57,5 +57,6 @@ themes and palettes, USB themes, images and animations.
 
 ## Installing from the Store
 
-Add `ALMSTRA/idv7lol` with the **Branch** channel (`main`). The Tags channel skips pre-release
-tags such as `v0.2.0-beta.1`, so idv7lol is not listed there until a plain version tag exists.
+Add `ALMSTRA/idv7lol` on **Branch** `main` (the Store builds the app on the head unit; tested on a
+car) or on **Releases** (the `catalog` release's ready package, without BMW's SDK; not tried on a
+car yet). The Tags channel skips pre-release tags such as `v0.2.0-beta.2`.

@@ -32,9 +32,13 @@ run `npx tsx tools/build/bake-fonts.ts` before `npm run build` / `tauri build`.
 
 ## Car app
 
-**The app does not appear in the Store.** Check the source (`ALMSTRA/idv7lol`, **Branch**
-channel, `main`). The Tags channel skips pre-release tags such as `v0.2.0-beta.1`, so idv7lol
+**The app does not appear in the Store.** Check the source (`ALMSTRA/idv7lol`, **Releases** or
+**Branch** `main`). The Tags channel skips pre-release tags such as `v0.2.0-beta.2`, so idv7lol
 isn't listed there. The Store shows a source error when a component cannot be used.
+
+**"no catalog release and no <id>@<x.y.z>.tgz or .mgu in its releases".** The source was added
+on Releases before the repository had its `catalog` release (November 2026). Let the Store check
+its sources again, or remove the source and add it again; **Branch** `main` works as well.
 
 **The Store says "coding is missing: it holds default values".** The head unit has no coding,
 usually because the SSH unlock flash erased it. MainApp doesn't start on default coding, so no

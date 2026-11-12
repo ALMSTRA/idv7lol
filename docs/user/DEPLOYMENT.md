@@ -93,8 +93,14 @@ This is about installing the Store, not idv7lol: idv7lol itself doesn't flash or
 ## Procedure (via the MGU Store)
 
 1. In the Store on the car, open **Settings > Sources > Add GitHub repository** and enter
-   `ALMSTRA/idv7lol`. Choose the **Branch** channel with `main`. The Tags channel doesn't list
-   idv7lol yet: it skips pre-release tags such as `v0.2.0-beta.1`.
+   `ALMSTRA/idv7lol`. Either channel works:
+   - **Releases** (the Store's default once a repo has releases) reads the `catalog` release: a
+     ready package of the car app, without BMW's SDK, which the head unit makes from one of its
+     own apps. Not tried on a car yet.
+   - **Branch** `main` builds the app on the head unit from the latest code. Tested on a car.
+
+   Don't pick Tags: it skips pre-release tags such as `v0.2.0-beta.2`.
+
 2. The Store lists **idv7lol**. Open it and press **Install**. The Store installs
    `cluster-render` first if needed, then builds idv7lol from source on the unit (Python +
    Node, about a minute) and installs it.

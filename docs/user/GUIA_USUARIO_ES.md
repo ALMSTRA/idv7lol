@@ -161,5 +161,7 @@ un respaldo de la codificación antes, ten a la mano cómo recodificar y flashea
 el SSH falla después, usa los pasos de enable o persist de la herramienta, que no flashean. Los
 detalles están en `docs/user/DEPLOYMENT.md`.
 
-Al agregar la fuente `ALMSTRA/idv7lol` en MGU Store, elige el canal **Branch** con `main`. El canal
-Tags no muestra idv7lol por ahora, porque ignora las versiones preliminares como `v0.2.0-beta.1`.
+Al agregar la fuente `ALMSTRA/idv7lol` en MGU Store sirven dos canales: **Releases**, el que el
+Store elige primero, que instala un paquete ya armado (todavía no probado en un auto), o **Branch**
+con `main`, que arma la app en el auto con el código más reciente (ya probado). El canal Tags no
+muestra idv7lol, porque ignora las versiones preliminares como `v0.2.0-beta.2`.
