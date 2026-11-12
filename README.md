@@ -4,6 +4,16 @@
 
 Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus an editor for Windows and macOS to design them.
 
+<table align="center"><tr><td align="center">
+
+### 🚧 Coming soon: [idv7lol.com](https://idv7lol.com)
+
+A home for idv7lol themes: **upload** your own layouts, **browse** the community's, **rate** the
+ones you like, and **download** them to the Studio or, if the head unit's connection allows it,
+**straight to the car**. Work in progress.
+
+</td></tr></table>
+
 You draw your cluster on the PC, drive it with a simulated car to see how it behaves, check it
 against the limits of the cluster renderer, and build a package that the
 [MGU Store](https://github.com/robertnisipeanu/mgu-store) can install. When idv7lol is switched
