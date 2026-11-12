@@ -10,8 +10,14 @@ Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus an editor for W
 
 **Browse** 13 themes with a live preview, **download** any of them for the car (a USB stick, no
 account needed), **sign in** to **upload** your own layouts and **vote** for the ones you like.
-Plus the full [install guide](https://www.idv7lol.com/instalar/), in English and Spanish, and a
-place to [report bugs](https://www.idv7lol.com/reportar/) with a picture or a video.
+
+**New: the [web editor](https://www.idv7lol.com/editor/).** idv7lol Studio in the browser, nothing
+to install: design, try it with the simulator, compile for the car and share, with a free account
+on a computer (Chrome, Edge or Firefox). The desktop app is still the better pick for the car.
+
+The site and the [install guide](https://www.idv7lol.com/instalar/) are in English, Español,
+Русский, 日本語 and 简体中文, and there's a place to
+[report bugs](https://www.idv7lol.com/reportar/) with a picture or a video.
 Downloading straight to the car is next, once it passes a test on one.
 [Read the announcement](https://www.idv7lol.com/beta/).
 
@@ -35,7 +41,12 @@ pictures and animations haven't been tried on a car yet. Details in
 
 **Download:** the Windows installer of idv7lol Studio is on the
 [Releases page](https://github.com/ALMSTRA/idv7lol/releases). It isn't signed, so Windows
-SmartScreen warns the first time; choose _More info_ and _Run anyway_.
+SmartScreen warns the first time; choose _More info_ and _Run anyway_. The Studio speaks English,
+Español, Русский, 日本語 and 简体中文 (**…** > Language); it starts in your system's language
+when it has it, otherwise in English.
+
+**In the browser:** the same Studio runs at [idv7lol.com/editor](https://www.idv7lol.com/editor/),
+with a free account. Files open and save through the browser instead of straight to a USB stick.
 
 **On a Mac:** there is a build for Apple silicon and Intel Macs (macOS 10.15 or newer). It is
 compiled but not tested on a Mac yet; how to get it and open it the first time is in
@@ -77,7 +88,8 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
 
 - **idv7lol Studio**, the editor for Windows and macOS. Drag gauges, bars, readouts and text onto the layout,
   import pictures, GIFs or short videos and edit them, try it with the simulator, and build. In
-  English, Spanish, Russian, Japanese and Simplified Chinese.
+  English, Spanish, Russian, Japanese and Simplified Chinese, on the desktop or in the
+  [browser](https://www.idv7lol.com/editor/).
 - **Themes to start from.** Performance, Modern, Classic, Night Minimal (a calm night layout),
   Rally Dash (LED strip, rev bar, huge gear and data cards) and Supercar Track (a wide rev arc and a
   huge gear, in the style of Italian supercar track clusters), plus seven free community layouts
