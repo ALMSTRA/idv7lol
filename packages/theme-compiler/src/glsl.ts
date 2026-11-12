@@ -297,7 +297,7 @@ uniform vec4 u_shadow;  // enabled, blurPx, 0, 0
 void main() {
   vec2 p = px() - u_size * 0.5;
   float a = radians(u_angle);
-  mat2 rot = mat2(cos(a), sin(a), -sin(a), cos(a));
+  mat2 rot = mat2(cos(a), -sin(a), sin(a), cos(a)); // columns: turns p back by a
   vec2 q = rot * p; // needle along +x
   float len = u_needle.x;
   float tail = u_needle.y;
