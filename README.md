@@ -6,11 +6,12 @@ Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus an editor for W
 
 <table align="center"><tr><td align="center">
 
-### 🚧 Coming soon: [idv7lol.com](https://idv7lol.com)
+### 🎉 Now live: [idv7lol.com](https://idv7lol.com)
 
-A home for idv7lol themes: **upload** your own layouts, **browse** the community's, **rate** the
-ones you like, and **download** them to the Studio or, if the head unit's connection allows it,
-**straight to the car**. Work in progress.
+**Browse** 13 themes with a live preview, **download** any of them for the car (a USB stick, no
+account needed), **sign in** to **upload** your own layouts and **vote** for the ones you like.
+Plus the full [install guide](https://idv7lol.com/instalar/), in English and Spanish.
+Downloading straight to the car is next, once it passes a test on one.
 
 </td></tr></table>
 
