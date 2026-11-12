@@ -164,4 +164,4 @@ detalles están en `docs/user/DEPLOYMENT.md`.
 Al agregar la fuente `ALMSTRA/idv7lol` en MGU Store sirven dos canales: **Releases**, el que el
 Store elige primero, que instala un paquete ya armado (todavía no probado en un auto), o **Branch**
 con `main`, que arma la app en el auto con el código más reciente (ya probado). El canal Tags no
-muestra idv7lol, porque ignora las versiones preliminares como `v0.2.0-beta.2`.
+muestra idv7lol, porque ignora las versiones preliminares como `v0.2.0-beta.3`.

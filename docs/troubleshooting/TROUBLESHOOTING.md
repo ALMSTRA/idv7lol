@@ -33,7 +33,7 @@ run `npx tsx tools/build/bake-fonts.ts` before `npm run build` / `tauri build`.
 ## Car app
 
 **The app does not appear in the Store.** Check the source (`ALMSTRA/idv7lol`, **Releases** or
-**Branch** `main`). The Tags channel skips pre-release tags such as `v0.2.0-beta.2`, so idv7lol
+**Branch** `main`). The Tags channel skips pre-release tags such as `v0.2.0-beta.3`, so idv7lol
 isn't listed there. The Store shows a source error when a component cannot be used.
 
 **"no catalog release and no <id>@<x.y.z>.tgz or .mgu in its releases".** The source was added

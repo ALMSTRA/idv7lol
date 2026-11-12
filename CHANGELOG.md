@@ -10,6 +10,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+## [0.2.0-beta.3] - 2026-11-12
+
+Third pre-release: idv7lol Studio in three more languages, and the car app on the Store's Releases
+channel.
+
 ### Added
 
 - The car app installs from the MGU Store's **Releases** channel too, the one the Store offers

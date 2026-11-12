@@ -27,7 +27,7 @@ off, the car shows its factory cluster again.
 > Use it parked or on a closed course, keep the factory warnings visible, and read
 > [SECURITY.md](SECURITY.md) first.
 
-**Status: 0.2.0-beta.2, an experimental pre-release.** First car test done: on a 2021 X4 M
+**Status: 0.2.0-beta.3, an experimental pre-release.** First car test done: on a 2021 X4 M
 Competition (iDrive 7) the app installed from the MGU Store, drew the Performance and Supercar
 Track themes on the cluster, and switching it off brought the factory cluster back. USB themes,
 pictures and animations haven't been tried on a car yet. Details in
@@ -76,7 +76,8 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
 ## What you get
 
 - **idv7lol Studio**, the editor for Windows and macOS. Drag gauges, bars, readouts and text onto the layout,
-  import pictures, GIFs or short videos and edit them, try it with the simulator, and build.
+  import pictures, GIFs or short videos and edit them, try it with the simulator, and build. In
+  English, Spanish, Russian, Japanese and Simplified Chinese.
 - **Themes to start from.** Performance, Modern, Classic, Night Minimal (a calm night layout),
   Rally Dash (LED strip, rev bar, huge gear and data cards) and Supercar Track (a wide rev arc and a
   huge gear, in the style of Italian supercar track clusters), plus seven free community layouts
@@ -141,7 +142,7 @@ needs root SSH access once; its README explains how.
    and enter `ALMSTRA/idv7lol`. The Store offers **Releases** first: that works (it reads the
    `catalog` release, a ready package), and so does **Branch** `main` (the Store builds the app on
    the head unit from the latest code). Don't pick Tags: it skips pre-release tags like
-   `v0.2.0-beta.2`.
+   `v0.2.0-beta.3`.
 2. Open **idv7lol** in the list and press **Install**. The Store installs `cluster-render` first if
    it is missing, then builds idv7lol on the head unit. That takes about a minute.
 3. Restart the head unit if the Store asks for it.

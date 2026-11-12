@@ -106,7 +106,7 @@ with read-only tokens.
 
 Tag `vX.Y.Z` only for documented, tested milestones. Attach the Studio installer from the CI
 artifact. The MGU Store reads the repository tree (`mgu-repo.json`) on a branch or tag. Its Tags
-channel skips tags with a pre-release suffix, so `v0.2.0-beta.2` is not offered there.
+channel skips tags with a pre-release suffix, so `v0.2.0-beta.3` is not offered there.
 
 On the **Releases** channel, which the Store offers first once a repository has releases, it
 reads the `catalog.json` of a release named `catalog`. After a car-app change, rebuild that
