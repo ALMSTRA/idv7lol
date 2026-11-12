@@ -18,6 +18,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   from one of its own apps). Its layout matches packages that install from the Store on the test
   car; this one hasn't been tried on a car yet. Before, a source added on Releases showed "no
   catalog release".
+- The Studio speaks Russian, Japanese and Simplified Chinese, next to English and Spanish
+  (… > Language). It starts in the system's language when it has it, otherwise in English.
 
 ## [0.2.0-beta.2] - 2026-11-11
 

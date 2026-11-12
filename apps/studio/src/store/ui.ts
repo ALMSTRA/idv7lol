@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { systemLang, type Lang } from '../i18n/languages.js';
 
 export type ColorScheme = 'dark' | 'light';
 export type RightTab = 'inspector' | 'layers' | 'palettes';
@@ -29,7 +30,7 @@ interface UiState {
   menu: { key: number; x: number; y: number; items: MenuItem[] } | null;
   openMenu(x: number, y: number, items: MenuItem[]): void;
   closeMenu(): void;
-  lang: 'en' | 'es';
+  lang: Lang;
   scheme: ColorScheme;
   leftOpen: boolean;
   rightOpen: boolean;
@@ -54,7 +55,7 @@ interface UiState {
   log: LogEntry[];
   cursor: { x: number; y: number } | null;
 
-  setLang(lang: 'en' | 'es'): void;
+  setLang(lang: Lang): void;
   setScheme(scheme: ColorScheme): void;
   toggle(
     key:
@@ -90,11 +91,7 @@ function loadPrefs(): Partial<
   } catch {
     /* ignore */
   }
-  const navLang =
-    typeof navigator !== 'undefined' && navigator.language.toLowerCase().startsWith('es')
-      ? 'es'
-      : 'en';
-  return { lang: navLang };
+  return { lang: systemLang(typeof navigator !== 'undefined' ? navigator.language : undefined) };
 }
 
 function savePrefs(s: UiState): void {

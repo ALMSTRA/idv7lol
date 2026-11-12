@@ -15,24 +15,10 @@ import { collectSignals } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
 import { simulator, useSimStore } from '../store/sim.js';
 import { useUiStore } from '../store/ui.js';
-import { useT, type Lang } from '../i18n/index.js';
-import { ES_PROFILES, ES_SCENARIOS } from '../i18n/es.js';
+import { profileName, scenarioText, useT } from '../i18n/index.js';
 import { Select } from '../inspector/fields.js';
 
 const DRIVE_MODES = ['ECO_PRO', 'COMFORT', 'SPORT', 'SPORT_PLUS', 'ADAPTIVE', 'TRACK'];
-
-/** A scenario's name and description in the UI language (English comes from the simulator). */
-function scenarioText(
-  lang: Lang,
-  s: { id: string; name: string; description: string } | undefined,
-): [string, string] {
-  if (!s) return ['', ''];
-  return (lang === 'es' && ES_SCENARIOS[s.id]) || [s.name, s.description];
-}
-
-function profileName(lang: Lang, p: { id: string; name: string }): string {
-  return (lang === 'es' && ES_PROFILES[p.id]) || p.name;
-}
 
 export function SimulatorPanel(): JSX.Element {
   const t = useT();

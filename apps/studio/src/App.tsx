@@ -19,7 +19,7 @@ import { useProjectStore } from './store/project.js';
 import { restorePanes, Splitter } from './ui/Splitter.js';
 import { useUiStore, type MenuItem } from './store/ui.js';
 import { useSimStore } from './store/sim.js';
-import { translate, useT } from './i18n/index.js';
+import { LANGUAGES, translate, useT } from './i18n/index.js';
 import { perf } from './lib/perf.js';
 import { shareBlock, shareTheme } from './lib/share.js';
 import { CanvasView, renderToCanvas } from './canvas/CanvasView.js';
@@ -101,6 +101,10 @@ export function App(): JSX.Element {
       toggle: s.toggle,
     })),
   );
+  // Screen readers, and the right Chinese or Japanese glyph shapes, follow the page language.
+  useEffect(() => {
+    document.documentElement.lang = LANGUAGES.find((l) => l.id === ui.lang)?.tag ?? 'en';
+  }, [ui.lang]);
   const project = useProjectStore(
     useShallow((s) => ({
       dirty: s.dirty,
@@ -475,10 +479,11 @@ export function App(): JSX.Element {
   const moreMenu = (): MenuItem[] => [
     {
       label: t('menu.language'),
-      items: [
-        { label: 'English', checked: ui.lang === 'en', onSelect: () => ui.setLang('en') },
-        { label: 'Español', checked: ui.lang === 'es', onSelect: () => ui.setLang('es') },
-      ],
+      items: LANGUAGES.map((l) => ({
+        label: l.name,
+        checked: ui.lang === l.id,
+        onSelect: () => ui.setLang(l.id),
+      })),
     },
     {
       label: t('menu.theme'),
