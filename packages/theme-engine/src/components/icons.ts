@@ -24,11 +24,11 @@ function arrow(ctx: Canvas2DLike, dir: 1 | -1): void {
   ctx.beginPath();
   // dir 1 points right, -1 points left
   const pts: Array<[number, number]> = [
-    [50 - 45 * dir, 50],
+    [50 + 45 * dir, 50],
     [50 + 0 * dir, 10],
     [50 + 0 * dir, 35],
-    [50 + 45 * dir, 35],
-    [50 + 45 * dir, 65],
+    [50 - 45 * dir, 35],
+    [50 - 45 * dir, 65],
     [50 + 0 * dir, 65],
     [50 + 0 * dir, 90],
   ];
