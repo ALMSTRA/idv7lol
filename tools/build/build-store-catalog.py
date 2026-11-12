@@ -25,6 +25,7 @@ import shutil
 import sys
 import tarfile
 import tempfile
+from urllib.parse import quote
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 APP = 'idv7lol'
@@ -59,6 +60,11 @@ def without_sdk(src, dst, extra):
         for m in tin.getmembers():
             if m.name == 'package/node_modules' or m.name.startswith('package/node_modules/'):
                 continue
+            # Built on Windows, entries come out world-writable (666/777); give them the modes and
+            # owner a Linux build has, like the Store packages that install on the car.
+            m.mode = 0o755 if m.isdir() else 0o644
+            m.uid = m.gid = 0
+            m.uname = m.gname = ''
             if m.name == 'package/package.json':
                 pkg = json.load(tin.extractfile(m))
                 pkg.update(extra)
@@ -94,6 +100,8 @@ def main():
         meta = json.load(t.extractfile('package/package.json'))
     assert meta['name'] == APP and meta['version'] == ver and meta['mguHmi'] == ['ID7'], meta
     assert not any('oap-sdk' in n for n in names), 'oap-sdk left in the package'
+    with tarfile.open(pkg, 'r:gz') as t:
+        assert all(m.mode in (0o644, 0o755) and '\\' not in m.name for m in t.getmembers()), 'modes or names'
     assert 'package/javascript/app.js' in names and 'package/rhmiData/application.json' in names
 
     icon_src = os.path.join(ROOT, 'dist', APP, 'rhmiData', 'resources', f'{APP}_icon.png')
@@ -116,7 +124,8 @@ def main():
                 'name': name,
                 'size': os.path.getsize(pkg),
                 'sha256': sha256(pkg),
-                'url': f'https://github.com/{REPO}/releases/download/{TAG}/{name}',
+                # encoded as the Store encodes release downloads (encodeURIComponent): @ is %40
+                'url': f'https://github.com/{REPO}/releases/download/{TAG}/{quote(name, safe="")}',
             },
             'icon': os.path.basename(icon),
             'iconSha256': sha256(icon),
