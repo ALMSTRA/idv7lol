@@ -1,6 +1,6 @@
 # idv7lol Studio user guide
 
-idv7lol Studio is a Windows desktop editor for custom BMW iDrive 7 instrument-cluster layouts.
+idv7lol Studio is a desktop editor for Windows and macOS for custom BMW iDrive 7 instrument-cluster layouts.
 You design on a 1920×720 canvas that represents the cluster, test with a built-in simulator,
 validate against the real limits of the car's renderer, and export a bundle the idv7lol car app
 loads. No GLSL, RAMSES or JavaScript knowledge is needed.

@@ -7,7 +7,7 @@ body:
     attributes:
       label: Area
       options:
-        - Studio (Windows editor)
+        - Studio (editor, Windows or macOS)
         - Simulator
         - Theme compiler
         - MGU app (on the car)

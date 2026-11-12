@@ -2,7 +2,7 @@
 
 # idv7lol
 
-Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus a Windows editor to design them.
+Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus an editor for Windows and macOS to design them.
 
 You draw your cluster on the PC, drive it with a simulated car to see how it behaves, check it
 against the limits of the cluster renderer, and build a package that the
@@ -62,7 +62,7 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
 
 ## What you get
 
-- **idv7lol Studio**, the Windows editor. Drag gauges, bars, readouts and text onto the layout,
+- **idv7lol Studio**, the editor for Windows and macOS. Drag gauges, bars, readouts and text onto the layout,
   import pictures, GIFs or short videos and edit them, try it with the simulator, and build.
 - **Themes to start from.** Performance, Modern, Classic, Night Minimal (a calm night layout),
   Rally Dash (LED strip, rev bar, huge gear and data cards) and Supercar Track (a wide rev arc and a
@@ -75,14 +75,14 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
 
 ## Where things stand
 
-| Part                                         | State                                        |
-| -------------------------------------------- | -------------------------------------------- |
-| Signals, theme format, engine, simulator     | written, covered by tests, published         |
-| Compiler (GLSL layers, SDF fonts, validator) | written, covered by tests, published         |
-| Bundled themes                               | pass validation, compiled into the car app   |
-| idv7lol Studio for Windows                   | tested on a PC, unsigned installer released  |
-| Car app (Node 8)                             | installs and draws on a car (one car so far) |
-| Tested in a vehicle                          | **yes**, X4 M Competition 2021, two themes   |
+| Part                                         | State                                                                                 |
+| -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Signals, theme format, engine, simulator     | written, covered by tests, published                                                  |
+| Compiler (GLSL layers, SDF fonts, validator) | written, covered by tests, published                                                  |
+| Bundled themes                               | pass validation, compiled into the car app                                            |
+| idv7lol Studio for Windows and macOS         | tested on a PC; Mac build compiled, not tested on a Mac; unsigned installers released |
+| Car app (Node 8)                             | installs and draws on a car (one car so far)                                          |
+| Tested in a vehicle                          | **yes**, X4 M Competition 2021, two themes                                            |
 
 ## Building it
 

@@ -3,12 +3,14 @@
 There are two ways in: design themes with the Studio, or work on the platform itself. Installing on a car is a separate step described in
 [user/DEPLOYMENT.md](user/DEPLOYMENT.md); nothing here touches your vehicle.
 
-## Designers: idv7lol Studio (Windows)
+## Designers: idv7lol Studio (Windows and macOS)
 
-1. Get the Studio: download the latest `idv7lol Studio_x.y.z_x64-setup.exe` from the GitHub
-   Releases page when one exists, or build it from source (below). The installer is not
-   code-signed, so Windows SmartScreen will ask you to confirm the first start.
-2. Start idv7lol Studio from the Start menu.
+1. Get the Studio from the GitHub Releases page, or build it from source (below):
+   - **Windows:** the `…-x64-setup.exe` installer. It is not code-signed, so SmartScreen asks
+     you to confirm the first start.
+   - **macOS:** the `…-universal.dmg`, for Apple silicon and Intel Macs. It is not notarized,
+     so macOS asks once; see [user/INSTALL_MAC.md](user/INSTALL_MAC.md).
+2. Start idv7lol Studio from the Start menu (Windows) or Applications (macOS).
 3. In the welcome dialog pick a template (Performance, Modern, Classic), the minimal example or
    a blank layout.
 4. Drag components from the **Library** onto the canvas. Click one to edit it in the

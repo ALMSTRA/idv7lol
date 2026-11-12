@@ -30,7 +30,7 @@ Thanks for helping out. Read the ground rules first; the rest is reference.
 | `packages/simulator`       | simulated vehicle, scenarios, recording and replay                    |
 | `packages/theme-compiler`  | validation and compilation of themes to the MGU runtime               |
 | `apps/idv7lol`             | the idv7lol app that runs on the head unit (Node 8, CommonJS)         |
-| `apps/studio`              | idv7lol Studio: Tauri 2 + React desktop editor for Windows            |
+| `apps/studio`              | idv7lol Studio: Tauri 2 + React desktop editor for Windows and macOS  |
 | `themes/`                  | the bundled themes (Performance, Modern, Classic) and examples        |
 | `tools/`                   | build, validation and development scripts                             |
 | `docs/`                    | user, developer, architecture, compatibility and troubleshooting docs |

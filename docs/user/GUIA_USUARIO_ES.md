@@ -1,6 +1,6 @@
 # Guía de usuario de idv7lol Studio
 
-idv7lol Studio es un editor de escritorio para Windows con el que diseñas tu propio tablero de
+idv7lol Studio es un editor de escritorio para Windows y macOS con el que diseñas tu propio tablero de
 instrumentos para un BMW con iDrive 7. Trabajas sobre un lienzo de 1920×720 píxeles que
 representa el cluster, lo pruebas con el simulador integrado, lo validas contra los límites reales
 del renderer del auto y exportas un paquete que carga la app idv7lol del auto. No necesitas saber
