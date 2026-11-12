@@ -14,7 +14,7 @@ off, the car shows its factory cluster again.
 > Use it parked or on a closed course, keep the factory warnings visible, and read
 > [SECURITY.md](SECURITY.md) first.
 
-**Status: 0.2.0-beta.1, an experimental pre-release.** First car test done: on a 2021 X4 M
+**Status: 0.2.0-beta.2, an experimental pre-release.** First car test done: on a 2021 X4 M
 Competition (iDrive 7) the app installed from the MGU Store, drew the Performance and Supercar
 Track themes on the cluster, and switching it off brought the factory cluster back. USB themes,
 pictures and animations haven't been tried on a car yet. Details in

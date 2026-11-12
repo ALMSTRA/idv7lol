@@ -1,6 +1,6 @@
 # Project status
 
-_Last updated: 2026-11-11._ Version: **0.2.0-beta.1** (pre-release; the Store installs from the
+_Last updated: 2026-11-11._ Version: **0.2.0-beta.2** (pre-release; the Store installs from the
 `main` branch, see Compatibility).
 
 Status words: **developed** (code exists), **tested locally** (automated tests or PC preview),
@@ -92,7 +92,7 @@ stick, that the new button appears, and that an installed theme draws like a bui
 5. Car runtime: opacity animations (needs a `u_alpha` in shaders), conditional transform clips,
    custom telltale icons, image layers upload path, `budget` event handling (lower rates).
 6. Diagnostics: export report from Studio; QR/USB log export on the car (Cluster Layouts style).
-7. Release: v0.2.0-beta.1 is out with the Studio installer. The Store's Tags channel skips
+7. Release: v0.2.0-beta.2 is out with the Studio for Windows and macOS. The Store's Tags channel skips
    pre-release tags, so the next car release needs a plain version tag to be installable from Tags.
 
 ## Known bugs / caveats

@@ -10,13 +10,18 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+## [0.2.0-beta.2] - 2026-11-11
+
+Second pre-release: idv7lol Studio 0.2.0 for Windows and, new, for macOS, plus the car app from
+`main`. The car app has run on one car (install, two themes drawn, turning off restores the
+factory cluster); everything marked below as not tried on a car still needs a test there.
+
 ### Added
 
 - idv7lol Studio for macOS: CI builds one universal `.dmg` (Apple silicon and Intel, macOS 10.15
   or newer), signed ad hoc, and checks its architectures, signature and the `.idv7theme`
   association. Double-clicking a theme in Finder opens it. Compiled, not tested on a Mac; how to
   open it the first time is in `docs/user/INSTALL_MAC.md`.
-
 - Studio: **Theme details** in the Inspector when nothing is selected (name, id, author, version,
   licence, description), with undo. Tested locally in the browser.
 - Studio: **File > Share with the community** checks the theme (no errors, an author, an id that
@@ -51,8 +56,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 - Car app: requires cluster-render 0.5.2 or newer. From 0.5.1 the panel has its own scene id and
   can show together with a HUD app; 0.5.2 fixes a crash after a renderer-side animation is
-  stopped (idrive-apps #132), which the car app does. The renderer client is refreshed from upstream (0.5.5; it only
-  adds the `yield` field, which idv7lol doesn't use). Checked locally: the client loads and
+  stopped (idrive-apps #132), which the car app does. The renderer client is refreshed from
+  upstream (0.5.5; it only adds the `yield` field, which idv7lol doesn't use). Checked locally: the client loads and
   parses as ES2017, and every theme still passes the car path test. Not tried on a car with
   0.5.x yet.
 - Car app build: the kit's `build.py` is refreshed from upstream (MIT). On the head unit it now
