@@ -38,6 +38,16 @@
     "de.bmw.infrastructure.analytics.BasicDataSet": {
       "_optional": "gearbox oil temperature",
       "basicDataSet": "s"
+    },
+    "de.bmw.infotainment.KombiIF": {
+      "_optional": "the fuel level, the fuel range and the odometer",
+      "statusRangeTankStatus": "rs"
+    },
+    "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": {
+      "_optional": "the engine unit's fuel percentage (OBD-II, read only); the fuel gauge then uses litres over the tank size",
+      "_instances": "SystemFunctionsInternalTasuInst1",
+      "_methods": "sendTasuRequest",
+      "_broadcasts": "sendTasuResponse"
     }
   },
   "screens": [
@@ -144,6 +154,20 @@
         ["auto", "Auto (until the car answers)"],
         ["on", "On"],
         ["off", "Off"]
+      ]
+    },
+    {
+      "key": "fuelTank",
+      "label": "Fuel tank size",
+      "type": "number",
+      "unit": "l",
+      "default": 0,
+      "labels": { "0": "Automatic" },
+      "steps": [
+        0, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
+        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74,
+        75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97,
+        98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110
       ]
     }
   ],

@@ -137,6 +137,12 @@ in the Store (_Add from USB_). The Store builds the app the same way.
   and animations, the Modern and Classic themes, and the community templates. Keep SSH access
   at hand in case you need to recover.
 - Signals mapped on the car: engine speed, speed, coolant, oil, torque, accelerations, gear and
-  gearbox mode, drive mode, boost (sport display cars), outside temperature, gearbox oil. Fuel
-  level, range and 12 V battery are not mapped yet and show dashes.
+  gearbox mode, drive mode, boost (sport display cars), outside temperature, gearbox oil, and from
+  the cluster the fuel level, fuel range, odometer and reserve warning. The 12 V battery is not
+  mapped yet and shows dashes.
+- The fuel level is the engine unit's own percentage (OBD-II, read only) where it answers;
+  otherwise the cluster's litres over the tank size. That size is learned (from the engine unit's
+  percentage, or from the fullest level seen, never below 65 l) or set in the app's settings
+  (_Fuel tank size_); until it is known a tank smaller than 65 l reads low. The app's page shows
+  which source it uses. Not tested in a vehicle yet.
 - Opacity animations do not play on the car; conditional rotation/scale clips are not started.

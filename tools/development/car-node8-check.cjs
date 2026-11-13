@@ -25,6 +25,7 @@ load('signals.js');
 load('conditions.js');
 load('text.js');
 load('units.js');
+load('fuel.js');
 
 class CountingClient extends EventEmitter {
   constructor() {

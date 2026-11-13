@@ -203,8 +203,8 @@ npx tsx tools/build/build-mgu-themes.ts
 
 Then commit, push, and add your fork in the Store instead of `ALMSTRA/idv7lol`.
 
-On the car, fuel level, range and the 12 V battery are not read yet and show dashes. Opacity
-animations don't play there either. The current list of known limits is in the deployment guide.
+On the car, the 12 V battery is not read yet and shows dashes; the fuel level, range and odometer
+come from the cluster (not tested in a vehicle yet). Opacity animations don't play there either. The current list of known limits is in the deployment guide.
 
 ## How it works
 

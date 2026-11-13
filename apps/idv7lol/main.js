@@ -265,6 +265,7 @@ mgu.run({
               '  ·  gearbox ' +
               ((vehicle.store.get('transmission.mode') || {}).value || '-'),
           ],
+          ['Fuel', vs.fuel || '-'],
           ['Providers', vs.providers || '-'],
           ['USB themes', library.list().length + ' installed  ·  ' + usbNote],
           [
@@ -273,8 +274,9 @@ mgu.run({
           ],
         ];
         lines.forEach(([k, v], i) => {
-          text(k, 48, 140 + i * 44, 20, t.dim, { font: 'bold' });
-          text(v, 300, 140 + i * 44, k === 'Safety' || k === 'USB themes' ? 16 : 19, t.text, {
+          // 9 rows: 40 px apart so the last stays clear of the footer at y 500
+          text(k, 48, 140 + i * 40, 20, t.dim, { font: 'bold' });
+          text(v, 300, 140 + i * 40, k === 'Safety' || k === 'USB themes' ? 16 : 19, t.text, {
             font: 'label',
           });
         });

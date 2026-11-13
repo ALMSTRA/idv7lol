@@ -28,8 +28,16 @@ time from cluster-render's `hello` (`backend`, `targets`), never assumed from th
 See [../developer/SIGNALS.md](../developer/SIGNALS.md). Mapped on the car: engine speed,
 speed, coolant and oil temperature, torque, longitudinal/lateral acceleration, gear and gearbox
 programme, drive mode, boost (cars with the sport display), outside temperature, gearbox oil
-(optional interface). Not yet mapped: fuel level, ranges, 12 V battery, lights, cruise, hybrid
-values, tyre pressures, time signals (the clock uses the unit clock plus a UTC offset setting).
+(optional interface), and fuel level, fuel range, odometer and reserve warning (optional
+interfaces: the cluster's `KombiIF.statusRangeTankStatus`, plus the engine unit's OBD-II PID 2F
+for the percentage; not tested in a vehicle yet). Not yet mapped: the electric range, 12 V
+battery, lights, cruise, hybrid values, tyre pressures, time signals (the clock uses the unit
+clock plus a UTC offset setting).
+
+`KombiIF.statusRangeTankStatus` as one car sent it (G05 X5 xDrive45e, I-step
+`P18_23w44.2-1-3`, 69 l tank full): `fluidLevelFuelTank` 68 (litres), `fluidLevelFuelTankLeftHand`
+0 and `fluidLevelFuelTankRightHand` 137 (not usable), `statusFluidLevelFuelTankSpare`
+`NICHT_AKTIV`, `range` 522 (km), `mileageKilometre` (the odometer, km).
 
 Drivetrains: the vehicle profiles `generic-ice`, `turbo-ice`, `turbo-ice-sport`, `phev`, `bev`
 only affect validation and simulation; the car app reads whatever the unit provides.
