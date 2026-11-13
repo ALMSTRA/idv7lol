@@ -82,8 +82,9 @@ stick, that the new button appears, and that an installed theme draws like a bui
    confirm: telltales and pop-ups on top, values against the factory gauges, Modern and Classic,
    palettes, a USB theme, a theme with pictures or an animation, and the I-step and cluster-render
    version. Record them in `COMPATIBILITY.md`.
-2. Map more signals on the car: fuel level/range (`KombiIF`, member-name discovery), 12 V
-   battery, cruise, lights, hybrid values (shared tmpfs from eDrive Live as Cluster Layouts does).
+2. Map more signals on the car: 12 V battery, cruise, lights, hybrid values (shared tmpfs from
+   eDrive Live as Cluster Layouts does). Fuel level, range and odometer are mapped (Unreleased,
+   from `KombiIF` and OBD-II); they still need a run on a car.
 3. Theme upload path: done for USB sticks (car app 0.2.0); a download path with a short code needs
    a web service and stays planned.
 4. Studio: PNG export of scenario sequences, project folders with assets. Done on 2026-11-09:

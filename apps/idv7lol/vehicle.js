@@ -10,10 +10,112 @@
  * everything into a SignalStore keyed by catalog id, with timestamps, so
  * the engine can tell fresh data from stale data.
  *
+ * The fuel level, fuel range and odometer come from the cluster
+ * (KombiIF.statusRangeTankStatus) and, for the percentage, from the engine
+ * unit over the kit's read-only diagnostic link (fuel.js says how).
+ *
  * Nothing here is written to the car; every field is read-only.
  */
+const fs = require('fs');
+const path = require('path');
 const Car = require('./kit/car');
 const { SignalStore, driveModeOf, GEAR_TEXT } = require('./signals');
+const { FuelGauge, parseTank } = require('./fuel');
+
+/** The engine unit's fuel level: OBD-II PID 2F, A x 100 / 255 (a public standard, no BMW table). */
+const FUEL_OBD = {
+  ecu: 0x12,
+  obd: '2F',
+  bytes: 1,
+  factor: 100 / 255,
+  offset: 0,
+  min: 0,
+  max: 100,
+  timeoutMs: 1500,
+};
+const FUEL_EVERY_MS = 10000;
+const FUEL_RETRY_MS = 300000; // an engine unit that didn't answer 3 times in a row is asked this often
+
+/**
+ * The fuel gauge (fuel.js) with what it learned kept in the app's data folder, and the engine
+ * unit asked for its percentage every FUEL_EVERY_MS. The diagnostic link is the kit's read-only
+ * one (kit/readonly-diag.js): it refuses anything but reads before a request leaves the head
+ * unit. Returns { gauge, ask(now) }.
+ */
+function startFuel(ctx, log) {
+  const file = path.join(ctx.dataDir || process.cwd(), 'fuel.json');
+  let state = null;
+  try {
+    state = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (_e) {
+    /* first start */
+  }
+  const gauge = new FuelGauge({
+    state,
+    save: (s) => {
+      try {
+        fs.writeFileSync(file, JSON.stringify(s));
+        log.info('fuel: tank size ' + JSON.stringify(s));
+      } catch (e) {
+        log.warn('fuel: ' + e);
+      }
+    },
+  });
+  let reader = null;
+  let ready = null;
+  let misses = 0;
+  let lastAsk = -Infinity;
+  let busy = false;
+  let answered = null;
+  const ask = (now) => {
+    if (reader === false || busy) return;
+    if (now - lastAsk < (misses >= 3 ? FUEL_RETRY_MS : FUEL_EVERY_MS)) return;
+    if (!reader) {
+      try {
+        const { ReadOnlyDiag } = require('./kit/readonly-diag');
+        const { DidReader } = require('./kit/dids');
+        const link = new ReadOnlyDiag(ctx.signals, log);
+        ready = link.init().catch(() => {});
+        reader = new DidReader(link, { ecu: FUEL_OBD.ecu });
+      } catch (e) {
+        reader = false;
+        log.info('fuel: no diagnostic link (' + e + '); litres over the tank size');
+        return;
+      }
+    }
+    lastAsk = now;
+    busy = true;
+    Promise.resolve(ready)
+      .then(() => reader.value('fuel', [FUEL_OBD]))
+      .then((v) => {
+        if (v !== null) {
+          if (answered !== true)
+            log.info('fuel: ' + v.toFixed(0) + ' % from the engine unit (OBD 2F)');
+          answered = true;
+          misses = 0;
+          gauge.obd(v, Date.now());
+          return;
+        }
+        misses++;
+        if (misses === 3 && answered !== false) {
+          const r = reader.raws[reader.key(FUEL_OBD)] || {};
+          log.info(
+            'fuel: the engine unit gives no OBD 2F (' +
+              (r.why || '?') +
+              '); litres over the tank size, asked again every 5 min',
+          );
+          answered = false;
+        }
+      })
+      .catch(() => {
+        misses++;
+      })
+      .then(() => {
+        busy = false;
+      });
+  };
+  return { gauge, ask };
+}
 
 /**
  * Start reading the car. Returns { store, car, live(), status(), stop() }.
@@ -26,7 +128,16 @@ function startVehicle(ctx, opts) {
     raw[field] = JSON.stringify(v).slice(0, 160);
   };
   let modeFallbackSince = Date.now();
+  const fuel = startFuel(ctx, ctx.log);
+  let tank = null; // the cluster's last tank values (fuel.js parseTank)
   const extra = {
+    'de.bmw.infotainment.KombiIF': {
+      statusRangeTankStatus: (v) => {
+        seen('statusRangeTankStatus', v);
+        tank = parseTank(v);
+        if (tank.litres !== null) fuel.gauge.tank(tank.litres, Date.now());
+      },
+    },
     'de.bmw.infotainment.drivingexcitement.FES': {
       statusFESVehicleDynamicSwitchHMI: (v) => {
         seen('statusFESVehicleDynamicSwitchHMI', v);
@@ -104,7 +215,57 @@ function startVehicle(ctx, opts) {
     car.data().demo ||
     car.subs.some((s) => s.available) ||
     (car.lastCar > 0 && Date.now() - car.lastCar < 3000);
+  const tankSetting = () => ctx.settings && ctx.settings.get('fuelTank');
+  // The cluster notifies its tank values on change only (once while parked), so while the car is
+  // live the last ones are published again every second; the layout would take them for stale.
+  let fuelSrc = '';
+  setInterval(() => {
+    const now = Date.now();
+    if (car.data().demo || !live()) return;
+    fuel.ask(now);
+    fuel.gauge.tick(now);
+    if (tank) {
+      if (tank.litres !== null) store.set('fuel.volume', tank.litres, now);
+      if (tank.rangeKm !== null) store.set('vehicle.range', tank.rangeKm, now);
+      if (tank.odometerKm !== null) store.set('vehicle.odometer', tank.odometerKm, now);
+      if (tank.reserve !== null) store.set('fuel.low', tank.reserve, now);
+    }
+    const lv = fuel.gauge.level(now, tankSetting());
+    if (!lv) return;
+    store.set('fuel.level', lv.pct, now);
+    const src = lv.src === 'obd' ? 'the engine unit' : lv.capacity.src + ' ' + lv.capacity.litres;
+    if (src !== fuelSrc) {
+      fuelSrc = src;
+      ctx.log.info(
+        'fuel: level from ' +
+          (lv.src === 'obd'
+            ? 'the engine unit (OBD 2F)'
+            : 'litres over a ' + lv.capacity.litres + ' l tank (' + lv.capacity.src + ')'),
+      );
+    }
+  }, 1000);
+  /** One line for the app's page: what the fuel gauge shows and where it comes from. */
+  const fuelText = () => {
+    const lv = fuel.gauge.level(Date.now(), tankSetting());
+    if (!lv) return 'no value from the car yet';
+    const litres = tank && tank.litres !== null ? tank.litres + ' l  ·  ' : '';
+    const cap = fuel.gauge.capacity(tankSetting());
+    return (
+      Math.round(lv.pct) +
+      ' %  ·  ' +
+      litres +
+      (lv.src === 'obd' ? 'from the engine unit' : 'litres over the tank') +
+      '  ·  tank ' +
+      cap.litres +
+      ' l (' +
+      cap.src +
+      ')' +
+      (tank && tank.rangeKm !== null ? '  ·  range ' + tank.rangeKm + ' km' : '') +
+      (tank && tank.reserve ? '  ·  RESERVE' : '')
+    );
+  };
   const status = () => ({
+    fuel: fuelText(),
     demo: !!car.data().demo,
     providers: car.subs
       .map((s) => s.iface.split('.').pop() + (s.available ? ' ok' : s.error ? ' error' : ' -'))

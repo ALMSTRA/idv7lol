@@ -10,6 +10,21 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+### Added
+
+- The car app reads the fuel level, the fuel range and the odometer, and the reserve warning
+  (`fuel.level`, `fuel.volume`, `vehicle.range`, `vehicle.odometer`, `fuel.low`), from the
+  cluster's `KombiIF.statusRangeTankStatus`, the signal other iDrive 7 apps read. The cluster gives
+  litres, so the percentage comes from the engine unit's OBD-II PID 2F while it answers, read over
+  the kit's read-only diagnostic link (one request every 10 s, every 5 min once it hasn't answered
+  3 times). Otherwise it is litres over the tank size: the new setting _Fuel tank size_, else the
+  size worked out from the litres and the engine unit's percentage, else the largest level that
+  held, never less than 65 l so a half tank doesn't read full. What it learns is kept in the app's
+  data folder (`fuel.json`), and the app's page says where the level comes from. Both interfaces
+  are optional: a car without them installs as before, with dashes. Tested locally (unit tests,
+  and `vehicle.js` run against a fake car); the cluster's values were read on a G05 X5 xDrive45e
+  with a full 69 l tank (68 l); not tested in a vehicle with this code.
+
 ### Fixed
 
 - Needles turn the way their scale runs on the car and in the Studio's car preview. The needle
