@@ -60,6 +60,14 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   layers and uncompressed assets against its 16 MiB of pixel memory (its `PROTOCOL.md`, "Choosing a
   pixel format"). A theme that passed while needing more than the renderer has is now refused, and
   the warning starts earlier. No bundled theme is affected. Tested locally.
+- The MIT app kit's runtime (`kit/runtime`) is refreshed from cauliflowermossgrape/idrive7-apps.
+  Settings and other small files are written whole (a temp file renamed over the old one), so a power
+  cut while saving no longer leaves a half-written `settings.json`. An app that comes to the front
+  without the iDrive controller (the Store's renderer held it while the app restarted after an
+  update) connects to the renderer again, up to three times, so the controller reaches it. The
+  app page's drawn frames go to RAM instead of the head unit's flash, with a fallback to the old
+  folder. The vehicle state the kit reads is logged once per new value. The CI's Node 8 check now
+  compiles every kit runtime file. Tested locally (Node 8.16.2); not tested in a vehicle.
 
 ## [0.2.0-beta.3] - 2026-11-12
 

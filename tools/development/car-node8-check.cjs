@@ -26,6 +26,16 @@ load('conditions.js');
 load('text.js');
 load('units.js');
 load('fuel.js');
+// The kit's runtime goes into the app too (kit/tools/build.py). It needs the head unit's oap-sdk
+// to run, so here it is only compiled, which is enough to catch syntax this Node lacks.
+const vm = require('vm');
+const KIT = path.join(__dirname, '..', '..', 'kit', 'runtime');
+fs.readdirSync(KIT)
+  .filter((f) => /\.js$/.test(f))
+  .forEach((f) => {
+    const src = fs.readFileSync(path.join(KIT, f), 'utf8');
+    new vm.Script(require('module').wrap(src), { filename: 'kit/runtime/' + f });
+  });
 
 class CountingClient extends EventEmitter {
   constructor() {
