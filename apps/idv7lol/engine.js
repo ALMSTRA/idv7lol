@@ -24,6 +24,7 @@ const { layoutLine, formatNumber, formatDash, formatClock, enumText } = require(
 const { convert } = require('./units');
 const conditions = require('./conditions');
 const { decodeEtc2Rgba } = require('./etc2');
+const SHADERS = require('./shaders');
 
 const RATE_MS = 1000 / 60;
 const TEXT_DIVIDER = 2; // texts/colours every 2nd tick (30 Hz)
@@ -41,6 +42,9 @@ const LAYERS_PER_CLIENT = 64;
 // temperature). Cluster projects tested on cars found that a layout ending here leaves the KOMBI
 // no reason to put black boxes over it; 660 already touched the strip's drive mode.
 const STRIP_Y = 646;
+// The black band under it, to y 662, and to 658 over the strip's drive mode and gear (x 1196-1424,
+// their tops at 660), as another cluster project settled from photos of a car (a G05).
+const BAND = { h: 16, notchFrom: 1196, notchTo: 1424, notchH: 12 };
 
 const ICON_P_CODE = 'P';
 const SECONDARY_START = '\u0001';
@@ -303,6 +307,7 @@ class ClusterEngine {
     } catch (e) {
       this.log.warn('layout failed, the factory cluster stays: ' + ((e && e.stack) || e));
       this._made.reverse().forEach((ref) => this.cr.drop(ref));
+      this.band = 0;
       this.pieces = [];
       this.images = [];
       this.assets = {};
@@ -473,6 +478,26 @@ class ClusterEngine {
       }
       return st;
     });
+    // Under a layout cut at the bottom strip, a black band hides the factory dials' lower edges
+    // (BAND), when the layout leaves a layer for it.
+    if (typeof strip === 'number' && this.pieces.length + this.images.length < LAYERS_PER_CLIENT) {
+      const ref = this._make('effect', {
+        target,
+        klass: 'content',
+        z: 0,
+        x: 0,
+        y: strip,
+        w: 1920,
+        h: BAND.h,
+        visible: 1,
+        fs: SHADERS.band,
+      });
+      if (ref) {
+        this.cr.uniform(ref, 'u_size', [1920, BAND.h]);
+        this.cr.uniform(ref, 'u_notch', [BAND.notchFrom, BAND.notchTo, BAND.notchH]);
+        this.band = ref;
+      }
+    }
     this.startedAt = this.now();
     this._update(true);
     if (this.sweep()) this._sweep();
@@ -489,6 +514,8 @@ class ClusterEngine {
     this.pieces.forEach((p) => {
       if (p.ref) this.cr.drop(p.ref);
     });
+    if (this.band) this.cr.drop(this.band);
+    this.band = 0;
     Object.keys(this.assets).forEach((fam) => this.cr.drop(this.assets[fam]));
     this.images.forEach((st) => {
       if (st.ref) this.cr.drop(st.ref);

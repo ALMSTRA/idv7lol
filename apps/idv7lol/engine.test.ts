@@ -548,6 +548,12 @@ describe('MGU engine bottom strip', () => {
     expect(img).toMatchObject({ y: 620, h: 26, iw: 40, ih: 26 });
     const px = client.ops.find((o) => o.op === 'pixels' && o.ref === img.ref)!;
     expect(px.bytes).toBe(40 * 26 * 4);
+    // a black band under the cut, lower over the strip's drive mode and gear
+    const band = client.ops.find((o) => o.op === 'layer' && o.y === 646 && o.w === 1920)!;
+    expect(band).toMatchObject({ x: 0, h: 16 });
+    expect(
+      client.ops.find((o) => o.op === 'uniform' && o.ref === band.ref && o.name === 'u_notch')!.v,
+    ).toEqual([1196, 1424, 12]);
   });
 
   it('draws everything whole with the strip covered', () => {
@@ -555,6 +561,7 @@ describe('MGU engine bottom strip', () => {
     expect(piece('bg')).toMatchObject({ h: 720 });
     expect(keep(piece('bg')!.ref)).toBeUndefined();
     expect(piece('under')).toMatchObject({ y: 660, h: 40 });
+    expect(client.ops.some((o) => o.op === 'layer' && o.y === 646 && o.w === 1920)).toBe(false);
     expect(client.ops.find((o) => o.op === 'image')).toMatchObject({ h: 52, ih: 52 });
   });
 });

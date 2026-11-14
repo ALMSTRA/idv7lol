@@ -34,7 +34,7 @@ const { FuelGauge, parseTank, CarAwake } = require('./fuel.js') as {
   }) => Gauge;
   parseTank: (v: unknown) => Tank;
   CarAwake: new () => {
-    note(condition: number | undefined): void;
+    note(condition: number | null | undefined): void;
     sample(speed: unknown, rpm: unknown, now: number): void;
     on(now: number): boolean;
   };

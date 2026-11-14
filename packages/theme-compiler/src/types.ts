@@ -41,7 +41,8 @@ export type ShaderKind =
   | 'shiftlights'
   | 'telltale'
   | 'panel'
-  | 'sprite';
+  | 'sprite'
+  | 'band';
 
 /** A static uniform: numbers sent once when the layer is made. */
 export type StaticUniforms = Record<string, number[]>;

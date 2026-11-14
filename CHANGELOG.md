@@ -60,6 +60,10 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- Under a layout cut at the bottom strip, a black band (to y 662, to 658 over the strip's drive
+  mode and gear at x 1196–1424) hides the factory dials' lower edges and the separator line, which
+  showed there in photos of a car (another cluster project, a G05). One layer with a small shader
+  of its own, made only when the layout leaves room for it.
 - The start-up sweep's animations are stopped once it is over and the gauges' values sent again. A
   finished animation holds its last key and plays again whenever cluster-render publishes the scene
   again (its PROTOCOL.md), which 0.5.5 and later do more often; a steady gauge (fuel, a temperature)

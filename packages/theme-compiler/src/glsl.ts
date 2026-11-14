@@ -652,7 +652,23 @@ void main() {
 }
 `;
 
+/**
+ * The car app's black band under a layout that ends above the cluster's own bottom strip: with the
+ * layout cut at y 646, the factory dials' lower edges and the separator line showed below it in
+ * photos of a car (another cluster project), and a band to 662 hid them. It is lower where the
+ * strip's drive mode and gear start (their tops at 660). Not part of any theme.
+ */
+export const BAND_FS = `${PRELUDE}
+uniform vec4 u_notch; // x from, x to, the band's height there (px), 0
+void main() {
+  vec2 p = uvDrawn() * u_size;
+  if (p.x >= u_notch.x && p.x < u_notch.y && p.y > u_notch.z) { gl_FragColor = vec4(0.0); return; }
+  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+}
+`;
+
 export const SHADERS: Readonly<Record<ShaderKind, string>> = {
+  band: BAND_FS,
   sprite: SPRITE_FS,
   flat: FLAT_FS,
   panel: PANEL_FS,
