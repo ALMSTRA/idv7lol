@@ -33,6 +33,13 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **VDO Classic M** (contributed): a classic round-dial M cluster built from a photo, widened over
+  the whole glass. It has live needles (speed, revs, fuel, coolant, consumption, oil temperature),
+  the odometer and the trip since refuel, and a bottom bar: drive mode, gear, low beam, parking
+  brake and DSC on the left; a boost readout and bar in the middle; battery, cruise with its set
+  speed, and the clock on the right. The fuel pump lights when fuel is low, and the coolant symbol
+  is blue while cold and red when hot. It frames the factory's own turn arrows. **Tested in
+  vehicle** (F98 X4 M Competition).
 - Signal `chassis.dsc.mode` (ON, OFF, DTC, MDM) from the DSC button's state (`FES.statusDSCSwitchHMI`).
 - Boost from the engine unit when the car's sport display sends none, read over the read-only link as
   Cluster Layouts and M Vitals read it (charge pressure less ambient). Tested locally.

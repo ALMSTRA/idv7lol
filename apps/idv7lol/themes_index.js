@@ -92,6 +92,15 @@ module.exports = {
       ]
     },
     {
+      "id": "vdo-classic-m",
+      "name": "VDO Classic M",
+      "module": "theme_vdo_classic_m",
+      "palettes": [
+        "amber",
+        "sport"
+      ]
+    },
+    {
       "id": "idv7lol-volt-runner",
       "name": "Volt Runner",
       "module": "theme_idv7lol_volt_runner",
