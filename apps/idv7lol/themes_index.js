@@ -59,6 +59,16 @@ module.exports = {
         "track",
         "corsa"
       ]
+    },
+    {
+      "id": "idv7lol-volt-runner",
+      "name": "Volt Runner",
+      "module": "theme_idv7lol_volt_runner",
+      "palettes": [
+        "volt",
+        "dusk",
+        "sport"
+      ]
     }
   ],
   "fonts": [

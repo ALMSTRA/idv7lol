@@ -1,0 +1,1224 @@
+{
+  "schemaVersion": 1,
+  "id": "idv7lol-volt-runner",
+  "name": "Volt Runner",
+  "version": "0.1.0",
+  "author": "idv7lol contributors",
+  "description": "A bright yellow layout around a running bolt that speeds up with the car: big speed on the left, gear on the right, engine speed as the road under the runner, fuel, oil and water along the bottom. Swap the runner for your own animation in the Studio.",
+  "license": "GPL-3.0-or-later",
+  "target": {
+    "platform": "idrive7-mgu",
+    "display": "kombi-id7-12.3",
+    "renderer": "cluster-render"
+  },
+  "vehicleProfile": "turbo-ice",
+  "layout": {
+    "width": 1920,
+    "height": 720,
+    "background": "$background",
+    "reservedZones": [
+      {
+        "x": 730,
+        "y": 0,
+        "width": 460,
+        "height": 128,
+        "id": "cowl",
+        "name": "Top cowl (factory telltales)",
+        "kind": "factory"
+      },
+      {
+        "x": 1410,
+        "y": 262,
+        "width": 252,
+        "height": 192,
+        "id": "gear-bracket",
+        "name": "Gear bracket (factory gear display)",
+        "kind": "factory"
+      },
+      {
+        "x": 1770,
+        "y": 170,
+        "width": 150,
+        "height": 95,
+        "id": "edrive-box",
+        "name": "eDrive status box (hybrids)",
+        "kind": "factory"
+      },
+      {
+        "x": 560,
+        "y": 652,
+        "width": 960,
+        "height": 68,
+        "id": "telltales-bottom",
+        "name": "Bottom telltale strip",
+        "kind": "factory"
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "width": 394.5454545454545,
+        "height": 217,
+        "id": "glass-corner-left",
+        "name": "Glass corner (left)",
+        "kind": "keep-clear",
+        "polygon": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 394.5454545454545,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "x": 1525.4545454545455,
+        "y": 0,
+        "width": 394.5454545454545,
+        "height": 217,
+        "id": "glass-corner-right",
+        "name": "Glass corner (right)",
+        "kind": "keep-clear",
+        "polygon": [
+          {
+            "x": 1920,
+            "y": 0
+          },
+          {
+            "x": 1525.4545454545455,
+            "y": 0
+          },
+          {
+            "x": 1920,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "x": 416,
+        "y": 120,
+        "width": 1088,
+        "height": 480,
+        "id": "stock-map-window",
+        "name": "Stock map window (slot 0x100)",
+        "kind": "info"
+      },
+      {
+        "x": 0,
+        "y": 646,
+        "width": 1920,
+        "height": 74,
+        "id": "bottom-strip",
+        "name": "Bottom strip (black boxes reported below y 646)",
+        "kind": "info"
+      },
+      {
+        "x": 793,
+        "y": 289,
+        "width": 246,
+        "height": 92,
+        "id": "m-box-left",
+        "name": "M cars: cluster box (approx. ±10 px)",
+        "kind": "info"
+      },
+      {
+        "x": 1223,
+        "y": 328,
+        "width": 171,
+        "height": 78,
+        "id": "m-box-right",
+        "name": "M cars: cluster box (approx. ±10 px)",
+        "kind": "info"
+      },
+      {
+        "x": 740,
+        "y": 128,
+        "width": 440,
+        "height": 19,
+        "id": "driver-camera",
+        "name": "Driver camera notch (cars with it, to y ≈ 147)",
+        "kind": "info"
+      }
+    ]
+  },
+  "palettes": {
+    "volt": {
+      "name": "Volt",
+      "colors": {
+        "background": "#000000",
+        "surface": "#0d0c08",
+        "text": "#fff8e1",
+        "text-muted": "#8f8668",
+        "accent": "#ffd60a",
+        "track": "#1d1a10",
+        "glow": "#2a2306",
+        "success": "#2fd06f",
+        "warning": "#ffb020",
+        "danger": "#ff3b30"
+      }
+    },
+    "dusk": {
+      "name": "Dusk",
+      "colors": {
+        "background": "#000000",
+        "surface": "#0d0c08",
+        "text": "#f3e3c3",
+        "text-muted": "#7d6a4c",
+        "accent": "#e8a317",
+        "track": "#1d1a10",
+        "glow": "#1d1505",
+        "success": "#2fd06f",
+        "warning": "#ffb020",
+        "danger": "#ff3b30"
+      }
+    },
+    "sport": {
+      "name": "Sport",
+      "colors": {
+        "background": "#000000",
+        "surface": "#0d0c08",
+        "text": "#ffffff",
+        "text-muted": "#9b9270",
+        "accent": "#ffea00",
+        "track": "#1d1a10",
+        "glow": "#3a3000",
+        "success": "#2fd06f",
+        "warning": "#ffb020",
+        "danger": "#ff3b30"
+      }
+    }
+  },
+  "palette": {
+    "default": "volt",
+    "byDriveMode": {
+      "SPORT": "sport",
+      "SPORT_PLUS": "sport"
+    },
+    "allowManual": true
+  },
+  "fonts": {
+    "default": {
+      "family": "sans"
+    }
+  },
+  "assets": {
+    "runner": {
+      "type": "image",
+      "name": "Volt runner",
+      "width": 1536,
+      "height": 576,
+      "animation": {
+        "frames": 8,
+        "columns": 4,
+        "frameWidth": 384,
+        "frameHeight": 288,
+        "durations": [90, 90, 90, 90, 90, 90, 90, 90]
+      },
+      "data": "data:image/png;base64,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"
+    }
+  },
+  "animations": {},
+  "components": [
+    {
+      "id": "bg",
+      "name": "Background",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 720,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": true,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "fill": "$background",
+        "radius": 0
+      }
+    },
+    {
+      "id": "stage",
+      "name": "Stage",
+      "x": 560,
+      "y": 140,
+      "width": 800,
+      "height": 300,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$background"
+            },
+            {
+              "offset": 1,
+              "color": "$glow"
+            }
+          ]
+        },
+        "radius": 40
+      }
+    },
+    {
+      "id": "runner",
+      "name": "Runner",
+      "x": 752,
+      "y": 134,
+      "width": 416,
+      "height": 312,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "image",
+      "props": {
+        "asset": "runner",
+        "fit": "contain",
+        "speed": 0.6,
+        "speedFrom": {
+          "signal": "vehicle.speed",
+          "from": 0,
+          "to": 200,
+          "fastSpeed": 4
+        }
+      }
+    },
+    {
+      "id": "revs",
+      "name": "Rev road",
+      "x": 560,
+      "y": 462,
+      "width": 800,
+      "height": 14,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.rpm",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.06,
+        "fallback": "dash",
+        "min": 0,
+        "max": 7000
+      },
+      "animations": [],
+      "type": "gauge.bar",
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": {
+          "show": true,
+          "color": "$track",
+          "radius": 2
+        },
+        "fill": {
+          "color": "$accent",
+          "radius": 2,
+          "mode": "segments",
+          "segments": 40,
+          "segmentGap": 4,
+          "zones": [
+            {
+              "from": 6000,
+              "to": 7000,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "show": false,
+          "count": 7,
+          "color": "$text",
+          "length": 8,
+          "width": 2,
+          "side": "after"
+        },
+        "labels": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 18,
+            "weight": "medium",
+            "color": "$text-muted",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "divisor": 1,
+          "offset": 16
+        },
+        "marker": {
+          "show": false,
+          "value": 0,
+          "color": "$text",
+          "width": 3
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 14
+        }
+      }
+    },
+    {
+      "id": "speed",
+      "name": "Speed",
+      "x": 300,
+      "y": 220,
+      "width": 260,
+      "height": 210,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "vehicle.speed",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "value.digital",
+      "props": {
+        "format": "0",
+        "unit": "kmh",
+        "showUnit": true,
+        "label": "",
+        "layout": "stacked",
+        "valueStyle": {
+          "font": "default",
+          "size": 150,
+          "weight": "bold",
+          "color": "$accent",
+          "align": "center",
+          "baseline": "alphabetic",
+          "letterSpacing": -4,
+          "uppercase": false
+        },
+        "unitStyle": {
+          "font": "default",
+          "size": 24,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "alphabetic",
+          "letterSpacing": 1,
+          "uppercase": false
+        },
+        "labelStyle": {
+          "font": "default",
+          "size": 20,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": true
+        },
+        "zones": [],
+        "radius": 0,
+        "padding": 0,
+        "tabular": true
+      }
+    },
+    {
+      "id": "gear",
+      "name": "Gear",
+      "x": 1190,
+      "y": 220,
+      "width": 200,
+      "height": 190,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "transmission.gear",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "indicator.gear",
+      "props": {
+        "style": {
+          "font": "default",
+          "size": 150,
+          "weight": "bold",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "showMode": false,
+        "modeStyle": {
+          "font": "default",
+          "size": 36,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "modeSignal": "transmission.mode",
+        "mapping": {},
+        "radius": 0
+      }
+    },
+    {
+      "id": "drive-mode",
+      "name": "Drive mode",
+      "x": 1190,
+      "y": 418,
+      "width": 200,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "drive.mode",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}",
+        "style": {
+          "font": "default",
+          "size": 22,
+          "weight": "bold",
+          "color": "$accent",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "uppercase": true
+        },
+        "format": "",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "turn-left",
+      "name": "Turn left",
+      "x": 640,
+      "y": 150,
+      "width": 48,
+      "height": 48,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "light.turn.left",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "turn-left",
+        "onColor": "$success",
+        "offColor": "$track",
+        "hideWhenOff": true
+      }
+    },
+    {
+      "id": "turn-right",
+      "name": "Turn right",
+      "x": 1232,
+      "y": 150,
+      "width": 48,
+      "height": 48,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "light.turn.right",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "turn-right",
+        "onColor": "$success",
+        "offColor": "$track",
+        "hideWhenOff": true
+      }
+    },
+    {
+      "id": "fuel-label",
+      "name": "Fuel label",
+      "x": 300,
+      "y": 532,
+      "width": 120,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "FUEL",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "bold",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "fuel-value",
+      "name": "Fuel value",
+      "x": 440,
+      "y": 532,
+      "width": 120,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "fuel.level",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}%",
+        "style": {
+          "font": "default",
+          "size": 22,
+          "weight": "medium",
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "fuel",
+      "name": "Fuel",
+      "x": 300,
+      "y": 566,
+      "width": 260,
+      "height": 10,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "fuel.level",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.3,
+        "fallback": "dash",
+        "min": 0,
+        "max": 100
+      },
+      "animations": [],
+      "type": "gauge.bar",
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": {
+          "show": true,
+          "color": "$track",
+          "radius": 4
+        },
+        "fill": {
+          "color": "$accent",
+          "radius": 4,
+          "mode": "segments",
+          "segments": 10,
+          "segmentGap": 4,
+          "zones": [
+            {
+              "from": 0,
+              "to": 15,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "show": false,
+          "count": 5,
+          "color": "$text",
+          "length": 8,
+          "width": 2,
+          "side": "after"
+        },
+        "labels": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 18,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "divisor": 1,
+          "offset": 16
+        },
+        "marker": {
+          "show": false,
+          "value": 0,
+          "color": "$text",
+          "width": 3
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 14
+        }
+      }
+    },
+    {
+      "id": "range",
+      "name": "Range",
+      "x": 300,
+      "y": 594,
+      "width": 260,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "vehicle.range",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value} km",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "oil-label",
+      "name": "Oil label",
+      "x": 600,
+      "y": 532,
+      "width": 120,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "OIL",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "bold",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "oil-value",
+      "name": "Oil value",
+      "x": 820,
+      "y": 532,
+      "width": 120,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.oil.temp",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash",
+        "unit": "celsius"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}{unit}",
+        "style": {
+          "font": "default",
+          "size": 22,
+          "weight": "medium",
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "oil",
+      "name": "OIL",
+      "x": 600,
+      "y": 566,
+      "width": 340,
+      "height": 8,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.oil.temp",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.3,
+        "fallback": "dash",
+        "min": 50,
+        "max": 150,
+        "unit": "celsius"
+      },
+      "animations": [],
+      "type": "gauge.bar",
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": {
+          "show": true,
+          "color": "$track",
+          "radius": 4
+        },
+        "fill": {
+          "color": "$accent",
+          "radius": 4,
+          "mode": "solid",
+          "segments": 20,
+          "segmentGap": 3,
+          "zones": [
+            {
+              "from": 130,
+              "to": 150,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "show": false,
+          "count": 5,
+          "color": "$text",
+          "length": 8,
+          "width": 2,
+          "side": "after"
+        },
+        "labels": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 18,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "divisor": 1,
+          "offset": 16
+        },
+        "marker": {
+          "show": false,
+          "value": 0,
+          "color": "$text",
+          "width": 3
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 14
+        }
+      }
+    },
+    {
+      "id": "coolant-label",
+      "name": "Coolant label",
+      "x": 980,
+      "y": 532,
+      "width": 120,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "WATER",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "bold",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "coolant-value",
+      "name": "Coolant value",
+      "x": 1200,
+      "y": 532,
+      "width": 120,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash",
+        "unit": "celsius"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}{unit}",
+        "style": {
+          "font": "default",
+          "size": 22,
+          "weight": "medium",
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "coolant",
+      "name": "WATER",
+      "x": 980,
+      "y": 566,
+      "width": 340,
+      "height": 8,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.3,
+        "fallback": "dash",
+        "min": 50,
+        "max": 130,
+        "unit": "celsius"
+      },
+      "animations": [],
+      "type": "gauge.bar",
+      "props": {
+        "orientation": "horizontal",
+        "direction": "forward",
+        "track": {
+          "show": true,
+          "color": "$track",
+          "radius": 4
+        },
+        "fill": {
+          "color": "$accent",
+          "radius": 4,
+          "mode": "solid",
+          "segments": 20,
+          "segmentGap": 3,
+          "zones": [
+            {
+              "from": 115,
+              "to": 130,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "show": false,
+          "count": 5,
+          "color": "$text",
+          "length": 8,
+          "width": 2,
+          "side": "after"
+        },
+        "labels": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 18,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "divisor": 1,
+          "offset": 16
+        },
+        "marker": {
+          "show": false,
+          "value": 0,
+          "color": "$text",
+          "width": 3
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 14
+        }
+      }
+    },
+    {
+      "id": "clock",
+      "name": "Clock",
+      "x": 1440,
+      "y": 500,
+      "width": 260,
+      "height": 50,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "clock",
+      "props": {
+        "format": "24h",
+        "showSeconds": false,
+        "showSuffix": true,
+        "style": {
+          "font": "default",
+          "size": 42,
+          "weight": "medium",
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "blinkColon": false
+      }
+    },
+    {
+      "id": "outside-temp",
+      "name": "Outside temp",
+      "x": 1440,
+      "y": 560,
+      "width": 260,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "environment.outside.temp",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}{unit}",
+        "style": {
+          "font": "default",
+          "size": 22,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0.0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "odometer",
+      "name": "Odometer",
+      "x": 1440,
+      "y": 594,
+      "width": 260,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "vehicle.odometer",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value} km",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    }
+  ],
+  "meta": {
+    "createdWith": "idv7lol Studio",
+    "created": "2026-11-14T07:09:03.000Z",
+    "tags": ["yellow", "animated"]
+  }
+}

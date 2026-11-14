@@ -17,6 +17,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Volt Runner**, a new bright yellow theme built around an animation: a running lightning bolt
+  (original pixel art) in the middle that runs faster the faster the car goes, the speed big on
+  the left, the gear on the right, engine speed as the road under the runner, and fuel, oil and
+  water along the bottom. Volt, Dusk and Sport palettes. Swap the runner for your own GIF in the
+  Studio. Tested locally (Studio and car preview); not tested in a vehicle.
 - Animated pictures can follow a signal: `speedFrom` on an image plays it faster as the signal
   rises (for example `vehicle.speed`), in the Studio and on the car, where the app restarts the
   renderer's animation at the new speed only when it changes by a step. In the Inspector under

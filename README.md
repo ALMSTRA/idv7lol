@@ -91,8 +91,9 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
   English, Spanish, Russian, Japanese and Simplified Chinese, on the desktop or in the
   [browser](https://www.idv7lol.com/editor/).
 - **Themes to start from.** Performance, Modern, Classic, Night Minimal (a calm night layout),
-  Rally Dash (LED strip, rev bar, huge gear and data cards) and Supercar Track (a wide rev arc and a
-  huge gear, in the style of Italian supercar track clusters), plus seven free community layouts
+  Rally Dash (LED strip, rev bar, huge gear and data cards), Supercar Track (a wide rev arc and a
+  huge gear, in the style of Italian supercar track clusters) and Volt Runner (bright yellow, with a
+  running bolt in the middle that runs faster the faster you go), plus seven free community layouts
   converted from eroobeeroo's Cluster Layouts (GPL, credited in each theme).
 - **The car app**, which runs on the head unit, draws the active theme through `cluster-render`,
   and lets you turn it on or off and switch themes from the iDrive menu.

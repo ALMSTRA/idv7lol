@@ -86,7 +86,8 @@
         ["idv7lol-night-minimal", "Night Minimal"],
         ["idv7lol-performance", "IDV7LOL Performance"],
         ["idv7lol-rally-dash", "Rally Dash"],
-        ["idv7lol-supercar-track", "Supercar Track"]
+        ["idv7lol-supercar-track", "Supercar Track"],
+        ["idv7lol-volt-runner", "Volt Runner"]
       ]
     },
     {
@@ -104,7 +105,9 @@
         ["rally", "Palette: rally"],
         ["stage", "Palette: stage"],
         ["ice", "Palette: ice"],
-        ["corsa", "Palette: corsa"]
+        ["corsa", "Palette: corsa"],
+        ["volt", "Palette: volt"],
+        ["dusk", "Palette: dusk"]
       ]
     },
     {

@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { createRequire } from 'node:module';
 import { EventEmitter } from 'node:events';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { buildThemePackage, compileTheme, encodeThemePackage } from '@idv7lol/theme-compiler';
-import { bakeFamily } from '@idv7lol/theme-compiler/node';
+import { bakeFamily, imagesFor } from '@idv7lol/theme-compiler/node';
+import { parseTheme } from '@idv7lol/theme-schema';
 
 // Every theme in the repository, run through the same path a theme takes to the car:
 // compile, package for a USB stick, check on the car, then build with the car's engine.
@@ -77,7 +78,10 @@ describe('every bundled theme on the car path', () => {
   for (const file of themeFiles) {
     const name = file.slice(root.length + 1).replace(/\\/g, '/');
     it(name, () => {
-      const result = compileTheme(JSON.parse(readFileSync(file, 'utf8')) as unknown, { fonts });
+      const doc = JSON.parse(readFileSync(file, 'utf8')) as unknown;
+      const parsed = parseTheme(doc);
+      const images = parsed.ok ? imagesFor(parsed.theme, dirname(file)) : {};
+      const result = compileTheme(doc, { fonts, images });
       expect(result.report.errors).toEqual([]);
       const compiled = result.compiled!;
       for (const p of compiled.pieces) expect(SHADERS[p.shader], p.shader).toBeTypeOf('string');
