@@ -198,7 +198,8 @@
       "speed": {
         "factor": 0.015625,
         "offset": 0,
-        "invalid": 65535
+        "invalid": 65535,
+        "invalidFrom": 25601
       },
       "accel": {
         "factor": 0.002,

@@ -60,6 +60,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- Boost from the car's sport display (`FES.displayBoostPressure`) is read in hundredths of a bar.
+  It was read in tenths, ten times the real figure: another cluster project fixed the same after a
+  user's photos against the engine unit, and the MIT kit's own apps read it so. 255 is no value.
+- The drive mode is read by BMW's name or wire number (`actualValueModeDrivingExperience`, as the
+  kit's apps read it): Sport+ (`SPORT_EXPERT`, 2) was shown as Sport, numbers weren't read, and a
+  plug-in hybrid's modes now map to the catalog (Sport+ and Boost to Sport, Hybrid and Electric to
+  Comfort, which has no hybrid mode). 0 and 61–63 carry no mode.
+- Speeds over 400 km/h, which a car sends while it wakes, are no value (as the kit's eDrive app
+  reads them); they pegged the speed needle and counted as driving.
 - Animations didn't show on the car in 0.2.5: the car app's copy of the renderer client predated
   cluster-render 0.5.9's ETC2 support, so it sized an `etc2rgba` atlas at four bytes a pixel and
   didn't send it (Volt Runner's runner stayed blank, a 2048×1024 atlas was refused). The client is

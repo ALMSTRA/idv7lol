@@ -25,9 +25,10 @@ interface LineLayout {
 const { ClusterEngine } = require('./engine.js') as {
   ClusterEngine: new (o: Record<string, unknown>) => Engine;
 };
-const { SignalStore, driveModeOf, GEAR_TEXT } = require('./signals.js') as {
+const { SignalStore, driveModeOf, boostOf, GEAR_TEXT } = require('./signals.js') as {
   SignalStore: new () => Store;
   driveModeOf: (raw: unknown) => string | null;
+  boostOf: (raw: unknown) => number | null;
   GEAR_TEXT: (gear: unknown, stage: unknown) => string | null;
 };
 const { layoutLine, formatNumber } = require('./text.js') as {
@@ -624,6 +625,31 @@ describe('vehicle helpers', () => {
     expect(driveModeOf('COMFORT')).toBe('COMFORT');
     expect(driveModeOf('BASIS')).toBe('COMFORT');
     expect(driveModeOf('???')).toBe(null);
+  });
+
+  it("reads FES's drive mode by BMW name or wire number (Sport+ is SPORT_EXPERT, 2)", () => {
+    const of = (m: unknown) => driveModeOf({ actualValueModeDrivingExperience: m });
+    expect(of('SPORT_EXPERT')).toBe('SPORT_PLUS');
+    expect(of(2)).toBe('SPORT_PLUS');
+    expect(of('SPORT_DYNAMIC')).toBe('SPORT');
+    expect(of(1)).toBe('SPORT');
+    expect(of('ECO_PRO_EFFICIENT')).toBe('ECO_PRO');
+    expect(of(10)).toBe('ADAPTIVE');
+    expect(of('PHEV_SPORT_PLUS')).toBe('SPORT_PLUS');
+    expect(of('BOOST')).toBe('SPORT');
+    expect(of('PHEV_HYBRID_STANDARD')).toBe('COMFORT');
+    expect(of(20)).toBe('COMFORT');
+    for (const none of [0, 61, 62, 63]) expect(of(none)).toBe(null);
+  });
+
+  it('reads boost from the sport display in hundredths of a bar', () => {
+    // 1.2 bar showed as 12 when read in tenths (issue #7 of another cluster project, confirmed with
+    // photos against the engine unit; the kit's own apps read it the same way).
+    expect(boostOf(120)).toBeCloseTo(1.2, 5);
+    expect(boostOf(0)).toBe(0);
+    expect(boostOf(255)).toBe(null);
+    expect(boostOf(-1)).toBe(null);
+    expect(boostOf(undefined)).toBe(null);
     expect(GEAR_TEXT(3, 'D')).toBe('3');
     expect(GEAR_TEXT(-1, 'R')).toBe('R');
     expect(GEAR_TEXT(0, 'P')).toBe('P');

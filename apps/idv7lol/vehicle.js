@@ -19,7 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const Car = require('./kit/car');
-const { SignalStore, driveModeOf, GEAR_TEXT } = require('./signals');
+const { SignalStore, driveModeOf, boostOf, GEAR_TEXT } = require('./signals');
 const { FuelGauge, CarAwake, parseTank } = require('./fuel');
 
 /** The engine unit's fuel level: OBD-II PID 2F, A x 100 / 255 (a public standard, no BMW table). */
@@ -150,8 +150,8 @@ function startVehicle(ctx, opts) {
       },
       statusSwitchDriveDynamicSport2: (v) => {
         seen('statusSwitchDriveDynamicSport2', v);
-        const b = v && v.displayBoostPressure;
-        if (typeof b === 'number' && b < 254) store.set('engine.boost', b / 10);
+        const b = boostOf(v && v.displayBoostPressure);
+        if (b !== null) store.set('engine.boost', b);
         if (Date.now() > modeFallbackSince) {
           const m = driveModeOf(v);
           if (m) store.set('drive.mode', m);

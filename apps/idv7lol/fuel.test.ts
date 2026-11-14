@@ -232,3 +232,41 @@ describe('CarAwake (when the engine unit may be asked)', () => {
     expect(a.on(S)).toBe(false);
   });
 });
+
+describe('the speed scaling in app.json', () => {
+  // A car that is waking sends speeds over 400 km/h that aren't real (the kit's eDrive app reads
+  // them as no value); counted, they would wake the fuel reads and peg the speed needle.
+  it("makes the kit's Car drop raw speeds over 400 km/h", () => {
+    const spec = JSON.parse(
+      require('node:fs').readFileSync(new URL('./app.json', import.meta.url), 'utf8'),
+    ) as object;
+    const handlers: Record<string, Record<string, (v: unknown) => void>> = {};
+    const Car = require('../../kit/runtime/car.js') as new (
+      ctx: object,
+      groups: string[],
+    ) => { data(): { speed?: number }; stop?: () => void };
+    const car = new Car(
+      {
+        spec,
+        log: { info: () => undefined, warn: () => undefined },
+        signals: {
+          watch: (iface: string, _i: string, fields: Record<string, (v: unknown) => void>) => {
+            handlers[iface] = fields;
+            return Promise.resolve({ available: true });
+          },
+        },
+      },
+      ['speed'],
+    );
+    const send = (raw: number) =>
+      handlers['de.bmw.infotainment.vehicle.Vehicle2']!['statusCarSpeed2']!({
+        speedVehicleCentreOfGravity: raw,
+      });
+    send(6400);
+    expect(car.data().speed).toBe(100);
+    send(25601); // 400.02 km/h: dropped, the last real speed stays
+    expect(car.data().speed).toBe(100);
+    send(25600);
+    expect(car.data().speed).toBe(400);
+  });
+});
