@@ -21,6 +21,7 @@ const mgu = require('./kit/mgu');
 const { ClusterRender } = require('./cluster_render_client');
 const { ClusterEngine, STRIP_Y, SETTLE_MS } = require('./engine');
 const { startVehicle } = require('./vehicle');
+const tz = require('./tz');
 const index = require('./themes_index');
 const SHADERS = require('./shaders');
 const { ThemeLibrary, UsbWatcher, PREFIX } = require('./usb_themes');
@@ -60,7 +61,13 @@ mgu.run({
     );
 
     const showing = () => settings.get('show') === 'on';
-    const utcOffset = () => Number(settings.get('utcOffset')) || 0;
+    // the Time zone setting (daylight saving included, tz.js); 'offset' uses the fixed Clock offset
+    const utcOffset = () =>
+      tz.offsetMinutes(
+        settings.get('timeZone'),
+        Date.now(),
+        Number(settings.get('utcOffset')) || 0,
+      );
     const vehicle = startVehicle(ctx, { redline: 7000 });
 
     const library = new ThemeLibrary({ dataDir: ctx.dataDir || process.cwd(), log });
@@ -141,7 +148,7 @@ mgu.run({
       }
       if (k === 'bottomStrip') engine.setTheme(current.theme, current.fonts);
       if (k === 'palette') engine.recolour();
-      if (k === 'sweep' || k === 'utcOffset') return;
+      if (k === 'sweep' || k === 'utcOffset' || k === 'timeZone') return;
       render().catch(() => {});
     });
 

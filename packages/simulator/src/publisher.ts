@@ -74,6 +74,7 @@ export function modelSignals(
     'chassis.accel.lat': Math.round(s.accelLat * 100) / 100,
     'chassis.yaw.rate': Math.round(s.accelLat * 30),
     'chassis.handbrake': i.handbrake,
+    'chassis.dsc.mode': 'ON',
     'chassis.tyre.pressure.fl': 2.4,
     'chassis.tyre.pressure.fr': 2.4,
     'chassis.tyre.pressure.rl': 2.6,

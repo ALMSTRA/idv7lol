@@ -172,4 +172,58 @@ class CarAwake {
   }
 }
 
-module.exports = { FuelGauge, CarAwake, parseTank, STABLE_MS, OBD_FRESH_MS };
+const REFUEL_LITRES = 5; // the tank this much over its lowest since the last refuel: a refuel
+const REFUEL_MAX_KMH = 3; // only while standing (fuel sloshing while driving moves the level a litre or two)
+
+/**
+ * The distance since the last refuel, from the cluster's odometer and tank litres (both whole numbers).
+ * A refuel is the tank REFUEL_LITRES over its lowest since the last one while the car stands. Until the
+ * first refuel is seen it counts from the first odometer reading. Its state is kept (save) so it survives
+ * restarts. update() returns the km, or null while the odometer isn't known.
+ */
+class RefuelTrip {
+  /** opts: { state ({ odometerKm, lowLitres }), save(state) } */
+  constructor(opts) {
+    const o = opts || {};
+    const st = o.state || {};
+    this.save = o.save || (() => {});
+    this.startKm = isNum(st.odometerKm) ? st.odometerKm : null;
+    this.low = isNum(st.lowLitres) ? st.lowLitres : null;
+  }
+
+  update(litres, odometerKm, speedKmh, now) {
+    if (!isNum(odometerKm)) return null;
+    let changed = false;
+    if (this.startKm === null || odometerKm < this.startKm) {
+      this.startKm = odometerKm; // first reading, or another car / cluster
+      changed = true;
+    }
+    if (isNum(litres)) {
+      const standing = !isNum(speedKmh) || speedKmh < REFUEL_MAX_KMH;
+      if (this.low === null) {
+        this.low = litres;
+        changed = true;
+      } else if (standing && litres >= this.low + REFUEL_LITRES) {
+        this.startKm = odometerKm;
+        this.low = litres;
+        this.refuelAt = now;
+        changed = true;
+      } else if (litres < this.low) {
+        this.low = litres;
+        changed = true;
+      }
+    }
+    if (changed) this._save();
+    return odometerKm - this.startKm;
+  }
+
+  _save() {
+    try {
+      this.save({ odometerKm: this.startKm, lowLitres: this.low });
+    } catch (_e) {
+      /* the next change saves again */
+    }
+  }
+}
+
+module.exports = { FuelGauge, CarAwake, RefuelTrip, parseTank, STABLE_MS, OBD_FRESH_MS };

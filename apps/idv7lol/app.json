@@ -10,26 +10,31 @@
   "signals": {
     "de.bmw.infotainment.vehicle.CDS": {
       "statusEngineSpeed2": "rs",
-      "statusEngineTemperature": "rs"
+      "statusEngineTemperature": "rs",
+      "statusHandBrake": "rs"
     },
     "de.bmw.infotainment.vehicle.CDS2": {
       "statusLongitudinalAccelerationMassCenter": "rs",
-      "statusLateralAccelerationMassCenter": "rs"
+      "statusLateralAccelerationMassCenter": "rs",
+      "statusInjectionVolume": "rs"
     },
     "de.bmw.infotainment.vehicle.Vehicle2": {
-      "statusCarSpeed2": "rs"
+      "statusCarSpeed2": "rs",
+      "statusStandstillFunctions": "rs"
     },
     "de.bmw.infotainment.drivingexcitement.FES": {
       "statusSwitchDriveDynamicSport2": "rs",
       "statusActualValueTorque2": "rs",
-      "statusFESVehicleDynamicSwitchHMI": "rs"
+      "statusFESVehicleDynamicSwitchHMI": "rs",
+      "statusDSCSwitchHMI": "rs"
     },
     "de.bmw.infrastructure.EnvironmentalInformation": {
       "ExteriorTemperature": "s"
     },
     "de.bmw.infotainment.misc.MDrive": {
-      "_optional": "the gearbox S / M programme (cars without an M/S selector show D)",
-      "dataDisplayGearbox": "s"
+      "_optional": "the gearbox S / M programme (cars without an M/S selector show D) and an M car's engine mode",
+      "dataDisplayGearbox": "s",
+      "controlDisplayMSystems": "rs"
     },
     "de.bmw.infrastructure.VehicleInformation": {
       "statusGearboxDrive": "s",
@@ -44,14 +49,35 @@
       "VehicleCondition": "s"
     },
     "de.bmw.infotainment.KombiIF": {
-      "_optional": "the fuel level, the fuel range and the odometer",
-      "statusRangeTankStatus": "rs"
+      "_optional": "the fuel level, the fuel range, the odometer and the trip computer",
+      "statusRangeTankStatus": "rs",
+      "statusBordcomputerTravelData": "rs",
+      "statusBordcomputerAverage": "rs"
+    },
+    "de.bmw.body.Light": {
+      "_optional": "the turn signals, low and high beam and the rear fog light",
+      "StatusFunctionsIndicators": "s",
+      "LowBeam": "rs",
+      "LampExterior": "s",
+      "LampExterior2": "s"
+    },
+    "de.bmw.infotainment.displaydata.DisplayDataServer2": {
+      "_optional": "cruise control: on and its set speed",
+      "functionalLibraryData": "rs"
+    },
+    "de.bmw.infotainment.displaydataserver.DisplayDataServer": {
+      "_optional": "cruise control on cars that fill the older display data",
+      "functionalLibraryData": "rs"
+    },
+    "de.bmw.chassis.VehicleStabilizationManagement": {
+      "_optional": "DSC's raw state on the Signals page and in the log (its values are not decoded yet)",
+      "StabilizationManagement": "s"
     },
     "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": {
-      "_optional": "the engine unit's fuel percentage (OBD-II, read only); the fuel gauge then uses litres over the tank size",
+      "_optional": "the engine unit's boost and fuel percentage (read only); without it no boost unless the car sends one, and the fuel gauge uses litres over the tank size",
       "_instances": "SystemFunctionsInternalTasuInst1",
-      "_methods": "sendTasuRequest",
-      "_broadcasts": "sendTasuResponse"
+      "_methods": ["sendTasuRequest"],
+      "_broadcasts": ["sendTasuResponse"]
     }
   },
   "screens": [
@@ -61,10 +87,10 @@
       "title": "idv7lol",
       "buttons": [
         ["BTN_SHOW", "Show on the cluster"],
+        ["BTN_DIAG", "Diagnostics"],
         ["BTN_THEME", "Next theme"],
-        ["BTN_REMOVE", "Remove USB theme"],
         ["BTN_PALETTE", "Palette"],
-        ["BTN_DIAG", "Diagnostics"]
+        ["BTN_REMOVE", "Remove USB theme"]
       ]
     }
   ],
@@ -147,8 +173,32 @@
       ]
     },
     {
+      "key": "timeZone",
+      "label": "Time zone",
+      "type": "choice",
+      "default": "offset",
+      "options": [
+        ["offset", "Fixed offset (Clock: offset from UTC)"],
+        ["melbourne", "Melbourne, Sydney, Canberra, Hobart"],
+        ["brisbane", "Brisbane"],
+        ["adelaide", "Adelaide"],
+        ["darwin", "Darwin"],
+        ["perth", "Perth"],
+        ["auckland", "Auckland"],
+        ["uk", "UK, Ireland, Portugal"],
+        ["cet", "Central Europe"],
+        ["eet", "Eastern Europe"],
+        ["us-eastern", "US Eastern"],
+        ["us-central", "US Central"],
+        ["us-mountain", "US Mountain"],
+        ["arizona", "Arizona"],
+        ["us-pacific", "US Pacific"],
+        ["utc", "UTC"]
+      ]
+    },
+    {
       "key": "utcOffset",
-      "label": "Clock: offset from UTC",
+      "label": "Clock: offset from UTC (Time zone: Fixed offset)",
       "type": "choice",
       "default": "0",
       "options": [
