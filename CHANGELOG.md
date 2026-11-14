@@ -20,7 +20,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   leaning bars for oil, water, fuel and gearbox oil, the time and outside temperature, and a pill
   that says Low fuel. Its Track and Corsa palettes keep their names. Tested locally; not tested in
   a vehicle.
-- The car app is version 0.2.9, so the MGU Store's Releases channel offers the X4 M fixes, Lily
+- The car app is version 0.2.10, so the MGU Store's Releases channel offers the X4 M fixes, VDO
+  Classic M, Lily
   Pad, Neon Drive,
   Heritage 89, the new Supercar Track, Volt Runner, the
   fuel readings, the needle fix, the bottom strip fix, ETC2 animations and the fixes taken from
