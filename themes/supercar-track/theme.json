@@ -4,7 +4,7 @@
   "name": "Supercar Track",
   "version": "0.1.0",
   "author": "idv7lol contributors",
-  "description": "A track cluster in the style of Italian supercars: a wide rev arc counting to 9, a huge gear in the middle, oil, water and fuel columns at the sides, speed bottom right. Fuel and range show dashes on the car until those signals are read.",
+  "description": "A track cluster in the style of Italian supercars: a wide rev arc counting to 9, a huge gear in the middle, oil, water and fuel columns at the sides, speed bottom right. Fuel and range come from the cluster on the car.",
   "license": "GPL-3.0-or-later",
   "target": {
     "platform": "idrive7-mgu",
