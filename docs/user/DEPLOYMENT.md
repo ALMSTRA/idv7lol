@@ -99,7 +99,7 @@ This is about installing the Store, not idv7lol: idv7lol itself doesn't flash or
      own apps. Not tried on a car yet.
    - **Branch** `main` builds the app on the head unit from the latest code. Tested on a car.
 
-   Don't pick Tags: it skips pre-release tags such as `v0.2.0-beta.3`.
+   Don't pick Tags: it skips pre-release tags such as `v0.2.0-beta.4`.
 
 2. The Store lists **idv7lol**. Open it and press **Install**. The Store installs what idv7lol
    needs first (`cluster-render` 0.5.9, and its own deploy tool 0.8.12, which makes an update run
