@@ -1,0 +1,2015 @@
+{
+  "schemaVersion": 1,
+  "id": "idv7lol-lily-pad",
+  "name": "Lily Pad",
+  "version": "0.1.0",
+  "author": "idv7lol contributors",
+  "description": "A night pond on the whole cluster: a tree frog hops on its lily pad in the middle of the rev ring, faster the faster the car goes, fireflies light up as the revs climb, the speed is a needle on a lily pad, and fuel, oil and water stand as reeds. Ripples, a turning swirl, a gear that flashes on each change, and a frog that croaks near the redline. Swap the frog for your own animation in the Studio.",
+  "license": "GPL-3.0-or-later",
+  "target": {
+    "platform": "idrive7-mgu",
+    "display": "kombi-id7-12.3",
+    "renderer": "cluster-render"
+  },
+  "vehicleProfile": "turbo-ice",
+  "layout": {
+    "width": 1920,
+    "height": 720,
+    "background": "$background",
+    "reservedZones": [
+      {
+        "x": 730,
+        "y": 0,
+        "width": 460,
+        "height": 128,
+        "id": "cowl",
+        "name": "Top cowl (factory telltales)",
+        "kind": "factory"
+      },
+      {
+        "x": 1410,
+        "y": 262,
+        "width": 252,
+        "height": 192,
+        "id": "gear-bracket",
+        "name": "Gear bracket (factory gear display)",
+        "kind": "factory"
+      },
+      {
+        "x": 1770,
+        "y": 170,
+        "width": 150,
+        "height": 95,
+        "id": "edrive-box",
+        "name": "eDrive status box (hybrids)",
+        "kind": "factory"
+      },
+      {
+        "x": 560,
+        "y": 652,
+        "width": 960,
+        "height": 68,
+        "id": "telltales-bottom",
+        "name": "Bottom telltale strip",
+        "kind": "factory"
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "width": 394.5454545454545,
+        "height": 217,
+        "id": "glass-corner-left",
+        "name": "Glass corner (left)",
+        "kind": "keep-clear",
+        "polygon": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 394.5454545454545,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "x": 1525.4545454545455,
+        "y": 0,
+        "width": 394.5454545454545,
+        "height": 217,
+        "id": "glass-corner-right",
+        "name": "Glass corner (right)",
+        "kind": "keep-clear",
+        "polygon": [
+          {
+            "x": 1920,
+            "y": 0
+          },
+          {
+            "x": 1525.4545454545455,
+            "y": 0
+          },
+          {
+            "x": 1920,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "x": 416,
+        "y": 120,
+        "width": 1088,
+        "height": 480,
+        "id": "stock-map-window",
+        "name": "Stock map window (slot 0x100)",
+        "kind": "info"
+      },
+      {
+        "x": 0,
+        "y": 646,
+        "width": 1920,
+        "height": 74,
+        "id": "bottom-strip",
+        "name": "Bottom strip: the car's own (the car app cuts layouts here)",
+        "kind": "info"
+      },
+      {
+        "x": 793,
+        "y": 289,
+        "width": 246,
+        "height": 92,
+        "id": "m-box-left",
+        "name": "M cars: cluster box (approx. ±10 px)",
+        "kind": "info"
+      },
+      {
+        "x": 1223,
+        "y": 328,
+        "width": 171,
+        "height": 78,
+        "id": "m-box-right",
+        "name": "M cars: cluster box (approx. ±10 px)",
+        "kind": "info"
+      },
+      {
+        "x": 740,
+        "y": 128,
+        "width": 440,
+        "height": 19,
+        "id": "driver-camera",
+        "name": "Driver camera notch (cars with it, to y ≈ 147)",
+        "kind": "info"
+      }
+    ]
+  },
+  "palettes": {
+    "pond": {
+      "name": "Pond",
+      "colors": {
+        "success": "#2fd06f",
+        "warning": "#ffc93c",
+        "danger": "#ff4b3e",
+        "background": "#0e2e26",
+        "deep": "#04120f",
+        "surface": "#123a30",
+        "text": "#eafff0",
+        "text-muted": "#7fae96",
+        "accent": "#7ee04a",
+        "track": "#1c4a3c",
+        "glow": "#2f7a48",
+        "pad": "#2f8f46",
+        "pad-dark": "#1a5a2c",
+        "pad-edge": "#8fe07a",
+        "ripple": "#5fd0c8",
+        "needle": "#ff4b3e",
+        "firefly": "#e8ff6a"
+      }
+    },
+    "firefly": {
+      "name": "Firefly night",
+      "colors": {
+        "success": "#2fd06f",
+        "warning": "#ffc93c",
+        "danger": "#ff4b3e",
+        "background": "#0b1630",
+        "deep": "#03060f",
+        "surface": "#13234a",
+        "text": "#f2f5ff",
+        "text-muted": "#8090c0",
+        "accent": "#e8ff6a",
+        "track": "#1c2c56",
+        "glow": "#5a6a20",
+        "pad": "#2a6a5a",
+        "pad-dark": "#123a32",
+        "pad-edge": "#6fd0b0",
+        "ripple": "#6a8cff",
+        "needle": "#ffb347",
+        "firefly": "#ffe66a"
+      }
+    },
+    "toxic": {
+      "name": "Toxic",
+      "colors": {
+        "success": "#2fd06f",
+        "warning": "#ffc93c",
+        "danger": "#ff2d55",
+        "background": "#102408",
+        "deep": "#030901",
+        "surface": "#1a3a10",
+        "text": "#f4ffe8",
+        "text-muted": "#8fb070",
+        "accent": "#c6ff00",
+        "track": "#24421a",
+        "glow": "#5a8a00",
+        "pad": "#3b8f1a",
+        "pad-dark": "#1f5a0c",
+        "pad-edge": "#c6ff00",
+        "ripple": "#c6ff00",
+        "needle": "#ff2d55",
+        "firefly": "#ff2d55"
+      }
+    },
+    "lotus": {
+      "name": "Lotus",
+      "colors": {
+        "success": "#2fd06f",
+        "warning": "#ffc93c",
+        "danger": "#ff4b3e",
+        "background": "#1a2232",
+        "deep": "#070a12",
+        "surface": "#232c40",
+        "text": "#fff2fa",
+        "text-muted": "#a090b0",
+        "accent": "#ff7ac8",
+        "track": "#2c3448",
+        "glow": "#7a3a60",
+        "pad": "#2f8f6a",
+        "pad-dark": "#1a5a44",
+        "pad-edge": "#ffb0de",
+        "ripple": "#ff9ad6",
+        "needle": "#ff7ac8",
+        "firefly": "#fff0a0"
+      }
+    }
+  },
+  "palette": {
+    "default": "pond",
+    "byDriveMode": {
+      "SPORT": "toxic",
+      "SPORT_PLUS": "toxic",
+      "ECO_PRO": "lotus"
+    },
+    "allowManual": true
+  },
+  "fonts": {
+    "default": {
+      "family": "sans"
+    }
+  },
+  "assets": {
+    "frog": {
+      "type": "image",
+      "name": "Tree frog",
+      "data": "data:image/png;base64,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",
+      "width": 1536,
+      "height": 576,
+      "animation": {
+        "frames": 8,
+        "columns": 4,
+        "frameWidth": 384,
+        "frameHeight": 288,
+        "durations": [110, 90, 80, 80, 80, 80, 90, 130]
+      }
+    }
+  },
+  "animations": {
+    "swirl": {
+      "name": "Swirl",
+      "duration": 24000,
+      "easing": "linear",
+      "loop": true,
+      "direction": "normal",
+      "tracks": [
+        {
+          "property": "rotation",
+          "keyframes": [
+            {
+              "t": 0,
+              "value": 0
+            },
+            {
+              "t": 1,
+              "value": 360
+            }
+          ]
+        }
+      ]
+    },
+    "ripple-a": {
+      "name": "Ripple",
+      "duration": 2200,
+      "easing": "ease-in-out",
+      "loop": true,
+      "direction": "alternate",
+      "tracks": [
+        {
+          "property": "scale",
+          "keyframes": [
+            {
+              "t": 0,
+              "value": 1
+            },
+            {
+              "t": 0.5,
+              "value": 1.1
+            },
+            {
+              "t": 1,
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    "ripple-b": {
+      "name": "Ripple, wider",
+      "duration": 3400,
+      "easing": "ease-in-out",
+      "loop": true,
+      "direction": "normal",
+      "tracks": [
+        {
+          "property": "scale",
+          "keyframes": [
+            {
+              "t": 0,
+              "value": 1.08
+            },
+            {
+              "t": 0.5,
+              "value": 1
+            },
+            {
+              "t": 1,
+              "value": 1.08
+            }
+          ]
+        }
+      ]
+    },
+    "redline-flash": {
+      "name": "Redline flash",
+      "duration": 240,
+      "easing": "ease-in-out",
+      "loop": true,
+      "direction": "alternate",
+      "tracks": [
+        {
+          "property": "props.fill.color",
+          "keyframes": [
+            {
+              "t": 0,
+              "value": "$danger"
+            },
+            {
+              "t": 1,
+              "value": "$firefly"
+            }
+          ]
+        }
+      ]
+    },
+    "croak-flash": {
+      "name": "Croak",
+      "duration": 300,
+      "easing": "ease-in-out",
+      "loop": true,
+      "direction": "alternate",
+      "tracks": [
+        {
+          "property": "props.style.color",
+          "keyframes": [
+            {
+              "t": 0,
+              "value": "$danger"
+            },
+            {
+              "t": 1,
+              "value": "$firefly"
+            }
+          ]
+        }
+      ]
+    },
+    "gear-pop": {
+      "name": "Gear change",
+      "duration": 450,
+      "easing": "ease-out",
+      "loop": false,
+      "direction": "normal",
+      "tracks": [
+        {
+          "property": "props.style.color",
+          "keyframes": [
+            {
+              "t": 0,
+              "value": "$accent"
+            },
+            {
+              "t": 1,
+              "value": "$text"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "bg",
+      "name": "Pond",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 720,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": true,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$background"
+            },
+            {
+              "offset": 1,
+              "color": "$deep"
+            }
+          ]
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "surface",
+      "name": "Water surface",
+      "x": 520,
+      "y": 506,
+      "width": 880,
+      "height": 2,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "line",
+      "props": {
+        "stroke": {
+          "color": "$ripple",
+          "width": 2,
+          "cap": "butt"
+        },
+        "direction": "horizontal"
+      }
+    },
+    {
+      "id": "speed-pad",
+      "name": "Speed lily pad",
+      "x": 110,
+      "y": 160,
+      "width": 460,
+      "height": 460,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "group",
+      "props": {
+        "children": [
+          {
+            "id": "pad-swirl",
+            "name": "Swirl",
+            "x": 0,
+            "y": 0,
+            "width": 460,
+            "height": 460,
+            "rotation": 0,
+            "opacity": 1,
+            "visible": true,
+            "locked": false,
+            "anchor": "center",
+            "animations": [
+              {
+                "clip": "swirl",
+                "trigger": {
+                  "on": "always"
+                },
+                "delay": 0
+              }
+            ],
+            "type": "arc",
+            "props": {
+              "startAngle": 0,
+              "sweepAngle": 300,
+              "stroke": {
+                "color": "$ripple",
+                "width": 2,
+                "cap": "round"
+              }
+            }
+          },
+          {
+            "id": "pad-leaf",
+            "name": "Leaf",
+            "x": 20,
+            "y": 20,
+            "width": 420,
+            "height": 420,
+            "rotation": 0,
+            "opacity": 1,
+            "visible": true,
+            "locked": false,
+            "anchor": "top-left",
+            "animations": [],
+            "type": "ellipse",
+            "props": {
+              "fill": {
+                "type": "linear",
+                "angle": 120,
+                "stops": [
+                  {
+                    "offset": 0,
+                    "color": "$pad"
+                  },
+                  {
+                    "offset": 1,
+                    "color": "$pad-dark"
+                  }
+                ]
+              },
+              "stroke": {
+                "color": "$pad-edge",
+                "width": 3,
+                "cap": "butt"
+              }
+            }
+          },
+          {
+            "id": "speed",
+            "name": "Speed",
+            "x": 40,
+            "y": 40,
+            "width": 380,
+            "height": 380,
+            "rotation": 0,
+            "opacity": 1,
+            "visible": true,
+            "locked": false,
+            "anchor": "top-left",
+            "binding": {
+              "signal": "vehicle.speed",
+              "min": 0,
+              "max": 280,
+              "scale": 1,
+              "offset": 0,
+              "clamp": true,
+              "smoothing": 0.12,
+              "fallback": "dash"
+            },
+            "animations": [],
+            "type": "gauge.arc",
+            "props": {
+              "startAngle": 135,
+              "sweepAngle": 270,
+              "track": {
+                "show": true,
+                "color": "$track",
+                "width": 6,
+                "cap": "round"
+              },
+              "fill": {
+                "show": true,
+                "color": "$accent",
+                "width": 6,
+                "mode": "solid",
+                "segments": 40,
+                "segmentGap": 1.5,
+                "cap": "round",
+                "zones": []
+              },
+              "ticks": {
+                "major": 14,
+                "minor": 1,
+                "majorLength": 14,
+                "minorLength": 6,
+                "majorWidth": 3,
+                "minorWidth": 1.5,
+                "color": "$text",
+                "minorColor": "$text-muted",
+                "inset": 10
+              },
+              "labels": {
+                "show": true,
+                "every": 2,
+                "style": {
+                  "font": "default",
+                  "size": 22,
+                  "weight": "medium",
+                  "color": "$text",
+                  "align": "center",
+                  "baseline": "middle",
+                  "letterSpacing": 0,
+                  "uppercase": false
+                },
+                "divisor": 1,
+                "format": "0",
+                "inset": 36
+              },
+              "needle": {
+                "show": true,
+                "color": "$needle",
+                "width": 7,
+                "length": 0.86,
+                "tail": 0.12,
+                "shape": "tapered",
+                "cap": {
+                  "show": true,
+                  "radius": 16,
+                  "color": "$firefly"
+                }
+              },
+              "redline": {
+                "show": false,
+                "from": 6500,
+                "color": "$danger",
+                "width": 10,
+                "placement": "outer"
+              },
+              "valueText": {
+                "show": false,
+                "style": {
+                  "font": "default",
+                  "size": 64,
+                  "weight": "bold",
+                  "color": "$text",
+                  "align": "center",
+                  "baseline": "middle",
+                  "letterSpacing": 0,
+                  "uppercase": false
+                },
+                "format": "0",
+                "showUnit": false,
+                "unitStyle": {
+                  "font": "default",
+                  "size": 22,
+                  "weight": "regular",
+                  "color": "$text",
+                  "align": "center",
+                  "baseline": "middle",
+                  "letterSpacing": 0,
+                  "uppercase": false
+                },
+                "offsetX": 0,
+                "offsetY": 0
+              },
+              "glow": {
+                "show": false,
+                "color": "$accent",
+                "blur": 18
+              }
+            }
+          },
+          {
+            "id": "speed-value",
+            "name": "Speed value",
+            "x": 140,
+            "y": 262,
+            "width": 180,
+            "height": 80,
+            "rotation": 0,
+            "opacity": 1,
+            "visible": true,
+            "locked": false,
+            "anchor": "top-left",
+            "binding": {
+              "signal": "vehicle.speed",
+              "scale": 1,
+              "offset": 0,
+              "clamp": true,
+              "smoothing": 0,
+              "fallback": "dash"
+            },
+            "animations": [],
+            "type": "value.digital",
+            "props": {
+              "format": "0",
+              "showUnit": true,
+              "label": "",
+              "layout": "stacked",
+              "valueStyle": {
+                "font": "default",
+                "size": 66,
+                "weight": "bold",
+                "color": "$text",
+                "align": "center",
+                "baseline": "alphabetic",
+                "letterSpacing": 0,
+                "uppercase": false
+              },
+              "unitStyle": {
+                "font": "default",
+                "size": 20,
+                "weight": "medium",
+                "color": "$text-muted",
+                "align": "center",
+                "baseline": "alphabetic",
+                "letterSpacing": 0,
+                "uppercase": false
+              },
+              "labelStyle": {
+                "font": "default",
+                "size": 20,
+                "weight": "regular",
+                "color": "$text-muted",
+                "align": "center",
+                "baseline": "middle",
+                "letterSpacing": 0,
+                "uppercase": true
+              },
+              "zones": [],
+              "radius": 0,
+              "padding": 0,
+              "tabular": true
+            }
+          },
+          {
+            "id": "boost",
+            "name": "Boost",
+            "x": 150,
+            "y": 352,
+            "width": 160,
+            "height": 30,
+            "rotation": 0,
+            "opacity": 1,
+            "visible": true,
+            "locked": false,
+            "anchor": "top-left",
+            "binding": {
+              "signal": "engine.boost",
+              "scale": 1,
+              "offset": 0,
+              "clamp": true,
+              "smoothing": 0,
+              "fallback": "dash"
+            },
+            "animations": [],
+            "type": "text",
+            "props": {
+              "text": "{value} bar",
+              "style": {
+                "font": "default",
+                "size": 20,
+                "weight": "bold",
+                "color": "$firefly",
+                "align": "center",
+                "baseline": "middle",
+                "letterSpacing": 0,
+                "uppercase": false
+              },
+              "format": "0.00",
+              "clip": false,
+              "wrap": false,
+              "lineHeight": 1.2
+            }
+          }
+        ],
+        "clip": false
+      }
+    },
+    {
+      "id": "revs",
+      "name": "Rev ring",
+      "x": 640,
+      "y": 170,
+      "width": 640,
+      "height": 640,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 7000,
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.06,
+        "fallback": "dash"
+      },
+      "animations": [
+        {
+          "clip": "redline-flash",
+          "trigger": {
+            "on": "while",
+            "condition": {
+              "signal": "engine.rpm",
+              "op": "gt",
+              "value": 6200
+            }
+          },
+          "delay": 0
+        }
+      ],
+      "type": "gauge.arc",
+      "props": {
+        "startAngle": 180,
+        "sweepAngle": 180,
+        "track": {
+          "show": true,
+          "color": "$track",
+          "width": 16,
+          "cap": "butt"
+        },
+        "fill": {
+          "show": true,
+          "color": "$accent",
+          "width": 16,
+          "mode": "segments",
+          "segments": 28,
+          "segmentGap": 1.4,
+          "cap": "butt",
+          "zones": [
+            {
+              "from": 6000,
+              "to": 7000,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "major": 7,
+          "minor": 1,
+          "majorLength": 12,
+          "minorLength": 6,
+          "majorWidth": 3,
+          "minorWidth": 1.5,
+          "color": "$text",
+          "minorColor": "$text-muted",
+          "inset": 22,
+          "redlineColor": "$danger"
+        },
+        "labels": {
+          "show": true,
+          "every": 1,
+          "style": {
+            "font": "default",
+            "size": 24,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "divisor": 1000,
+          "format": "0",
+          "inset": 48
+        },
+        "needle": {
+          "show": false,
+          "color": "$accent",
+          "width": 6,
+          "length": 0.9,
+          "tail": 0.1,
+          "shape": "tapered",
+          "cap": {
+            "show": true,
+            "radius": 14,
+            "color": "$surface"
+          }
+        },
+        "redline": {
+          "show": true,
+          "from": 6000,
+          "color": "$danger",
+          "width": 6,
+          "placement": "outer"
+        },
+        "valueText": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 64,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "showUnit": false,
+          "unitStyle": {
+            "font": "default",
+            "size": 22,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "glow": {
+          "show": true,
+          "color": "$glow",
+          "blur": 16
+        }
+      }
+    },
+    {
+      "id": "fireflies",
+      "name": "Fireflies",
+      "x": 790,
+      "y": 136,
+      "width": 340,
+      "height": 22,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 7000,
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "indicator.shiftlights",
+      "props": {
+        "count": 9,
+        "shape": "circle",
+        "gap": 18,
+        "from": 4500,
+        "to": 6400,
+        "flashAbove": 6500,
+        "flashRateHz": 6,
+        "colors": [
+          "$firefly",
+          "$firefly",
+          "$firefly",
+          "$firefly",
+          "$firefly",
+          "$warning",
+          "$warning",
+          "$danger",
+          "$danger"
+        ],
+        "offColor": "$track",
+        "symmetric": true,
+        "glow": true
+      }
+    },
+    {
+      "id": "ripple-in",
+      "name": "Ripple",
+      "x": 780,
+      "y": 470,
+      "width": 360,
+      "height": 70,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "center",
+      "animations": [
+        {
+          "clip": "ripple-a",
+          "trigger": {
+            "on": "always"
+          },
+          "delay": 0
+        }
+      ],
+      "type": "ellipse",
+      "props": {
+        "fill": "transparent",
+        "stroke": {
+          "color": "$ripple",
+          "width": 2,
+          "cap": "butt"
+        }
+      }
+    },
+    {
+      "id": "ripple-out",
+      "name": "Ripple",
+      "x": 720,
+      "y": 462,
+      "width": 480,
+      "height": 92,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "center",
+      "animations": [
+        {
+          "clip": "ripple-b",
+          "trigger": {
+            "on": "always"
+          },
+          "delay": 0
+        }
+      ],
+      "type": "ellipse",
+      "props": {
+        "fill": "transparent",
+        "stroke": {
+          "color": "$ripple",
+          "width": 1.5,
+          "cap": "butt"
+        }
+      }
+    },
+    {
+      "id": "frog-pad",
+      "name": "Frog lily pad",
+      "x": 830,
+      "y": 462,
+      "width": 260,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "ellipse",
+      "props": {
+        "fill": "$pad",
+        "stroke": {
+          "color": "$pad-edge",
+          "width": 2,
+          "cap": "butt"
+        }
+      }
+    },
+    {
+      "id": "frog",
+      "name": "Frog",
+      "x": 812,
+      "y": 268,
+      "width": 296,
+      "height": 222,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "image",
+      "props": {
+        "asset": "frog",
+        "fit": "contain",
+        "edits": {
+          "rotate": 0,
+          "flipH": false,
+          "flipV": false,
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "hue": 0,
+          "temperature": 0,
+          "sharpen": 0,
+          "blur": 0,
+          "invert": false,
+          "grayscale": false,
+          "vignette": 0,
+          "radius": 0,
+          "strokes": []
+        },
+        "speed": 0.7,
+        "speedFrom": {
+          "signal": "vehicle.speed",
+          "from": 0,
+          "to": 180,
+          "fastSpeed": 4
+        }
+      }
+    },
+    {
+      "id": "turn-left",
+      "name": "Turn left",
+      "x": 596,
+      "y": 186,
+      "width": 46,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "light.turn.left",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "turn-left",
+        "onColor": "$success",
+        "offColor": "$track",
+        "hideWhenOff": true
+      }
+    },
+    {
+      "id": "turn-right",
+      "name": "Turn right",
+      "x": 1278,
+      "y": 186,
+      "width": 46,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "light.turn.right",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "turn-right",
+        "onColor": "$success",
+        "offColor": "$track",
+        "hideWhenOff": true
+      }
+    },
+    {
+      "id": "high-beam",
+      "name": "High beam",
+      "x": 650,
+      "y": 186,
+      "width": 46,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "light.high.beam",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "high-beam",
+        "onColor": "$ripple",
+        "offColor": "$track",
+        "hideWhenOff": true
+      }
+    },
+    {
+      "id": "gear",
+      "name": "Gear",
+      "x": 880,
+      "y": 530,
+      "width": 160,
+      "height": 104,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "transmission.gear",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [
+        {
+          "clip": "gear-pop",
+          "trigger": {
+            "on": "change",
+            "signal": "transmission.gear"
+          },
+          "delay": 0
+        }
+      ],
+      "type": "indicator.gear",
+      "props": {
+        "style": {
+          "font": "default",
+          "size": 88,
+          "weight": "bold",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "showMode": false,
+        "modeStyle": {
+          "font": "default",
+          "size": 36,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "modeSignal": "transmission.mode",
+        "mapping": {},
+        "radius": 0
+      }
+    },
+    {
+      "id": "drive-mode",
+      "name": "Drive mode",
+      "x": 1060,
+      "y": 566,
+      "width": 240,
+      "height": 32,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "drive.mode",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "hide"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}",
+        "style": {
+          "font": "default",
+          "size": 22,
+          "weight": "bold",
+          "color": "$accent",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "uppercase": true
+        },
+        "format": "",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "ribbit",
+      "name": "ribbit",
+      "x": 600,
+      "y": 584,
+      "width": 260,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "visibleWhen": {
+        "all": [
+          {
+            "signal": "vehicle.speed",
+            "op": "lt",
+            "value": 1
+          },
+          {
+            "signal": "engine.rpm",
+            "op": "lt",
+            "value": 6000
+          }
+        ]
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "ribbit ribbit",
+        "style": {
+          "font": "default",
+          "size": 22,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "croak",
+      "name": "croak",
+      "x": 600,
+      "y": 548,
+      "width": 260,
+      "height": 34,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "visibleWhen": {
+        "signal": "engine.rpm",
+        "op": "gt",
+        "value": 6000
+      },
+      "animations": [
+        {
+          "clip": "croak-flash",
+          "trigger": {
+            "on": "while",
+            "condition": {
+              "signal": "engine.rpm",
+              "op": "gt",
+              "value": 6000
+            }
+          },
+          "delay": 0
+        }
+      ],
+      "type": "text",
+      "props": {
+        "text": "CROAK!",
+        "style": {
+          "font": "default",
+          "size": 28,
+          "weight": "bold",
+          "color": "$danger",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 2,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "clock",
+      "name": "Clock",
+      "x": 1440,
+      "y": 132,
+      "width": 300,
+      "height": 56,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "clock",
+      "props": {
+        "format": "24h",
+        "showSeconds": false,
+        "showSuffix": true,
+        "style": {
+          "font": "default",
+          "size": 46,
+          "weight": "medium",
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "blinkColon": false
+      }
+    },
+    {
+      "id": "fuel-low",
+      "name": "Fuel low",
+      "x": 1699,
+      "y": 222,
+      "width": 36,
+      "height": 36,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "fuel.low",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "fuel",
+        "onColor": "$warning",
+        "offColor": "$track",
+        "hideWhenOff": true
+      }
+    },
+    {
+      "id": "fuel-value",
+      "name": "fuel-value",
+      "x": 1687,
+      "y": 266,
+      "width": 60,
+      "height": 24,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "fuel.level",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}%",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "bold",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "oil-value",
+      "name": "oil-value",
+      "x": 1752,
+      "y": 266,
+      "width": 60,
+      "height": 24,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.oil.temp",
+        "unit": "celsius",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}°",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "bold",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "water-value",
+      "name": "water-value",
+      "x": 1817,
+      "y": 266,
+      "width": 60,
+      "height": 24,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "unit": "celsius",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value}°",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "bold",
+          "color": "$text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "fuel",
+      "name": "Fuel reed",
+      "x": 1700,
+      "y": 296,
+      "width": 34,
+      "height": 150,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "fuel.level",
+        "min": 0,
+        "max": 100,
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.3,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "gauge.bar",
+      "props": {
+        "orientation": "vertical",
+        "direction": "forward",
+        "track": {
+          "show": true,
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": "$accent",
+          "radius": 6,
+          "mode": "segments",
+          "segments": 10,
+          "segmentGap": 3,
+          "zones": [
+            {
+              "from": 0,
+              "to": 15,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "show": true,
+          "count": 5,
+          "color": "$text-muted",
+          "length": 6,
+          "width": 2,
+          "side": "before"
+        },
+        "labels": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 18,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "divisor": 1,
+          "offset": 16
+        },
+        "marker": {
+          "show": false,
+          "value": 0,
+          "color": "$text",
+          "width": 3
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 14
+        }
+      }
+    },
+    {
+      "id": "oil",
+      "name": "Oil reed",
+      "x": 1765,
+      "y": 296,
+      "width": 34,
+      "height": 150,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.oil.temp",
+        "min": 50,
+        "max": 150,
+        "unit": "celsius",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.3,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "gauge.bar",
+      "props": {
+        "orientation": "vertical",
+        "direction": "forward",
+        "track": {
+          "show": true,
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": "$accent",
+          "radius": 6,
+          "mode": "segments",
+          "segments": 10,
+          "segmentGap": 3,
+          "zones": [
+            {
+              "from": 130,
+              "to": 150,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "show": false,
+          "count": 5,
+          "color": "$text-muted",
+          "length": 6,
+          "width": 2,
+          "side": "before"
+        },
+        "labels": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 18,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "divisor": 1,
+          "offset": 16
+        },
+        "marker": {
+          "show": false,
+          "value": 0,
+          "color": "$text",
+          "width": 3
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 14
+        }
+      }
+    },
+    {
+      "id": "water",
+      "name": "Water reed",
+      "x": 1830,
+      "y": 296,
+      "width": 34,
+      "height": 150,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "min": 50,
+        "max": 130,
+        "unit": "celsius",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.3,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "gauge.bar",
+      "props": {
+        "orientation": "vertical",
+        "direction": "forward",
+        "track": {
+          "show": true,
+          "color": "$track",
+          "radius": 6
+        },
+        "fill": {
+          "color": "$accent",
+          "radius": 6,
+          "mode": "segments",
+          "segments": 10,
+          "segmentGap": 3,
+          "zones": [
+            {
+              "from": 115,
+              "to": 130,
+              "color": "$danger"
+            }
+          ]
+        },
+        "ticks": {
+          "show": false,
+          "count": 5,
+          "color": "$text-muted",
+          "length": 6,
+          "width": 2,
+          "side": "before"
+        },
+        "labels": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 18,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "divisor": 1,
+          "offset": 16
+        },
+        "marker": {
+          "show": false,
+          "value": 0,
+          "color": "$text",
+          "width": 3
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 14
+        }
+      }
+    },
+    {
+      "id": "fuel-label",
+      "name": "fuel-label",
+      "x": 1687,
+      "y": 452,
+      "width": 60,
+      "height": 22,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "FUEL",
+        "style": {
+          "font": "default",
+          "size": 15,
+          "weight": "bold",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 1,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "oil-label",
+      "name": "oil-label",
+      "x": 1752,
+      "y": 452,
+      "width": 60,
+      "height": 22,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "OIL",
+        "style": {
+          "font": "default",
+          "size": 15,
+          "weight": "bold",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 1,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "water-label",
+      "name": "water-label",
+      "x": 1817,
+      "y": 452,
+      "width": 60,
+      "height": 22,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "H2O",
+        "style": {
+          "font": "default",
+          "size": 15,
+          "weight": "bold",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 1,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "pond-log",
+      "name": "Pond log",
+      "x": 1460,
+      "y": 488,
+      "width": 420,
+      "height": 136,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "status.panel",
+      "props": {
+        "rows": [
+          {
+            "label": "RANGE",
+            "binding": {
+              "signal": "vehicle.range",
+              "scale": 1,
+              "offset": 0,
+              "clamp": true,
+              "smoothing": 0,
+              "fallback": "dash"
+            },
+            "format": "0",
+            "unit": "km",
+            "showUnit": true
+          },
+          {
+            "label": "OUTSIDE",
+            "binding": {
+              "signal": "environment.outside.temp",
+              "unit": "celsius",
+              "scale": 1,
+              "offset": 0,
+              "clamp": true,
+              "smoothing": 0,
+              "fallback": "dash"
+            },
+            "format": "0.0",
+            "unit": "celsius",
+            "showUnit": true
+          },
+          {
+            "label": "ODOMETER",
+            "binding": {
+              "signal": "vehicle.odometer",
+              "scale": 1,
+              "offset": 0,
+              "clamp": true,
+              "smoothing": 0,
+              "fallback": "dash"
+            },
+            "format": "0",
+            "unit": "km",
+            "showUnit": true
+          }
+        ],
+        "rowHeight": 40,
+        "labelStyle": {
+          "font": "default",
+          "size": 18,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 1,
+          "uppercase": false
+        },
+        "valueStyle": {
+          "font": "default",
+          "size": 24,
+          "weight": "medium",
+          "color": "$text",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "unitStyle": {
+          "font": "default",
+          "size": 15,
+          "weight": "medium",
+          "color": "$text-muted",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "radius": 0,
+        "padding": 8
+      }
+    }
+  ],
+  "meta": {
+    "createdWith": "idv7lol Studio",
+    "created": "2026-11-14T11:26:22.923Z",
+    "tags": ["green", "animated", "night"]
+  }
+}

@@ -17,9 +17,9 @@ Los detalles están en `docs/user/INSTALL_MAC.md`.
 
 ## Pasos básicos
 
-1. Abre idv7lol Studio y elige una plantilla (Performance, Modern, Classic, Night Minimal, Rally
-   Dash, Supercar Track, Volt Runner), el ejemplo mínimo
-   o un lienzo vacío.
+1. Abre idv7lol Studio y elige una plantilla (las más nuevas primero: Lily Pad, Supercar Track,
+   Neon Drive, Heritage 89, Volt Runner; luego Performance, Modern, Classic, Night Minimal, Rally
+   Dash), el ejemplo mínimo o un lienzo vacío.
 2. Arrastra un componente de la **Biblioteca** al lienzo, por ejemplo el _Tacómetro_.
 3. Muévelo arrastrando y cambia su tamaño con las asas blancas.
 4. En el **Inspector** cambia colores, marcas, aguja… Revisa también la **Señal**: el tacómetro

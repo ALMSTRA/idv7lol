@@ -12,6 +12,13 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
+- **Supercar Track** is redrawn closer to an Italian supercar's digital cluster: a thick rev band
+  of 30 blocks counting to 10 (red from 7) under a yellow and red rim, a yellow inner line with the
+  numbers, a huge red gear with the drive mode beside it and the odometer to its right, the speed
+  bottom right, a hexagon floor with a lane in perspective (original artwork), side panels with
+  leaning bars for oil, water, fuel and gearbox oil, the time and outside temperature, and a pill
+  that says Low fuel. Its Track and Corsa palettes keep their names. Tested locally; not tested in
+  a vehicle.
 - The car app is version 0.2.7, so the MGU Store's Releases channel offers Volt Runner, the
   fuel readings, the needle fix, the bottom strip fix, ETC2 animations and the fixes taken from
   upstream below as an update. The `catalog` release holds the new package.
@@ -22,6 +29,25 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   instead of holding an empty panel (0.5.9). See `docs/architecture/RENDERER.md`.
 
 ### Added
+
+- **Lily Pad**, a night pond: an original pixel-art tree frog hops on its lily pad in the middle
+  of a segmented rev ring, faster the faster the car goes; fireflies are the shift lights, the
+  speed is a needle on a lily pad (in a group, with a swirl turning round it), fuel, oil and water
+  stand as reeds, ripples breathe under the frog, the gear flashes on each change, the frog croaks
+  near the redline and says ribbit at a stop. Pond, Firefly night, Toxic (Sport) and Lotus (Eco
+  Pro) palettes. Tested locally (car preview); not tested in a vehicle.
+- **Neon Drive**, cyberpunk: huge neon speed in holo rings turning both ways, a segmented rev bar
+  with a sync strip that flashes at the limit, the gear in a diamond, a system readout, a fuel cell
+  and range; the speed glitches past 130, OVERDRIVE flashes near the redline and STANDBY breathes
+  at a stop. Neon, Blood (Sport) and Acid (Eco Pro) palettes. Tested locally; not tested in a
+  vehicle.
+- **Heritage 89**, inspired by late-80s and 90s BMW clusters (no logos): a speedometer and a
+  tachometer with chrome bezels and orange-red needles, fuel and temperature dials inside them,
+  check lamps, a gear window, a green-yellow-red row of lamps for the oil warming up and an amber
+  on-board computer. Amber night, Daylight and Red night palettes. Tested locally; not tested in a
+  vehicle.
+- The newest themes open the Studio's template list: Lily Pad, Supercar Track, Neon Drive,
+  Heritage 89, Volt Runner.
 
 - **Volt Runner**, a new bright yellow theme built around an animation: a running lightning bolt
   (original pixel art) in the middle that runs faster the faster the car goes, the speed big on

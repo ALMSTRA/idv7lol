@@ -12,6 +12,27 @@ module.exports = {
       ]
     },
     {
+      "id": "idv7lol-heritage-89",
+      "name": "Heritage 89",
+      "module": "theme_idv7lol_heritage_89",
+      "palettes": [
+        "amber",
+        "daylight",
+        "red"
+      ]
+    },
+    {
+      "id": "idv7lol-lily-pad",
+      "name": "Lily Pad",
+      "module": "theme_idv7lol_lily_pad",
+      "palettes": [
+        "pond",
+        "firefly",
+        "toxic",
+        "lotus"
+      ]
+    },
+    {
       "id": "idv7lol-modern",
       "name": "IDV7LOL Modern",
       "module": "theme_idv7lol_modern",
@@ -19,6 +40,16 @@ module.exports = {
         "night",
         "sport",
         "eco"
+      ]
+    },
+    {
+      "id": "idv7lol-neon-drive",
+      "name": "Neon Drive",
+      "module": "theme_idv7lol_neon_drive",
+      "palettes": [
+        "neon",
+        "blood",
+        "acid"
       ]
     },
     {
