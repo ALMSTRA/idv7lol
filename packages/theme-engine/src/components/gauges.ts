@@ -195,7 +195,24 @@ export const arcGaugeRenderer: ComponentRenderer<ArcGaugeComponent> = {
     }
 
     // Needle
-    if (p.needle.show && value !== undefined) {
+    const needlePic = p.needle.image ? rc.options.images?.get(p.needle.image) : undefined;
+    if (p.needle.show && value !== undefined && needlePic) {
+      // a needle of your own: the picture, pointing right, from the tail to the tip
+      const len = p.needle.length * R;
+      const tail = p.needle.tail * R;
+      const half = ((len + tail) * needlePic.height) / needlePic.width / 2;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angleAt(norm) * DEG);
+      ctx.drawImage(needlePic.image, -tail, -half, len + tail, half * 2);
+      ctx.restore();
+      if (p.needle.cap.show && p.needle.cap.radius > 0) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, p.needle.cap.radius, 0, Math.PI * 2);
+        ctx.fillStyle = rc.color(p.needle.cap.color);
+        ctx.fill();
+      }
+    } else if (p.needle.show && value !== undefined) {
       const a = angleAt(norm);
       ctx.save();
       ctx.translate(cx, cy);

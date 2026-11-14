@@ -221,6 +221,12 @@ export const NeedleSchema = z.object({
   /** Tail length as a fraction of the radius (behind the pivot). */
   tail: z.number().min(0).max(0.5).default(0.1),
   shape: z.enum(['tapered', 'bar', 'arrow']).default('tapered'),
+  /**
+   * A picture of your own as the needle (an asset id), pointing right with the pivot at its tail
+   * end: drawn from `tail` behind the pivot to `length`, its height from the picture's proportions.
+   * The colour, width and shape are then not used.
+   */
+  image: IdSchema.optional(),
   cap: z
     .object({
       show: z.boolean().default(true),

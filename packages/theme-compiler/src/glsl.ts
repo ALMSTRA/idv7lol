@@ -652,6 +652,39 @@ void main() {
 }
 `;
 
+/** A custom icon: its picture as a mask (R8), lit in the telltale's colour. */
+export const MASK_FS = `${PRELUDE}${COMMON}
+uniform sampler2D u_mask;
+uniform vec4 u_color;
+void main() {
+  float a = texture2D(u_mask, uvDrawn()).r;
+  gl_FragColor = vec4(u_color.rgb, u_color.a * a);
+}
+`;
+
+/**
+ * A needle of your own: its picture (RGBA8, pointing right) turned by u_angle about the layer's
+ * centre, the same way NEEDLE_FS turns its drawn needle, with the cap over it.
+ */
+export const NEEDLE_IMAGE_FS = `${PRELUDE}${COMMON}
+uniform sampler2D u_tex;
+uniform float u_angle;  // deg
+uniform vec4 u_nrect;   // tailPx, lengthPx, halfHeightPx, 0
+uniform vec4 u_cap;     // radiusPx, show, 0, 0
+uniform vec4 u_capc;
+void main() {
+  vec2 p = px() - u_size * 0.5;
+  float a = radians(u_angle);
+  mat2 rot = mat2(cos(a), -sin(a), sin(a), cos(a)); // columns: turns p back by a
+  vec2 q = rot * p; // needle along +x
+  vec2 uv = vec2((q.x + u_nrect.x) / (u_nrect.x + u_nrect.y), (q.y + u_nrect.z) / (2.0 * u_nrect.z));
+  vec4 col = vec4(0.0);
+  if (uv.x >= 0.0 && uv.x <= 1.0 && uv.y >= 0.0 && uv.y <= 1.0) col = texture2D(u_tex, uv);
+  if (u_cap.y > 0.5) col = over(col, vec4(u_capc.rgb, u_capc.a * cov(length(p) - u_cap.x)));
+  gl_FragColor = col;
+}
+`;
+
 /**
  * The car app's black band under a layout that ends above the cluster's own bottom strip: with the
  * layout cut at y 646, the factory dials' lower edges and the separator line showed below it in
@@ -669,6 +702,8 @@ void main() {
 
 export const SHADERS: Readonly<Record<ShaderKind, string>> = {
   band: BAND_FS,
+  mask: MASK_FS,
+  'needle-image': NEEDLE_IMAGE_FS,
   sprite: SPRITE_FS,
   flat: FLAT_FS,
   panel: PANEL_FS,

@@ -122,6 +122,7 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
       title: 'Needle',
       fields: [
         { path: 'needle.show', label: 'Show', kind: 'bool' },
+        { path: 'needle.image', label: 'Needle picture', kind: 'asset' },
         { path: 'needle.color', label: 'Colour', kind: 'color' },
         { path: 'needle.width', label: 'Width', kind: 'number', min: 0.5, max: 40, step: 0.5 },
         { path: 'needle.length', label: 'Length', kind: 'number', min: 0, max: 1.2, step: 0.01 },

@@ -58,7 +58,7 @@ const isCount = (v) => isNum(v) && v >= 1 && Math.floor(v) === v;
 // Own keys only: a name like "constructor" must not find Object.prototype.
 const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
 const ID_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
-const IMAGE_RE = /^images\/[A-Za-z0-9_.-]{1,96}\.(rgba|etc2)$/;
+const IMAGE_RE = /^images\/[A-Za-z0-9_.-]{1,96}\.(rgba|etc2|r8)$/;
 
 /** Why an animation's frame grid doesn't fit its atlas, or '' when it does. */
 function badSprite(sp, iw, ih) {
@@ -170,6 +170,30 @@ function readPackage(buf, opts) {
     pixelBytes += etc2 ? px.length : 2 * px.length;
     images[img.file] = px;
   });
+  // Pictures layers sample (a custom icon's mask, a needle of your own): R8 or RGBA8, uncompressed.
+  let textures = 0;
+  theme.pieces.forEach((p, i) => {
+    const t = p.texture;
+    if (t === undefined) return;
+    textures++;
+    if (!t || typeof t.file !== 'string' || !IMAGE_RE.test(t.file))
+      fail('layer ' + i + ' has a bad picture name');
+    if (t.format !== 'r8' && t.format !== 'rgba8')
+      fail('layer ' + i + ' has a picture of no known format');
+    if (!isCount(t.w) || !isCount(t.h) || t.w > 1024 || t.h > 1024)
+      fail('layer ' + i + ' has a picture of a bad size');
+    if (t.sampler !== 'u_mask' && t.sampler !== 'u_tex')
+      fail('layer ' + i + ' samples an unknown picture');
+    const b64 = data[t.file];
+    if (typeof b64 !== 'string') fail('layer ' + i + ' has no picture');
+    const px = Buffer.from(b64, 'base64');
+    if (px.length !== t.w * t.h * (t.format === 'r8' ? 1 : 4))
+      fail('layer ' + i + ' has a picture of the wrong size');
+    pixelBytes += 2 * px.length;
+    images[t.file] = px;
+  });
+  if (sprites + textures > LIMITS.sprites)
+    fail('more than ' + LIMITS.sprites + ' animations, custom icons and needle pictures');
   if (sprites > LIMITS.sprites) fail('more than ' + LIMITS.sprites + ' animations');
   if (pixelBytes > LIMITS.pixelBytes) fail('images use too much renderer memory');
 

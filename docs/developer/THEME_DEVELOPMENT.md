@@ -108,6 +108,17 @@ picture costs eight bytes a pixel. Frames are laid out in whole 4×4 blocks, up 
 all; ETC2 keeps flat colours and hard edges well but can shift a subtle gradient by a step. The
 Studio's car preview decodes the same atlas, so it shows what the car draws.
 
+### Your own icons and needles
+
+A telltale with `"icon": "custom"` and an `asset` draws that picture as an icon lit in its on
+and off colours: a picture with transparency lights its opaque parts, an opaque one its dark
+parts. A circular gauge's `needle.image` turns a picture of your own instead of the drawn needle:
+the picture points right, from `tail` behind the pivot to `length`, and keeps its proportions. In
+the Inspector, **Icon picture** and **Needle picture** pick one of the theme's pictures or import a
+PNG or SVG without placing it. On the car each is an uncompressed asset of its own (R8 for an
+icon, RGBA8 for a needle) sampled by a small shader, and counts against the 15 assets an app may
+add besides the glyph atlas. Save the result with **Save as piece** to reuse it in any theme.
+
 ### Alerts
 
 An `alert` is a warning box (a text, an optional icon, a fill and a border) that takes over its

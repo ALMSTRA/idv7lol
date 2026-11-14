@@ -6,6 +6,7 @@ import {
   collectSignals,
   findComponent,
   fitRaster,
+  maskOf,
   resolveColor,
 } from '@idv7lol/theme-engine';
 import { buildPieces } from './pieces.js';
@@ -177,6 +178,35 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
         baked.data.byteLength,
       ),
     });
+  }
+
+  // Pictures pieces sample: a custom icon's mask (R8), a needle of your own (RGBA8).
+  for (const ref of build.textureRefs) {
+    const img = opts.images?.[ref.asset];
+    if (!img) {
+      report.infos.push({
+        severity: 'info',
+        code: 'bundle.image-missing',
+        message: `Image asset "${ref.asset}" was not decoded; the bundle needs ${ref.file}.`,
+      });
+      continue;
+    }
+    const source = {
+      width: img.width,
+      height: img.height,
+      data: new Uint8ClampedArray(
+        img.rgba.buffer as ArrayBuffer,
+        img.rgba.byteOffset,
+        img.rgba.byteLength,
+      ),
+    };
+    const fitted = fitRaster(source, ref.w, ref.h, ref.mask ? 'contain' : 'stretch');
+    const rgba = new Uint8Array(
+      fitted.data.buffer as ArrayBuffer,
+      fitted.data.byteOffset,
+      fitted.data.byteLength,
+    );
+    files.push({ path: ref.file, data: ref.mask ? maskOf(rgba) : new Uint8Array(rgba) });
   }
 
   // Last, so it records every value settled above.

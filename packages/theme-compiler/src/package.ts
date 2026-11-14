@@ -54,6 +54,14 @@ export function buildThemePackage(
       throw new Error(`Image layer ${img.key} has no pixels.`);
     images[img.file] = toBase64(file.data);
   }
+  // pictures pieces sample (a custom icon, a needle of your own) travel the same way
+  for (const piece of compiled.pieces) {
+    if (!piece.texture) continue;
+    const file = result.files.find((f) => f.path === piece.texture!.file);
+    if (!file || typeof file.data === 'string')
+      throw new Error(`Layer ${piece.key} has no picture.`);
+    images[piece.texture.file] = toBase64(file.data);
+  }
   return {
     idv7pkg: PACKAGE_FORMAT,
     id: compiled.id,

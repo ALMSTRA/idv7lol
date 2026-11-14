@@ -509,13 +509,14 @@ export function validateTheme(doc: unknown): ValidationReport {
     );
   if (layers === 0) out.warning('budget.empty', 'The theme has no visible components.');
   const atlasBytes = new Set(Object.values(theme.fonts).map((f) => f.family)).size * 344_064;
+  // Animations, custom icons and needle pictures are each an asset; one more is the glyph atlas.
   const sprites = build.images.filter((i) => i.sprite).length;
-  // One asset is the glyph atlas of the text.
-  if (sprites + 1 > RENDERER_LIMITS.assetsPerClient) {
+  const textures = build.pieces.filter((p) => p.texture).length;
+  if (sprites + textures + 1 > RENDERER_LIMITS.assetsPerClient) {
     out.error(
       'budget.assets',
-      `${sprites} animations are placed but the car allows ${RENDERER_LIMITS.assetsPerClient - 1}.`,
-      { hint: 'Remove some animations from the layout.' },
+      `${sprites} animations and ${textures} custom icons or needle pictures are placed but the car allows ${RENDERER_LIMITS.assetsPerClient - 1} together.`,
+      { hint: 'Remove some animations, custom icons or needle pictures from the layout.' },
     );
   }
   // cluster-render charges image layers and uncompressed assets twice their size against its
@@ -525,9 +526,15 @@ export function validateTheme(doc: unknown): ValidationReport {
     (sum, i) => sum + (i.format === 'etc2rgba' ? i.iw * i.ih : 2 * i.iw * i.ih * 4),
     0,
   );
-  if (imageBytes > 0) {
+  // pictures pieces sample: uncompressed assets, charged twice
+  const textureBytes = build.pieces.reduce(
+    (sum, p) =>
+      sum + (p.texture ? 2 * p.texture.w * p.texture.h * (p.texture.format === 'r8' ? 1 : 4) : 0),
+    0,
+  );
+  if (imageBytes + textureBytes > 0) {
     const mib = (n: number) => (n / (1024 * 1024)).toFixed(1);
-    const total = imageBytes + 2 * atlasBytes;
+    const total = imageBytes + textureBytes + 2 * atlasBytes;
     const limit = RENDERER_LIMITS.pixelMemoryBytes;
     if (total > limit) {
       out.error(

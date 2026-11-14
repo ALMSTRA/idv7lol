@@ -57,9 +57,20 @@ export interface PieceBuild {
   pieces: CompiledPiece[];
   images: CompiledImage[];
   alerts: CompiledAlert[];
+  /** Pictures pieces sample (CompiledPiece.texture): baked by compileTheme from the asset. */
+  textureRefs: TextureRef[];
   findings: Finding[];
   /** Assets referenced by image pieces, by component id. */
   assetRefs: Array<{ componentId: string; asset: string; key: string }>;
+}
+
+/** A piece's picture to bake: `asset` fitted to w×h, as a mask (R8) or as it is (RGBA8). */
+export interface TextureRef {
+  file: string;
+  asset: string;
+  w: number;
+  h: number;
+  mask: boolean;
 }
 
 interface Ctx {
@@ -68,6 +79,7 @@ interface Ctx {
   pieces: CompiledPiece[];
   images: CompiledImage[];
   alerts: CompiledAlert[];
+  textureRefs: TextureRef[];
   assetRefs: PieceBuild['assetRefs'];
   z: number;
   /** What each component takes from the groups around it: their opacity and conditions. */
@@ -189,6 +201,23 @@ function animationsOf(ctx: Ctx, c: Component): CompiledAnimation[] {
     });
   }
   return out;
+}
+
+/** Give `piece` a picture to sample: the asset baked to w×h by compileTheme (TextureRef). */
+function addTexture(
+  ctx: Ctx,
+  piece: CompiledPiece,
+  asset: string,
+  w: number,
+  h: number,
+  mask: boolean,
+  sampler: string,
+): void {
+  const tw = Math.max(2, Math.min(1024, Math.round(w)));
+  const th = Math.max(2, Math.min(1024, Math.round(h)));
+  const file = `images/${piece.key.replace(/[^A-Za-z0-9_.-]/g, '_')}.${mask ? 'r8' : 'rgba'}`;
+  piece.texture = { file, format: mask ? 'r8' : 'rgba8', w: tw, h: th, sampler };
+  ctx.textureRefs.push({ file, asset, w: tw, h: th, mask });
 }
 
 function basePiece(
@@ -695,7 +724,30 @@ function buildArcGauge(ctx: Ctx, f: FlatComponent, c: ArcGaugeComponent): void {
     }
   }
 
-  if (p.needle.show && cb) {
+  const pic = p.needle.image ? ctx.theme.assets[p.needle.image] : undefined;
+  if (p.needle.show && cb && p.needle.image && !pic)
+    warn(ctx, 'needle.image', 'The needle picture is missing; the drawn needle is used.', c.id);
+  if (p.needle.show && cb && pic && p.needle.image) {
+    // a needle of your own: its picture, pointing right, turned like the drawn one
+    const len = p.needle.length * R;
+    const tail = p.needle.tail * R;
+    const ratio = pic.width && pic.height ? pic.height / pic.width : 0.12;
+    const half = Math.max(1, ((len + tail) * ratio) / 2);
+    const n = basePiece(ctx, f, `${c.id}:needle`, 'needle-image', square);
+    n.statics['u_angle'] = [p.startAngle];
+    n.statics['u_nrect'] = [tail, len, half, 0];
+    n.statics['u_cap'] = [p.needle.cap.radius, p.needle.cap.show ? 1 : 0, 0, 0];
+    n.colors['u_capc'] = p.needle.cap.color;
+    addTexture(ctx, n, p.needle.image, len + tail, half * 2, false, 'u_tex');
+    n.dynamics.push({
+      kind: 'angle',
+      uniform: 'u_angle',
+      binding: cb,
+      from: p.startAngle,
+      sweep: p.sweepAngle,
+    });
+    ctx.pieces.push(n);
+  } else if (p.needle.show && cb) {
     const n = basePiece(ctx, f, `${c.id}:needle`, 'needle', square);
     n.statics['u_angle'] = [p.startAngle];
     n.statics['u_needle'] = [
@@ -1043,13 +1095,35 @@ function buildTelltale(ctx: Ctx, f: FlatComponent): void {
   const abs = { x: f.absX, y: f.absY, w: c.width, h: c.height };
   const cb = c.binding ? compileBinding(c.binding) : undefined;
   if (p.icon === 'custom') {
-    warn(
-      ctx,
-      'telltale.custom',
-      'Custom telltale icons are not drawn on the car yet.',
-      c.id,
-      'Use one of the built-in icons.',
-    );
+    // your own icon: its picture as a mask, lit in the on and off colours (mask.ts, MASK_FS)
+    if (!p.asset || !ctx.theme.assets[p.asset]) {
+      warn(
+        ctx,
+        'telltale.custom',
+        'This custom telltale has no picture, so it is not drawn.',
+        c.id,
+        'Pick or import one under Icon picture.',
+      );
+      return;
+    }
+    const size = Math.min(abs.w, abs.h);
+    const piece = basePiece(ctx, f, c.id, 'mask', {
+      x: abs.x + (abs.w - size) / 2,
+      y: abs.y + (abs.h - size) / 2,
+      w: size,
+      h: size,
+    });
+    addTexture(ctx, piece, p.asset, size, size, true, 'u_mask');
+    piece.colors['u_color'] = p.offColor;
+    if (cb)
+      piece.dynamics.push({
+        kind: 'telltale',
+        binding: cb,
+        onColor: p.onColor,
+        offColor: p.offColor,
+        hideWhenOff: p.hideWhenOff,
+      });
+    ctx.pieces.push(piece);
     return;
   }
   const size = Math.min(abs.w, abs.h);
@@ -1220,6 +1294,7 @@ export function buildPieces(theme: Theme): PieceBuild {
     pieces: [],
     images: [],
     alerts: [],
+    textureRefs: [],
     assetRefs: [],
     z: 0,
     inherited: new Map(),
@@ -1300,6 +1375,7 @@ export function buildPieces(theme: Theme): PieceBuild {
     pieces: ctx.pieces,
     images: ctx.images,
     alerts: ctx.alerts,
+    textureRefs: ctx.textureRefs,
     findings: ctx.findings,
     assetRefs: ctx.assetRefs,
   };

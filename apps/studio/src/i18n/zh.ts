@@ -523,6 +523,7 @@ export const zh: Dictionary = {
  * which are written in English in inspector/descriptors.ts. Anything missing stays English.
  */
 export const ZH_FIELD_LABELS: Record<string, string> = {
+  'Needle picture': '指针图片',
   Alert: '警告',
   Priority: '优先级',
   Flash: '闪烁',

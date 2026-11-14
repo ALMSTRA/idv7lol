@@ -34,6 +34,12 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Your own icons and needles.** A custom telltale (and an alert's icon) draws a picture of your
+  own, PNG or SVG, lit in its colours, now on the car too (a mask and a small shader; they were not
+  drawn on the car before). A circular gauge's needle can be a picture of your own that turns with
+  the value. The Inspector's Icon picture and Needle picture fields import one without placing it;
+  Save as piece keeps the result for any theme. USB packages carry the pictures. Tested locally
+  (compiler, car engine, USB package); not tested in a vehicle.
 - **Alerts** with a priority: a new component, a warning box with a text, an icon, a fill and a
   border, that shows while its condition (Show only when) holds; when several hold only the
   highest priority shows, and it can blink. The car app draws it with the pieces it already has and

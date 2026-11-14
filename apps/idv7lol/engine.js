@@ -422,6 +422,7 @@ class ClusterEngine {
         if (piece.shader === 'telltale')
           this.cr.uniform(ref, 'u_code_p', [m.chars.indexOf(ICON_P_CODE)]);
       }
+      if (piece.texture) this._texture(st, piece.texture);
       this._startAnimations(st);
       return st;
     });
@@ -518,6 +519,7 @@ class ClusterEngine {
     this.alertNow = null;
     this.pieces.forEach((p) => {
       if (p.ref) this.cr.drop(p.ref);
+      if (p.texAsset) this.cr.drop(p.texAsset);
     });
     if (this.band) this.cr.drop(this.band);
     this.band = 0;
@@ -665,6 +667,38 @@ class ClusterEngine {
       this.recolour();
     }
     this._update(false);
+  }
+
+  /**
+   * A picture the piece samples (a custom icon's mask, a needle of your own): an asset of its own,
+   * its pixels from the theme's files, bound as the piece's sampler. Without it the layer draws
+   * nothing, which a log line says.
+   */
+  _texture(st, tex) {
+    let pixels = null;
+    try {
+      pixels = this.loadImage(tex);
+    } catch (e) {
+      this.log.warn('picture ' + tex.file + ': ' + e);
+    }
+    if (!pixels || pixels.length !== tex.w * tex.h * (tex.format === 'r8' ? 1 : 4)) {
+      this.log.warn('picture ' + tex.file + ': no usable pixels');
+      return;
+    }
+    st.texAsset = this._make('asset', {
+      target: this.target,
+      format: tex.format,
+      w: tex.w,
+      h: tex.h,
+      sampling: 'bilinear',
+    });
+    if (!st.texAsset) {
+      this.log.warn('picture refused: ' + tex.file);
+      return;
+    }
+    if (this.cr.pixels(st.texAsset, null, pixels) === false)
+      this.log.warn('picture ' + tex.file + ': the renderer client did not take it');
+    this.cr.bind(st.ref, tex.sampler, st.texAsset);
   }
 
   /**

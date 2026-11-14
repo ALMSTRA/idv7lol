@@ -541,6 +541,7 @@ export const ja: Dictionary = {
  * written in English in inspector/descriptors.ts. Anything missing stays English.
  */
 export const JA_FIELD_LABELS: Record<string, string> = {
+  'Needle picture': '針の画像',
   Alert: 'アラート',
   Priority: '優先度',
   Flash: '点滅',

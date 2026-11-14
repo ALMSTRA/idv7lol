@@ -2,12 +2,16 @@ import { describe, expect, it } from 'vitest';
 import { createRequire } from 'node:module';
 import { EventEmitter } from 'node:events';
 import { readFileSync } from 'node:fs';
-import { compileTheme } from '@idv7lol/theme-compiler';
+import { gzipSync } from 'node:zlib';
+import { buildThemePackage, compileTheme, encodeThemePackage } from '@idv7lol/theme-compiler';
 import { bakeFamily, decodePng, encodePng } from '@idv7lol/theme-compiler/node';
 import { createComponent, createEmptyTheme } from '@idv7lol/theme-schema';
 import type { CompiledTheme } from '@idv7lol/theme-compiler';
 
 const require = createRequire(import.meta.url);
+const { readPackage } = require('./usb_themes.js') as {
+  readPackage(buf: Buffer, opts: Record<string, unknown>): unknown;
+};
 // The MGU app is CommonJS for Node 8; load it as the head unit would.
 interface Engine {
   shown: boolean;
@@ -346,6 +350,107 @@ describe('when the layout goes up', () => {
       'target panel: shown',
       'target panel: waiting (hmi): speech dialog',
     ]);
+  });
+});
+
+describe('pictures of your own', () => {
+  it('draws a custom icon as a mask and a needle from a picture, on the car and over USB', () => {
+    // a 4x4 icon: an opaque cross on a clear background; a 10x2 needle picture
+    const icon = new Uint8Array(4 * 4 * 4);
+    for (let i = 0; i < 4; i++) {
+      icon.set([255, 255, 255, 255], (i * 4 + 1) * 4);
+      icon.set([255, 255, 255, 255], (1 * 4 + i) * 4);
+    }
+    const needle = new Uint8Array(10 * 2 * 4).fill(200);
+    const theme = createEmptyTheme({ id: 'pics', name: 'Pics' });
+    const asset = (png: Uint8Array, w: number, h: number) => ({
+      type: 'image' as const,
+      data: `data:image/png;base64,${Buffer.from(png).toString('base64')}`,
+      width: w,
+      height: h,
+    });
+    const iconPng = encodePng(4, 4, icon);
+    const needlePng = encodePng(10, 2, needle);
+    const doc = {
+      ...theme,
+      assets: { mark: asset(iconPng, 4, 4), stick: asset(needlePng, 10, 2) },
+      components: [
+        createComponent('telltale', {
+          id: 'mine',
+          x: 600,
+          y: 200,
+          width: 40,
+          height: 40,
+          binding: { signal: 'light.high.beam' },
+          props: { icon: 'custom', asset: 'mark', onColor: '$accent', offColor: '$track' },
+        }),
+        createComponent('gauge.arc', {
+          id: 'dial',
+          x: 800,
+          y: 150,
+          width: 300,
+          height: 300,
+          binding: { signal: 'vehicle.speed', min: 0, max: 200 },
+          props: { needle: { show: true, image: 'stick', length: 0.8, tail: 0.1 } },
+        }),
+      ],
+    };
+    const result = compileTheme(doc, {
+      images: { mark: decodePng(iconPng), stick: decodePng(needlePng) },
+    });
+    expect(result.report.errors).toEqual([]);
+    const c = result.compiled!;
+    const mask = c.pieces.find((p) => p.key === 'mine')!;
+    expect(mask).toMatchObject({
+      shader: 'mask',
+      texture: { format: 'r8', w: 40, h: 40, sampler: 'u_mask' },
+    });
+    const pic = c.pieces.find((p) => p.key === 'dial:needle')!;
+    expect(pic.shader).toBe('needle-image');
+    // 150 px of radius: 15 px of tail and 120 of length; a 10x2 picture -> 27 px tall
+    expect(pic.statics['u_nrect']).toEqual([15, 120, 13.5, 0]);
+    expect(pic.texture).toMatchObject({ format: 'rgba8', w: 135, h: 27, sampler: 'u_tex' });
+    const maskFile = result.files.find((f) => f.path === mask.texture!.file)!.data as Uint8Array;
+    expect(maskFile.length).toBe(40 * 40);
+    expect(Math.max(...maskFile)).toBeGreaterThan(240); // the cross is lit (scaled up 10x)
+    expect(maskFile[0]).toBe(0); // the clear corner is not
+    expect(c.shaders['mask']).toContain('u_mask');
+    expect(c.shaders['needle-image']).toContain('u_nrect');
+
+    // the car app makes an asset per picture and binds it
+    const files = new Map(result.files.map((f) => [f.path, f.data]));
+    const client = new FakeClient();
+    const engine = new ClusterEngine({
+      client,
+      log: quiet,
+      theme: c,
+      fonts: {},
+      signals: new SignalStore(),
+      enabled: () => true,
+      live: () => true,
+      sweep: () => false,
+      now: () => 1000,
+      paletteId: () => 'night',
+      loadImage: (img: { file: string }) => Buffer.from(files.get(img.file) as Uint8Array),
+    });
+    engine.tick();
+    const assets = client.ops.filter((o) => o.op === 'asset');
+    expect(assets.map((a) => [a.format, a.w, a.h])).toEqual([
+      ['r8', 40, 40],
+      ['rgba8', 135, 27],
+    ]);
+    const binds = client.ops.filter((o) => o.op === 'bind').map((o) => o.sampler);
+    expect(binds).toEqual(expect.arrayContaining(['u_mask', 'u_tex']));
+
+    // and a USB package carries them
+    const pkg = buildThemePackage(result, { now: () => new Date('2026-11-14T00:00:00Z') });
+    expect(Object.keys(pkg.images).sort()).toEqual([mask.texture!.file, pic.texture!.file].sort());
+    const read = readPackage(gzipSync(Buffer.from(encodeThemePackage(pkg))), {
+      appVersion: '0.3.0',
+      shaders: c.shaders,
+      fonts: ['sans'],
+    }) as { images: Record<string, Buffer> };
+    expect(read.images[mask.texture!.file]!.length).toBe(40 * 40);
   });
 });
 

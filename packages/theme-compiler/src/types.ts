@@ -42,7 +42,9 @@ export type ShaderKind =
   | 'telltale'
   | 'panel'
   | 'sprite'
-  | 'band';
+  | 'band'
+  | 'mask'
+  | 'needle-image';
 
 /** A static uniform: numbers sent once when the layer is made. */
 export type StaticUniforms = Record<string, number[]>;
@@ -155,6 +157,11 @@ export interface CompiledPiece {
   animations: CompiledAnimation[];
   /** Part of an alert (CompiledAlert.id): shown only while that alert wins. */
   alert?: string;
+  /**
+   * A picture the layer samples as `sampler` (a custom icon's mask, a needle picture): `file` in
+   * the bundle, R8 or RGBA8, `w`×`h`. The car app makes it an asset of its own and binds it.
+   */
+  texture?: { file: string; format: 'r8' | 'rgba8'; w: number; h: number; sampler: string };
 }
 
 /** An alert: its pieces show while `when` holds and no alert of a higher priority does. */

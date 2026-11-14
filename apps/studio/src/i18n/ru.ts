@@ -538,6 +538,7 @@ export const ru: Dictionary = {
  * written in English in inspector/descriptors.ts. Anything missing stays English.
  */
 export const RU_FIELD_LABELS: Record<string, string> = {
+  'Needle picture': 'Изображение стрелки',
   Alert: 'Предупреждение',
   Priority: 'Приоритет',
   Flash: 'Мигание',
