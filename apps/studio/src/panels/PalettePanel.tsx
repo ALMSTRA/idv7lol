@@ -210,6 +210,59 @@ export function PalettePanel(): JSX.Element {
           ))}
         </div>
       </div>
+      <TextStylesSection />
+    </div>
+  );
+}
+
+/** The theme's named text styles: rename or remove them (they are made from a text in the Inspector). */
+function TextStylesSection(): JSX.Element {
+  const t = useT();
+  const theme = useProjectStore((s) => s.theme);
+  const rename = useProjectStore((s) => s.renameTextStyle);
+  const remove = useProjectStore((s) => s.removeTextStyle);
+  const ids = Object.keys(theme.textStyles ?? {});
+  const json = JSON.stringify(theme.components);
+  return (
+    <div className="section">
+      <div className="section-title">{t('textStyles.title')}</div>
+      <div className="section-body">
+        {ids.length === 0 && <div className="hint">{t('textStyles.empty')}</div>}
+        {ids.map((id) => {
+          const st = theme.textStyles[id]!;
+          const uses = json.split(`"use":${JSON.stringify(id)}`).length - 1;
+          return (
+            <div key={id} className="row" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <span
+                style={{
+                  flex: 1,
+                  fontWeight: st.weight === 'bold' ? 700 : st.weight === 'light' ? 300 : 500,
+                  textTransform: st.uppercase ? 'uppercase' : 'none',
+                  letterSpacing: Math.min(st.letterSpacing, 4),
+                }}
+                title={id}
+              >
+                {st.name}
+              </span>
+              <span className="muted">
+                {st.size}px · {t('textStyles.uses', { n: uses })}
+              </span>
+              <button
+                className="ghost"
+                onClick={() => {
+                  const name = window.prompt(t('textStyles.renamePrompt'), st.name);
+                  if (name) rename(id, name);
+                }}
+              >
+                {t('textStyles.rename')}
+              </button>
+              <button className="ghost" onClick={() => remove(id)}>
+                {t('textStyles.remove')}
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import type {
   Theme,
   Zone,
 } from '@idv7lol/theme-schema';
+import { resolveTextStyles } from '@idv7lol/theme-schema';
 import {
   RENDERER_LIMITS,
   anchorFraction,
@@ -1140,6 +1141,8 @@ function buildStatusPanel(ctx: Ctx, f: FlatComponent): void {
 /* -------------------------------------------------------------------------- */
 
 export function buildPieces(theme: Theme): PieceBuild {
+  // texts that use a named style follow it
+  theme = resolveTextStyles(theme);
   const ctx: Ctx = {
     theme,
     findings: [],

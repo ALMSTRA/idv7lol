@@ -6,3 +6,4 @@ export * from './theme.js';
 export * from './display-profiles.js';
 export * from './factory.js';
 export * from './parse.js';
+export * from './text-styles.js';

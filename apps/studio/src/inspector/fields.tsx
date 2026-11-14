@@ -1,6 +1,18 @@
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import type { Color, Fill, Gradient, Stroke, TextStyle, Theme, Zone } from '@idv7lol/theme-schema';
+import {
+  NAMED_STYLE_KEYS,
+  applyNamedStyle,
+  type Color,
+  type Fill,
+  type Gradient,
+  type Stroke,
+  type TextStyle,
+  type Theme,
+  type Zone,
+} from '@idv7lol/theme-schema';
+import { useProjectStore } from '../store/project.js';
+import { useT } from '../i18n/index.js';
 import {
   SIGNALS,
   UNITS,
@@ -268,21 +280,51 @@ export function TextStyleInput({
   onChange: (v: TextStyle) => void;
   theme: Theme;
 }): JSX.Element {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const fonts = Object.keys(theme.fonts).map((f) => ({ value: f, label: f }));
+  const styles = theme.textStyles ?? {};
+  const linked = value.use && styles[value.use] ? value.use : '';
+  // A text that follows a named style changes the style (and every text that uses it).
+  const set = (patch: Partial<TextStyle>) => {
+    const named = Object.keys(patch).every((k) =>
+      (NAMED_STYLE_KEYS as readonly string[]).includes(k),
+    );
+    if (linked && named) useProjectStore.getState().updateTextStyle(linked, patch);
+    else onChange({ ...value, ...patch });
+  };
+  const pick = (v: string) => {
+    if (v === NEW_STYLE) {
+      const name = window.prompt(t('textStyles.namePrompt'))?.trim();
+      if (!name) return;
+      const id = useProjectStore.getState().addTextStyle(name, value);
+      onChange({ ...value, use: id });
+    } else if (!v) {
+      const { use: _use, ...rest } = value;
+      onChange(rest);
+    } else {
+      onChange(applyNamedStyle({ ...value, use: v }, styles));
+    }
+  };
+  const styleOptions = [
+    { value: '', label: t('textStyles.none') },
+    ...Object.entries(styles).map(([id, st]) => ({ value: id, label: st.name })),
+    { value: NEW_STYLE, label: t('textStyles.saveNew') },
+  ];
   return (
     <div style={{ display: 'grid', gap: 4, width: '100%' }}>
+      <div
+        className="row"
+        title={linked ? t('textStyles.linked', { name: styles[linked]!.name }) : ''}
+      >
+        <Select value={linked} options={styleOptions} onChange={pick} />
+      </div>
       <div className="row">
-        <NumberInput
-          value={value.size}
-          min={4}
-          max={600}
-          onChange={(size) => onChange({ ...value, size })}
-        />
+        <NumberInput value={value.size} min={4} max={600} onChange={(size) => set({ size })} />
         <Select
           value={value.weight}
           options={WEIGHTS}
-          onChange={(weight) => onChange({ ...value, weight: weight as TextStyle['weight'] })}
+          onChange={(weight) => set({ weight: weight as TextStyle['weight'] })}
         />
         <button className="icon ghost" onClick={() => setOpen(!open)} title="More">
           {open ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
@@ -291,7 +333,7 @@ export function TextStyleInput({
       <div className="row">
         <ColorInput
           value={value.color}
-          onChange={(c) => onChange({ ...value, color: c ?? '$text' })}
+          onChange={(c) => set({ color: c ?? '$text' })}
           theme={theme}
         />
       </div>
@@ -301,32 +343,26 @@ export function TextStyleInput({
             <Select
               value={value.align}
               options={ALIGNS}
-              onChange={(align) => onChange({ ...value, align: align as TextStyle['align'] })}
+              onChange={(align) => set({ align: align as TextStyle['align'] })}
             />
             <Select
               value={value.baseline}
               options={BASELINES}
-              onChange={(baseline) =>
-                onChange({ ...value, baseline: baseline as TextStyle['baseline'] })
-              }
+              onChange={(baseline) => set({ baseline: baseline as TextStyle['baseline'] })}
             />
           </div>
           <div className="row">
-            <Select
-              value={value.font}
-              options={fonts}
-              onChange={(font) => onChange({ ...value, font })}
-            />
+            <Select value={value.font} options={fonts} onChange={(font) => set({ font })} />
             <NumberInput
               value={value.letterSpacing}
               min={-20}
               max={60}
               step={0.5}
-              onChange={(letterSpacing) => onChange({ ...value, letterSpacing })}
+              onChange={(letterSpacing) => set({ letterSpacing })}
             />
             <Checkbox
               value={value.uppercase}
-              onChange={(uppercase) => onChange({ ...value, uppercase })}
+              onChange={(uppercase) => set({ uppercase })}
               label="ABC"
             />
           </div>
@@ -335,6 +371,9 @@ export function TextStyleInput({
     </div>
   );
 }
+
+/** The style picker's entry for saving the current look as a new named style. */
+const NEW_STYLE = '__new_style__';
 
 /* ----- stroke ----- */
 

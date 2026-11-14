@@ -108,6 +108,22 @@ picture costs eight bytes a pixel. Frames are laid out in whole 4×4 blocks, up 
 all; ETC2 keeps flat colours and hard edges well but can shift a subtle gradient by a step. The
 Studio's car preview decodes the same atlas, so it shows what the car draws.
 
+### Text styles
+
+`textStyles` names a look once and shares it: a text style with `"use": "<id>"` takes the font,
+size, weight, colour, letter spacing and capitals of that named style, and keeps its own alignment
+and baseline.
+
+```json
+"textStyles": { "label": { "name": "Label", "size": 16, "weight": "bold", "color": "$text-muted", "letterSpacing": 2, "uppercase": true } }
+"style": { "use": "label", "align": "right" }
+```
+
+In the Studio, the style picker at the top of any text style saves the current look as a new style
+or links a text to one; editing a linked text changes the style and every text that uses it. The
+Palettes panel lists the styles to rename or remove them; texts that used a removed style keep its
+look. The texts carry the style's values too, so a theme read by an older Studio looks the same.
+
 ## Keeping out of the factory's way
 
 The 1920×720 panel sits above the factory gauges and below its telltales and pop-ups. Keep

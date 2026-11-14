@@ -123,8 +123,25 @@ export const TextStyleSchema = z.object({
   baseline: TextBaselineSchema.default('alphabetic'),
   letterSpacing: z.number().default(0),
   uppercase: z.boolean().default(false),
+  /**
+   * A named text style of the theme (`textStyles`) this one follows: its font, size, weight,
+   * colour, spacing and capitals come from there; alignment and baseline stay this one's.
+   */
+  use: IdSchema.optional(),
 });
 export type TextStyle = z.infer<typeof TextStyleSchema>;
+
+/** A named text style, shared by every text that `use`s it. */
+export const NamedTextStyleSchema = z.object({
+  name: z.string().min(1).max(48),
+  font: IdSchema.default('default'),
+  size: z.number().positive().default(24),
+  weight: z.enum(['light', 'regular', 'medium', 'bold']).default('regular'),
+  color: ColorSchema.default('$text'),
+  letterSpacing: z.number().default(0),
+  uppercase: z.boolean().default(false),
+});
+export type NamedTextStyle = z.infer<typeof NamedTextStyleSchema>;
 
 /**
  * A number format string. Supported tokens:

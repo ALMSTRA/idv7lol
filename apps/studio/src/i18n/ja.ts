@@ -368,6 +368,20 @@ export const ja: Dictionary = {
     addToken: 'カラートークンを追加',
     contrast: 'テキストのコントラスト',
   },
+  textStyles: {
+    title: 'テキストスタイル',
+    none: 'スタイルなし',
+    saveNew: '新しいスタイルとして保存…',
+    namePrompt: '新しいテキストスタイルの名前',
+    linked:
+      '「{name}」に従います。ここでの変更は、このスタイルを使うすべてのテキストに反映されます。',
+    empty:
+      'テキストスタイルはまだありません。インスペクターで任意のテキストから「新しいスタイルとして保存…」で作成できます。',
+    rename: '名前を変更',
+    remove: '削除',
+    renamePrompt: '新しい名前',
+    uses: '{n} 件のテキスト',
+  },
   welcome: {
     community: '無料のコミュニティレイアウト',
     communityNote:

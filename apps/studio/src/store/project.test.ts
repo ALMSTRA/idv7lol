@@ -101,3 +101,30 @@ describe('ordering', () => {
     expect(grp?.type === 'group' && grp.props.children.map((c) => c.id)).toEqual(['y', 'x']);
   });
 });
+
+describe('named text styles in the store', () => {
+  it('saves a look as a style, changes every text that uses it, and keeps the look on removal', () => {
+    const a = createComponent('text', { id: 'a', props: { text: 'A', style: { size: 20 } } });
+    const b = createComponent('text', {
+      id: 'b',
+      props: { text: 'B', style: { size: 30, align: 'right' } },
+    });
+    const get = load([a, b]);
+    const style = (id: string) =>
+      (findComponent(get().theme.components, id)!.props as { style: Record<string, unknown> })
+        .style;
+    const sid = get().addTextStyle('Label', style('a') as never);
+    get().updateProps('a', { style: { ...style('a'), use: sid } });
+    get().updateProps('b', { style: { ...style('b'), use: sid, size: 20 } });
+    get().updateTextStyle(sid, { size: 44, color: '$accent' });
+    expect(style('a')).toMatchObject({ size: 44, color: '$accent', use: sid });
+    expect(style('b')).toMatchObject({ size: 44, color: '$accent', align: 'right' });
+    get().undo();
+    expect(style('a').size).toBe(20);
+    get().redo();
+    get().removeTextStyle(sid);
+    expect(get().theme.textStyles[sid]).toBeUndefined();
+    expect(style('b')).toMatchObject({ size: 44, align: 'right' });
+    expect(style('b').use).toBeUndefined();
+  });
+});

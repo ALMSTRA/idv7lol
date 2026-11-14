@@ -2,6 +2,8 @@ import {
   REQUIRED_PALETTE_TOKENS,
   getDisplayProfile,
   parseTheme,
+  resolveTextStyles,
+  unknownTextStyles,
   type Binding,
   type Color,
   type Component,
@@ -129,7 +131,16 @@ export function validateTheme(doc: unknown): ValidationReport {
     for (const i of parsed.issues) out.error(`schema.${i.code}`, i.message, { path: i.path });
     return finish(out);
   }
-  const theme = parsed.theme;
+  // texts that use a named style follow it; a name the theme lacks is reported
+  const theme = resolveTextStyles(parsed.theme);
+  for (const id of unknownTextStyles(theme))
+    out.warning(
+      'text.style-unknown',
+      `A text uses the style "${id}", which the theme doesn't have.`,
+      {
+        hint: 'Pick another style or detach it in the Inspector.',
+      },
+    );
   const profile = getProfile(theme.vehicleProfile);
   const display = getDisplayProfile(theme.target.display);
 

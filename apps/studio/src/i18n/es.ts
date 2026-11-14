@@ -366,6 +366,19 @@ export const es: Dictionary = {
     addToken: 'Añadir color',
     contrast: 'Contraste del texto',
   },
+  textStyles: {
+    title: 'Estilos de texto',
+    none: 'Sin estilo',
+    saveNew: 'Guardar como estilo nuevo…',
+    namePrompt: 'Nombre del nuevo estilo de texto',
+    linked: 'Sigue a «{name}»: un cambio aquí cambia todos los textos que lo usan.',
+    empty:
+      'Aún no hay estilos de texto. Guarda uno desde cualquier texto en el Inspector con «Guardar como estilo nuevo…».',
+    rename: 'Renombrar',
+    remove: 'Quitar',
+    renamePrompt: 'Nuevo nombre',
+    uses: '{n} textos',
+  },
   welcome: {
     community: 'Plantillas gratuitas de la comunidad',
     communityNote:

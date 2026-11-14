@@ -34,6 +34,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Text styles** with a name: save a text's look as a style from the Inspector's style picker
+  and link other texts to it; changing a linked text changes the style and every text that uses
+  it, while each keeps its own alignment. The Palettes panel lists the styles to rename or remove
+  them (texts keep their look). Theme format: `textStyles` and `TextStyle.use`; the compiler and the
+  editor resolve them, so the car app needs no change. Tested locally.
 - **VDO Classic M** (contributed): a classic round-dial M cluster built from a photo, widened over
   the whole glass. It has live needles (speed, revs, fuel, coolant, consumption, oil temperature),
   the odometer and the trip since refuel, and a bottom bar: drive mode, gear, low beam, parking

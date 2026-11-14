@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  NamedTextStyleSchema,
   ColorLiteralSchema,
   FillSchema,
   IdSchema,
@@ -164,6 +165,8 @@ export const ThemeSchema = z.object({
   palettes: z.record(IdSchema, PaletteSchema),
   palette: PaletteSelectionSchema,
   fonts: z.record(IdSchema, FontSchema).prefault({ default: { family: 'sans' } }),
+  /** Named text styles: a text that `use`s one follows it (TextStyle.use). */
+  textStyles: z.record(IdSchema, NamedTextStyleSchema).prefault({}),
   assets: z.record(IdSchema, AssetSchema).prefault({}),
   animations: z.record(IdSchema, AnimationClipSchema).prefault({}),
   components: z.array(ComponentSchema),

@@ -358,6 +358,19 @@ export const en = {
     addToken: 'Add colour token',
     contrast: 'Text contrast',
   },
+  textStyles: {
+    title: 'Text styles',
+    none: 'No style',
+    saveNew: 'Save as a new style…',
+    namePrompt: 'Name of the new text style',
+    linked: 'Follows “{name}”: a change here changes every text that uses it.',
+    empty:
+      'No text styles yet. Save one from any text in the Inspector with “Save as a new style…”.',
+    rename: 'Rename',
+    remove: 'Remove',
+    renamePrompt: 'New name',
+    uses: '{n} texts',
+  },
   welcome: {
     community: 'Free community layouts',
     communityNote:

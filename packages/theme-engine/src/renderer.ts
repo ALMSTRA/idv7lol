@@ -1,4 +1,4 @@
-import type { Component, Theme } from '@idv7lol/theme-schema';
+import { resolveTextStyles, type Component, type Theme } from '@idv7lol/theme-schema';
 import type { Canvas2DLike } from './canvas.js';
 import { AnimationPlayer, applyPropOverrides } from './animation.js';
 import { DEG, anchorFraction } from './math.js';
@@ -45,6 +45,8 @@ export function renderTheme(
   anim: AnimationPlayer,
   options: RenderOptions = {},
 ): RenderStats {
+  // texts that use a named style follow it (cached per theme object)
+  theme = resolveTextStyles(theme);
   const paletteId = selectPaletteId(theme, state);
   const palette = resolvePalette(theme, paletteId);
   const rc = new RenderContext(ctx, theme, palette, state, anim, options);

@@ -6,8 +6,13 @@ import {
   createComponent,
   createEmptyTheme,
   nextComponentId,
+  detachTextStyle,
+  newTextStyleId,
+  resolveTextStyles,
   type Component,
   type ComponentType,
+  type NamedTextStyle,
+  type TextStyle,
   type Theme,
 } from '@idv7lol/theme-schema';
 import { findComponent, flattenComponents } from '@idv7lol/theme-engine';
@@ -35,6 +40,13 @@ export interface ProjectState {
   /** Replace the theme. Records history unless `record` is false (live drags). */
   setTheme(theme: Theme, record?: boolean): void;
   patchTheme(patch: Partial<Theme>): void;
+  /** A new named text style from `from`'s look; returns its id. */
+  addTextStyle(name: string, from: TextStyle): string;
+  /** Change a named text style: every text that uses it follows. */
+  updateTextStyle(id: string, patch: Partial<NamedTextStyle>, record?: boolean): void;
+  renameTextStyle(id: string, name: string): void;
+  /** Remove a named text style; the texts that used it keep their look. */
+  removeTextStyle(id: string): void;
   beginTxn(): void;
   endTxn(): void;
   undo(): void;
@@ -226,6 +238,39 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     }
   },
   patchTheme: (patch) => get().setTheme({ ...get().theme, ...patch }),
+  addTextStyle: (name, from) => {
+    const theme = get().theme;
+    const id = newTextStyleId(theme, name);
+    const style: NamedTextStyle = {
+      name,
+      font: from.font,
+      size: from.size,
+      weight: from.weight,
+      color: from.color,
+      letterSpacing: from.letterSpacing,
+      uppercase: from.uppercase,
+    };
+    get().setTheme({ ...theme, textStyles: { ...theme.textStyles, [id]: style } });
+    return id;
+  },
+  updateTextStyle: (id, patch, record = true) => {
+    const theme = get().theme;
+    const cur = theme.textStyles[id];
+    if (!cur) return;
+    // the texts that use it carry its values too, so a theme read elsewhere looks the same
+    const next = { ...theme, textStyles: { ...theme.textStyles, [id]: { ...cur, ...patch } } };
+    get().setTheme(resolveTextStyles(next), record);
+  },
+  renameTextStyle: (id, name) => {
+    const theme = get().theme;
+    const cur = theme.textStyles[id];
+    if (!cur || !name.trim()) return;
+    get().setTheme({
+      ...theme,
+      textStyles: { ...theme.textStyles, [id]: { ...cur, name: name.trim() } },
+    });
+  },
+  removeTextStyle: (id) => get().setTheme(detachTextStyle(get().theme, id)),
   beginTxn: () => {
     if (!get().txn) set({ txn: get().theme });
   },

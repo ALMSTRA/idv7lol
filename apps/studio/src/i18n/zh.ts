@@ -356,6 +356,18 @@ export const zh: Dictionary = {
     addToken: '添加颜色变量',
     contrast: '文字对比度',
   },
+  textStyles: {
+    title: '文字样式',
+    none: '无样式',
+    saveNew: '另存为新样式…',
+    namePrompt: '新文字样式的名称',
+    linked: '跟随“{name}”：在此处的更改会同步到所有使用该样式的文字。',
+    empty: '还没有文字样式。可在检查器中从任意文字选择“另存为新样式…”来创建。',
+    rename: '重命名',
+    remove: '移除',
+    renamePrompt: '新名称',
+    uses: '{n} 个文字',
+  },
   welcome: {
     community: '免费社区布局',
     communityNote: '其他作者 GPL 许可布局的可选转换版本。署名信息见各主题。',
