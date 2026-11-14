@@ -249,6 +249,8 @@ describe('the speed scaling in app.json', () => {
       {
         spec,
         log: { info: () => undefined, warn: () => undefined },
+        // its 20 Hz demo timer reads this setting; without it a late tick throws
+        settings: { get: () => 'off' },
         signals: {
           watch: (iface: string, _i: string, fields: Record<string, (v: unknown) => void>) => {
             handlers[iface] = fields;
