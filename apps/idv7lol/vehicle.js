@@ -18,8 +18,26 @@
  */
 const fs = require('fs');
 const path = require('path');
-const { SignalStore, driveModeOf, boostOf, GEAR_TEXT } = require('./signals');
-const { FuelGauge, CarAwake, parseTank } = require('./fuel');
+const {
+  SignalStore,
+  driveModeOf,
+  boostOf,
+  GEAR_TEXT,
+  mEngineModeOf,
+  indicatorsOf,
+  flashLit,
+  lowBeamOf,
+  highBeamOf,
+  rearFogOf,
+  handBrakeOf,
+  cruiseOf,
+  averageConsumptionOf,
+  dippedBeamOf,
+  parkingBrakeOf,
+  dscModeOf,
+  cruiseHudOf,
+} = require('./signals');
+const { FuelGauge, CarAwake, RefuelTrip, parseTank } = require('./fuel');
 
 /** The engine unit's fuel level: OBD-II PID 2F, A x 100 / 255 (a public standard, no BMW table). */
 const FUEL_OBD = {
@@ -72,29 +90,34 @@ function startFuel(ctx, log, deps) {
   let lastAsk = -Infinity;
   let busy = false;
   let answered = null;
+  /** The kit's read-only diagnostic link, opened once (shared with the boost reads): true when there is one. */
+  const open = () => {
+    if (reader === false) return false;
+    if (reader) return true;
+    try {
+      if (deps && deps.openLink) {
+        const o = deps.openLink();
+        link = o.link;
+        reader = o.reader;
+        ready = o.ready;
+      } else {
+        const { ReadOnlyDiag } = require('./kit/readonly-diag');
+        const { DidReader } = require('./kit/dids');
+        link = new ReadOnlyDiag(ctx.signals, log);
+        ready = link.init().catch((e) => log.warn('diagnostic link: ' + e));
+        reader = new DidReader(link, { ecu: FUEL_OBD.ecu });
+      }
+      return true;
+    } catch (e) {
+      reader = false;
+      log.info('fuel: no diagnostic link (' + e + '); litres over the tank size');
+      return false;
+    }
+  };
   const ask = (now) => {
     if (reader === false || busy) return;
     if (now - lastAsk < (misses >= 3 ? FUEL_RETRY_MS : FUEL_EVERY_MS)) return;
-    if (!reader) {
-      try {
-        if (deps && deps.openLink) {
-          const o = deps.openLink();
-          link = o.link;
-          reader = o.reader;
-          ready = o.ready;
-        } else {
-          const { ReadOnlyDiag } = require('./kit/readonly-diag');
-          const { DidReader } = require('./kit/dids');
-          link = new ReadOnlyDiag(ctx.signals, log);
-          ready = link.init().catch(() => {});
-          reader = new DidReader(link, { ecu: FUEL_OBD.ecu });
-        }
-      } catch (e) {
-        reader = false;
-        log.info('fuel: no diagnostic link (' + e + '); litres over the tank size');
-        return;
-      }
-    }
+    if (!open()) return;
     // The kit's link stops asking a unit after 5 misses in a row until it is woken; a retry
     // after misses wakes it, or the 5-minute retries would never send anything again.
     if (misses >= 3 && link && link.wake) link.wake(FUEL_OBD.ecu);
@@ -133,7 +156,125 @@ function startFuel(ctx, log, deps) {
     if (link && link.wake) link.wake(FUEL_OBD.ecu);
     lastAsk = -Infinity;
   };
-  return { gauge, ask, wake };
+  /** { reader, ready } of the shared link, or null. */
+  const diag = () => (open() ? { reader, ready } : null);
+  return { gauge, ask, wake, diag };
+}
+
+/*
+ * Boost from the engine unit over the read-only link, as Cluster Layouts (idrive7-cluster-info config.dme)
+ * and M Vitals read it: BMW's actual boost pressure (absolute) first, then the OBD-II ones, minus the
+ * barometric pressure. Candidates are tried in order and the first that answers is kept (kit/dids.js).
+ */
+const BOOST_ACTUAL = [
+  {
+    ecu: 0x12,
+    did: '580B',
+    bytes: 2,
+    at: 0,
+    factor: 0.00390625,
+    min: 20,
+    max: 400,
+    timeoutMs: 600,
+  },
+  { ecu: 0x12, did: 'F470', bytes: 2, at: 3, factor: 0.03125, min: 20, max: 600, timeoutMs: 600 },
+  { ecu: 0x12, obd: '70', bytes: 2, at: 3, factor: 0.03125, min: 20, max: 600, timeoutMs: 600 },
+  { ecu: 0x12, obd: '0B', bytes: 1, at: 0, factor: 1, min: 20, max: 255, timeoutMs: 600 },
+];
+const BARO = [
+  { ecu: 0x12, did: 'F433', bytes: 1, at: 0, factor: 1, min: 50, max: 115, timeoutMs: 600 },
+  { ecu: 0x12, obd: '33', bytes: 1, at: 0, factor: 1, min: 50, max: 115, timeoutMs: 600 },
+];
+const BOOST_EVERY_MS = 200; // 5 a second while the engine runs
+const BARO_EVERY_MS = 60000;
+const BOOST_RETRY_MS = 60000; // an engine unit that answered none of them is asked again after this
+
+/**
+ * Asks the engine unit for boost while the engine runs and the sport display gives none. tick(now, running)
+ * from vehicle.js; sets engine.boost (bar over atmosphere) in the store.
+ */
+function startBoost(fuel, store, log) {
+  let busy = false;
+  let lastAsk = -Infinity;
+  let baro = 101.3;
+  let baroAt = -Infinity;
+  let misses = 0;
+  let told = null;
+  return {
+    tick(now, running) {
+      if (!running || busy) return;
+      if (now - lastAsk < (misses >= 5 ? BOOST_RETRY_MS : BOOST_EVERY_MS)) return;
+      const d = fuel.diag();
+      if (!d) return;
+      lastAsk = now;
+      busy = true;
+      Promise.resolve(d.ready)
+        .then(() => (now - baroAt > BARO_EVERY_MS ? d.reader.value('baro', BARO) : null))
+        .then((b) => {
+          if (b !== null && b !== undefined) {
+            baro = b;
+            baroAt = now;
+          }
+          return d.reader.value('boost', BOOST_ACTUAL);
+        })
+        .then((abs) => {
+          if (abs === null) {
+            misses++;
+            if (misses === 5 && told !== false) {
+              told = false;
+              log.info(
+                'boost: the engine unit gives none of its boost pressures; asked again every minute',
+              );
+            }
+            return;
+          }
+          misses = 0;
+          if (told !== true) {
+            told = true;
+            log.info(
+              'boost: from the engine unit (' +
+                (d.reader.pick.boost || 0) +
+                '), ' +
+                abs.toFixed(1) +
+                ' kPa absolute, baro ' +
+                baro.toFixed(1),
+            );
+          }
+          store.set('engine.boost', (abs - baro) / 100);
+        })
+        .catch(() => {
+          misses++;
+        })
+        .then(() => {
+          busy = false;
+        });
+    },
+  };
+}
+
+/**
+ * The distance since the last refuel (fuel.js RefuelTrip), kept in the app's data folder (trip.json) so it
+ * survives restarts.
+ */
+function startTrip(ctx, log) {
+  const file = path.join(ctx.dataDir || process.cwd(), 'trip.json');
+  let state = null;
+  try {
+    state = JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch (_e) {
+    /* first start */
+  }
+  return new RefuelTrip({
+    state,
+    save: (s) => {
+      try {
+        fs.writeFileSync(file + '.tmp', JSON.stringify(s));
+        fs.renameSync(file + '.tmp', file);
+      } catch (e) {
+        log.warn('trip: ' + e);
+      }
+    },
+  });
 }
 
 /**
@@ -149,8 +290,33 @@ function startVehicle(ctx, opts) {
     raw[field] = JSON.stringify(v).slice(0, 160);
   };
   let modeFallbackSince = Date.now();
+  // An M car names its mode in M Drive (the engine mode of M Setup); once it has, the driving
+  // experience switch (FES), which stays on COMFORT there, no longer sets the mode.
+  let mDriveMode = false;
+  // Fields whose scaling isn't known yet: each distinct raw value (the first 20) goes to the log too, for
+  // calibrating against the car (DSC on / off / MDM, the injected fuel against the trip computer).
+  const logged = {};
+  const calibrate = (field, v) => {
+    seen(field, v);
+    const j = JSON.stringify(v);
+    const l = logged[field] || (logged[field] = []);
+    if (l.length < 20 && l.indexOf(j) < 0) {
+      l.push(j);
+      ctx.log.info('raw ' + field + ': ' + j.slice(0, 300));
+    }
+  };
+  let indicate = null; // the direction the car indicates: 'left' | 'right' | 'both' | 'off'
+  let dipped = false; // the dipped beam lamp has been heard (LampExterior2)
+  let epb = false; // an electric parking brake has been heard (Vehicle2.statusStandstillFunctions)
+  let cruise2 = false; // the car fills DisplayDataServer2's set speed
   const fuel = startFuel(ctx, ctx.log);
+  const trip = startTrip(ctx, ctx.log);
+  const boost = startBoost(fuel, store, ctx.log);
+  let boostSportAt = -Infinity; // the sport display last gave a boost
   let tank = null; // the cluster's last tank values (fuel.js parseTank)
+  const flag = (id, v) => {
+    if (v !== null) store.set(id, v);
+  };
   const extra = {
     'de.bmw.infotainment.KombiIF': {
       statusRangeTankStatus: (v) => {
@@ -158,11 +324,92 @@ function startVehicle(ctx, opts) {
         tank = parseTank(v);
         if (tank.litres !== null) fuel.gauge.tank(tank.litres, Date.now());
       },
+      // (the trip computer's own distance: shown on the Signals page; vehicle.trip.distance is the distance
+      // since the last refuel, below)
+      statusBordcomputerTravelData: (v) => seen('statusBordcomputerTravelData', v),
+      statusBordcomputerAverage: (v) => {
+        seen('statusBordcomputerAverage', v);
+        flag('fuel.consumption.average', averageConsumptionOf(v));
+      },
+    },
+    'de.bmw.body.Light': {
+      StatusFunctionsIndicators: (v) => {
+        seen('StatusFunctionsIndicators', v);
+        const d = indicatorsOf(v);
+        if (d !== null) indicate = d;
+      },
+      // the switch's "driving light on", only until the dipped beam lamp itself (LampExterior2) is heard
+      LowBeam: (v) => {
+        seen('LowBeam', v);
+        if (!dipped) flag('light.low.beam', lowBeamOf(v));
+      },
+      LampExterior: (v) => {
+        seen('LampExterior', v);
+        flag('light.fog.rear', rearFogOf(v));
+      },
+      LampExterior2: (v) => {
+        seen('LampExterior2', v);
+        flag('light.high.beam', highBeamOf(v));
+        const d = dippedBeamOf(v);
+        if (d !== null) {
+          dipped = true;
+          store.set('light.low.beam', d);
+        }
+      },
+    },
+    'de.bmw.infotainment.vehicle.CDS': {
+      // a mechanical handbrake's switch, only on cars without an electric parking brake (below)
+      statusHandBrake: (v) => {
+        seen('statusHandBrake', v);
+        if (!epb) flag('chassis.handbrake', handBrakeOf(v));
+      },
+    },
+    'de.bmw.infotainment.vehicle.Vehicle2': {
+      statusStandstillFunctions: (v) => {
+        seen('statusStandstillFunctions', v);
+        const p = parkingBrakeOf(v);
+        if (p === null) return;
+        epb = true;
+        store.set('chassis.handbrake', p);
+      },
+    },
+    'de.bmw.infotainment.displaydataserver.DisplayDataServer': {
+      functionalLibraryData: (v) => {
+        seen(
+          'functionalLibraryData (HUD)',
+          v && { ldmSymColor: v.ldmSymColor, cruiseCtrlSpeedHUD: v.cruiseCtrlSpeedHUD },
+        );
+        const c = cruiseHudOf(v);
+        if (!c || cruise2) return;
+        store.set('vehicle.cruise.active', c.active);
+        if (c.speed !== null) store.set('vehicle.cruise.speed', c.speed);
+      },
+    },
+    'de.bmw.infotainment.displaydata.DisplayDataServer2': {
+      functionalLibraryData: (v) => {
+        const c = cruiseOf(v);
+        seen('functionalLibraryData', v && v.ldmSetSpeed);
+        if (!c) return;
+        // a set speed here (not just OFF) means this car fills DisplayDataServer2; it wins then
+        if (c.active || c.speed !== null) cruise2 = true;
+        store.set('vehicle.cruise.active', c.active);
+        if (c.speed !== null) store.set('vehicle.cruise.speed', c.speed);
+      },
+    },
+    'de.bmw.chassis.VehicleStabilizationManagement': {
+      StabilizationManagement: (v) => calibrate('StabilizationManagement', v),
+    },
+    'de.bmw.infotainment.vehicle.CDS2': {
+      statusInjectionVolume: (v) => calibrate('statusInjectionVolume', v),
     },
     'de.bmw.infotainment.drivingexcitement.FES': {
+      statusDSCSwitchHMI: (v) => {
+        seen('statusDSCSwitchHMI', v);
+        flag('chassis.dsc.mode', dscModeOf(v));
+      },
       statusFESVehicleDynamicSwitchHMI: (v) => {
         seen('statusFESVehicleDynamicSwitchHMI', v);
-        const m = driveModeOf(v);
+        const m = mDriveMode ? null : driveModeOf(v);
         if (m) {
           store.set('drive.mode', m);
           modeFallbackSince = Date.now() + 60000;
@@ -171,8 +418,11 @@ function startVehicle(ctx, opts) {
       statusSwitchDriveDynamicSport2: (v) => {
         seen('statusSwitchDriveDynamicSport2', v);
         const b = boostOf(v && v.displayBoostPressure);
-        if (b !== null) store.set('engine.boost', b);
-        if (Date.now() > modeFallbackSince) {
+        if (b !== null) {
+          boostSportAt = Date.now();
+          store.set('engine.boost', b);
+        }
+        if (!mDriveMode && Date.now() > modeFallbackSince) {
           const m = driveModeOf(v);
           if (m) store.set('drive.mode', m);
         }
@@ -186,6 +436,14 @@ function startVehicle(ctx, opts) {
       },
     },
     'de.bmw.infotainment.misc.MDrive': {
+      controlDisplayMSystems: (v) => {
+        seen('controlDisplayMSystems', v);
+        const m = mEngineModeOf(v);
+        if (!m) return;
+        if (!mDriveMode) ctx.log.info('drive mode: from M Drive (the engine mode of M Setup)');
+        mDriveMode = true;
+        store.set('drive.mode', m);
+      },
       dataDisplayGearbox: (v) => {
         seen('dataDisplayGearbox', v);
         const s = JSON.stringify(v || '');
@@ -208,6 +466,27 @@ function startVehicle(ctx, opts) {
     extra,
   );
   if (opts && opts.redline) car.setRedline(opts.redline);
+  // The car says which way it indicates, not each flash: the turn signals flash here at the cluster's
+  // own rate (signals.js FLASH_MS), lit together for hazards. Ticks every 40 ms for clean edges.
+  setInterval(() => {
+    if (indicate === null || car.data().demo) return;
+    const now = Date.now();
+    const lit = flashLit(now);
+    store.set('light.turn.left', lit && (indicate === 'left' || indicate === 'both'), now);
+    store.set('light.turn.right', lit && (indicate === 'right' || indicate === 'both'), now);
+  }, 40);
+  // Boost from the engine unit while it runs and the sport display gives none (startBoost).
+  setInterval(() => {
+    let d;
+    try {
+      d = car.data();
+      if (d.demo || !live()) return;
+    } catch (_e) {
+      return; // (no car yet)
+    }
+    const now = Date.now();
+    boost.tick(now, typeof d.rpm === 'number' && d.rpm > 400 && now - boostSportAt > 3000);
+  }, 50);
   car.onSample((d, t) => {
     if (typeof d.rpm === 'number') store.set('engine.rpm', d.rpm, t);
     if (typeof d.speed === 'number') store.set('vehicle.speed', d.speed, t);
@@ -274,6 +553,8 @@ function startVehicle(ctx, opts) {
       if (tank.rangeKm !== null) store.set('vehicle.range', tank.rangeKm, now);
       if (tank.odometerKm !== null) store.set('vehicle.odometer', tank.odometerKm, now);
       if (tank.reserve !== null) store.set('fuel.low', tank.reserve, now);
+      const km = trip.update(tank.litres, tank.odometerKm, d.speed, now);
+      if (km !== null) store.set('vehicle.trip.distance', km, now);
     }
     const lv = fuel.gauge.level(now, tankSetting());
     if (!lv) return;

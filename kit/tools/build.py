@@ -307,7 +307,9 @@ def manifest_for(spec):
         if isinstance(fields, dict):
             attrs = {k: v for k, v in fields.items() if not k.startswith('_')}
             meths = fields.get('_methods')
+            if isinstance(meths, str): meths = [meths]   # (a lone name: a string would be checked letter by letter)
             evts = fields.get('_broadcasts')
+            if isinstance(evts, str): evts = [evts]
             if attrs: entry['attributes'] = attrs
             if meths: entry['methods'] = meths
             if evts: entry['broadcasts'] = evts

@@ -10,6 +10,34 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+### Fixed
+
+- The car app's diagnostic link (TASU) never reached the car: app.json named its method and broadcast
+  as plain strings, which `kit/tools/build.py` checked letter by letter against the unit's catalog, so
+  the whole interface was dropped on install and every engine-unit read failed silently. They are
+  lists now, the build accepts either form, a test guards it, and a link that fails to start is
+  logged. **Tested in vehicle** (F98 X4 M Competition) for the signals below; the diagnostic link fix is
+  tested locally.
+- Signals on an F98 X4 M Competition (**tested in vehicle**): drive mode from M Drive's engine mode
+  (`MDrive.controlDisplayMSystems`: Efficient, Sport, Sport+); the electric parking brake
+  (`Vehicle2.statusStandstillFunctions`; the mechanical handbrake switch only without one); low beam
+  from the dipped beam lamp (`Light.LampExterior2`), so it goes out with the lights; cruise from the
+  older display data on cars that don't fill `DisplayDataServer2`.
+
+### Added
+
+- Signal `chassis.dsc.mode` (ON, OFF, DTC, MDM) from the DSC button's state (`FES.statusDSCSwitchHMI`).
+- Boost from the engine unit when the car's sport display sends none, read over the read-only link as
+  Cluster Layouts and M Vitals read it (charge pressure less ambient). Tested locally.
+- A Time zone setting with daylight saving (Australian, New Zealand, European and US rules; `tz.js`).
+  It defaults to the fixed offset, so existing installs keep their clock.
+- `vehicle.trip.distance` is the distance since the last refuel (the tank 5 l up while standing),
+  kept across restarts (`trip.json`). Not yet confirmed on a car.
+
+### Changed
+
+- Diagnostics is the second button (as the fifth it wasn't shown on some units).
+
 ### Changed
 
 - **Supercar Track** is redrawn closer to an Italian supercar's digital cluster: a thick rev band

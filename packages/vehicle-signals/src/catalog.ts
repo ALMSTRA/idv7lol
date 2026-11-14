@@ -650,6 +650,21 @@ export const SIGNALS: readonly SignalDef[] = [
     description: 'Parking brake engaged.',
   }),
   S({
+    id: 'chassis.dsc.mode',
+    name: 'DSC mode',
+    group: 'Chassis',
+    kind: 'enum',
+    unit: 'none',
+    min: 0,
+    max: 3,
+    decimals: 0,
+    enumValues: ['ON', 'OFF', 'DTC', 'MDM'],
+    availability: 'common',
+    rateHz: 1,
+    description:
+      'Stability control: ON, OFF (DSC off), DTC (traction mode) or MDM (M Dynamic Mode), as the DSC button set it.',
+  }),
+  S({
     id: 'chassis.tyre.pressure.fl',
     name: 'Tyre pressure front left',
     group: 'Chassis',
