@@ -349,6 +349,48 @@ describe('when the layout goes up', () => {
   });
 });
 
+describe('the start-up sweep', () => {
+  it("stops its animations once it is over and sends the gauges' values again", () => {
+    let now = 100_000;
+    const client = new FakeClient();
+    const store = new SignalStore();
+    const engine = new ClusterEngine({
+      client,
+      log: quiet,
+      theme: compiled,
+      fonts,
+      signals: store,
+      enabled: () => true,
+      live: () => true,
+      sweep: () => true,
+      now: () => now,
+      paletteId: () => 'night',
+    });
+    store.set('engine.rpm', 3000, now);
+    engine.tick();
+    const sweeps = client.ops.filter((o) => o.op === 'animate' && o.loop === false);
+    expect(sweeps.length).toBeGreaterThan(0);
+    expect(client.count('stop')).toBe(0);
+    for (let t = 0; t < 1700; t += 1000 / 60) {
+      now += 1000 / 60;
+      store.set('engine.rpm', 3000, now);
+      engine.tick();
+    }
+    expect(client.count('stop')).toBe(sweeps.length);
+    const stopAt = client.ops.findIndex((o) => o.op === 'stop');
+    const names = new Set(sweeps.map((o) => `${o.ref}:${o.name}`));
+    const resent = client.ops
+      .slice(stopAt)
+      .filter((o) => o.op === 'uniform' && names.has(`${o.ref}:${o.name}`));
+    expect(new Set(resent.map((o) => `${o.ref}:${o.name}`)).size).toBe(names.size);
+    // and only once
+    const before = client.count('stop');
+    now += 1000;
+    engine.tick();
+    expect(client.count('stop')).toBe(before);
+  });
+});
+
 describe('the car state for the layout (vehicle.js holdFor)', () => {
   const { holdFor } = require('./vehicle.js') as {
     holdFor: (d: Record<string, unknown>) => string | null;

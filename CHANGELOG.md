@@ -60,6 +60,10 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- The start-up sweep's animations are stopped once it is over and the gauges' values sent again. A
+  finished animation holds its last key and plays again whenever cluster-render publishes the scene
+  again (its PROTOCOL.md), which 0.5.5 and later do more often; a steady gauge (fuel, a temperature)
+  could have dropped back to zero with nothing sent to correct it.
 - The layout keeps off the cluster while the car is off or switching on and off: none with the
   car parked, in standby or with the ignition off (vehicle state 5 or lower), it goes when drive
   readiness ends (12), and none new goes up while drive readiness starts (8) or the car sends a

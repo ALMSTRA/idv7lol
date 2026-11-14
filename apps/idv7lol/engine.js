@@ -524,17 +524,20 @@ class ClusterEngine {
   _sweep() {
     this.pieces.forEach((st) => {
       if (!st.ref) return;
+      st.sweepAnims = [];
       st.piece.dynamics.forEach((d) => {
         if (d.kind === 'norm') {
-          this.cr.animate(st.ref, {
-            property: 'uniform',
-            name: d.uniform,
-            keys: '0:0 ' + SWEEP_MS + ':1 ' + SWEEP_MS * 2 + ':0',
-            loop: false,
-          });
+          st.sweepAnims.push(
+            this.cr.animate(st.ref, {
+              property: 'uniform',
+              name: d.uniform,
+              keys: '0:0 ' + SWEEP_MS + ':1 ' + SWEEP_MS * 2 + ':0',
+              loop: false,
+            }),
+          );
           st.sweeping = this.now() + SWEEP_MS * 2 + 150;
         } else if (d.kind === 'angle') {
-          this.cr.animate(st.ref, {
+          const anim = this.cr.animate(st.ref, {
             property: 'uniform',
             name: d.uniform,
             keys:
@@ -550,6 +553,7 @@ class ClusterEngine {
               r3(d.from),
             loop: false,
           });
+          st.sweepAnims.push(anim);
           st.sweeping = this.now() + SWEEP_MS * 2 + 150;
         }
       });
@@ -784,10 +788,22 @@ class ClusterEngine {
         if (!vis) return;
       }
       const sweeping = st.sweeping && now < st.sweeping;
+      // A finished animation holds its last key and plays again whenever the renderer publishes
+      // the scene again (PROTOCOL.md), which would put a steady gauge back to 0 with nothing sent
+      // to correct it. So the sweep's animations are stopped once it is over, the uniforms go back
+      // to what the app set, and its values are sent again.
+      let again = force;
+      if (!sweeping && st.sweepAnims && st.sweepAnims.length) {
+        st.sweepAnims.forEach((anim) => {
+          if (anim) this.cr.stop(st.ref, anim);
+        });
+        st.sweepAnims = null;
+        again = true;
+      }
       piece.dynamics.forEach((d) => {
         switch (d.kind) {
           case 'norm':
-            if (!sweeping) this._easeTo(st, d.uniform, this._norm(d.binding, now), force, EPS);
+            if (!sweeping) this._easeTo(st, d.uniform, this._norm(d.binding, now), again, EPS);
             break;
           case 'angle':
             if (!sweeping)
@@ -795,7 +811,7 @@ class ClusterEngine {
                 st,
                 d.uniform,
                 d.from + d.sweep * this._norm(d.binding, now),
-                force,
+                again,
                 ANGLE_EPS,
               );
             break;
