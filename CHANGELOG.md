@@ -59,6 +59,10 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- The Studio's car preview drew a layer with uniforms left over from the last layer of the same
+  shader: WebGL keeps them per program, while on the car each layer has its own and an unset one
+  reads 0. A shape drawn after a background cut at the bottom strip came out stretched. Each layer
+  now resets what it doesn't set.
 - The car app requires the Store's deploy tool 0.8.12, which removes an app's code cache on
   install so an update runs the new code (mgu-store #261, the Store pins it the same way). The app
   folder has its `icon.png`, so the Branch channel shows the icon before install and after removal

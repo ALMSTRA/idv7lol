@@ -58,6 +58,17 @@ interface Asset {
 }
 
 import { decodeEtc2Rgba } from '@idv7lol/theme-compiler';
+/** Uniforms the preview itself sets on every draw. */
+const PREVIEW_SET = new Set([
+  'u_rect',
+  'u_canvas',
+  'u_xf',
+  'u_scl',
+  'u_opacity',
+  'u_time',
+  'u_tex',
+]);
+
 const VS = `
 attribute vec2 a_pos;
 uniform vec4 u_rect;   // x, y, w, h in layout pixels
@@ -320,6 +331,12 @@ export class WebGLClusterClient {
     set('u_scl', [sx, sy]);
     if (l.kind === 'image') set('u_opacity', [l.opacity]);
     if (l.time) set('u_time', [(now - l.born) / 1000]);
+    // On the car each layer keeps its own uniforms and an unset one reads 0; in WebGL they live
+    // in the program, which layers of one shader share. So whatever this layer doesn't set goes
+    // back to 0 (a cut background's u_keep would otherwise squash the next layer drawn with it).
+    for (const [name, u] of l.uniforms)
+      if (!PREVIEW_SET.has(name) && !l.values.has(name) && !animated.has(name))
+        this.setUniform(u, []);
     for (const [name, v] of l.values) if (!animated.has(name)) set(name, v);
     for (const [name, v] of animated) set(name, v);
 
