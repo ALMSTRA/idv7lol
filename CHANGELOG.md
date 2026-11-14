@@ -12,8 +12,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
-- The car app is version 0.2.1, so the MGU Store's Releases channel offers the fuel readings and
-  the needle fix below as an update. The `catalog` release holds the new package.
+- The car app is version 0.2.2, so the MGU Store's Releases channel offers Volt Runner, the
+  fuel readings and the needle fix below as an update. The `catalog` release holds the new package.
 
 ### Added
 
