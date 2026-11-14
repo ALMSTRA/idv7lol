@@ -18,8 +18,10 @@ on a computer (Chrome, Edge or Firefox). The desktop app is still the better pic
 The site and the [install guide](https://www.idv7lol.com/instalar/) are in English, Español,
 Русский, 日本語 and 简体中文, and there's a place to
 [report bugs](https://www.idv7lol.com/reportar/) with a picture or a video.
-Downloading straight to the car is next, once it passes a test on one.
 [Read the announcement](https://www.idv7lol.com/beta/).
+
+**Coming very soon to try:** download themes from the site's catalog straight in the car, no USB
+stick needed.
 
 </td></tr></table>
 
