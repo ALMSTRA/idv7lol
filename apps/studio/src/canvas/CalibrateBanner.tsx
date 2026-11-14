@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { getSignal } from '@idv7lol/vehicle-signals';
-import type { SignalId } from '@idv7lol/theme-schema';
 import { calibratedNeedle, useCalibrateStore, type Point } from '../lib/calibrate.js';
 import { NumberInput, SignalSelect } from '../inspector/fields.js';
 import { useProjectStore } from '../store/project.js';
@@ -37,7 +36,7 @@ export function CalibrateBanner(): JSX.Element | null {
       {
         id: 'needle',
         name: t('calibrate.needleName'),
-        signal: signal as SignalId,
+        signal,
         min,
         max,
         clockwise,

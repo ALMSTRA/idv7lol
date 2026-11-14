@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { createComponent, type Component, type SignalId } from '@idv7lol/theme-schema';
+import { createComponent, type Component } from '@idv7lol/theme-schema';
 
 /**
  * "Needle on a photo": the user clicks a dial's centre, its first mark and its last mark on a
@@ -21,7 +21,7 @@ export interface Calibration {
 export interface NeedleOptions {
   id: string;
   name: string;
-  signal: SignalId;
+  signal: string;
   min: number;
   max: number;
   /** The needle turns clockwise from the first mark to the last (most dials). */
