@@ -26,6 +26,7 @@ load('conditions.js');
 load('text.js');
 load('units.js');
 load('fuel.js');
+load('etc2.js');
 // The kit's runtime goes into the app too (kit/tools/build.py). It needs the head unit's oap-sdk
 // to run, so here it is only compiled, which is enough to catch syntax this Node lacks.
 const vm = require('vm');

@@ -443,8 +443,12 @@ function wrapStatic(text: string, maxChars: number): string[] {
   return out;
 }
 
-/** The renderer's largest texture upload: one message, at most 2048 on a side. */
-const MAX_ATLAS_BYTES = 1920 * 720 * 4;
+/**
+ * An animation's atlas is an etc2rgba asset (cluster-render 0.5.9): one byte a pixel, sent once,
+ * cells in whole 4×4 blocks so no block mixes two frames. At most 2048 on a side, and no more
+ * pixels than the 2048×1024 atlas cluster-render's ETC2 car test drew on the instrument cluster.
+ */
+const MAX_ATLAS_PIXELS = 2048 * 1024;
 const MAX_ATLAS_SIDE = 2048;
 
 /** A grid that fits `frames` cells of about `w`×`h` in one atlas, shrinking the cells if needed. */
@@ -453,10 +457,10 @@ export function atlasLayout(
   w: number,
   h: number,
 ): { columns: number; rows: number; cellW: number; cellH: number } {
-  let s = Math.min(1, Math.sqrt(MAX_ATLAS_BYTES / 4 / (frames * w * h)));
+  let s = Math.min(1, Math.sqrt(MAX_ATLAS_PIXELS / (frames * w * h)));
   for (;;) {
-    const cellW = Math.max(2, Math.floor(w * s));
-    const cellH = Math.max(2, Math.floor(h * s));
+    const cellW = Math.max(4, Math.floor((w * s) / 4) * 4);
+    const cellH = Math.max(4, Math.floor((h * s) / 4) * 4);
     const columns = Math.max(
       1,
       Math.min(
@@ -466,7 +470,7 @@ export function atlasLayout(
       ),
     );
     const rows = Math.ceil(frames / columns);
-    if (rows * cellH <= MAX_ATLAS_SIDE && columns * cellW * rows * cellH * 4 <= MAX_ATLAS_BYTES)
+    if (rows * cellH <= MAX_ATLAS_SIDE && columns * cellW * rows * cellH <= MAX_ATLAS_PIXELS)
       return { columns, rows, cellW, cellH };
     s *= 0.95;
   }
@@ -513,6 +517,8 @@ function buildImage(ctx: Ctx, f: FlatComponent): void {
     const grid = atlasLayout(a.frames, boxW, boxH);
     entry.iw = grid.columns * grid.cellW;
     entry.ih = grid.rows * grid.cellH;
+    entry.format = 'etc2rgba';
+    entry.file = `images/${c.id}.etc2`;
     entry.sprite = {
       ...grid,
       frames: a.frames,

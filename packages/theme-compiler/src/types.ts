@@ -162,11 +162,16 @@ export interface CompiledImage {
   w: number;
   h: number;
   z: number;
-  /** Image width/height of the RGBA data. */
+  /** Image width/height of the pixel data. */
   iw: number;
   ih: number;
-  /** File name of the raw RGBA8 data in the bundle. */
+  /** File name of the pixel data in the bundle: raw RGBA8, or etc2rgba blocks with `format`. */
   file: string;
+  /**
+   * `etc2rgba` for an animation's atlas (cluster-render 0.5.9): ETC2 RGBA with EAC alpha, one
+   * byte a pixel, sent once as an asset. Absent: raw RGBA8.
+   */
+  format?: 'etc2rgba';
   opacity: number;
   rotation: number;
   /** Rotation pivot in pixels from the layer's top-left. */

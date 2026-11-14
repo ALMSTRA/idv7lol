@@ -9,6 +9,7 @@ import {
   resolveColor,
 } from '@idv7lol/theme-engine';
 import { buildPieces } from './pieces.js';
+import { encodeEtc2Rgba } from './etc2.js';
 import { SHADERS } from './glsl.js';
 import { codeOf } from './font/glyphs.js';
 import { validateTheme } from './validate.js';
@@ -156,7 +157,11 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
             ((y + oy) * entry.iw + ox) * 4,
           );
       }
-      files.push({ path: entry.file, data: new Uint8Array(atlas.data.buffer as ArrayBuffer) });
+      const rgba = new Uint8Array(atlas.data.buffer as ArrayBuffer);
+      files.push({
+        path: entry.file,
+        data: entry.format === 'etc2rgba' ? etc2Cached(rgba, entry.iw, entry.ih) : rgba,
+      });
       continue;
     }
     const edited = applyImageEdits(source, component.props.edits, (c) =>
@@ -183,4 +188,27 @@ function fontFamilyOf(theme: Theme, _piece: CompiledPiece): string {
   const fonts = theme.fonts;
   const first = Object.values(fonts)[0];
   return (fonts['default'] ?? first)?.family ?? 'sans';
+}
+
+/**
+ * The editor compiles again on every change; an atlas that didn't change is not encoded again.
+ * Keyed by a hash of its pixels; a few kept.
+ */
+const etc2Cache = new Map<string, Uint8Array>();
+function etc2Cached(rgba: Uint8Array, w: number, h: number): Uint8Array {
+  let a = 0x811c9dc5,
+    b = 0x01000193;
+  const words = new Uint32Array(rgba.buffer, rgba.byteOffset, rgba.byteLength >> 2);
+  for (let i = 0; i < words.length; i++) {
+    a = Math.imul(a ^ words[i]!, 0x01000193);
+    b = Math.imul(b ^ words[i]!, 0x5bd1e995) ^ (b >>> 15);
+  }
+  const key = `${w}x${h}:${(a >>> 0).toString(16)}:${(b >>> 0).toString(16)}`;
+  let out = etc2Cache.get(key);
+  if (!out) {
+    out = encodeEtc2Rgba(rgba, w, h);
+    etc2Cache.set(key, out);
+    if (etc2Cache.size > 8) etc2Cache.delete(etc2Cache.keys().next().value!);
+  }
+  return out;
 }

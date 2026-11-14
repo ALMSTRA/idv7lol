@@ -47,6 +47,17 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   and `vehicle.js` run against a fake car); the cluster's values were read on a G05 X5 xDrive45e
   with a full 69 l tank (68 l); not tested in a vehicle with this code.
 
+- Animations go to the car as ETC2 textures (`etc2rgba`, cluster-render 0.5.9): a quarter of
+  the bytes of RGBA8, sent once and charged once against the renderer's pixel memory instead of
+  twice, so an animation costs an eighth of the memory it did. Volt Runner's runner atlas goes from
+  4.6 MB to 1.2 MB. The theme compiler encodes the atlas (`packages/theme-compiler/src/etc2.ts`,
+  frames in whole 4×4 blocks, up to 2048×1024), the car app sends it as an `etc2rgba` asset and,
+  if a renderer refuses the texture, decodes it and sends it again as RGBA8. USB packages carry
+  the atlas as `images/<id>.etc2`; the Studio's car preview decodes it to show what the car draws.
+  An older car app refuses a USB package with an ETC2 animation (it reads it as a bad file name).
+  Tested locally (unit tests; the encoder's blocks decode byte for byte the same with
+  cluster-render's reference decoder; the car preview); not tested in a vehicle.
+
 ### Fixed
 
 - Needles turn the way their scale runs on the car and in the Studio's car preview. The needle

@@ -13,6 +13,12 @@ updated when the material is added to the repository.
 The Studio's interface icons come from [Lucide](https://lucide.dev) (ISC licence), through the
 `lucide-react` package.
 
+The ETC2 encoder in `packages/theme-compiler/src/etc2.ts` follows the approach of cluster-render's
+`tools/etc2_test/etc2_encode.py` (Robert Nisipeanu,
+[robertnisipeanu/idrive-apps](https://github.com/robertnisipeanu/idrive-apps), GPL-3.0-or-later):
+ETC1 individual and differential modes for colour, EAC for alpha, weighted by alpha. It is a new
+implementation with its own search; its blocks decode the same with that script's decoder.
+
 Reference projects studied but **not copied** (their code stays under their own licences and
 is not part of idv7lol): eroobeeroo/idrive7-apps and robertnisipeanu/mgu-store (GPL-3.0-or-later).
 

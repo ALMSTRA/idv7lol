@@ -57,6 +57,7 @@ interface Asset {
   h: number;
 }
 
+import { decodeEtc2Rgba } from '@idv7lol/theme-compiler';
 const VS = `
 attribute vec2 a_pos;
 uniform vec4 u_rect;   // x, y, w, h in layout pixels
@@ -202,7 +203,9 @@ export class WebGLClusterClient {
     const gl = this.gl;
     gl.bindTexture(gl.TEXTURE_2D, a.texture);
     const fmt = a.format === 'r8' ? gl.LUMINANCE : gl.RGBA;
-    const data = new Uint8Array(px.buffer, px.byteOffset, px.byteLength);
+    let data = new Uint8Array(px.buffer, px.byteOffset, px.byteLength);
+    // An animation's ETC2 atlas, decoded here so the preview shows what the car draws.
+    if (a.format === 'etc2rgba') data = decodeEtc2Rgba(data, a.w, a.h);
     gl.texImage2D(gl.TEXTURE_2D, 0, fmt, a.w, a.h, 0, fmt, gl.UNSIGNED_BYTE, data);
   }
 

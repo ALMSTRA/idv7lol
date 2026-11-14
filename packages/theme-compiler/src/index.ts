@@ -5,3 +5,4 @@ export * from './validate.js';
 export * from './compile.js';
 export * from './font/glyphs.js';
 export * from './package.js';
+export * from './etc2.js';

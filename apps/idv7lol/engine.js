@@ -23,6 +23,7 @@
 const { layoutLine, formatNumber, formatDash, formatClock, enumText } = require('./text');
 const { convert } = require('./units');
 const conditions = require('./conditions');
+const { decodeEtc2Rgba } = require('./etc2');
 
 const RATE_MS = 1000 / 60;
 const TEXT_DIVIDER = 2; // texts/colours every 2nd tick (30 Hz)
@@ -177,7 +178,10 @@ class ClusterEngine {
     });
     this.cr.on('layer', (ref, state, reason) => {
       this.layerStates[ref] = state + (reason ? ' ' + reason : '');
-      if (state === 'error') this.log.warn('layer ' + ref + ' error: ' + reason);
+      if (state === 'error') {
+        this.log.warn('layer ' + ref + ' error: ' + reason);
+        this._etc2Refused(ref, reason);
+      }
     });
     this.cr.on('status', (text) => {
       this.rendererStatus = text;
@@ -407,7 +411,9 @@ class ClusterEngine {
       } catch (e) {
         this.log.warn('image ' + img.key + ': ' + e);
       }
-      if (!pixels || pixels.length !== img.iw * img.ih * 4) {
+      // An animation's atlas comes as etc2rgba blocks (a byte a pixel), a picture as RGBA8.
+      const bytes = img.iw * img.ih * (img.format === 'etc2rgba' ? 1 : 4);
+      if (!pixels || pixels.length !== bytes) {
         this.log.warn('image ' + img.key + ': no usable pixels');
         return st;
       }
@@ -415,51 +421,9 @@ class ClusterEngine {
       if (shownH !== null) this.cut++;
       if (shownH === 0) return st;
       if (img.sprite) {
-        // The renderer plays the frames by itself: nothing is sent per frame.
-        st.asset = this._make('asset', {
-          target,
-          format: 'rgba8',
-          w: img.iw,
-          h: img.ih,
-          sampling: 'bilinear',
-        });
-        const sprite = {
-          target,
-          klass: 'content',
-          z: img.z,
-          x: img.x,
-          y: img.y,
-          w: img.w,
-          h: shownH === null ? img.h : shownH,
-          visible: 1,
-          fs: theme.shaders.sprite,
-        };
-        if (img.rotation) {
-          sprite.rotate = img.rotation;
-          sprite.px = img.pivotX;
-          sprite.py = img.pivotY;
-        }
-        st.ref = st.asset ? this._make('effect', sprite) : 0;
-        if (!st.ref) {
-          this.log.warn('animation refused: ' + img.key);
-          return st;
-        }
-        this.cr.pixels(st.asset, null, pixels);
-        this.cr.bind(st.ref, 'u_atlas', st.asset);
-        const sp = img.sprite;
-        this.cr.uniform(st.ref, 'u_size', [img.w, img.h]);
-        if (shownH !== null)
-          this.cr.uniform(st.ref, 'u_keep', [Math.round((shownH / img.h) * 1e6) / 1e6]);
-        this.cr.uniform(st.ref, 'u_cells', [sp.columns, sp.rows]);
-        // Half a texel of a cell; six decimals, so it doesn't round to 0 on wide cells.
-        const r6 = (v) => Math.round(v * 1e6) / 1e6;
-        this.cr.uniform(st.ref, 'u_texel', [r6(0.5 / sp.cellW), r6(0.5 / sp.cellH)]);
-        this.cr.uniform(st.ref, 'u_opacity', [img.opacity]);
-        this.cr.uniform(st.ref, 'u_frame', [0]);
-        st.speed = img.speedFrom ? img.speedFrom.slow : 1;
-        st.played = 0; // time into the loop, in the compiled durations, when this run started
-        st.startedAt = this.now();
-        st.anim = this._playSprite(st, 1, 0);
+        st.shownH = shownH;
+        st.pixels = pixels;
+        this._makeSprite(st, img.format === 'etc2rgba' ? 'etc2rgba' : 'rgba8', pixels);
         return st;
       }
       if (shownH !== null) {
@@ -641,6 +605,77 @@ class ClusterEngine {
    * Start an animated picture's frames on the renderer, `factor` times faster than compiled,
    * from `frame` on. The renderer plays them by itself; returns the animation's number.
    */
+  /**
+   * An animation: its atlas as one asset and an effect layer that samples it; the renderer plays
+   * the frames by itself, nothing is sent per frame. `format` etc2rgba or rgba8.
+   */
+  _makeSprite(st, format, pixels) {
+    const img = st.img;
+    const shownH = st.shownH;
+    st.format = format;
+    st.asset = this._make('asset', {
+      target: this.target,
+      format,
+      w: img.iw,
+      h: img.ih,
+      sampling: 'bilinear',
+    });
+    const sprite = {
+      target: this.target,
+      klass: 'content',
+      z: img.z,
+      x: img.x,
+      y: img.y,
+      w: img.w,
+      h: shownH === null ? img.h : shownH,
+      visible: st.visible ? 1 : 0,
+      fs: this.theme.shaders.sprite,
+    };
+    if (img.rotation) {
+      sprite.rotate = img.rotation;
+      sprite.px = img.pivotX;
+      sprite.py = img.pivotY;
+    }
+    st.ref = st.asset ? this._make('effect', sprite) : 0;
+    if (!st.ref) {
+      this.log.warn('animation refused: ' + img.key);
+      return;
+    }
+    this.cr.pixels(st.asset, null, pixels);
+    this.cr.bind(st.ref, 'u_atlas', st.asset);
+    const sp = img.sprite;
+    this.cr.uniform(st.ref, 'u_size', [img.w, img.h]);
+    if (shownH !== null)
+      this.cr.uniform(st.ref, 'u_keep', [Math.round((shownH / img.h) * 1e6) / 1e6]);
+    this.cr.uniform(st.ref, 'u_cells', [sp.columns, sp.rows]);
+    // Half a texel of a cell; six decimals, so it doesn't round to 0 on wide cells.
+    const r6 = (v) => Math.round(v * 1e6) / 1e6;
+    this.cr.uniform(st.ref, 'u_texel', [r6(0.5 / sp.cellW), r6(0.5 / sp.cellH)]);
+    this.cr.uniform(st.ref, 'u_opacity', [img.opacity]);
+    this.cr.uniform(st.ref, 'u_frame', [0]);
+    st.speed = img.speedFrom ? img.speedFrom.slow : 1;
+    st.played = 0; // time into the loop, in the compiled durations, when this run started
+    st.startedAt = this.now();
+    st.anim = this._playSprite(st, 1, 0);
+  }
+
+  /**
+   * The renderer refused an animation's ETC2 texture (its layer is in error, PROTOCOL.md): the
+   * animation is made again from the same atlas decoded to RGBA8, which every renderer takes.
+   */
+  _etc2Refused(ref, reason) {
+    if (!/etc2rgba texture/.test(reason || '')) return;
+    const st = this.images.find((s) => s.ref === ref && s.format === 'etc2rgba');
+    if (!st) return;
+    this.log.warn('animation ' + st.img.key + ': ETC2 refused, sent again as RGBA');
+    this.cr.drop(st.ref);
+    this.cr.drop(st.asset);
+    st.ref = 0;
+    st.asset = 0;
+    this._makeSprite(st, 'rgba8', decodeEtc2Rgba(st.pixels, st.img.iw, st.img.ih));
+    st.pixels = null;
+  }
+
   _playSprite(st, factor, frame) {
     const sp = st.img.sprite;
     const order = [];

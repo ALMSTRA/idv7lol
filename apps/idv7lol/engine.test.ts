@@ -467,8 +467,11 @@ describe('MGU engine animations', () => {
       frames: 2,
       durations: [50, 100],
     });
-    const atlas = result.files.find((f) => f.path === 'images/g.rgba')!.data as Uint8Array;
-    expect(atlas.length).toBe(entry.iw * entry.ih * 4);
+    // An etc2rgba atlas: a byte a pixel, whole 4×4 blocks.
+    expect(entry.format).toBe('etc2rgba');
+    const atlas = result.files.find((f) => f.path === 'images/g.etc2')!.data as Uint8Array;
+    expect(atlas.length).toBe(entry.iw * entry.ih);
+    expect(entry.iw % 4 || entry.ih % 4).toBe(0);
     expect(result.compiled!.shaders['sprite']).toContain('u_atlas');
 
     const client = new FakeClient();
@@ -486,7 +489,11 @@ describe('MGU engine animations', () => {
       loadImage: () => Buffer.from(atlas),
     });
     engine.tick();
-    expect(client.ops.some((o) => o.op === 'asset' && o.format === 'rgba8')).toBe(true);
+    const asset = client.ops.find((o) => o.op === 'asset' && o.format === 'etc2rgba')!;
+    expect(asset).toMatchObject({ w: entry.iw, h: entry.ih });
+    expect(client.ops.find((o) => o.op === 'pixels' && o.ref === asset.ref)!.bytes).toBe(
+      entry.iw * entry.ih,
+    );
     const anim = client.ops.find((o) => o.op === 'animate')!;
     expect(anim).toMatchObject({
       name: 'u_frame',
@@ -498,6 +505,27 @@ describe('MGU engine animations', () => {
     engine.tick();
     engine.tick();
     expect(client.ops.length).toBe(before);
+
+    // A renderer that refuses the ETC2 texture gets the same atlas again as RGBA8.
+    const layer = client.ops.find(
+      (o) => o.op === 'layer' && o.fs === result.compiled!.shaders['sprite'],
+    )!;
+    client.emit(
+      'layer',
+      layer.ref,
+      'error',
+      `asset ${asset.ref}: the renderer refused its ${entry.iw}x${entry.ih} etc2rgba texture`,
+    );
+    expect(client.ops.filter((o) => o.op === 'drop').map((o) => o.ref)).toEqual([
+      layer.ref,
+      asset.ref,
+    ]);
+    const again = client.ops.find((o) => o.op === 'asset' && o.format === 'rgba8')!;
+    expect(again).toMatchObject({ w: entry.iw, h: entry.ih });
+    expect(client.ops.find((o) => o.op === 'pixels' && o.ref === again.ref)!.bytes).toBe(
+      entry.iw * entry.ih * 4,
+    );
+    expect(client.ops.filter((o) => o.op === 'animate').length).toBe(2);
   });
 });
 
@@ -546,7 +574,7 @@ describe('animation speed tied to a signal', () => {
       slow: 1,
       fast: 3,
     });
-    const atlas = result.files.find((f) => f.path === 'images/g.rgba')!.data as Uint8Array;
+    const atlas = result.files.find((f) => f.path === 'images/g.etc2')!.data as Uint8Array;
     let now = 1000;
     const store = new SignalStore();
     const client = new FakeClient();

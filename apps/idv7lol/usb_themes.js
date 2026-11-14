@@ -58,7 +58,7 @@ const isCount = (v) => isNum(v) && v >= 1 && Math.floor(v) === v;
 // Own keys only: a name like "constructor" must not find Object.prototype.
 const has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
 const ID_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
-const IMAGE_RE = /^images\/[A-Za-z0-9_.-]{1,96}\.rgba$/;
+const IMAGE_RE = /^images\/[A-Za-z0-9_.-]{1,96}\.(rgba|etc2)$/;
 
 /** Why an animation's frame grid doesn't fit its atlas, or '' when it does. */
 function badSprite(sp, iw, ih) {
@@ -146,6 +146,11 @@ function readPackage(buf, opts) {
       fail('image ' + i + ' has a bad file name');
     if (!inside(img)) fail('image ' + i + ' is outside the panel');
     if (!isCount(img.iw) || !isCount(img.ih)) fail('image ' + i + ' has no size');
+    // An animation's atlas may come as etc2rgba blocks (a byte a pixel, whole 4x4 blocks).
+    const etc2 = img.format === 'etc2rgba';
+    if (img.format !== undefined && !etc2) fail('image ' + i + ' has an unknown format');
+    if (etc2 && (!img.sprite || img.iw % 4 || img.ih % 4))
+      fail('image ' + i + ' is not a whole number of ETC2 blocks');
     if (img.sprite) {
       sprites++;
       if (img.iw > LIMITS.atlasSide || img.ih > LIMITS.atlasSide)
@@ -160,8 +165,9 @@ function readPackage(buf, opts) {
     const b64 = data[img.file];
     if (typeof b64 !== 'string') fail('image ' + i + ' has no pixels');
     const px = Buffer.from(b64, 'base64');
-    if (px.length !== img.iw * img.ih * 4) fail('image ' + i + ' has the wrong size');
-    pixelBytes += px.length;
+    if (px.length !== img.iw * img.ih * (etc2 ? 1 : 4)) fail('image ' + i + ' has the wrong size');
+    // cluster-render charges uncompressed pixels twice, compressed ones once
+    pixelBytes += etc2 ? px.length : 2 * px.length;
     images[img.file] = px;
   });
   if (sprites > LIMITS.sprites) fail('more than ' + LIMITS.sprites + ' animations');

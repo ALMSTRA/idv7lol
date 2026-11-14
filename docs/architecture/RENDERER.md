@@ -75,8 +75,13 @@ ignored (forward compatible).
 exclusive, time`, plus `guide_hold` (iDrive 7 `map` only) and `yield` (0.5.3, targets with
   yield slots, today `hud`: 0 keeps the layer over the stock HMI's pop-ups). idv7lol uses
   neither; on `panel` the factory telltales and pop-ups always stay on top.
-- `asset`: `r8`/`rgba8` textures ≤ 2048², sampled by effects (`bind`). idv7lol uploads one R8
-  glyph atlas.
+- `asset`: `r8`/`rgba8` textures ≤ 2048², and from 0.5.9 `etc2rgba`/`etc2rgb` (ETC2, w and h
+  multiples of 4, sent once, charged once to the pixel memory), sampled by effects (`bind`).
+  idv7lol uploads one R8 glyph atlas, and each animation's frames as one `etc2rgba` atlas of at
+  most 2048×1024 (the size upstream's ETC2 test drew on the instrument cluster, TEST-ETC2.md). If
+  the renderer refuses an ETC2 texture, the sampling layer goes to `error` with
+  `asset N: the renderer refused its WxH etc2rgba texture`; the car app then decodes the atlas
+  (`apps/idv7lol/etc2.js`) and sends it again as `rgba8`.
 - `uniform`: `v` = 1–4 numbers, or with `type` (`float|vec2|vec3|vec4|mat4`) arrays up to 1024
   numbers. A name the shader lacks is silently dropped.
 - `animate`: renderer-side keyframes (`keys "t:v,…"`, `loop`, `interp`) on `rotate`,

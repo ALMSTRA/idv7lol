@@ -102,6 +102,12 @@ car the renderer still plays the frames by itself; the app restarts the animatio
 speed, from the frame it is on, when the step changes (at most twice a second). Volt Runner uses
 it for its runner.
 
+On the car an animation's frames go as one ETC2 atlas (`etc2rgba`, cluster-render 0.5.9): a byte
+a pixel instead of four, sent once and charged once against the renderer's 16 MiB, where a still
+picture costs eight bytes a pixel. Frames are laid out in whole 4×4 blocks, up to 2048×1024 in
+all; ETC2 keeps flat colours and hard edges well but can shift a subtle gradient by a step. The
+Studio's car preview decodes the same atlas, so it shows what the car draws.
+
 ## Keeping out of the factory's way
 
 The 1920×720 panel sits above the factory gauges and below its telltales and pop-ups. Keep
