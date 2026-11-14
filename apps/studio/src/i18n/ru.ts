@@ -335,7 +335,7 @@ export const ru: Dictionary = {
     howToInstall: 'Как установить в машину',
     deps: 'Зависимости на головном устройстве',
     depsNote:
-      'Для idv7lol нужен MGU Store с cluster-render ≥ 0.5.2. Studio не может проверить, что установлено в вашей машине.',
+      'Для idv7lol нужен MGU Store с cluster-render ≥ 0.5.9. Studio не может проверить, что установлено в вашей машине.',
   },
   timeline: {
     clips: 'Клипы',

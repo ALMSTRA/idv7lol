@@ -14,6 +14,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 - The car app is version 0.2.2, so the MGU Store's Releases channel offers Volt Runner, the
   fuel readings and the needle fix below as an update. The `catalog` release holds the new package.
+- The car app requires cluster-render 0.5.9 or newer (was 0.5.2), so the Store brings its fixes
+  along: a scene the cluster accepted and then never mapped (a cluster still starting, or a lock
+  while parked) is asked for again instead of leaving the panel blank (0.5.5, 0.5.6), and a layer
+  whose atlas the renderer refused lets go of the cluster, which goes back to its own gauges,
+  instead of holding an empty panel (0.5.9). See `docs/architecture/RENDERER.md`.
 
 ### Added
 

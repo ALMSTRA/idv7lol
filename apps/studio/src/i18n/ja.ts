@@ -336,7 +336,7 @@ export const ja: Dictionary = {
     howToInstall: '車両へのインストール方法',
     deps: 'ヘッドユニットの依存関係',
     depsNote:
-      'idv7lol には cluster-render ≥ 0.5.2 を含む MGU Store が必要です。車両にインストールされている内容は Studio では確認できません。',
+      'idv7lol には cluster-render ≥ 0.5.9 を含む MGU Store が必要です。車両にインストールされている内容は Studio では確認できません。',
   },
   timeline: {
     clips: 'クリップ',

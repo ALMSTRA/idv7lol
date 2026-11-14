@@ -325,7 +325,7 @@ export const zh: Dictionary = {
     howToInstall: '如何安装到车上',
     deps: '主机上的依赖',
     depsNote:
-      'idv7lol 需要安装 MGU Store 及 cluster-render ≥ 0.5.2。Studio 无法检查你车上安装了什么。',
+      'idv7lol 需要安装 MGU Store 及 cluster-render ≥ 0.5.9。Studio 无法检查你车上安装了什么。',
   },
   timeline: {
     clips: '片段',

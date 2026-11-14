@@ -69,7 +69,7 @@ channel now offers an update only when the car app or the kit changes (`build.sh
 `mgu-repo.json`, mgu-store #205).
 
 **The app page says "not connected".** cluster-render is not installed or not running. Install
-it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.5.2+.
+it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.5.9+.
 
 **"Waiting for live car data".** No signal has arrived: with the engine off and the car asleep
 the bus is silent. Start the car, or set _Demo data: On_ to check the layout.

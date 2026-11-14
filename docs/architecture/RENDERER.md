@@ -42,9 +42,18 @@ to 0x01000400, the HUD's, and then the two can't show together, as before 0.5.1
 fallback once the panel's id has had two strikes, until `cluster-render guard-reset` (root, SSH)
 or a new cluster-render version (idrive-apps #128, #54).
 
-idv7lol requires cluster-render **0.5.2** or newer: before 0.5.2, stopping a renderer-side
-animation left RAMSES 19's animation system broken, and the next request for the target crashed
-the service (idrive-apps #132, fixed in 0.5.2). The car app starts and stops animations.
+idv7lol requires cluster-render **0.5.9** or newer:
+
+- before 0.5.2, stopping a renderer-side animation left RAMSES 19's animation system broken, and
+  the next request for the target crashed the service (idrive-apps #132). The car app starts and
+  stops animations.
+- 0.5.5 and 0.5.6 ask again for a scene the cluster accepted and then never mapped: a cluster
+  that is still starting, or a lock that unmapped a parked scene, left the panel blank until the
+  next request (idrive-apps #147, #151).
+- 0.5.9 releases the target when the renderer refuses the texture a layer samples, as for any
+  layer in error (idrive-apps #159). Every idv7lol piece samples the glyph atlas and animated
+  pictures sample their sprite atlas, so a refused atlas now hands the cluster back instead of
+  holding an empty panel.
 
 ## iDrive 8 (not supported by idv7lol)
 
@@ -83,7 +92,7 @@ exclusive, time`, plus `guide_hold` (iDrive 7 `map` only) and `yield` (0.5.3, ta
 | Uniforms per layer       | 32 (reference tests assert ≤ 30)                                                                    |
 | Floats per layer         | 4096; ≤ 1024 per array uniform                                                                      |
 | Animations per layer     | 16                                                                                                  |
-| Assets                   | 16 per client / 32 total, ≤ 16 MiB CPU pixel memory                                                 |
+| Assets                   | 16 per client / 32 total, ≤ 16 MiB pixel memory; image layers and uncompressed assets count twice   |
 | Video layers             | 2 (0.5.x)                                                                                           |
 | Clients / binds          | 16 clients; 32 binds (0.5.x)                                                                        |
 | Layer geometry           | x,y ±4096; w,h 1..4096; opacity 0..1; rotate ±36000°                                                |

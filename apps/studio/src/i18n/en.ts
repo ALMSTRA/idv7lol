@@ -326,7 +326,7 @@ export const en = {
     howToInstall: 'How to install on the car',
     deps: 'Dependencies on the head unit',
     depsNote:
-      'idv7lol needs the MGU Store with cluster-render ≥ 0.5.2. The Studio cannot verify what is installed on your car.',
+      'idv7lol needs the MGU Store with cluster-render ≥ 0.5.9. The Studio cannot verify what is installed on your car.',
   },
   timeline: {
     clips: 'Clips',
