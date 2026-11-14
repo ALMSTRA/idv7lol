@@ -5,10 +5,11 @@
  *   npx tsx tools/development/make-test-packages.ts <out-folder>
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { buildThemePackage, compileTheme, encodeThemePackage } from '@idv7lol/theme-compiler';
-import { bakeFamily } from '@idv7lol/theme-compiler/node';
+import { bakeFamily, imagesFor } from '@idv7lol/theme-compiler/node';
+import { parseTheme } from '@idv7lol/theme-schema';
 
 const out = process.argv[2];
 if (!out) {
@@ -29,7 +30,10 @@ const baked = bakeFamily('sans');
 const fonts = { sans: { pixels: baked.pixels, metrics: baked.metrics } };
 let bad = 0;
 for (const file of files) {
-  const result = compileTheme(JSON.parse(readFileSync(file, 'utf8')) as unknown, { fonts });
+  const doc = JSON.parse(readFileSync(file, 'utf8')) as unknown;
+  const parsed = parseTheme(doc);
+  const images = parsed.ok ? imagesFor(parsed.theme, dirname(file)) : {};
+  const result = compileTheme(doc, { fonts, images });
   if (!result.compiled) {
     bad++;
     console.error(`${file}: ${result.report.errors.map((e) => e.message).join('; ')}`);
