@@ -10,6 +10,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+### Changed
+
+- The car app is version 0.2.1, so the MGU Store's Releases channel offers the fuel readings and
+  the needle fix below as an update. The `catalog` release holds the new package.
+
 ### Added
 
 - The car app reads the fuel level, the fuel range and the odometer, and the reserve warning
