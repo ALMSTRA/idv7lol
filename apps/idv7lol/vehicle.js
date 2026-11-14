@@ -41,9 +41,11 @@ const FUEL_RETRY_MS = 300000; // an engine unit that didn't answer 3 times in a 
  * unit asked for its percentage every FUEL_EVERY_MS while the car is switched on (CarAwake in
  * fuel.js; never parked, where the requests would keep the car's networks awake). The diagnostic
  * link is the kit's read-only one (kit/readonly-diag.js): it refuses anything but reads before a
- * request leaves the head unit. Returns { gauge, ask(now) }.
+ * request leaves the head unit. Returns { gauge, ask(now), wake() }: wake() when the car comes
+ * on, so the engine unit is asked at once even after it went quiet.
+ * deps.openLink() (tests) returns { link, reader, ready } in place of the kit's.
  */
-function startFuel(ctx, log) {
+function startFuel(ctx, log, deps) {
   const file = path.join(ctx.dataDir || process.cwd(), 'fuel.json');
   let state = null;
   try {
@@ -55,7 +57,9 @@ function startFuel(ctx, log) {
     state,
     save: (s) => {
       try {
-        fs.writeFileSync(file, JSON.stringify(s));
+        // whole or not at all: a temp file renamed over it, so a power cut never leaves half
+        fs.writeFileSync(file + '.tmp', JSON.stringify(s));
+        fs.renameSync(file + '.tmp', file);
         log.info('fuel: tank size ' + JSON.stringify(s));
       } catch (e) {
         log.warn('fuel: ' + e);
@@ -63,6 +67,7 @@ function startFuel(ctx, log) {
     },
   });
   let reader = null;
+  let link = null;
   let ready = null;
   let misses = 0;
   let lastAsk = -Infinity;
@@ -73,17 +78,27 @@ function startFuel(ctx, log) {
     if (now - lastAsk < (misses >= 3 ? FUEL_RETRY_MS : FUEL_EVERY_MS)) return;
     if (!reader) {
       try {
-        const { ReadOnlyDiag } = require('./kit/readonly-diag');
-        const { DidReader } = require('./kit/dids');
-        const link = new ReadOnlyDiag(ctx.signals, log);
-        ready = link.init().catch(() => {});
-        reader = new DidReader(link, { ecu: FUEL_OBD.ecu });
+        if (deps && deps.openLink) {
+          const o = deps.openLink();
+          link = o.link;
+          reader = o.reader;
+          ready = o.ready;
+        } else {
+          const { ReadOnlyDiag } = require('./kit/readonly-diag');
+          const { DidReader } = require('./kit/dids');
+          link = new ReadOnlyDiag(ctx.signals, log);
+          ready = link.init().catch(() => {});
+          reader = new DidReader(link, { ecu: FUEL_OBD.ecu });
+        }
       } catch (e) {
         reader = false;
         log.info('fuel: no diagnostic link (' + e + '); litres over the tank size');
         return;
       }
     }
+    // The kit's link stops asking a unit after 5 misses in a row until it is woken; a retry
+    // after misses wakes it, or the 5-minute retries would never send anything again.
+    if (misses >= 3 && link && link.wake) link.wake(FUEL_OBD.ecu);
     lastAsk = now;
     busy = true;
     Promise.resolve(ready)
@@ -115,7 +130,11 @@ function startFuel(ctx, log) {
         busy = false;
       });
   };
-  return { gauge, ask };
+  const wake = () => {
+    if (link && link.wake) link.wake(FUEL_OBD.ecu);
+    lastAsk = -Infinity;
+  };
+  return { gauge, ask, wake };
 }
 
 /**
@@ -230,10 +249,13 @@ function startVehicle(ctx, opts) {
     const now = Date.now();
     const d = car.data();
     if (d.demo || !live()) return;
-    awake.note(d.condition);
+    // A state the car sent but the kit doesn't know (15, no value) is no state: the activity
+    // rule decides then, instead of the last known one.
+    awake.note(d.conditionKnown === false ? null : d.condition);
     awake.sample(d.speed, d.rpm, now);
     const on = awake.on(now);
     if (on !== awakeWas) {
+      if (on && awakeWas === false) fuel.wake();
       awakeWas = on;
       ctx.log.info(
         'fuel: car ' +
@@ -298,4 +320,4 @@ function startVehicle(ctx, opts) {
   return { store, car, live, status, stop: () => Promise.all(car.subs.map((s) => s.shutdown())) };
 }
 
-module.exports = { startVehicle, SignalStore, driveModeOf, GEAR_TEXT };
+module.exports = { startVehicle, startFuel, SignalStore, driveModeOf, GEAR_TEXT };

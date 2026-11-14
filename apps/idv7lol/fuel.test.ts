@@ -270,3 +270,82 @@ describe('the speed scaling in app.json', () => {
     expect(car.data().speed).toBe(400);
   });
 });
+
+describe('the engine unit asked for fuel (vehicle.js startFuel)', () => {
+  const { startFuel } = require('./vehicle.js') as {
+    startFuel: (ctx: object, log: object, deps: object) => { ask(now: number): void; wake(): void };
+  };
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+
+  /** A link that, like the kit's readonly-diag, stops sending to a unit after 5 misses until woken. */
+  function silentLink() {
+    let misses = 0;
+    const link = {
+      sent: 0,
+      wake: () => {
+        misses = 0;
+      },
+    };
+    const reader = {
+      raws: {},
+      key: () => 'k',
+      value: () => {
+        if (misses >= 5) return Promise.resolve(null); // skipped, nothing sent
+        link.sent++;
+        misses++;
+        return Promise.resolve(null); // no answer
+      },
+    };
+    return { link, reader, ready: Promise.resolve() };
+  }
+
+  it('keeps asking a unit that went quiet, every 5 minutes, instead of never again', async () => {
+    const dir = require('node:fs').mkdtempSync(
+      require('node:path').join(require('node:os').tmpdir(), 'fuel-'),
+    );
+    const o = silentLink();
+    const quiet = { info: () => undefined, warn: () => undefined };
+    const fuel = startFuel({ dataDir: dir }, quiet, { openLink: () => o });
+    let t = 0;
+    for (let i = 0; i < 12; i++) {
+      fuel.ask(t);
+      await tick();
+      t += 5 * 60 * 1000;
+    }
+    // Without waking the unit, the link would have stopped after 5 requests.
+    expect(o.link.sent).toBe(12);
+  });
+
+  it('asks at once when the car comes on', async () => {
+    const dir = require('node:fs').mkdtempSync(
+      require('node:path').join(require('node:os').tmpdir(), 'fuel-'),
+    );
+    const o = silentLink();
+    const fuel = startFuel(
+      { dataDir: dir },
+      { info: () => undefined, warn: () => undefined },
+      { openLink: () => o },
+    );
+    fuel.ask(0);
+    await tick();
+    fuel.ask(1000); // too soon: not asked
+    await tick();
+    expect(o.link.sent).toBe(1);
+    fuel.wake();
+    fuel.ask(2000);
+    await tick();
+    expect(o.link.sent).toBe(2);
+  });
+});
+
+describe('CarAwake with a state the car can not tell', () => {
+  it('lets activity decide again when the car sends a state it has no name for', () => {
+    const a = new CarAwake();
+    a.note(10);
+    expect(a.on(0)).toBe(true);
+    a.note(null); // e.g. 15, no value: car.js reports conditionKnown false
+    expect(a.on(0)).toBe(false);
+    a.sample(30, 2000, 0);
+    expect(a.on(60 * S)).toBe(true);
+  });
+});

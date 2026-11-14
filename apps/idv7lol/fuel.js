@@ -155,8 +155,10 @@ class CarAwake {
     this.activeAt = -Infinity;
   }
 
+  /** A state number, or null when the car says it has none it can tell (then activity decides). */
   note(condition) {
-    if (isNum(condition)) this.condition = condition;
+    if (condition === null) this.condition = undefined;
+    else if (isNum(condition)) this.condition = condition;
   }
 
   sample(speed, rpm, now) {

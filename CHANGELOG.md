@@ -60,6 +60,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- The engine unit's fuel percentage came back only after the app restarted once the unit had
+  missed five times in a row: the kit's read-only link skips such a unit until it is woken, and the
+  5-minute retries never woke it. Each retry and the car coming on now wake it. A vehicle state the
+  car can't name (15, no value) no longer keeps the last one: activity decides, so a car switching
+  off isn't asked. `fuel.json` is written whole (a temp file renamed over it).
 - Boost from the car's sport display (`FES.displayBoostPressure`) is read in hundredths of a bar.
   It was read in tenths, ten times the real figure: another cluster project fixed the same after a
   user's photos against the engine unit, and the MIT kit's own apps read it so. 255 is no value.
