@@ -8,7 +8,7 @@
       "title": "idv7lol",
       "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
       "mguHmi": ["ID7"],
-      "requires": { "cluster-render": "0.5.9" },
+      "requires": { "cluster-render": "0.5.9", "mgu-deploy": "0.8.12" },
       "build": {
         "python": "kit/tools/build.py",
         "args": ["idv7lol"],

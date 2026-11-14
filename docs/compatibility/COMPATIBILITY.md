@@ -18,10 +18,13 @@ time from cluster-render's `hello` (`backend`, `targets`), never assumed from th
 
 | Component                                    | Minimum                           | Source                      |
 | -------------------------------------------- | --------------------------------- | --------------------------- |
-| MGU Store (mgu-deploy, app-privacy, updater) | current                           | robertnisipeanu/mgu-store   |
+| MGU Store (mgu-deploy, app-privacy, updater) | mgu-deploy 0.8.12                 | robertnisipeanu/mgu-store   |
 | cluster-render                               | 0.5.9 (see RENDERER.md)           | robertnisipeanu/idrive-apps |
 | Node.js on the unit                          | 8.7+ (8.16.2 on current firmware) | BMW firmware                |
 | Python on the unit (build from source)       | mgu-python                        | installed by the Store      |
+
+mgu-deploy 0.8.12 makes an update run the new code (mgu-store #261); idv7lol requires it, so the
+Store installs it first. The Store's own setup currently refuses MainApp 6.4.8 (mgu-store #273).
 
 ## Vehicle signals
 

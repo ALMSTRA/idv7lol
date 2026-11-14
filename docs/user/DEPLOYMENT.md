@@ -101,9 +101,10 @@ This is about installing the Store, not idv7lol: idv7lol itself doesn't flash or
 
    Don't pick Tags: it skips pre-release tags such as `v0.2.0-beta.3`.
 
-2. The Store lists **idv7lol**. Open it and press **Install**. The Store installs
-   `cluster-render` first if needed, then builds idv7lol from source on the unit (Python +
-   Node, about a minute) and installs it.
+2. The Store lists **idv7lol**. Open it and press **Install**. The Store installs what idv7lol
+   needs first (`cluster-render` 0.5.9, and its own deploy tool 0.8.12, which makes an update run
+   the new code), then installs idv7lol: on **Releases** the ready package, on **Branch** after
+   building it from source on the unit (Python + Node, about a minute).
 3. Restart the head unit if the Store asks.
 4. Open the **idv7lol** app from the apps menu. Its page shows status, car data and the renderer
    connection. Diagnostics pages follow with the **Diagnostics** button.
@@ -122,14 +123,22 @@ This is about installing the Store, not idv7lol: idv7lol itself doesn't flash or
 
 - In the app's own Settings, _Show on the cluster: Off_ stops drawing immediately.
 - MGU Store > Installed > idv7lol > **Remove** uninstalls the app; removing `cluster-render` is
-  optional (other apps may use it). The Store's deploy tool can also roll back.
+  optional (other apps may use it). The Store removes `cluster-render` only once no installed app
+  needs it: while idv7lol is installed it refuses with _Needed by idv7lol_ (mgu-store #242, #249).
+  The Store's deploy tool can also roll back.
+- **Before a firmware (I-Step) update**, set _Show on the cluster: Off_. The Store's author
+  advises uninstalling the Store and its apps before an I-Step update (mgu-store #280).
 - If the head unit misbehaves, the Store's documentation describes SSH-level removal of
   everything it installed.
 
 ## Alternative: USB stick
 
 Copy a checkout of this repository to a USB stick, plug it into the car and add it as a source
-in the Store (_Add from USB_). The Store builds the app the same way.
+in the Store (_Add from USB_). The Store builds the app the same way. The Store reads a stick
+with `mgu-repo.json` or `catalog.json` at its root or under `mgu-repo/`, not under `apps/`
+(mgu-store #284). The Store repository's installer can write our ready package and icon to a
+stick: `node deploy/mgu-install.js usb-repo <stick> github:ALMSTRA/idv7lol` (mgu-store #268). Not
+tried with idv7lol yet.
 
 ## Known limits of this release
 

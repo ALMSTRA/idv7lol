@@ -220,6 +220,7 @@
     }
   },
   "requires": {
-    "cluster-render": "0.5.9"
+    "cluster-render": "0.5.9",
+    "mgu-deploy": "0.8.12"
   }
 }

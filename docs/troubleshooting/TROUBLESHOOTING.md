@@ -62,12 +62,31 @@ Store build leaves out fields and interfaces the unit lacks and logs what was le
 the error text and your car model.
 
 **Installed, but no tile in the apps menu.** Some iDrive 7 units report HMI version 3, and older
-Store versions gave apps marked only `ID7` no tile there (mgu-store #255). Update the Store's
-tools, then reinstall idv7lol.
+Store versions gave apps marked only `ID7` no tile there (mgu-store #255). The Store's deploy tool
+0.8.11 and later repairs apps already installed and marks a restart pending, and 0.8.13 lists again
+apps missing from the menu (mgu-store #265). Update the Store's tools, then use the Store's
+**Restart now**.
 
-**An update installed, but the app behaves like the old version.** Older Store versions could
-run a cached copy of the previous code when the new bundle had the same length (mgu-store #261).
-Update the Store's tools and restart the head unit.
+**An update installed, but the app behaves like the old version.** The Store's deploy tool before
+0.8.12 could run a cached copy of the previous code when the new bundle had the same length
+(mgu-store #261). idv7lol requires 0.8.12, so the Store updates it first; on an older Store, update
+its tools and restart the head unit.
+
+**The install rolled back with "run the install again later".** MainApp was busy installing
+something else, so the deploy tool didn't restart it (mgu-store #216). Wait a few minutes and
+install again.
+
+**The Store's status line says Safe mode, and the app says the renderer is not connected.** After
+four head-unit starts in a row that each failed within about two minutes, the Store's deploy tool
+(0.8.16 and later) keeps every tool's services off, `cluster-render` included, so the factory
+cluster stays (mgu-store #236, #286). Find out what restarted the head unit first. Then press
+**Leave safe mode** on the Store's start screen, or install or update any app or tool; the tools
+start again at the next head-unit start.
+
+**The iDrive knob doesn't work on the idv7lol page.** The Store's renderer gives touch and the knob
+back to the HMI while a pop-up or the header menu covers an app (mgu-store #288). If it stays
+stuck, the head unit's log names who holds the controller:
+`journalctl -u mgu-render.service | grep -E "controller:|covered"` (over SSH).
 
 **The head unit boot-loops after the Store's first install (firmware 030.016).** A file
 permission problem fixed in the Store's deploy tool (mgu-store #173, #185). Follow the Store's

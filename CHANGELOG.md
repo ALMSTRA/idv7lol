@@ -60,6 +60,12 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- The car app requires the Store's deploy tool 0.8.12, which removes an app's code cache on
+  install so an update runs the new code (mgu-store #261, the Store pins it the same way). The app
+  folder has its `icon.png`, so the Branch channel shows the icon before install and after removal
+  (mgu-store #241); it is the icon the kit made, unchanged. The install and troubleshooting guides
+  cover the Store's safe mode, the tile repair, removing `cluster-render`, I-Step updates, USB
+  sticks and the knob.
 - The shader lint counts uniform vectors as GLSL ES does and refuses more than 48, and refuses a
   loop left with `break`. A shader of about 70 vectors restarted a G21's KOMBI (the MIT kit's
   Redline), and another cluster project suspected an early exit from a loop around texture reads of
