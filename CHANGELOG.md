@@ -34,6 +34,12 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Alerts** with a priority: a new component, a warning box with a text, an icon, a fill and a
+  border, that shows while its condition (Show only when) holds; when several hold only the
+  highest priority shows, and it can blink. The car app draws it with the pieces it already has and
+  picks the alert that wins as the values change. In the Studio a selected alert shows on the
+  canvas whatever its condition; the Library has a low fuel and an engine hot alert. Tested locally
+  (unit tests on the compiler and the car engine); not tested in a vehicle.
 - **Text styles** with a name: save a text's look as a style from the Inspector's style picker
   and link other texts to it; changing a linked text changes the style and every text that uses
   it, while each keeps its own alignment. The Palettes panel lists the styles to rename or remove

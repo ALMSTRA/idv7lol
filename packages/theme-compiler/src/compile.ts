@@ -93,6 +93,7 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
     shaders: usedShaders,
     pieces: build.pieces,
     images: build.images,
+    ...(build.alerts.length ? { alerts: build.alerts } : {}),
     signals: [...signals].sort(),
     layers: build.pieces.length + build.images.length,
     warnings,

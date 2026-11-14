@@ -67,3 +67,40 @@ async function replaceNow(componentId: string, files: File[]): Promise<void> {
   await ensureSource(img.id, img.data, img.animation);
   useProjectStore.getState().replaceImageAsset(componentId, img);
 }
+
+/**
+ * Import one picture into the theme's assets without placing it (an icon or a needle a component
+ * uses); returns its asset id, or null when nothing was imported.
+ */
+export function importAssetOnly(): Promise<string | null> {
+  return pickImageFiles(false).then((files) =>
+    files.length ? inTurn(() => importOnlyNow(files)) : null,
+  );
+}
+
+async function importOnlyNow(files: File[]): Promise<string | null> {
+  const ui = useUiStore.getState();
+  const project = useProjectStore.getState();
+  const { images, failed } = await importFiles(files, project.theme.assets);
+  const img = images[0];
+  if (!img) {
+    if (failed.length)
+      window.alert(translate(ui.lang, 'image.failed', { names: failed.join(', ') }));
+    return null;
+  }
+  await ensureSource(img.id, img.data, img.animation);
+  const theme = useProjectStore.getState().theme;
+  useProjectStore.getState().patchTheme({
+    assets: {
+      ...theme.assets,
+      [img.id]: {
+        type: 'image',
+        name: img.name,
+        data: img.data,
+        width: img.width,
+        height: img.height,
+      },
+    },
+  });
+  return img.id;
+}

@@ -74,6 +74,7 @@ export const zh: Dictionary = {
     clock: '时钟',
     telltale: '指示灯',
     'status.panel': '状态面板',
+    alert: '警告',
     text: '文本',
     rect: '矩形',
     ellipse: '椭圆',
@@ -83,6 +84,9 @@ export const zh: Dictionary = {
     group: '组',
   },
   presets: {
+    alertFuel: '低油量警告',
+    alertHot: '发动机过热警告',
+    alertDesc: '条件成立时显示在布局之上的警告框；多个同时成立时显示优先级最高的那个',
     tachometer: '转速表',
     tachometerDesc: '分段转速弧，带红线区和刻度',
     analogSpeed: '指针车速表',
@@ -162,6 +166,10 @@ export const zh: Dictionary = {
     shiftLedDesc: '15 个矩形 LED，4500 至 7000 rpm',
   },
   inspector: {
+    alertHint:
+      '警告在其条件（仅在以下情况显示）成立时显示。多个同时成立时，只显示优先级最高的那个。选中时会显示在画布上，方便你设计。',
+    noPicture: '（无）',
+    importPicture: '导入图片…',
     nothing: '选择一个组件进行编辑。',
     themeDetails: '主题信息',
     themeId: 'ID',
@@ -515,6 +523,11 @@ export const zh: Dictionary = {
  * which are written in English in inspector/descriptors.ts. Anything missing stays English.
  */
 export const ZH_FIELD_LABELS: Record<string, string> = {
+  Alert: '警告',
+  Priority: '优先级',
+  Flash: '闪烁',
+  'Icon colour': '图标颜色',
+  'Icon picture': '图标图片',
   'AM/PM': 'AM/PM',
   'All lights at': '全亮于',
   Arc: '圆弧',

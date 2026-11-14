@@ -153,6 +153,16 @@ export interface CompiledPiece {
   dynamics: Dynamic[];
   visibleWhen?: Condition;
   animations: CompiledAnimation[];
+  /** Part of an alert (CompiledAlert.id): shown only while that alert wins. */
+  alert?: string;
+}
+
+/** An alert: its pieces show while `when` holds and no alert of a higher priority does. */
+export interface CompiledAlert {
+  id: string;
+  priority: number;
+  flash: boolean;
+  when?: Condition;
 }
 
 export interface CompiledImage {
@@ -217,6 +227,8 @@ export interface CompiledTheme {
   shaders: Record<string, string>;
   pieces: CompiledPiece[];
   images: CompiledImage[];
+  /** Alerts in layout order (pieces carry their alert's id). */
+  alerts?: CompiledAlert[];
   /** Every signal the runtime must subscribe to. */
   signals: string[];
   /** Layer count including images. */

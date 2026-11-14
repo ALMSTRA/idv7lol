@@ -76,6 +76,7 @@ export const ru: Dictionary = {
     clock: 'Часы',
     telltale: 'Сигнальная лампа',
     'status.panel': 'Панель состояния',
+    alert: 'Предупреждение',
     text: 'Текст',
     rect: 'Прямоугольник',
     ellipse: 'Эллипс',
@@ -85,6 +86,10 @@ export const ru: Dictionary = {
     group: 'Группа',
   },
   presets: {
+    alertFuel: 'Мало топлива',
+    alertHot: 'Двигатель перегрет',
+    alertDesc:
+      'Окно предупреждения поверх макета, пока выполняется его условие; если выполняются несколько, показывается с наибольшим приоритетом',
     tachometer: 'Тахометр',
     tachometerDesc: 'Сегментная дуга оборотов с красной зоной и делениями',
     analogSpeed: 'Аналоговый спидометр',
@@ -164,6 +169,10 @@ export const ru: Dictionary = {
     shiftLedDesc: '15 прямоугольных светодиодов от 4500 до 7000 rpm',
   },
   inspector: {
+    alertHint:
+      'Предупреждение показывается, пока выполняется его условие (Показывать только если). Если выполняются несколько, показывается только с наибольшим приоритетом. Выбранное, оно видно на холсте, чтобы его можно было оформить.',
+    noPicture: '(нет)',
+    importPicture: 'Импортировать изображение…',
     nothing: 'Выберите компонент, чтобы изменить его.',
     themeDetails: 'Сведения о теме',
     themeId: 'Id',
@@ -529,6 +538,11 @@ export const ru: Dictionary = {
  * written in English in inspector/descriptors.ts. Anything missing stays English.
  */
 export const RU_FIELD_LABELS: Record<string, string> = {
+  Alert: 'Предупреждение',
+  Priority: 'Приоритет',
+  Flash: 'Мигание',
+  'Icon colour': 'Цвет значка',
+  'Icon picture': 'Изображение значка',
   'AM/PM': 'AM/PM',
   'All lights at': 'Все огни при',
   Arc: 'Дуга',

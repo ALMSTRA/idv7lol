@@ -250,6 +250,8 @@ export function CanvasView(): JSX.Element {
           images: imageResolver,
           showReservedZones: uiState.showZones,
           showBounds: uiState.showBounds,
+          // a selected alert shows whatever its condition, so it can be designed
+          showAlert: selectedAlert(th, useProjectStore.getState().selection),
         });
       }
       ctx.restore();
@@ -1055,4 +1057,11 @@ function TextEditor({ id, view }: { id: string; view: View }): JSX.Element | nul
       }}
     />
   );
+}
+
+/** The alert selected on its own, if any: the canvas shows it whatever its condition. */
+function selectedAlert(theme: Theme, selection: readonly string[]): string | undefined {
+  if (selection.length !== 1) return undefined;
+  const c = findComponent(theme.components, selection[0]!);
+  return c?.type === 'alert' ? c.id : undefined;
 }

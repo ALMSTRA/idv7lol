@@ -17,7 +17,8 @@ export type FieldKind =
   | 'unit'
   | 'format'
   | 'rows'
-  | 'colors';
+  | 'colors'
+  | 'asset';
 
 export interface FieldDescriptor {
   path: string;
@@ -356,11 +357,52 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
             'oil',
             'coolant',
             'snowflake',
+            'custom',
           ]),
         },
+        { path: 'asset', label: 'Icon picture', kind: 'asset' },
         { path: 'onColor', label: 'On colour', kind: 'color' },
         { path: 'offColor', label: 'Off colour', kind: 'color' },
         { path: 'hideWhenOff', label: 'Hide when off', kind: 'bool' },
+      ],
+    },
+  ],
+  alert: [
+    {
+      title: 'Alert',
+      fields: [
+        { path: 'text', label: 'Text', kind: 'text' },
+        { path: 'priority', label: 'Priority', kind: 'number', min: 1, max: 9 },
+        { path: 'flash', label: 'Flash', kind: 'bool' },
+        {
+          path: 'icon',
+          label: 'Icon',
+          kind: 'select',
+          options: opt([
+            'none',
+            'fuel',
+            'coolant',
+            'oil',
+            'battery',
+            'engine',
+            'parking-brake',
+            'snowflake',
+            'high-beam',
+            'cruise',
+            'custom',
+          ]),
+        },
+        { path: 'asset', label: 'Icon picture', kind: 'asset' },
+        { path: 'iconColor', label: 'Icon colour', kind: 'color' },
+      ],
+    },
+    {
+      title: 'Style',
+      fields: [
+        { path: 'style', label: 'Style', kind: 'textstyle' },
+        { path: 'fill', label: 'Fill', kind: 'fill' },
+        { path: 'stroke', label: 'Border', kind: 'stroke' },
+        { path: 'radius', label: 'Radius', kind: 'number', min: 0, max: 200 },
       ],
     },
   ],

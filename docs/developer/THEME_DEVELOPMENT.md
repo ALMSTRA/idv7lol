@@ -108,6 +108,25 @@ picture costs eight bytes a pixel. Frames are laid out in whole 4×4 blocks, up 
 all; ETC2 keeps flat colours and hard edges well but can shift a subtle gradient by a step. The
 Studio's car preview decodes the same atlas, so it shows what the car draws.
 
+### Alerts
+
+An `alert` is a warning box (a text, an optional icon, a fill and a border) that takes over its
+spot while its condition holds: the component's `visibleWhen`. When several alerts hold, only the
+one with the highest `priority` (1 to 9) shows, the first in the layout on a tie, so alerts that
+share a spot never pile up. `flash` blinks it twice a second.
+
+```json
+{
+  "type": "alert",
+  "visibleWhen": { "signal": "engine.coolant.temp", "op": "gt", "value": 115 },
+  "props": { "text": "Engine hot", "icon": "coolant", "priority": 8, "flash": true }
+}
+```
+
+On the car it is drawn with the pieces it already has (a box, a telltale, a text) and the app
+shows them while the alert wins. In the Studio a selected alert shows whatever its condition, so
+it can be designed; the Library has a low fuel and an engine hot alert to start from.
+
 ### Text styles
 
 `textStyles` names a look once and shares it: a text style with `"use": "<id>"` takes the font,

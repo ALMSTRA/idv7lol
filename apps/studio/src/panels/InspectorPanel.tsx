@@ -18,7 +18,7 @@ import { findComponent, resolveColor } from '@idv7lol/theme-engine';
 import { useProjectStore, useThemeForPanels } from '../store/project.js';
 import { fieldLabel, useT } from '../i18n/index.js';
 import { useUiStore } from '../store/ui.js';
-import { replaceImage } from '../lib/imageActions.js';
+import { importAssetOnly, replaceImage } from '../lib/imageActions.js';
 import { imageResolver, subscribeImages } from '../lib/imageStore.js';
 import { DESCRIPTORS, getPath, patchFor, type FieldDescriptor } from '../inspector/descriptors.js';
 import {
@@ -505,7 +505,8 @@ function BindingSection({ c, theme }: { c: Component; theme: Theme }): JSX.Eleme
     c.type === 'arc' ||
     c.type === 'image' ||
     c.type === 'clock' ||
-    c.type === 'status.panel'
+    c.type === 'status.panel' ||
+    c.type === 'alert'
   )
     return null;
   const b = c.binding;
@@ -607,6 +608,7 @@ function PropsSections({
   const sections = DESCRIPTORS[c.type];
   return (
     <>
+      {c.type === 'alert' && <div className="hint">{t('inspector.alertHint')}</div>}
       {sections.map((sec, i) => (
         <Section key={sec.title} title={fl(sec.title)} defaultOpen={i < 3}>
           {sec.fields.map((f) => (
@@ -702,6 +704,12 @@ function PropField({
       return (
         <Field label={fl(f.label)} hint={f.hint}>
           <StrokeInput value={value as never} onChange={onChange} theme={theme} />
+        </Field>
+      );
+    case 'asset':
+      return (
+        <Field label={fl(f.label)} hint={f.hint}>
+          <AssetPicker value={value as string | undefined} onChange={onChange} theme={theme} />
         </Field>
       );
     case 'textstyle':
@@ -989,5 +997,47 @@ function AnimationsSection({
       </button>
       {clips.length === 0 && <div className="hint">{t('timeline.none')}</div>}
     </Section>
+  );
+}
+
+/** A still picture of the theme for a component (an icon, a needle), or a new one imported. */
+function AssetPicker({
+  value,
+  onChange,
+  theme,
+}: {
+  value: string | undefined;
+  onChange: (v: unknown) => void;
+  theme: Theme;
+}): JSX.Element {
+  const t = useT();
+  const ids = Object.entries(theme.assets)
+    .filter(([, a]) => a.type === 'image' && !a.animation)
+    .map(([id]) => id);
+  return (
+    <div className="row" style={{ display: 'flex', gap: 4 }}>
+      <select
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value || undefined)}
+        style={{ flex: 1 }}
+      >
+        <option value="">{t('inspector.noPicture')}</option>
+        {ids.map((id) => (
+          <option key={id} value={id}>
+            {theme.assets[id]?.name ?? id}
+          </option>
+        ))}
+      </select>
+      <button
+        className="ghost"
+        onClick={() => {
+          void importAssetOnly().then((id) => {
+            if (id) onChange(id);
+          });
+        }}
+      >
+        {t('inspector.importPicture')}
+      </button>
+    </div>
   );
 }

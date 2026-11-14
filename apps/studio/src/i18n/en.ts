@@ -73,6 +73,7 @@ export const en = {
     clock: 'Clock',
     telltale: 'Telltale',
     'status.panel': 'Status panel',
+    alert: 'Alert',
     text: 'Text',
     rect: 'Rectangle',
     ellipse: 'Ellipse',
@@ -82,6 +83,10 @@ export const en = {
     group: 'Group',
   },
   presets: {
+    alertFuel: 'Low fuel alert',
+    alertHot: 'Engine hot alert',
+    alertDesc:
+      'A warning box that takes over the layout while its condition holds; when several hold, the highest priority shows',
     tachometer: 'Tachometer',
     tachometerDesc: 'Segmented rev arc with redline and ticks',
     analogSpeed: 'Analog speedometer',
@@ -161,6 +166,10 @@ export const en = {
     shiftLedDesc: '15 rectangular LEDs from 4500 to 7000 rpm',
   },
   inspector: {
+    alertHint:
+      'An alert shows while its condition holds (Show only when). When several alerts hold, only the one with the highest priority shows. Selected, it shows on the canvas so you can design it.',
+    noPicture: '(none)',
+    importPicture: 'Import picture…',
     nothing: 'Select a component to edit it.',
     themeDetails: 'Theme details',
     themeId: 'Id',

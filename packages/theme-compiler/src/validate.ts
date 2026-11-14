@@ -41,6 +41,7 @@ const INFORMATIVE_TYPES = new Set<Component['type']>([
   'clock',
   'telltale',
   'status.panel',
+  'alert',
 ]);
 
 /** A gauge's range as the engine works it out: the binding's, else the signal's in the shown unit. */
@@ -593,6 +594,9 @@ function* literalTexts(c: Component): Generator<string> {
     case 'indicator.gear':
       for (const v of Object.values(c.props.mapping)) yield v;
       break;
+    case 'alert':
+      yield c.props.text;
+      break;
   }
 }
 
@@ -608,6 +612,8 @@ function textColorOf(c: Component): Color | undefined {
       return c.props.style.color;
     case 'status.panel':
       return c.props.valueStyle.color;
+    case 'alert':
+      return c.props.style.color;
     case 'gauge.arc':
       return c.props.labels.show ? c.props.labels.style.color : undefined;
     default:

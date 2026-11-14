@@ -11,7 +11,7 @@ import type {
   Theme,
   Zone,
 } from '@idv7lol/theme-schema';
-import { resolveTextStyles } from '@idv7lol/theme-schema';
+import { createComponent, resolveTextStyles } from '@idv7lol/theme-schema';
 import {
   RENDERER_LIMITS,
   anchorFraction,
@@ -23,6 +23,7 @@ import { convert, getSignal, unitSymbol, type UnitId } from '@idv7lol/vehicle-si
 import type {
   CompiledAnimation,
   CompiledBinding,
+  CompiledAlert,
   CompiledImage,
   CompiledPiece,
   Dynamic,
@@ -55,6 +56,7 @@ export const ICON_IDS: Record<string, number> = {
 export interface PieceBuild {
   pieces: CompiledPiece[];
   images: CompiledImage[];
+  alerts: CompiledAlert[];
   findings: Finding[];
   /** Assets referenced by image pieces, by component id. */
   assetRefs: Array<{ componentId: string; asset: string; key: string }>;
@@ -65,6 +67,7 @@ interface Ctx {
   findings: Finding[];
   pieces: CompiledPiece[];
   images: CompiledImage[];
+  alerts: CompiledAlert[];
   assetRefs: PieceBuild['assetRefs'];
   z: number;
   /** What each component takes from the groups around it: their opacity and conditions. */
@@ -1071,6 +1074,74 @@ function buildTelltale(ctx: Ctx, f: FlatComponent): void {
   ctx.pieces.push(piece);
 }
 
+/**
+ * An alert is drawn with the pieces the car already has (a box, an icon, a text) made from
+ * stand-in components, and the car app shows them while the alert wins (CompiledAlert).
+ */
+function buildAlert(ctx: Ctx, f: FlatComponent): void {
+  const c = f.component;
+  if (c.type !== 'alert') return;
+  const p = c.props;
+  const start = ctx.pieces.length;
+  const at = (component: Component): FlatComponent => ({ ...f, component });
+  // stand-ins get their ids after they are made: "~" keeps them apart from any real component
+  const named = <T extends Component>(component: T, id: string): T => ({
+    ...component,
+    id: `${c.id}~${id}`,
+  });
+  const part = (type: Component['type'], id: string, x: number, w: number, props: object) =>
+    named(
+      createComponent(type, {
+        x: c.x + x,
+        y: c.y,
+        width: w,
+        height: c.height,
+        opacity: c.opacity,
+        props: props as Record<string, unknown>,
+      }),
+      id,
+    );
+  // the stand-ins sit where the alert is: their absolute place is the alert's
+  const flat = (component: Component, dx: number): FlatComponent => ({
+    ...at(component),
+    absX: f.absX + dx,
+    absY: f.absY,
+  });
+  buildShape(
+    ctx,
+    flat(part('rect', 'box', 0, c.width, { fill: p.fill, stroke: p.stroke, radius: p.radius }), 0),
+  );
+  let left = 0;
+  if (p.icon !== 'none') {
+    const size = Math.round(Math.min(c.height * 0.62, c.width * 0.3));
+    const pad = Math.round((c.height - size) / 2);
+    const icon = named(
+      createComponent('telltale', {
+        x: c.x + pad,
+        y: c.y + pad,
+        width: size,
+        height: size,
+        opacity: c.opacity,
+        props: { icon: p.icon, asset: p.asset, onColor: p.iconColor, offColor: p.iconColor },
+      }),
+      'icon',
+    );
+    buildTelltale(ctx, { ...at(icon), absX: f.absX + pad, absY: f.absY + pad });
+    left = pad * 2 + size;
+  }
+  buildText(
+    ctx,
+    flat(part('text', 'text', left, c.width - left, { text: p.text, style: p.style }), left),
+  );
+  for (const piece of ctx.pieces.slice(start)) {
+    piece.alert = c.id;
+    piece.componentId = c.id;
+    delete piece.visibleWhen;
+  }
+  const when = effective(ctx, c).visibleWhen;
+  ctx.alerts.push({ id: c.id, priority: p.priority, flash: p.flash, ...(when ? { when } : {}) });
+}
+
 function buildStatusPanel(ctx: Ctx, f: FlatComponent): void {
   const c = f.component;
   if (c.type !== 'status.panel') return;
@@ -1148,6 +1219,7 @@ export function buildPieces(theme: Theme): PieceBuild {
     findings: [],
     pieces: [],
     images: [],
+    alerts: [],
     assetRefs: [],
     z: 0,
     inherited: new Map(),
@@ -1215,6 +1287,9 @@ export function buildPieces(theme: Theme): PieceBuild {
       case 'status.panel':
         buildStatusPanel(ctx, f);
         break;
+      case 'alert':
+        buildAlert(ctx, f);
+        break;
       case 'group':
         if (c.props.clip)
           info(ctx, 'group.clip', 'Group clipping is not applied on the car.', c.id);
@@ -1224,6 +1299,7 @@ export function buildPieces(theme: Theme): PieceBuild {
   return {
     pieces: ctx.pieces,
     images: ctx.images,
+    alerts: ctx.alerts,
     findings: ctx.findings,
     assetRefs: ctx.assetRefs,
   };

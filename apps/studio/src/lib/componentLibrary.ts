@@ -589,6 +589,38 @@ export const LIBRARY: LibraryEntry[] = [
     },
   },
   {
+    id: 'alert-fuel',
+    group: 'indicators',
+    type: 'alert',
+    nameKey: 'alertFuel',
+    descKey: 'alertDesc',
+    overrides: {
+      width: 420,
+      height: 72,
+      visibleWhen: { signal: 'fuel.low', op: 'truthy' },
+      props: {
+        text: 'Low fuel',
+        icon: 'fuel',
+        iconColor: '$warning',
+        priority: 4,
+        stroke: { color: '$warning', width: 3 },
+      },
+    },
+  },
+  {
+    id: 'alert-hot',
+    group: 'indicators',
+    type: 'alert',
+    nameKey: 'alertHot',
+    descKey: 'alertDesc',
+    overrides: {
+      width: 420,
+      height: 72,
+      visibleWhen: { signal: 'engine.coolant.temp', op: 'gt', value: 115 },
+      props: { text: 'Engine hot', icon: 'coolant', priority: 8, flash: true },
+    },
+  },
+  {
     id: 'clock',
     group: 'readouts',
     type: 'clock',

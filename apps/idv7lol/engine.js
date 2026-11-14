@@ -34,6 +34,8 @@ const ANGLE_EPS = 0.05;
 // Wanted this long without a break before the layout goes up: services come up one by one at
 // start, and a layout put up at the first moment went up and down (another cluster project, on cars).
 const SETTLE_MS = 1200;
+// A flashing alert's blink: this long shown, this long hidden (the Studio's alertRenderer too).
+const ALERT_FLASH_MS = 250;
 const LIVE_GRACE_MS = 1500;
 const SWEEP_MS = 700;
 // cluster-render's layer limit for one client (docs/architecture/RENDERER.md).
@@ -167,6 +169,8 @@ class ClusterEngine {
     this.settleMs = opts.settleMs || 0;
     this.wantSince = null;
     this.lastHold = null;
+    this.alertNow = null; // the alert that shows (CompiledAlert), worked out in _update
+    this.alertShown = false;
     this.now = opts.now || (() => Date.now());
     this.shown = false;
     this.pieces = []; // runtime state per piece
@@ -511,6 +515,7 @@ class ClusterEngine {
   }
 
   _teardown() {
+    this.alertNow = null;
     this.pieces.forEach((p) => {
       if (p.ref) this.cr.drop(p.ref);
     });
@@ -802,9 +807,32 @@ class ClusterEngine {
         }
       });
     }
+    // Alerts: of those whose condition holds, the highest priority shows (the first in the layout
+    // on a tie), blinking if it flashes. Worked out with the texts; the blink every frame.
+    const alerts = this.theme.alerts || [];
+    if (alerts.length) {
+      if (textsNow) {
+        let best = null;
+        alerts.forEach((a) => {
+          const holds = !a.when || conditions.evaluate(a.when, this.signals, now);
+          if (holds && (!best || a.priority > best.priority)) best = a;
+        });
+        this.alertNow = best;
+      }
+      const a = this.alertNow;
+      this.alertShown = a ? (a.flash ? Math.floor(now / ALERT_FLASH_MS) % 2 === 0 : true) : false;
+    }
     this.pieces.forEach((st) => {
       if (!st.ref) return;
       const piece = st.piece;
+      if (piece.alert) {
+        const vis = !!this.alertNow && this.alertNow.id === piece.alert && this.alertShown;
+        if (vis !== st.visible || force) {
+          st.visible = vis;
+          this.cr.set(st.ref, { visible: vis ? 1 : 0 });
+        }
+        if (!vis) return;
+      }
       // visibility
       if (textsNow && piece.visibleWhen) {
         const vis = conditions.evaluate(piece.visibleWhen, this.signals, now);
@@ -1054,7 +1082,7 @@ class ClusterEngine {
   }
 
   _setVisible(st, vis) {
-    if (st.piece.visibleWhen) return; // owned by the condition
+    if (st.piece.visibleWhen || st.piece.alert) return; // owned by the condition or the alert
     if (st.shownByText === vis) return;
     st.shownByText = vis;
     this.cr.set(st.ref, { visible: vis ? 1 : 0 });

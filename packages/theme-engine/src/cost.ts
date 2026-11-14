@@ -51,6 +51,7 @@ const WEIGHTS: Record<Component['type'], number> = {
   clock: 2,
   telltale: 1.5,
   'status.panel': 4,
+  alert: 3,
   group: 0,
 };
 

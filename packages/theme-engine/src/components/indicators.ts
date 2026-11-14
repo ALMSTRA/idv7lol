@@ -1,4 +1,5 @@
 import type {
+  AlertComponent,
   DigitalValueComponent,
   GearIndicatorComponent,
   ShiftLightsComponent,
@@ -8,6 +9,7 @@ import type {
 import { unitSymbol } from '@idv7lol/vehicle-signals';
 import { clamp, normalize } from '../math.js';
 import { drawIcon } from './icons.js';
+import { tintedMask } from '../mask.js';
 import { textOrigin } from './text.js';
 import type { ComponentRenderer } from './types.js';
 
@@ -213,7 +215,8 @@ export const telltaleRenderer: ComponentRenderer<TelltaleComponent> = {
     ctx.lineJoin = 'round';
     if (p.icon === 'custom') {
       const img = p.asset ? rc.options.images?.get(p.asset) : undefined;
-      if (img) ctx.drawImage(img.image, 0, 0, 100, 100);
+      // lit in the telltale's colour, as the car draws it (mask.ts)
+      if (img) ctx.drawImage(tintedMask(img.image, size, size, color) ?? img.image, 0, 0, 100, 100);
       else {
         ctx.beginPath();
         ctx.arc(50, 50, 40, 0, Math.PI * 2);
@@ -276,3 +279,52 @@ export const statusPanelRenderer: ComponentRenderer<StatusPanelComponent> = {
 
 /** Normalised position helper shared with tests. */
 export { normalize };
+
+/* -------------------------------------------------------------------------- */
+/* Alert                                                                      */
+/* -------------------------------------------------------------------------- */
+
+/** Blink period of a flashing alert, in milliseconds (on, then off). */
+export const ALERT_FLASH_MS = 250;
+
+export const alertRenderer: ComponentRenderer<AlertComponent> = {
+  type: 'alert',
+  draw(rc, c, w, h) {
+    // only the alert that wins (alerts.ts topAlert) shows, and a flashing one every other beat
+    if (rc.activeAlert !== c.id) return;
+    const p = c.props;
+    if (p.flash && Math.floor(rc.now / ALERT_FLASH_MS) % 2 === 1) return;
+    const { ctx } = rc;
+    rc.roundRectPath(0, 0, w, h, p.radius);
+    ctx.fillStyle = rc.fill(p.fill, { x: 0, y: 0, w, h });
+    ctx.fill();
+    if (p.stroke.width > 0) {
+      ctx.lineWidth = p.stroke.width;
+      ctx.strokeStyle = rc.color(p.stroke.color);
+      ctx.stroke();
+    }
+    let left = 0;
+    if (p.icon !== 'none') {
+      const size = Math.min(h * 0.62, w * 0.3);
+      const pad = (h - size) / 2;
+      const color = rc.color(p.iconColor);
+      ctx.save();
+      ctx.translate(pad + p.radius * 0.3, pad);
+      ctx.scale(size / 100, size / 100);
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      if (p.icon === 'custom') {
+        const img = p.asset ? rc.options.images?.get(p.asset) : undefined;
+        if (img)
+          ctx.drawImage(tintedMask(img.image, size, size, color) ?? img.image, 0, 0, 100, 100);
+      } else drawIcon(ctx, p.icon);
+      ctx.restore();
+      left = pad * 2 + size;
+    }
+    const o = textOrigin(p.style, w - left, h);
+    rc.text(p.text, left + o.x, o.y, p.style, undefined, w - left);
+  },
+  layers: (c) => 2 + (c.props.icon === 'none' ? 0 : 1),
+};

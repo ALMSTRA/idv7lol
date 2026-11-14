@@ -8,6 +8,7 @@ import {
   gearIndicatorRenderer,
   shiftLightsRenderer,
   statusPanelRenderer,
+  alertRenderer,
   telltaleRenderer,
 } from './indicators.js';
 import { imageRenderer } from './image.js';
@@ -35,6 +36,7 @@ export const RENDERERS: Readonly<Record<Exclude<ComponentType, 'group'>, AnyRend
   clock: clockRenderer as AnyRenderer,
   telltale: telltaleRenderer as AnyRenderer,
   'status.panel': statusPanelRenderer as AnyRenderer,
+  alert: alertRenderer as AnyRenderer,
 };
 
 export function rendererFor(type: ComponentType): AnyRenderer | undefined {

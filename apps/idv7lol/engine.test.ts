@@ -349,6 +349,108 @@ describe('when the layout goes up', () => {
   });
 });
 
+describe('alerts', () => {
+  it('show the highest priority alert whose condition holds, and blink one that flashes', () => {
+    const theme = createEmptyTheme({ id: 'alerts', name: 'Alerts' });
+    const doc = {
+      ...theme,
+      components: [
+        createComponent('alert', {
+          id: 'hot',
+          x: 700,
+          y: 300,
+          width: 400,
+          height: 70,
+          visibleWhen: { signal: 'engine.coolant.temp', op: 'gt', value: 115 },
+          props: { text: 'HOT', priority: 8, icon: 'coolant', flash: true },
+        }),
+        createComponent('alert', {
+          id: 'fuel',
+          x: 700,
+          y: 300,
+          width: 400,
+          height: 70,
+          visibleWhen: { signal: 'fuel.level', op: 'lt', value: 10 },
+          props: { text: 'FUEL', priority: 3 },
+        }),
+      ],
+    };
+    const result = compileTheme(doc, {
+      fonts: { sans: { pixels: baked.pixels, metrics: baked.metrics } },
+    });
+    expect(result.report.errors).toEqual([]);
+    const c = result.compiled!;
+    expect(c.alerts).toEqual([
+      {
+        id: 'hot',
+        priority: 8,
+        flash: true,
+        when: { signal: 'engine.coolant.temp', op: 'gt', value: 115 },
+      },
+      {
+        id: 'fuel',
+        priority: 3,
+        flash: false,
+        when: { signal: 'fuel.level', op: 'lt', value: 10 },
+      },
+    ]);
+    // a box, an icon and a text for the first, a box and a text for the second
+    expect(c.pieces.filter((p) => p.alert === 'hot').map((p) => p.shader)).toEqual([
+      'flat',
+      'telltale',
+      'text',
+    ]);
+    expect(c.pieces.filter((p) => p.alert === 'fuel').length).toBe(2);
+    expect(c.pieces.every((p) => !p.visibleWhen)).toBe(true);
+
+    let now = 10_000;
+    const store = new SignalStore();
+    const client = new FakeClient();
+    const engine = new ClusterEngine({
+      client,
+      log: quiet,
+      theme: c,
+      fonts,
+      signals: store,
+      enabled: () => true,
+      live: () => true,
+      sweep: () => false,
+      now: () => now,
+      paletteId: () => 'night',
+    });
+    const refs = (id: string) =>
+      client.ops
+        .filter((o) => o.op === 'layer')
+        .filter((o) => c.pieces.find((p) => p.z === o.z)?.alert === id)
+        .map((o) => o.ref);
+    const shown = (id: string) => {
+      const last = new Map<unknown, unknown>();
+      for (const o of client.ops) if (o.op === 'set' && 'visible' in o) last.set(o.ref, o.visible);
+      return refs(id).every((r) => last.get(r) === 1);
+    };
+    const tick = (ms: number) => {
+      for (let t = 0; t < ms; t += 1000 / 60) {
+        now += 1000 / 60;
+        engine.tick();
+      }
+    };
+    store.set('engine.coolant.temp', 90, now);
+    store.set('fuel.level', 50, now);
+    tick(100);
+    expect(shown('hot') || shown('fuel')).toBe(false);
+    store.set('fuel.level', 5, now);
+    tick(100);
+    expect(shown('fuel')).toBe(true);
+    store.set('engine.coolant.temp', 120, now);
+    now = Math.ceil(now / 500) * 500 + 10; // the start of a "shown" beat
+    tick(60);
+    expect(shown('hot')).toBe(true);
+    expect(shown('fuel')).toBe(false);
+    tick(250);
+    expect(shown('hot')).toBe(false); // blinking
+  });
+});
+
 describe('the start-up sweep', () => {
   it("stops its animations once it is over and sends the gauges' values again", () => {
     let now = 100_000;

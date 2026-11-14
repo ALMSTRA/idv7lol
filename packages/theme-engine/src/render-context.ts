@@ -49,6 +49,8 @@ export interface RenderOptions {
   fontFamilies?: Partial<Record<FontFamilyId, string>>;
   /** Draw a thin outline around every component box (Studio debug). */
   showBounds?: boolean;
+  /** An alert to show whatever its condition (the one selected in the Studio). */
+  showAlert?: string;
 }
 
 /** What a readout should show for a binding right now. */
@@ -66,6 +68,8 @@ export interface DisplayValue {
  */
 export class RenderContext {
   private readonly bindingCache = new Map<string, EvaluatedBinding>();
+  /** The alert that shows this frame (alerts.ts topAlert), set by renderTheme. */
+  activeAlert: string | null = null;
 
   constructor(
     readonly ctx: Canvas2DLike,

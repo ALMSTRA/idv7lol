@@ -76,6 +76,7 @@ export const es: Dictionary = {
     clock: 'Reloj',
     telltale: 'Testigo',
     'status.panel': 'Panel de estado',
+    alert: 'Aviso',
     text: 'Texto',
     rect: 'Rectángulo',
     ellipse: 'Elipse',
@@ -85,6 +86,10 @@ export const es: Dictionary = {
     group: 'Grupo',
   },
   presets: {
+    alertFuel: 'Aviso de poca gasolina',
+    alertHot: 'Aviso de motor caliente',
+    alertDesc:
+      'Un recuadro de aviso que se muestra sobre el diseño mientras se cumple su condición; si se cumplen varios, se ve el de mayor prioridad',
     tachometer: 'Tacómetro',
     tachometerDesc: 'Arco de RPM segmentado con zona roja y marcas',
     analogSpeed: 'Velocímetro analógico',
@@ -164,6 +169,10 @@ export const es: Dictionary = {
     shiftLedDesc: '15 LED rectangulares de 4500 a 7000 rpm',
   },
   inspector: {
+    alertHint:
+      'Un aviso se muestra mientras se cumple su condición (Mostrar sólo cuando). Si se cumplen varios, sólo se ve el de mayor prioridad. Seleccionado, se ve en el lienzo para que lo diseñes.',
+    noPicture: '(ninguna)',
+    importPicture: 'Importar imagen…',
     nothing: 'Selecciona un componente para editarlo.',
     themeDetails: 'Datos del tema',
     themeId: 'Id',
@@ -528,6 +537,11 @@ export const es: Dictionary = {
  * written in English in inspector/descriptors.ts. Anything missing stays English.
  */
 export const ES_FIELD_LABELS: Record<string, string> = {
+  Alert: 'Aviso',
+  Priority: 'Prioridad',
+  Flash: 'Parpadear',
+  'Icon colour': 'Color del ícono',
+  'Icon picture': 'Imagen del ícono',
   'AM/PM': 'AM/PM',
   'All lights at': 'Todas encendidas en',
   Arc: 'Arco',

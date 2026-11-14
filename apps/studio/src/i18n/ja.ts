@@ -77,6 +77,7 @@ export const ja: Dictionary = {
     clock: '時計',
     telltale: '警告灯',
     'status.panel': 'ステータスパネル',
+    alert: 'アラート',
     text: 'テキスト',
     rect: '長方形',
     ellipse: '楕円',
@@ -86,6 +87,10 @@ export const ja: Dictionary = {
     group: 'グループ',
   },
   presets: {
+    alertFuel: '燃料残量警告',
+    alertHot: 'エンジン高温警告',
+    alertDesc:
+      '条件を満たす間、レイアウトの上に表示される警告ボックス。複数が該当する場合は優先度の最も高いものを表示',
     tachometer: 'タコメーター',
     tachometerDesc: 'レッドゾーンと目盛り付きのセグメント式回転計',
     analogSpeed: 'アナログスピードメーター',
@@ -165,6 +170,10 @@ export const ja: Dictionary = {
     shiftLedDesc: '4500〜7000 rpm で点灯する長方形 LED 15 個',
   },
   inspector: {
+    alertHint:
+      'アラートは条件（表示条件）を満たす間だけ表示されます。複数が該当する場合、優先度が最も高いものだけが表示されます。選択中はデザインできるようキャンバスに表示されます。',
+    noPicture: '（なし）',
+    importPicture: '画像を読み込む…',
     nothing: '編集するコンポーネントを選択してください。',
     themeDetails: 'テーマの詳細',
     themeId: 'ID',
@@ -532,6 +541,11 @@ export const ja: Dictionary = {
  * written in English in inspector/descriptors.ts. Anything missing stays English.
  */
 export const JA_FIELD_LABELS: Record<string, string> = {
+  Alert: 'アラート',
+  Priority: '優先度',
+  Flash: '点滅',
+  'Icon colour': 'アイコンの色',
+  'Icon picture': 'アイコン画像',
   'AM/PM': 'AM/PM',
   'All lights at': '全灯点灯',
   Arc: '円弧',

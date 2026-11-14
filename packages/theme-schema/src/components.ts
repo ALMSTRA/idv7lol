@@ -499,6 +499,32 @@ export const TelltalePropsSchema = z.object({
   hideWhenOff: z.boolean().default(false),
 });
 
+/**
+ * A warning that takes over a box of the layout while its condition (the component's
+ * `visibleWhen`) holds. When several hold, only the highest `priority` shows (the first in the
+ * layout on a tie), so alerts on the same spot never pile up.
+ */
+export const AlertPropsSchema = z.object({
+  text: z.string().max(80).default('Warning'),
+  /** 1 (lowest) to 9 (highest). */
+  priority: z.number().int().min(1).max(9).default(5),
+  /** A built-in icon, a `custom` one (`asset`), or none. */
+  icon: z.union([TelltaleIconSchema, z.literal('none')]).default('none'),
+  asset: IdSchema.optional(),
+  iconColor: ColorSchema.default('$danger'),
+  style: TextStyleSchema.prefault({
+    size: 26,
+    weight: 'bold',
+    align: 'center',
+    baseline: 'middle',
+  }),
+  fill: FillSchema.default('$surface'),
+  stroke: StrokeSchema.prefault({ color: '$danger', width: 3 }),
+  radius: z.number().min(0).default(16),
+  /** Blink twice a second while shown. */
+  flash: z.boolean().default(false),
+});
+
 export const StatusRowSchema = z.object({
   label: z.string().max(40),
   binding: BindingSchema,
@@ -562,6 +588,7 @@ export const ShiftLightsComponentSchema = C(
 export const ClockComponentSchema = C('clock', ClockPropsSchema.prefault({}));
 export const TelltaleComponentSchema = C('telltale', TelltalePropsSchema.prefault({}));
 export const StatusPanelComponentSchema = C('status.panel', StatusPanelPropsSchema);
+export const AlertComponentSchema = C('alert', AlertPropsSchema.prefault({}));
 
 export type RectComponent = z.infer<typeof RectComponentSchema>;
 export type EllipseComponent = z.infer<typeof EllipseComponentSchema>;
@@ -577,6 +604,7 @@ export type ShiftLightsComponent = z.infer<typeof ShiftLightsComponentSchema>;
 export type ClockComponent = z.infer<typeof ClockComponentSchema>;
 export type TelltaleComponent = z.infer<typeof TelltaleComponentSchema>;
 export type StatusPanelComponent = z.infer<typeof StatusPanelComponentSchema>;
+export type AlertComponent = z.infer<typeof AlertComponentSchema>;
 
 export interface GroupComponent extends BaseComponent {
   type: 'group';
@@ -602,6 +630,7 @@ export type Component =
   | ClockComponent
   | TelltaleComponent
   | StatusPanelComponent
+  | AlertComponent
   | GroupComponent;
 
 export type ComponentType = Component['type'];
@@ -620,7 +649,8 @@ type NonGroupInput =
   | z.input<typeof ShiftLightsComponentSchema>
   | z.input<typeof ClockComponentSchema>
   | z.input<typeof TelltaleComponentSchema>
-  | z.input<typeof StatusPanelComponentSchema>;
+  | z.input<typeof StatusPanelComponentSchema>
+  | z.input<typeof AlertComponentSchema>;
 
 export interface GroupComponentInput extends z.input<typeof BaseComponentSchema> {
   type: 'group';
@@ -654,6 +684,7 @@ export const ComponentSchema: z.ZodType<Component, ComponentInput> = z.lazy(() =
     ClockComponentSchema,
     TelltaleComponentSchema,
     StatusPanelComponentSchema,
+    AlertComponentSchema,
     GroupComponentSchema as unknown as typeof RectComponentSchema,
   ]),
 ) as unknown as z.ZodType<Component, ComponentInput>;
@@ -673,6 +704,7 @@ export const COMPONENT_TYPES: readonly ComponentType[] = [
   'clock',
   'telltale',
   'status.panel',
+  'alert',
   'group',
 ];
 
@@ -692,4 +724,5 @@ export const COMPONENT_PROPS_SCHEMAS = {
   clock: ClockPropsSchema,
   telltale: TelltalePropsSchema,
   'status.panel': StatusPanelPropsSchema,
+  alert: AlertPropsSchema,
 } as const;

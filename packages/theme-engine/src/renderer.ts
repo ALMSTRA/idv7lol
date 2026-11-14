@@ -6,6 +6,7 @@ import { effectiveZones } from './bounds.js';
 import { RenderContext, type RenderOptions } from './render-context.js';
 import { rendererFor } from './components/index.js';
 import { EngineState, resolvePalette, selectPaletteId } from './state.js';
+import { topAlert } from './alerts.js';
 
 export interface RenderStats {
   drawn: number;
@@ -50,6 +51,11 @@ export function renderTheme(
   const paletteId = selectPaletteId(theme, state);
   const palette = resolvePalette(theme, paletteId);
   const rc = new RenderContext(ctx, theme, palette, state, anim, options);
+  rc.activeAlert = topAlert(
+    theme.components,
+    (a) => !a.visibleWhen || state.condition(a.visibleWhen),
+    options.showAlert,
+  );
   const { width, height } = theme.layout;
   const stats: RenderStats = { drawn: 0, skipped: 0, paletteId };
 
@@ -69,7 +75,9 @@ export function renderTheme(
 
 export function drawComponent(rc: RenderContext, c: Component, stats: RenderStats): void {
   const { ctx } = rc;
-  if (!c.visible || (c.visibleWhen && !rc.state.condition(c.visibleWhen))) {
+  // an alert previewed in the Studio shows whatever its condition
+  const previewed = c.type === 'alert' && rc.options.showAlert === c.id;
+  if (!c.visible || (c.visibleWhen && !previewed && !rc.state.condition(c.visibleWhen))) {
     stats.skipped += 1;
     return;
   }
