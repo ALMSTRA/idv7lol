@@ -50,10 +50,10 @@ idv7lol requires cluster-render **0.5.9** or newer:
 - 0.5.5 and 0.5.6 ask again for a scene the cluster accepted and then never mapped: a cluster
   that is still starting, or a lock that unmapped a parked scene, left the panel blank until the
   next request (idrive-apps #147, #151).
-- 0.5.9 releases the target when the renderer refuses the texture a layer samples, as for any
-  layer in error (idrive-apps #159). Every idv7lol piece samples the glyph atlas and animated
-  pictures sample their sprite atlas, so a refused atlas now hands the cluster back instead of
-  holding an empty panel.
+- 0.5.9: a layer sampling a texture the renderer refused is in error and no longer wants its
+  target, as every other layer in error (idrive-apps #159). The panel stays while other layers
+  want it; if the glyph atlas, which every text samples, were refused, the layout would keep only
+  its shapes. The car app sends an animation's refused ETC2 atlas again as `rgba8`.
 
 ## iDrive 8 (not supported by idv7lol)
 
@@ -85,8 +85,12 @@ exclusive, time`, plus `guide_hold` (iDrive 7 `map` only) and `yield` (0.5.3, ta
 - `uniform`: `v` = 1–4 numbers, or with `type` (`float|vec2|vec3|vec4|mat4`) arrays up to 1024
   numbers. A name the shader lacks is silently dropped.
 - `animate`: renderer-side keyframes (`keys "t:v,…"`, `loop`, `interp`) on `rotate`,
-  `translate`, `scale` or a `uniform`; `time: 1` on an effect drives `u_time` from the KOMBI
-  clock. Nothing has to be sent per frame for decorative motion.
+  `translate`, `scale` or a `uniform`; `time: 1` on an effect is meant to drive `u_time` from the
+  renderer's clock, but another cluster project found it never ran on a car and sends `u_time`
+  itself (eroobeeroo/idrive7-cluster-info 58c58ee); idv7lol uses no `u_time`. A finished animation
+  holds its last key and starts again when the scene is published again, so the car app stops its
+  start-up sweep's animations once it is over. Nothing has to be sent per frame for decorative
+  motion.
 - `drop` releases a layer; closing the socket releases everything.
 
 ## Limits (cluster-render ≥ 0.4.2, server-enforced)
@@ -98,7 +102,7 @@ exclusive, time`, plus `guide_hold` (iDrive 7 `map` only) and `yield` (0.5.3, ta
 | Floats per layer         | 4096; ≤ 1024 per array uniform                                                                      |
 | Animations per layer     | 16                                                                                                  |
 | Assets                   | 16 per client / 32 total, ≤ 16 MiB pixel memory; image layers and uncompressed assets count twice   |
-| Video layers             | 2 (0.5.x)                                                                                           |
+| Video layers             | 8 for all clients, composed into 2 display buffers (0.5.7)                                          |
 | Clients / binds          | 16 clients; 32 binds (0.5.x)                                                                        |
 | Layer geometry           | x,y ±4096; w,h 1..4096; opacity 0..1; rotate ±36000°                                                |
 | Bandwidth                | shared budget, ceiling 5500 KB/s (8000 flashed the cluster black); `budget` events announce the cap |
@@ -190,6 +194,7 @@ Studio as hints (info zones, no findings) until someone checks them:
 | --------------- | ------------ | ------------------------------------------------------------------------------------------------ |
 | cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive                                     |
 | cluster-render  | 0.5.0–0.5.5  | 0.5.0 scene files (off by default); 0.5.1 panel's own scene id; 0.5.3 `yield`; 0.5.4–0.5.5 fixes |
+| cluster-render  | 0.5.6–0.5.9  | 0.5.6 re-ask of an accepted, unmapped scene; 0.5.7 video compose; 0.5.8 exclusive; 0.5.9 ETC2    |
 | Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                        |
 | Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`               |
 | mgu-deploy      | 0.7.11       | pinned by waze-on-cluster                                                                        |
