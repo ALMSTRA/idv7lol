@@ -20,12 +20,10 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   leaning bars for oil, water, fuel and gearbox oil, the time and outside temperature, and a pill
   that says Low fuel. Its Track and Corsa palettes keep their names. Tested locally; not tested in
   a vehicle.
-- The car app is version 0.2.10, so the MGU Store's Releases channel offers the X4 M fixes, VDO
-  Classic M, Lily
-  Pad, Neon Drive,
-  Heritage 89, the new Supercar Track, Volt Runner, the
-  fuel readings, the needle fix, the bottom strip fix, ETC2 animations and the fixes taken from
-  upstream below as an update. The `catalog` release holds the new package.
+- The car app is version 0.2.11, so the MGU Store's Releases channel offers alerts, your own icons
+  and needles, text styles, the X4 M fixes, VDO Classic M, Lily Pad, Neon Drive, Heritage 89, the
+  new Supercar Track, Volt Runner, the fuel readings, the needle fix, the bottom strip fix, ETC2
+  animations and the fixes taken from upstream below as an update. The `catalog` release holds the new package.
 - The car app requires cluster-render 0.5.9 or newer (was 0.5.2), so the Store brings its fixes
   along: a scene the cluster accepted and then never mapped (a cluster still starting, or a lock
   while parked) is asked for again instead of leaving the panel blank (0.5.5, 0.5.6), and a layer
