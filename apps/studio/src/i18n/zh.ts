@@ -384,6 +384,12 @@ export const zh: Dictionary = {
     trimmed: '仅保留了前 12 秒：{names}',
     animated: '{n} 帧动画，循环播放。',
     speed: '速度',
+    speedWith: '随信号加快',
+    speedFromValue: '起始值',
+    speedToValue: '上限值',
+    speedTop: '最高速度',
+    speedHint:
+      '不高于起始值时为正常速度，达到上限值后为最高速度。数值使用信号的单位（车速为 km/h）。',
     frame: '帧',
     title: '图片编辑器',
     tools: '工具',

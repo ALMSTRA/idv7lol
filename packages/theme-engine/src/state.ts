@@ -272,6 +272,7 @@ export function collectSignals(
     }
     if (c.type === 'status.panel') for (const r of c.props.rows) out.add(r.binding.signal);
     if (c.type === 'indicator.gear') out.add(c.props.modeSignal);
+    if (c.type === 'image' && c.props.speedFrom) out.add(c.props.speedFrom.signal);
     if (c.type === 'clock')
       ['time.hours', 'time.minutes', 'time.seconds'].forEach((s) => out.add(s));
     if (c.type === 'group') collectSignals(c.props.children, out);

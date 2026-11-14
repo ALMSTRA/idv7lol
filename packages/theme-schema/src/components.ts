@@ -9,7 +9,13 @@ import {
   StrokeSchema,
   TextStyleSchema,
 } from './primitives.js';
-import { BindingSchema, ConditionSchema, UnitIdSchema, ZoneSchema } from './bindings.js';
+import {
+  BindingSchema,
+  ConditionSchema,
+  SignalIdSchema,
+  UnitIdSchema,
+  ZoneSchema,
+} from './bindings.js';
 import { AnimationRefSchema } from './animation.js';
 
 /* -------------------------------------------------------------------------- */
@@ -148,6 +154,19 @@ export const ImageEditsSchema = z.object({
 });
 export type ImageEdits = z.infer<typeof ImageEditsSchema>;
 
+/**
+ * Plays an animated picture faster as a signal rises: at its `speed` while the
+ * signal is at `from` or below, at `fastSpeed` from `to` up, in between in
+ * proportion. Values are in the signal's catalog unit (vehicle.speed: km/h).
+ */
+export const ImageSpeedFromSchema = z.object({
+  signal: SignalIdSchema,
+  from: z.number().default(0),
+  to: z.number().default(200),
+  fastSpeed: z.number().min(0.1).max(4).default(4),
+});
+export type ImageSpeedFrom = z.infer<typeof ImageSpeedFromSchema>;
+
 export const ImagePropsSchema = z.object({
   /** Id of an entry in the theme's `assets` table. */
   asset: IdSchema,
@@ -155,6 +174,8 @@ export const ImagePropsSchema = z.object({
   edits: ImageEditsSchema.prefault({}),
   /** Playback speed of animated pictures. */
   speed: z.number().min(0.1).max(4).default(1),
+  /** Ties the playback speed to a signal, such as the car's speed. */
+  speedFrom: ImageSpeedFromSchema.optional(),
 });
 
 /* -------------------------------------------------------------------------- */

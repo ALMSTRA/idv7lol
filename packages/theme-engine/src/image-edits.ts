@@ -599,6 +599,31 @@ export function frameRaster(sheet: Raster, a: AssetAnimation, index: number): Ra
 }
 
 /**
+ * Playback speeds tied to a signal move in steps of this size, in the Studio and on the car, so
+ * the car restarts its animation only when the step changes, not on every value.
+ */
+export const SPEED_STEP = 0.25;
+
+/**
+ * The playback speed of an animated picture right now: `base` (its `speed`), or with
+ * `speedFrom` and a live value, `base` at `from` rising to `fastSpeed` at `to`, in SPEED_STEP
+ * steps. The car app does the same (apps/idv7lol/engine.js, playbackSpeed).
+ */
+export function playbackSpeed(
+  base: number,
+  speedFrom: { from: number; to: number; fastSpeed: number } | undefined,
+  value: number | undefined,
+): number {
+  if (!speedFrom || value === undefined || !Number.isFinite(value)) return base;
+  const { from, to, fastSpeed } = speedFrom;
+  const f =
+    to === from ? (value >= to ? 1 : 0) : Math.max(0, Math.min(1, (value - from) / (to - from)));
+  if (f === 0) return base;
+  const raw = base + (fastSpeed - base) * f;
+  return Math.max(0.1, Math.min(4, Math.round(raw / SPEED_STEP) * SPEED_STEP));
+}
+
+/**
  * The frame showing at a time, looping. `speed` divides each frame's time the
  * way the compiler does for the car, never below 20 ms a frame.
  */

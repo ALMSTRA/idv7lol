@@ -387,6 +387,12 @@ export const en = {
     trimmed: 'Only the first 12 seconds were kept: {names}',
     animated: 'Animation of {n} frames, on loop.',
     speed: 'Speed',
+    speedWith: 'Faster with',
+    speedFromValue: 'From',
+    speedToValue: 'Up to',
+    speedTop: 'Top speed',
+    speedHint:
+      "Normal speed at From or below, top speed from Up to on, in the signal's unit (km/h for the car's speed).",
     frame: 'Frame',
     title: 'Image editor',
     tools: 'Tools',

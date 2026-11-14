@@ -518,6 +518,15 @@ function buildImage(ctx: Ctx, f: FlatComponent): void {
       frames: a.frames,
       durations: a.durations.map((d) => Math.max(20, Math.round(d / c.props.speed))),
     };
+    const sf = c.props.speedFrom;
+    if (sf)
+      entry.speedFrom = {
+        signal: sf.signal,
+        from: sf.from,
+        to: sf.to,
+        slow: c.props.speed,
+        fast: sf.fastSpeed,
+      };
     if (grid.cellW < boxW * 0.6) {
       warn(
         ctx,

@@ -181,6 +181,11 @@ export interface CompiledImage {
     frames: number;
     durations: number[];
   };
+  /**
+   * Set when the playback speed follows a signal: `durations` are at speed `slow`, and the car
+   * plays them faster up to `fast` as the signal goes from `from` to `to`.
+   */
+  speedFrom?: { signal: string; from: number; to: number; slow: number; fast: number };
   visibleWhen?: Condition;
 }
 

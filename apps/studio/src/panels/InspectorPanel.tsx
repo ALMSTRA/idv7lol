@@ -324,6 +324,7 @@ function ImageSection({ c, theme }: { c: ImageComponent; theme: Theme }): JSX.El
               {c.props.speed.toFixed(2)}×
             </span>
           </Field>
+          <SpeedFromFields c={c} />
         </>
       )}
       <Field label={t('image.fit')}>
@@ -337,6 +338,54 @@ function ImageSection({ c, theme }: { c: ImageComponent; theme: Theme }): JSX.El
         />
       </Field>
     </Section>
+  );
+}
+
+/** Ties an animation's playback speed to a signal, such as the car's speed. */
+function SpeedFromFields({ c }: { c: ImageComponent }): JSX.Element {
+  const t = useT();
+  const updateProps = useProjectStore((s) => s.updateProps);
+  const sf = c.props.speedFrom;
+  const set = (patch: Partial<NonNullable<typeof sf>>) =>
+    updateProps(c.id, { speedFrom: { ...sf, ...patch } });
+  return (
+    <>
+      <Field label={t('image.speedWith')}>
+        <SignalSelect
+          value={sf?.signal}
+          allowNone
+          onChange={(signal) =>
+            updateProps(c.id, {
+              speedFrom: signal ? { from: 0, to: 200, fastSpeed: 3, ...sf, signal } : undefined,
+            })
+          }
+        />
+      </Field>
+      {sf && (
+        <>
+          <Field label={t('image.speedFromValue')}>
+            <NumberInput value={sf.from} onChange={(from) => set({ from })} />
+          </Field>
+          <Field label={t('image.speedToValue')}>
+            <NumberInput value={sf.to} onChange={(to) => set({ to })} />
+          </Field>
+          <Field label={t('image.speedTop')}>
+            <input
+              type="range"
+              min={0.1}
+              max={4}
+              step={0.05}
+              value={sf.fastSpeed}
+              onChange={(e) => set({ fastSpeed: parseFloat(e.target.value) })}
+            />
+            <span style={{ flex: 'none', width: 40, textAlign: 'right' }}>
+              {sf.fastSpeed.toFixed(2)}×
+            </span>
+          </Field>
+          <div className="hint">{t('image.speedHint')}</div>
+        </>
+      )}
+    </>
   );
 }
 

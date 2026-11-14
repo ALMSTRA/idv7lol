@@ -397,6 +397,12 @@ export const ja: Dictionary = {
     trimmed: '最初の 12 秒のみ保持しました: {names}',
     animated: '{n} フレームのアニメーション（ループ）。',
     speed: '速度',
+    speedWith: '連動する信号',
+    speedFromValue: '開始値',
+    speedToValue: '上限値',
+    speedTop: '最高速度',
+    speedHint:
+      '開始値以下では通常の速度、上限値以上では最高速度になります。値は信号の単位です（車速は km/h）。',
     frame: 'フレーム',
     title: '画像エディター',
     tools: 'ツール',

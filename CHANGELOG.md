@@ -17,6 +17,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- Animated pictures can follow a signal: `speedFrom` on an image plays it faster as the signal
+  rises (for example `vehicle.speed`), in the Studio and on the car, where the app restarts the
+  renderer's animation at the new speed only when it changes by a step. In the Inspector under
+  **Faster with**. Tested locally; not tested in a vehicle.
+
 - The car app reads the fuel level, the fuel range and the odometer, and the reserve warning
   (`fuel.level`, `fuel.volume`, `vehicle.range`, `vehicle.odometer`, `fuel.low`), from the
   cluster's `KombiIF.statusRangeTankStatus`, the signal other iDrive 7 apps read. The cluster gives

@@ -87,6 +87,21 @@ signal. Tracks may address `x y width height rotation opacity scale` or `props.<
 example `props.style.color`). On the car only rotation/scale tracks with `load`/`always`
 triggers and colour tracks are played; the validator and the Studio tell you.
 
+### Animated pictures that follow a signal
+
+An image whose asset has an `animation` (a GIF, a short video or a sprite sheet) plays at its
+`speed`. With `speedFrom` it plays faster as a signal rises, in steps of 0.25:
+
+```json
+"props": { "asset": "runner", "speed": 0.6, "speedFrom": { "signal": "vehicle.speed", "from": 0, "to": 200, "fastSpeed": 4 } }
+```
+
+`speed` holds at `from` and below, `fastSpeed` from `to` up, in the signal's catalog unit
+(km/h for `vehicle.speed`). In the Studio it is under the picture's **Faster with** field. On the
+car the renderer still plays the frames by itself; the app restarts the animation at the new
+speed, from the frame it is on, when the step changes (at most twice a second). Volt Runner uses
+it for its runner.
+
 ## Keeping out of the factory's way
 
 The 1920×720 panel sits above the factory gauges and below its telltales and pop-ups. Keep

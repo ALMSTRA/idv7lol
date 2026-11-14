@@ -395,6 +395,12 @@ export const es: Dictionary = {
     trimmed: 'Solo se conservaron los primeros 12 segundos: {names}',
     animated: 'Animación de {n} fotogramas, en bucle.',
     speed: 'Velocidad',
+    speedWith: 'Más rápido con',
+    speedFromValue: 'Desde',
+    speedToValue: 'Hasta',
+    speedTop: 'Máxima',
+    speedHint:
+      'Velocidad normal en Desde o menos y máxima de Hasta en adelante, en la unidad de la señal (km/h para la velocidad del auto).',
     frame: 'Fotograma',
     title: 'Editor de imagen',
     tools: 'Herramientas',

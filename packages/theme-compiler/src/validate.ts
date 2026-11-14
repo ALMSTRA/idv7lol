@@ -319,6 +319,12 @@ export function validateTheme(doc: unknown): ValidationReport {
               path: `animations[${i}].trigger`,
             });
     });
+    if (c.type === 'image' && c.props.speedFrom && !getSignal(c.props.speedFrom.signal))
+      out.error(
+        'signal.unknown',
+        `The animation's speed follows unknown signal "${c.props.speedFrom.signal}".`,
+        { componentId: cid, path: 'props.speedFrom.signal' },
+      );
     // assets
     if (c.type === 'image' && !theme.assets[c.props.asset])
       out.error('asset.unknown', `Image asset "${c.props.asset}" is not defined.`, {

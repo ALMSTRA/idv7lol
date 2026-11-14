@@ -75,6 +75,28 @@ function resolveColor(c, palette) {
   return parseColor(c);
 }
 
+const SPEED_STEP = 0.25; // as packages/theme-engine/src/image-edits.ts
+const SPRITE_RESTART_MS = 500; // a speed-tied animation restarts at most this often
+
+/**
+ * The playback speed of an animated picture: `base`, or with speedFrom and a live value, `base`
+ * at `from` rising to `fast` at `to`, in SPEED_STEP steps. Same as playbackSpeed in
+ * packages/theme-engine/src/image-edits.ts.
+ */
+function playbackSpeed(base, sf, value) {
+  if (!sf || value === null || value === undefined || !isFinite(value)) return base;
+  const fast = sf.fast !== undefined ? sf.fast : sf.fastSpeed;
+  const f =
+    sf.to === sf.from
+      ? value >= sf.to
+        ? 1
+        : 0
+      : Math.max(0, Math.min(1, (value - sf.from) / (sf.to - sf.from)));
+  if (f === 0) return base;
+  const raw = base + (fast - base) * f;
+  return Math.max(0.1, Math.min(4, Math.round(raw / SPEED_STEP) * SPEED_STEP));
+}
+
 const r3 = (v) => Math.round(v * 1000) / 1000;
 const vec = (arr) => arr.map(r3);
 
@@ -412,21 +434,10 @@ class ClusterEngine {
         this.cr.uniform(st.ref, 'u_texel', [r6(0.5 / sp.cellW), r6(0.5 / sp.cellH)]);
         this.cr.uniform(st.ref, 'u_opacity', [img.opacity]);
         this.cr.uniform(st.ref, 'u_frame', [0]);
-        let t = 0;
-        const keys = sp.durations.map((d, i) => {
-          const key = t + ':' + i;
-          t += d;
-          return key;
-        });
-        keys.push(t + ':' + (sp.frames - 1));
-        this.cr.animate(st.ref, {
-          property: 'uniform',
-          name: 'u_frame',
-          keys: keys.join(' '),
-          loop: true,
-          interp: 'step',
-        });
-        this.messages++;
+        st.speed = img.speedFrom ? img.speedFrom.slow : 1;
+        st.played = 0; // time into the loop, in the compiled durations, when this run started
+        st.startedAt = this.now();
+        st.anim = this._playSprite(st, 1, 0);
         return st;
       }
       const opts = {
@@ -598,11 +609,61 @@ class ClusterEngine {
     this._update(false);
   }
 
+  /**
+   * Start an animated picture's frames on the renderer, `factor` times faster than compiled,
+   * from `frame` on. The renderer plays them by itself; returns the animation's number.
+   */
+  _playSprite(st, factor, frame) {
+    const sp = st.img.sprite;
+    const order = [];
+    for (let i = 0; i < sp.frames; i++) order.push((frame + i) % sp.frames);
+    let t = 0;
+    const keys = order.map((i) => {
+      const key = t + ':' + i;
+      t += Math.max(20, Math.round(sp.durations[i] / factor));
+      return key;
+    });
+    keys.push(t + ':' + order[order.length - 1]);
+    this.messages++;
+    return this.cr.animate(st.ref, {
+      property: 'uniform',
+      name: 'u_frame',
+      keys: keys.join(' '),
+      loop: true,
+      interp: 'step',
+    });
+  }
+
+  /** Restart a speed-tied animation when its speed step changes, from the frame it is on. */
+  _spriteSpeed(st, now) {
+    const sf = st.img.speedFrom;
+    if (!sf || !st.ref || !st.anim) return;
+    if (now - st.startedAt < SPRITE_RESTART_MS) return;
+    const s = this.signals.get(sf.signal);
+    const live = s && s.valid && now - s.at <= conditions.STALE_MS ? Number(s.value) : null;
+    const speed = playbackSpeed(sf.slow, sf, live);
+    if (speed === st.speed) return;
+    const sp = st.img.sprite;
+    const factor = st.speed / sf.slow;
+    let total = 0;
+    for (let i = 0; i < sp.frames; i++) total += sp.durations[i];
+    let at = (st.played + (now - st.startedAt) * factor) % total;
+    let frame = 0;
+    while (frame < sp.frames - 1 && at >= sp.durations[frame]) at -= sp.durations[frame++];
+    this.cr.stop(st.ref, st.anim);
+    st.played = 0;
+    for (let i = 0; i < frame; i++) st.played += sp.durations[i];
+    st.speed = speed;
+    st.startedAt = now;
+    st.anim = this._playSprite(st, speed / sf.slow, frame);
+  }
+
   _update(force) {
     const now = this.now();
     const pal = this.palette();
     const textsNow = force || this.tickCount % TEXT_DIVIDER === 0;
     if (textsNow) {
+      this.images.forEach((st) => this._spriteSpeed(st, now));
       this.images.forEach((st) => {
         if (!st.ref || !st.img.visibleWhen) return;
         const vis = conditions.evaluate(st.img.visibleWhen, this.signals, now);

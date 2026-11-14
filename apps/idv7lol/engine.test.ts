@@ -411,6 +411,94 @@ describe('MGU engine animations', () => {
   });
 });
 
+describe('animation speed tied to a signal', () => {
+  it('plays faster as the car goes faster, restarting from the frame it is on', () => {
+    const sheet = new Uint8Array(16 * 4 * 4).fill(255);
+    const png = encodePng(16, 4, sheet);
+    const theme = createEmptyTheme({ id: 'run', name: 'Run' });
+    const doc = {
+      ...theme,
+      assets: {
+        gif: {
+          type: 'image' as const,
+          data: `data:image/png;base64,${Buffer.from(png).toString('base64')}`,
+          animation: {
+            frames: 4,
+            columns: 4,
+            frameWidth: 4,
+            frameHeight: 4,
+            durations: [100, 100, 100, 100],
+          },
+        },
+      },
+      components: [
+        createComponent('image', {
+          id: 'g',
+          x: 600,
+          y: 240,
+          width: 64,
+          height: 64,
+          props: {
+            asset: 'gif',
+            fit: 'stretch',
+            speedFrom: { signal: 'vehicle.speed', from: 0, to: 200, fastSpeed: 3 },
+          },
+        }),
+      ],
+    };
+    const result = compileTheme(doc, { images: { gif: decodePng(png) } });
+    expect(result.report.errors).toEqual([]);
+    expect(result.compiled!.signals).toContain('vehicle.speed');
+    expect(result.compiled!.images[0]!.speedFrom).toEqual({
+      signal: 'vehicle.speed',
+      from: 0,
+      to: 200,
+      slow: 1,
+      fast: 3,
+    });
+    const atlas = result.files.find((f) => f.path === 'images/g.rgba')!.data as Uint8Array;
+    let now = 1000;
+    const store = new SignalStore();
+    const client = new FakeClient();
+    const engine = new ClusterEngine({
+      client,
+      log: quiet,
+      theme: result.compiled,
+      fonts: {},
+      signals: store,
+      enabled: () => true,
+      live: () => true,
+      sweep: () => false,
+      now: () => now,
+      paletteId: () => 'night',
+      loadImage: () => Buffer.from(atlas),
+    });
+    store.set('vehicle.speed', 0, now);
+    engine.tick();
+    expect(client.count('animate')).toBe(1);
+    // Parked: nothing changes.
+    now = 1600;
+    store.set('vehicle.speed', 0, now);
+    engine.tick();
+    engine.tick();
+    expect(client.count('stop')).toBe(0);
+    // 100 km/h is half way: speed 2. 750 ms after the start the loop is on its last frame.
+    now = 1750;
+    store.set('vehicle.speed', 100, now);
+    engine.tick();
+    engine.tick();
+    expect(client.count('stop')).toBe(1);
+    const anims = client.ops.filter((o) => o.op === 'animate');
+    expect(anims[1]).toMatchObject({ name: 'u_frame', keys: '0:3 50:0 100:1 150:2 200:2' });
+    // The same step again sends nothing.
+    now += 600;
+    store.set('vehicle.speed', 101, now);
+    engine.tick();
+    engine.tick();
+    expect(client.count('animate')).toBe(2);
+  });
+});
+
 describe('vehicle helpers', () => {
   it('maps BMW drive-mode payloads and gear enums', () => {
     expect(driveModeOf('SPORT_PLUS')).toBe('SPORT_PLUS');

@@ -9,6 +9,7 @@ import {
   displayToSource,
   editedSize,
   frameAt,
+  playbackSpeed,
   frameRaster,
   frameRect,
   fitRaster,
@@ -214,5 +215,20 @@ describe('image component rendering', () => {
     });
     expect(asked).toEqual([['logo', 20]]);
     expect(ctx.count('drawImage')).toBe(1);
+  });
+});
+
+describe('playbackSpeed', () => {
+  const sf = { from: 0, to: 200, fastSpeed: 3 };
+  it('keeps the base speed without a live value or below from', () => {
+    expect(playbackSpeed(1, undefined, 120)).toBe(1);
+    expect(playbackSpeed(1, sf, undefined)).toBe(1);
+    expect(playbackSpeed(0.6, sf, 0)).toBe(0.6);
+  });
+  it('rises to fastSpeed in steps', () => {
+    expect(playbackSpeed(1, sf, 100)).toBe(2);
+    expect(playbackSpeed(1, sf, 101)).toBe(2);
+    expect(playbackSpeed(1, sf, 30)).toBe(1.25);
+    expect(playbackSpeed(1, sf, 500)).toBe(3);
   });
 });
