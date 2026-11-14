@@ -8,6 +8,7 @@ import {
   AlignStartVertical,
   AlignVerticalDistributeCenter,
   CarFront,
+  Crosshair,
   Grid3x3,
   Group,
   Info,
@@ -37,6 +38,8 @@ import { useUiStore } from '../store/ui.js';
 import { simulator, useSimStore } from '../store/sim.js';
 import { libraryEntry } from '../lib/componentLibrary.js';
 import { placeLibraryEntry } from '../lib/libraryActions.js';
+import { useCalibrateStore } from '../lib/calibrate.js';
+import { CalibrateBanner, drawCalibration } from './CalibrateBanner.js';
 import { useT } from '../i18n/index.js';
 import { perf } from '../lib/perf.js';
 import { openCanvasMenu } from '../lib/contextMenus.js';
@@ -152,6 +155,7 @@ export function CanvasView(): JSX.Element {
   );
   const running = useSimStore((s) => s.running);
   const editingText = useUiStore((s) => s.editingText);
+  const calibrating = useCalibrateStore((s) => s.active);
 
   // Read at use, so edits and drags never re-render this component.
   const themeRef = useMemo(
@@ -270,6 +274,7 @@ export function CanvasView(): JSX.Element {
         modeRef.current,
         guidesRef.current,
       );
+      drawCalibration(ctx, v, useCalibrateStore.getState().points);
       perf.frames += 1;
       perf.renderMs += performance.now() - frameStart;
     };
@@ -295,6 +300,13 @@ export function CanvasView(): JSX.Element {
       return;
     }
     if (e.button !== 0) return;
+    // "Needle on a photo": clicks are the dial's centre, first and last mark
+    const cal = useCalibrateStore.getState();
+    if (cal.active) {
+      const p = toLayout(v, sx, sy);
+      cal.add({ x: Math.round(p.x), y: Math.round(p.y) });
+      return;
+    }
     const th = themeRef.current;
     const sel = selectionRef.current;
     const geo = selectionGeometry(th, sel);
@@ -645,9 +657,10 @@ export function CanvasView(): JSX.Element {
     >
       {ui.carPreview && <CarPreview view={view} editorEngine={engine} />}
       {editingText && <TextEditor id={editingText} view={view} />}
+      <CalibrateBanner />
       <canvas
         ref={canvasRef}
-        style={{ cursor }}
+        style={{ cursor: calibrating ? 'crosshair' : cursor }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -657,6 +670,17 @@ export function CanvasView(): JSX.Element {
         onContextMenu={onContextMenu}
       />
       <div className="canvas-toolbar">
+        <button
+          className={`icon ${calibrating ? 'active' : ''}`}
+          title={t('calibrate.title')}
+          onClick={() =>
+            calibrating
+              ? useCalibrateStore.getState().cancel()
+              : useCalibrateStore.getState().start()
+          }
+        >
+          <Crosshair size={15} />
+        </button>
         <button
           className={`icon ${ui.showZones ? 'active' : ''}`}
           title={t('canvas.zones')}

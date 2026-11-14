@@ -46,6 +46,10 @@ Los detalles están en `docs/user/INSTALL_MAC.md`.
   selección múltiple, y arrastrar sobre un área vacía dibuja un marco de selección. La barra
   flotante alinea y distribuye, y Ctrl+G agrupa. El ajuste (snap) engancha a la cuadrícula y a los
   bordes y centros de otros componentes (guías magenta).
+- **Aguja sobre una foto** (botón de mira en la barra del lienzo): pone una aguja sobre una esfera
+  que es solo una imagen. Haz clic en el centro de la esfera, luego donde la aguja marca el valor
+  más bajo y luego donde marca el más alto. Elige la señal, su rango y el sentido, y **Crear la
+  aguja** agrega un indicador circular que es solo la aguja, del tamaño y el giro de la esfera.
 - **Zonas reservadas** (botón ▦): en naranja, las zonas donde el cluster de fábrica dibuja encima
   (cubierta superior con testigos, marco de la marcha a la derecha, caja eDrive, franja inferior
   de testigos). En rojo, las esquinas del vidrio, donde no se ve nada. En azul, la ventana del

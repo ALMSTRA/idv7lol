@@ -86,6 +86,11 @@ warns when a theme uses too much.
 | Duplicate / copy / paste / delete | Ctrl+D / Ctrl+C / Ctrl+V / Delete                                                                                        |
 | Snap                              | toggle in the canvas toolbar; snaps to grid, other components' edges and centres, and the layout centre (magenta guides) |
 
+**Needle on a photo** (crosshair button in the canvas toolbar) puts a needle on a dial that is
+only a picture: click the dial's centre, then where the needle points at the lowest value, then
+where it points at the highest. Pick the signal, its range and the direction, and **Make the
+needle** adds a circular gauge that is only a needle, sized and turned to match the dial.
+
 **Reserved zones** (toggle ▦) are drawn as hatched areas:
 
 - orange, _factory_: the factory cluster draws over this area (top cowl with telltales, gear

@@ -34,6 +34,10 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Needle on a photo.** A button in the canvas toolbar turns three clicks on a dial in a picture
+  (its centre, its first mark and its last mark) into a needle-only circular gauge placed, sized
+  and turned to match, bound to the signal and range you pick. Tested locally; not tested in a
+  vehicle.
 - **Your own icons and needles.** A custom telltale (and an alert's icon) draws a picture of your
   own, PNG or SVG, lit in its colours, now on the car too (a mask and a small shader; they were not
   drawn on the car before). A circular gauge's needle can be a picture of your own that turns with
