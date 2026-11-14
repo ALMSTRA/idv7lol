@@ -463,7 +463,9 @@ export function validateTheme(doc: unknown): ValidationReport {
   const imageBytes = build.images.reduce((sum, i) => sum + i.iw * i.ih * 4, 0);
   if (imageBytes > 0) {
     const mib = (n: number) => (n / (1024 * 1024)).toFixed(1);
-    const total = imageBytes + atlasBytes;
+    // cluster-render charges image layers and uncompressed assets twice their size against its
+    // pixel memory (PROTOCOL.md, "Choosing a pixel format"); pictures and glyph atlases are both.
+    const total = 2 * (imageBytes + atlasBytes);
     const limit = RENDERER_LIMITS.pixelMemoryBytes;
     if (total > limit) {
       out.error(

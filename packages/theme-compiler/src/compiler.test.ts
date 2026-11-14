@@ -279,7 +279,8 @@ describe('image memory budget', () => {
   const pic = (id: string, x: number) =>
     createComponent('image', { id, x, y: 240, width: 500, height: 400, props: { asset: 'a' } });
 
-  // Each 900×420 image is about 1.5 MiB; the warning starts at 9.6 MiB and the limit is 16 MiB.
+  // Each 900×420 image is about 1.4 MiB, which cluster-render charges twice (PROTOCOL.md, "Choosing a
+  // pixel format"); the warning starts at 9.6 MiB and the limit is 16 MiB.
   it('warns when images take much of the renderer memory and fails over the limit', () => {
     const big = (id: string) =>
       createComponent('image', {
@@ -291,12 +292,16 @@ describe('image memory budget', () => {
         props: { asset: 'a' },
       });
     expect(validateTheme(theme([pic('p1', 450)], { assets: { a: asset } })).errors).toEqual([]);
+    const fine = validateTheme(theme(['c1', 'c2'].map(big), { assets: { a: asset } }));
+    expect(fine.warnings.some((w) => w.code === 'budget.images')).toBe(false);
     const warned = validateTheme(
-      theme(['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7'].map(big), { assets: { a: asset } }),
+      theme(['a1', 'a2', 'a3', 'a4'].map(big), { assets: { a: asset } }),
     );
     expect(warned.warnings.some((w) => w.code === 'budget.images')).toBe(true);
+    expect(warned.errors.some((e) => e.code === 'budget.images')).toBe(false);
+    // Six of them fit in 16 MiB counted once, not counted twice as the renderer does.
     const failed = validateTheme(
-      theme(Array.from({ length: 11 }, (_, i) => `b${i}`).map(big), { assets: { a: asset } }),
+      theme(Array.from({ length: 6 }, (_, i) => `b${i}`).map(big), { assets: { a: asset } }),
     );
     expect(failed.errors.some((e) => e.code === 'budget.images')).toBe(true);
   });
