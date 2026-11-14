@@ -12,8 +12,9 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
-- The car app is version 0.2.3, so the MGU Store's Releases channel offers Volt Runner, the
-  fuel readings, the needle fix and the fixes taken from upstream below as an update. The `catalog`
+- The car app is version 0.2.4, so the MGU Store's Releases channel offers Volt Runner, the
+  fuel readings, the needle fix, the bottom strip fix and the fixes taken from upstream below as an
+  update. The `catalog`
   release holds the new package.
 - The car app requires cluster-render 0.5.9 or newer (was 0.5.2), so the Store brings its fixes
   along: a scene the cluster accepted and then never mapped (a cluster still starting, or a lock
