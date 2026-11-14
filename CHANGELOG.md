@@ -19,7 +19,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   leaning bars for oil, water, fuel and gearbox oil, the time and outside temperature, and a pill
   that says Low fuel. Its Track and Corsa palettes keep their names. Tested locally; not tested in
   a vehicle.
-- The car app is version 0.2.7, so the MGU Store's Releases channel offers Volt Runner, the
+- The car app is version 0.2.8, so the MGU Store's Releases channel offers Lily Pad, Neon Drive,
+  Heritage 89, the new Supercar Track, Volt Runner, the
   fuel readings, the needle fix, the bottom strip fix, ETC2 animations and the fixes taken from
   upstream below as an update. The `catalog` release holds the new package.
 - The car app requires cluster-render 0.5.9 or newer (was 0.5.2), so the Store brings its fixes
