@@ -26,13 +26,18 @@ interface Gauge {
   level(now: number, setting?: unknown): Level | null;
 }
 // The car app is CommonJS for Node 8; load it as the head unit would.
-const { FuelGauge, parseTank } = require('./fuel.js') as {
+const { FuelGauge, parseTank, CarAwake } = require('./fuel.js') as {
   FuelGauge: new (o?: {
     state?: State | null;
     save?: (s: State) => void;
     defaultLitres?: number;
   }) => Gauge;
   parseTank: (v: unknown) => Tank;
+  CarAwake: new () => {
+    note(condition: number | undefined): void;
+    sample(speed: unknown, rpm: unknown, now: number): void;
+    on(now: number): boolean;
+  };
 };
 
 const S = 1000;
@@ -178,5 +183,52 @@ describe('FuelGauge', () => {
     expect(g.level(1 * S)!.pct).toBe(100);
     g.obd(140, 2 * S);
     expect(g.level(3 * S)!.src).toBe('litres');
+  });
+});
+
+// A diagnostic request goes through the car's gateway and wakes its networks; asked while the car
+// is parked they never sleep, and the car stores faults for it (seen by another iDrive 7 project
+// whose apps read a locked car's units). The engine unit is asked only while the car is on.
+describe('CarAwake (when the engine unit may be asked)', () => {
+  const MIN = 60 * S;
+
+  it('says on in the states with the ignition on, and off in the parked ones', () => {
+    const a = new CarAwake();
+    for (const on of [7, 8, 10, 12]) {
+      a.note(on);
+      expect(a.on(0), `state ${on}`).toBe(true);
+    }
+    for (const off of [1, 2, 3, 5]) {
+      a.note(off);
+      expect(a.on(0), `state ${off}`).toBe(false);
+    }
+  });
+
+  it('counts a moving car or a running engine as on, whatever the state said', () => {
+    const a = new CarAwake();
+    a.note(5);
+    a.sample(40, 1800, 10 * S);
+    expect(a.on(20 * S)).toBe(true);
+    expect(a.on(10 * S + 31 * S)).toBe(false);
+    a.sample(0, 750, 50 * S); // idling
+    expect(a.on(55 * S)).toBe(true);
+  });
+
+  it('without a state from the car, stays on for 3 minutes after it last moved or ran', () => {
+    const a = new CarAwake();
+    expect(a.on(0)).toBe(false);
+    a.sample(30, 2000, 0);
+    expect(a.on(2 * MIN)).toBe(true);
+    expect(a.on(3 * MIN + S)).toBe(false);
+  });
+
+  it('ignores a state it does not know and values that are not numbers', () => {
+    const a = new CarAwake();
+    a.note(10);
+    a.note(undefined);
+    expect(a.on(0)).toBe(true);
+    a.sample('fast', null, 0);
+    a.note(2);
+    expect(a.on(S)).toBe(false);
   });
 });

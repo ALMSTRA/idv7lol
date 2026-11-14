@@ -141,7 +141,8 @@ in the Store (_Add from USB_). The Store builds the app the same way.
   the cluster the fuel level, fuel range, odometer and reserve warning. The 12 V battery is not
   mapped yet and shows dashes.
 - The fuel level is the engine unit's own percentage (OBD-II, read only) where it answers;
-  otherwise the cluster's litres over the tank size. That size is learned (from the engine unit's
+  otherwise the cluster's litres over the tank size. The engine unit is asked only while the car
+  is switched on, never parked, so the car's networks can go to sleep. That size is learned (from the engine unit's
   percentage, or from the fullest level seen, never below 65 l) or set in the app's settings
   (_Fuel tank size_); until it is known a tank smaller than 65 l reads low. The app's page shows
   which source it uses. Not tested in a vehicle yet.

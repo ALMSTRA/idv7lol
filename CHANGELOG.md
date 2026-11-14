@@ -56,6 +56,14 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   on the shader's matrix, and the car preview); not tested in a vehicle.
 - In the editor, the `turn-left` and `turn-right` telltales point the way they are named. They
   were swapped there; the car's shader already drew them right. Tested locally.
+- The car app asks the engine unit for the fuel percentage only while the car is switched on
+  (BMW's vehicle state `VehicleCondition`: ignition on, ready to drive, driving or switching off),
+  or, before the car has told its state, within 3 minutes of moving or running. It asked every 10 s
+  whenever the car's signals were there, parked too. Another iDrive 7 project found that
+  diagnostic requests to a locked car go through its gateway, keep its networks awake, and leave
+  faults ("no sleep in parking state", a battery management warning). The interface is optional
+  like the others. Tested locally (unit tests, and `vehicle.js` run against a fake car: no request
+  while parked, requests once on); not tested in a vehicle.
 - The image memory check counts pictures and glyph atlases twice, as cluster-render charges image
   layers and uncompressed assets against its 16 MiB of pixel memory (its `PROTOCOL.md`, "Choosing a
   pixel format"). A theme that passed while needing more than the renderer has is now refused, and

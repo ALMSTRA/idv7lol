@@ -20,7 +20,7 @@ const fs = require('fs');
 const path = require('path');
 const Car = require('./kit/car');
 const { SignalStore, driveModeOf, GEAR_TEXT } = require('./signals');
-const { FuelGauge, parseTank } = require('./fuel');
+const { FuelGauge, CarAwake, parseTank } = require('./fuel');
 
 /** The engine unit's fuel level: OBD-II PID 2F, A x 100 / 255 (a public standard, no BMW table). */
 const FUEL_OBD = {
@@ -38,9 +38,10 @@ const FUEL_RETRY_MS = 300000; // an engine unit that didn't answer 3 times in a 
 
 /**
  * The fuel gauge (fuel.js) with what it learned kept in the app's data folder, and the engine
- * unit asked for its percentage every FUEL_EVERY_MS. The diagnostic link is the kit's read-only
- * one (kit/readonly-diag.js): it refuses anything but reads before a request leaves the head
- * unit. Returns { gauge, ask(now) }.
+ * unit asked for its percentage every FUEL_EVERY_MS while the car is switched on (CarAwake in
+ * fuel.js; never parked, where the requests would keep the car's networks awake). The diagnostic
+ * link is the kit's read-only one (kit/readonly-diag.js): it refuses anything but reads before a
+ * request leaves the head unit. Returns { gauge, ask(now) }.
  */
 function startFuel(ctx, log) {
   const file = path.join(ctx.dataDir || process.cwd(), 'fuel.json');
@@ -181,7 +182,11 @@ function startVehicle(ctx, opts) {
       },
     },
   };
-  const car = new Car(ctx, ['rpm', 'speed', 'accel', 'temps', 'gear', 'torque'], extra);
+  const car = new Car(
+    ctx,
+    ['rpm', 'speed', 'accel', 'temps', 'gear', 'torque', 'condition'],
+    extra,
+  );
   if (opts && opts.redline) car.setRedline(opts.redline);
   car.onSample((d, t) => {
     if (typeof d.rpm === 'number') store.set('engine.rpm', d.rpm, t);
@@ -219,10 +224,27 @@ function startVehicle(ctx, opts) {
   // The cluster notifies its tank values on change only (once while parked), so while the car is
   // live the last ones are published again every second; the layout would take them for stale.
   let fuelSrc = '';
+  const awake = new CarAwake();
+  let awakeWas = null;
   setInterval(() => {
     const now = Date.now();
-    if (car.data().demo || !live()) return;
-    fuel.ask(now);
+    const d = car.data();
+    if (d.demo || !live()) return;
+    awake.note(d.condition);
+    awake.sample(d.speed, d.rpm, now);
+    const on = awake.on(now);
+    if (on !== awakeWas) {
+      awakeWas = on;
+      ctx.log.info(
+        'fuel: car ' +
+          (on ? 'on' : 'off') +
+          ' (vehicle state ' +
+          (awake.condition === undefined ? 'not told' : awake.condition) +
+          ')' +
+          (on ? '' : ': the engine unit is not asked until it is on again'),
+      );
+    }
+    if (on) fuel.ask(now);
     fuel.gauge.tick(now);
     if (tank) {
       if (tank.litres !== null) store.set('fuel.volume', tank.litres, now);

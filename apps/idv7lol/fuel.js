@@ -136,4 +136,38 @@ class FuelGauge {
   }
 }
 
-module.exports = { FuelGauge, parseTank, STABLE_MS, OBD_FRESH_MS };
+// BMW's vehicle state (VehicleCondition.statusConditionVehicle, numbered as kit/car.js does) with
+// the car switched on: 7 ignition on, 8 getting ready to drive, 10 ready to drive or driving (a
+// hybrid with its engine off too), 12 switching off. In the others (1, 2 parked; 3 standby with
+// nobody in the car; 5 someone in it, ignition off) a diagnostic request through the gateway wakes
+// the car's networks, and asked often enough they never sleep.
+const SWITCHED_ON = [7, 8, 10, 12];
+const ACTIVE_NOW_MS = 30000; // moved or ran this recently: on, whatever the state said last
+const ACTIVE_RECENT_MS = 180000; // no state told yet: on this long after the car last moved or ran
+
+/**
+ * Whether the car is switched on, so the engine unit may be asked for the fuel percentage.
+ * note(state) with each vehicle state the car sends; sample(km/h, rpm, now) with each reading.
+ */
+class CarAwake {
+  constructor() {
+    this.condition = undefined;
+    this.activeAt = -Infinity;
+  }
+
+  note(condition) {
+    if (isNum(condition)) this.condition = condition;
+  }
+
+  sample(speed, rpm, now) {
+    if ((isNum(speed) && speed > 1) || (isNum(rpm) && rpm > 400)) this.activeAt = now;
+  }
+
+  on(now) {
+    if (now - this.activeAt < ACTIVE_NOW_MS) return true;
+    if (this.condition !== undefined) return SWITCHED_ON.indexOf(this.condition) >= 0;
+    return now - this.activeAt < ACTIVE_RECENT_MS;
+  }
+}
+
+module.exports = { FuelGauge, CarAwake, parseTank, STABLE_MS, OBD_FRESH_MS };

@@ -39,6 +39,10 @@
       "_optional": "gearbox oil temperature",
       "basicDataSet": "s"
     },
+    "de.bmw.infrastructure.VehicleCondition": {
+      "_optional": "the car's state, so the engine unit is asked for the fuel percentage only while the car is on",
+      "VehicleCondition": "s"
+    },
     "de.bmw.infotainment.KombiIF": {
       "_optional": "the fuel level, the fuel range and the odometer",
       "statusRangeTankStatus": "rs"
