@@ -30,6 +30,9 @@ const TEXT_DIVIDER = 2; // texts/colours every 2nd tick (30 Hz)
 const TAU_MS = 30;
 const EPS = 0.0015;
 const ANGLE_EPS = 0.05;
+// Wanted this long without a break before the layout goes up: services come up one by one at
+// start, and a layout put up at the first moment went up and down (another cluster project, on cars).
+const SETTLE_MS = 1200;
 const LIVE_GRACE_MS = 1500;
 const SWEEP_MS = 700;
 // cluster-render's layer limit for one client (docs/architecture/RENDERER.md).
@@ -151,6 +154,15 @@ class ClusterEngine {
     // The y the layout ends at so the cluster's own bottom strip shows (STRIP_Y), or null to draw
     // over it. Read at each build.
     this.stripY = opts.stripY || (() => null);
+    // The car's state for the layout (vehicle.js hold()): 'drop' takes it down, 'wait' puts up no
+    // new one, null leaves it to Show and the signals. Mapping the panel while the car switches on
+    // or off counts against cluster-render's mapping guard, which turns a target off for good.
+    this.hold = opts.hold || (() => null);
+    // How long the layout must be wanted without a break before it goes up (the car app: SETTLE_MS),
+    // so services coming up one by one at start don't put it up and down.
+    this.settleMs = opts.settleMs || 0;
+    this.wantSince = null;
+    this.lastHold = null;
     this.now = opts.now || (() => Date.now());
     this.shown = false;
     this.pieces = []; // runtime state per piece
@@ -172,9 +184,11 @@ class ClusterEngine {
       this.log.warn('cluster-render refused ' + op + ' ' + ref + ': ' + reason);
     });
     this.cr.on('target', (name, state, holder, reason) => {
-      if (name === this.target)
-        this.targetState =
-          state + (holder ? ' (' + holder + ')' : '') + (reason ? ': ' + reason : '');
+      if (name !== this.target) return;
+      const text = state + (holder ? ' (' + holder + ')' : '') + (reason ? ': ' + reason : '');
+      // Each change in the log, so what the cluster did (a speech dialog, a guard, a lock) shows.
+      if (text !== this.targetState) this.log.info('target ' + name + ': ' + text);
+      this.targetState = text;
     });
     this.cr.on('layer', (ref, state, reason) => {
       this.layerStates[ref] = state + (reason ? ' ' + reason : '');
@@ -590,7 +604,23 @@ class ClusterEngine {
     const now = this.now();
     const live = this.live();
     if (live) this.lastLive = now;
-    const want = this.enabled() && (live || (this.lastLive && now - this.lastLive < LIVE_GRACE_MS));
+    let want = this.enabled() && (live || (this.lastLive && now - this.lastLive < LIVE_GRACE_MS));
+    const hold = this.hold();
+    if (hold !== this.lastHold) {
+      this.lastHold = hold;
+      if (hold)
+        this.log.info(
+          'car state: ' +
+            (hold === 'drop' ? 'switched off' : 'switching on or unknown') +
+            ', layout held',
+        );
+    }
+    if (hold === 'drop' || (hold === 'wait' && !this.shown)) want = false;
+    if (!want) this.wantSince = null;
+    else if (!this.shown) {
+      if (this.wantSince === null) this.wantSince = now;
+      if (now - this.wantSince < this.settleMs) want = false;
+    }
     if (want !== this.shown) this.setShown(want);
     if (!this.shown) return;
     const pid = this.paletteId();
@@ -601,10 +631,6 @@ class ClusterEngine {
     this._update(false);
   }
 
-  /**
-   * Start an animated picture's frames on the renderer, `factor` times faster than compiled,
-   * from `frame` on. The renderer plays them by itself; returns the animation's number.
-   */
   /**
    * An animation: its atlas as one asset and an effect layer that samples it; the renderer plays
    * the frames by itself, nothing is sent per frame. `format` etc2rgba or rgba8.
@@ -681,6 +707,10 @@ class ClusterEngine {
     st.pixels = null;
   }
 
+  /**
+   * Start an animated picture's frames on the renderer, `factor` times faster than compiled,
+   * from `frame` on. The renderer plays them by itself; returns the animation's number.
+   */
   _playSprite(st, factor, frame) {
     const sp = st.img.sprite;
     const order = [];
@@ -1147,6 +1177,7 @@ module.exports = {
   resolveColor,
   parseColor,
   LIVE_GRACE_MS,
+  SETTLE_MS,
   STRIP_Y,
   STALE_MS: conditions.STALE_MS,
 };

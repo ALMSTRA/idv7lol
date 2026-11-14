@@ -18,7 +18,6 @@
  */
 const fs = require('fs');
 const path = require('path');
-const Car = require('./kit/car');
 const { SignalStore, driveModeOf, boostOf, GEAR_TEXT } = require('./signals');
 const { FuelGauge, CarAwake, parseTank } = require('./fuel');
 
@@ -142,6 +141,8 @@ function startFuel(ctx, log, deps) {
  * `redline` is the demo drive's rev limit.
  */
 function startVehicle(ctx, opts) {
+  // The kit is next to this file only in the built app (kit/tools/build.py copies it in).
+  const Car = require('./kit/car');
   const store = new SignalStore();
   const raw = {}; // last raw payloads by field, for the Signals page
   const seen = (field, v) => {
@@ -317,7 +318,34 @@ function startVehicle(ctx, opts) {
     raw,
     values: store.snapshot(),
   });
-  return { store, car, live, status, stop: () => Promise.all(car.subs.map((s) => s.shutdown())) };
+  const hold = () => holdFor(car.data());
+  return {
+    store,
+    car,
+    live,
+    hold,
+    status,
+    stop: () => Promise.all(car.subs.map((s) => s.shutdown())),
+  };
 }
 
-module.exports = { startVehicle, startFuel, SignalStore, driveModeOf, GEAR_TEXT };
+/**
+ * Whether the layout must keep off the cluster for the car's state (VehicleCondition, kit/car.js):
+ * 'drop' while the car is off (5 or lower: parked, standby, someone in it with the ignition off)
+ * or switching off (12); 'wait' (no new layout) while drive readiness is starting (8) or the car
+ * sent a state it can't name; null otherwise, the demo drive, or a car that sends no state. The
+ * kit's Redline holds its cluster-render layer back the same way (issue #141 there): a target
+ * mapped while the KOMBI switches on or off took strikes from cluster-render's mapping guard, and
+ * two turn the target off for good.
+ */
+function holdFor(d) {
+  if (!d || d.demo) return null;
+  if (d.conditionKnown === false) return 'wait';
+  const c = d.condition;
+  if (typeof c !== 'number') return null;
+  if (c <= 5 || c === 12) return 'drop';
+  if (c === 8) return 'wait';
+  return null;
+}
+
+module.exports = { startVehicle, startFuel, holdFor, SignalStore, driveModeOf, GEAR_TEXT };

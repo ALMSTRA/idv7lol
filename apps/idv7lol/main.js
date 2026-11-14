@@ -19,7 +19,7 @@ const fs = require('fs');
 const path = require('path');
 const mgu = require('./kit/mgu');
 const { ClusterRender } = require('./cluster_render_client');
-const { ClusterEngine, STRIP_Y } = require('./engine');
+const { ClusterEngine, STRIP_Y, SETTLE_MS } = require('./engine');
 const { startVehicle } = require('./vehicle');
 const index = require('./themes_index');
 const SHADERS = require('./shaders');
@@ -106,6 +106,8 @@ mgu.run({
       // The layout ends above the cluster's own bottom strip unless the setting says otherwise:
       // drawn over it, some KOMBIs leave black boxes until the head unit restarts (issue #7).
       stripY: () => (settings.get('bottomStrip') === 'layout' ? null : STRIP_Y),
+      hold: vehicle.hold,
+      settleMs: SETTLE_MS,
     });
     client.on('ready', () =>
       log.info('cluster-render connected: ' + client.backend + ' ' + client.targets),
@@ -122,7 +124,12 @@ mgu.run({
       if (engine.shown) client.status();
     }, 5000);
 
+    // The kit tells every setting it is given, the same value too (picked again in the HMI). Only a
+    // real change rebuilds the layout: a rebuild that changes nothing still flashes the cluster.
+    const last = { theme: settings.get('theme'), bottomStrip: settings.get('bottomStrip') };
     settings.onChange((k) => {
+      if ((k === 'theme' || k === 'bottomStrip') && settings.get(k) === last[k]) return;
+      if (k === 'theme' || k === 'bottomStrip') last[k] = settings.get(k);
       if (k === 'theme') {
         try {
           current = loadTheme(settings.get('theme'), library);

@@ -60,6 +60,19 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- The layout keeps off the cluster while the car is off or switching on and off: none with the
+  car parked, in standby or with the ignition off (vehicle state 5 or lower), it goes when drive
+  readiness ends (12), and none new goes up while drive readiness starts (8) or the car sends a
+  state it can't name. A panel mapped while the KOMBI switches on or off counts against
+  cluster-render's mapping guard, which turns the target off for good after two strikes (the kit's
+  Redline holds its layer back the same way, issue #141 there). Cars that send no state work as
+  before.
+- The layout goes up only once it has been wanted for 1.2 s without a break, so services coming up
+  one by one at start don't put it up and down (seen by another cluster project on cars). Taking it
+  down stays immediate.
+- Picking the theme or the bottom strip setting it already has no longer rebuilds the layout (the
+  kit tells every setting it is given, and a rebuild flashes the cluster).
+- Each change of the renderer target (shown, waiting, a speech dialog, the guard) goes to the log.
 - The engine unit's fuel percentage came back only after the app restarted once the unit had
   missed five times in a row: the kit's read-only link skips such a unit until it is woken, and the
   5-minute retries never woke it. Each retry and the car coming on now wake it. A vehicle state the

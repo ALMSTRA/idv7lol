@@ -273,6 +273,96 @@ describe('MGU engine', () => {
   });
 });
 
+describe('when the layout goes up', () => {
+  function make(o: { hold?: () => string | null; settleMs?: number } = {}) {
+    let now = 100_000;
+    const client = new FakeClient();
+    const lines: string[] = [];
+    const engine = new ClusterEngine({
+      client,
+      log: { info: (m: string) => lines.push(m), warn: (m: string) => lines.push(m) },
+      theme: compiled,
+      fonts,
+      signals: new SignalStore(),
+      enabled: () => true,
+      live: () => true,
+      sweep: () => false,
+      now: () => now,
+      paletteId: () => 'night',
+      ...o,
+    });
+    const at = (t: number) => {
+      now = 100_000 + t;
+      engine.tick();
+    };
+    return { engine, client, lines, at };
+  }
+
+  it('waits until it has been wanted for the settle time without a break', () => {
+    let live = true;
+    const t = make({ settleMs: 1200 });
+    (t.engine as unknown as { live: () => boolean }).live = () => live;
+    t.at(0);
+    t.at(700);
+    expect(t.engine.shown).toBe(false);
+    live = false; // a service dropped out while the car comes up (after the grace time)
+    t.at(2300);
+    live = true;
+    t.at(2400);
+    t.at(3500);
+    expect(t.engine.shown).toBe(false); // 1100 ms since it came back
+    t.at(3700);
+    expect(t.engine.shown).toBe(true);
+  });
+
+  it('keeps off while the car is off or switching off, and puts up nothing new while it starts', () => {
+    let hold: string | null = 'drop';
+    const t = make({ hold: () => hold });
+    t.at(0);
+    expect(t.engine.shown).toBe(false);
+    hold = 'wait'; // drive readiness starting
+    t.at(100);
+    expect(t.engine.shown).toBe(false);
+    hold = null; // ready to drive
+    t.at(200);
+    expect(t.engine.shown).toBe(true);
+    hold = 'wait'; // a state it can't name while shown: stays
+    t.at(300);
+    expect(t.engine.shown).toBe(true);
+    hold = 'drop'; // switching off
+    t.at(400);
+    expect(t.engine.shown).toBe(false);
+    expect(t.client.layers.size).toBe(0);
+    expect(t.lines.some((l) => /car state: switched off/.test(l))).toBe(true);
+  });
+
+  it('logs each change of the target', () => {
+    const t = make();
+    t.client.emit('target', 'panel', 'shown', '', '');
+    t.client.emit('target', 'panel', 'shown', '', '');
+    t.client.emit('target', 'panel', 'waiting', 'hmi', 'speech dialog');
+    t.client.emit('target', 'hud', 'shown', '', '');
+    expect(t.lines.filter((l) => l.startsWith('target '))).toEqual([
+      'target panel: shown',
+      'target panel: waiting (hmi): speech dialog',
+    ]);
+  });
+});
+
+describe('the car state for the layout (vehicle.js holdFor)', () => {
+  const { holdFor } = require('./vehicle.js') as {
+    holdFor: (d: Record<string, unknown>) => string | null;
+  };
+  it('drops at 5 and below and at 12, waits at 8 and on an unknown state', () => {
+    expect([1, 2, 3, 5, 12].map((c) => holdFor({ condition: c }))).toEqual(Array(5).fill('drop'));
+    expect(holdFor({ condition: 8 })).toBe('wait');
+    expect(holdFor({ condition: 10, conditionKnown: false })).toBe('wait');
+    expect([7, 10].map((c) => holdFor({ condition: c }))).toEqual([null, null]);
+    expect(holdFor({})).toBe(null); // a car that sends no state
+    expect(holdFor({ condition: 2, demo: true })).toBe(null);
+  });
+});
+
 describe('MGU engine images', () => {
   it('uploads baked images as layers, follows conditions and drops them', () => {
     const png = encodePng(2, 2, new Uint8Array(16).fill(255));
