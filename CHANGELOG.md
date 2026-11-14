@@ -60,6 +60,10 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- The shader lint counts uniform vectors as GLSL ES does and refuses more than 48, and refuses a
+  loop left with `break`. A shader of about 70 vectors restarted a G21's KOMBI (the MIT kit's
+  Redline), and another cluster project suspected an early exit from a loop around texture reads of
+  the same. None of idv7lol's shaders does either; the most is the shift lights' 39, drawn on a car.
 - Under a layout cut at the bottom strip, a black band (to y 662, to 658 over the strip's drive
   mode and gear at x 1196–1424) hides the factory dials' lower edges and the separator line, which
   showed there in photos of a car (another cluster project, a G05). One layer with a small shader

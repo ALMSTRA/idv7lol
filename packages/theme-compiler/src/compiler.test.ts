@@ -13,6 +13,7 @@ import {
   fallbackMetrics,
   layoutLine,
   lintShader,
+  uniformVectors,
   SHADERS,
   textLayerGeometry,
   validateTheme,
@@ -339,6 +340,29 @@ describe('image memory budget', () => {
 describe('shaders', () => {
   it('pass the static lint', () => {
     for (const [kind, src] of Object.entries(SHADERS)) expect(lintShader(src), kind).toEqual([]);
+  });
+
+  it('count uniform vectors as GLSL ES does, and stay near what a car has drawn', () => {
+    const src = [
+      'uniform vec4 u_a[8];',
+      'uniform float u_b;',
+      'uniform mat4 u_m;',
+      'uniform sampler2D u_t;',
+    ].join('\n');
+    expect(uniformVectors(src)).toBe(13);
+    // The shift lights' 39 drew on a car; nothing of ours should go past the lint's limit.
+    expect(uniformVectors(SHADERS.shiftlights)).toBe(39);
+    for (const src of Object.values(SHADERS)) expect(uniformVectors(src)).toBeLessThanOrEqual(39);
+  });
+
+  it('refuse a shader with too many uniform vectors or a loop left with break', () => {
+    const head = '#version 100\nprecision mediump float;\n';
+    expect(lintShader(head + 'uniform vec4 u_x[70];\nvoid main() {}')).toContain(
+      'takes 70 uniform vectors (max 48)',
+    );
+    expect(
+      lintShader(head + 'void main() { for (int i = 0; i < 4; i++) { if (i > 1) break; } }'),
+    ).toContain('leaves a loop with break');
   });
 });
 

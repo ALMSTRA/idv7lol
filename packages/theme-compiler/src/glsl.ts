@@ -693,6 +693,28 @@ export function declaredUniforms(src: string): string[] {
   return out;
 }
 
+/**
+ * Uniform vectors a fragment shader takes, as GLSL ES 1.00 counts them: a float, vec2, vec3 or
+ * vec4 one, a mat4 four, an array its length times that; samplers apart. OpenGL ES 2 only promises
+ * 16 and embedded chips often stop at 64: a shader of about 70 restarted a G21's KOMBI (the kit's
+ * Redline, 046ca45). The most idv7lol has drawn on a car is the shift lights' 39.
+ */
+export function uniformVectors(src: string): number {
+  const re = /uniform\s+(\w+)\s+\w+(?:\[(\d+)\])?\s*;/g;
+  let total = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(src))) {
+    const type = m[1]!;
+    if (type.startsWith('sampler')) continue;
+    const per = type === 'mat4' ? 4 : type === 'mat3' ? 3 : type === 'mat2' ? 2 : 1;
+    total += per * (m[2] ? Number(m[2]) : 1);
+  }
+  return total;
+}
+
+/** Most uniform vectors a shader may take (see uniformVectors). */
+export const MAX_UNIFORM_VECTORS = 48;
+
 /** Static sanity checks on a shader source (the real compile happens on the car). */
 export function lintShader(src: string): string[] {
   const problems: string[] = [];
@@ -703,5 +725,11 @@ export function lintShader(src: string): string[] {
     if (new RegExp(`\\b${r}\\b`).test(src)) problems.push(`uses reserved uniform ${r}`);
   const names = declaredUniforms(src);
   if (names.length > 32) problems.push(`declares ${names.length} uniforms (max 32)`);
+  const vectors = uniformVectors(src);
+  if (vectors > MAX_UNIFORM_VECTORS)
+    problems.push(`takes ${vectors} uniform vectors (max ${MAX_UNIFORM_VECTORS})`);
+  // Leaving a loop early around texture reads is suspected of restarting a KOMBI (another cluster
+  // project rewrote such a shader without the loop); none of ours does it, and none should.
+  if (/\bbreak\s*;/.test(src)) problems.push('leaves a loop with break');
   return problems;
 }
