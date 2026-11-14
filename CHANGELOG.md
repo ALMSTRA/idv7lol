@@ -12,7 +12,7 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
-- The car app is version 0.2.5, so the MGU Store's Releases channel offers Volt Runner, the
+- The car app is version 0.2.6, so the MGU Store's Releases channel offers Volt Runner, the
   fuel readings, the needle fix, the bottom strip fix, ETC2 animations and the fixes taken from
   upstream below as an update. The `catalog`
   release holds the new package.
@@ -60,6 +60,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- Animations didn't show on the car in 0.2.5: the car app's copy of the renderer client predated
+  cluster-render 0.5.9's ETC2 support, so it sized an `etc2rgba` atlas at four bytes a pixel and
+  didn't send it (Volt Runner's runner stayed blank, a 2048×1024 atlas was refused). The client is
+  copied again from cluster-render, a test now runs the real client with ETC2 atlases, and the car
+  app logs when the client doesn't take an atlas. Tested locally; not tested in a vehicle.
 - Needles turn the way their scale runs on the car and in the Studio's car preview. The needle
   shader built its rotation the wrong way round, so a needle sent to angle _a_ was drawn at _−a_:
   mirrored top to bottom against its ticks, its band and the editor's own drawing. A dial at zero

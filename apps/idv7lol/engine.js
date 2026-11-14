@@ -641,7 +641,12 @@ class ClusterEngine {
       this.log.warn('animation refused: ' + img.key);
       return;
     }
-    this.cr.pixels(st.asset, null, pixels);
+    // false: the client could not take them (a size or format it doesn't know); the layer would
+    // wait for pixels that never come, with no error event, so say so.
+    if (this.cr.pixels(st.asset, null, pixels) === false)
+      this.log.warn(
+        'animation ' + img.key + ': the renderer client did not take its ' + format + ' atlas',
+      );
     this.cr.bind(st.ref, 'u_atlas', st.asset);
     const sp = img.sprite;
     this.cr.uniform(st.ref, 'u_size', [img.w, img.h]);
