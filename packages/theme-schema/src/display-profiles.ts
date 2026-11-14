@@ -122,7 +122,7 @@ export const DISPLAY_PROFILES: readonly DisplayProfile[] = [
       // measured them, so they are drawn as hints and never raise findings.
       {
         id: 'bottom-strip',
-        name: 'Bottom strip (black boxes reported below y 646)',
+        name: "Bottom strip: the car's own (the car app cuts layouts here)",
         kind: 'info',
         x: 0,
         y: 646,

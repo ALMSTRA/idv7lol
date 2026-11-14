@@ -336,6 +336,96 @@ describe('MGU engine images', () => {
   });
 });
 
+describe('MGU engine bottom strip', () => {
+  // Cluster projects tested on cars found that a layout drawn below y 646 makes some KOMBIs (M cars
+  // among them) leave black boxes over it until the head unit restarts (issue #7); ending above
+  // the car's own bottom strip leaves none. The car app cuts every layer there by default.
+  function build(stripY: number | null) {
+    const png = encodePng(2, 2, new Uint8Array(16).fill(255));
+    const theme = createEmptyTheme({ id: 'strip', name: 'Strip' });
+    const doc = {
+      ...theme,
+      assets: {
+        pic: {
+          type: 'image' as const,
+          data: `data:image/png;base64,${Buffer.from(png).toString('base64')}`,
+        },
+      },
+      components: [
+        createComponent('rect', { id: 'bg', x: 0, y: 0, width: 1920, height: 720 }),
+        createComponent('rect', { id: 'low', x: 100, y: 600, width: 200, height: 100 }),
+        createComponent('rect', { id: 'under', x: 100, y: 660, width: 200, height: 40 }),
+        createComponent('rect', {
+          id: 'turned',
+          x: 400,
+          y: 600,
+          width: 200,
+          height: 100,
+          rotation: 20,
+        }),
+        createComponent('image', {
+          id: 'pic',
+          x: 700,
+          y: 620,
+          width: 40,
+          height: 52,
+          props: { asset: 'pic', fit: 'stretch' },
+        }),
+      ],
+    };
+    const result = compileTheme(doc, { images: { pic: decodePng(png) } });
+    expect(result.report.errors).toEqual([]);
+    const baked = result.files.find((f) => f.path === 'images/pic.rgba')!.data as Uint8Array;
+    const client = new FakeClient();
+    const engine = new ClusterEngine({
+      client,
+      log: quiet,
+      theme: result.compiled,
+      fonts: {},
+      signals: new SignalStore(),
+      enabled: () => true,
+      live: () => true,
+      sweep: () => false,
+      now: () => 1000,
+      paletteId: () => 'night',
+      loadImage: () => Buffer.from(baked),
+      stripY: () => stripY,
+    });
+    engine.tick();
+    const piece = (key: string) => {
+      const piece = result.compiled!.pieces.find((p) => p.key === key)!;
+      return client.ops.find((o) => o.op === 'layer' && o.z === piece.z);
+    };
+    const keep = (ref: unknown) =>
+      client.ops.find((o) => o.op === 'uniform' && o.ref === ref && o.name === 'u_keep') as
+        { v: number[] } | undefined;
+    return { client, piece, keep };
+  }
+
+  it('cuts layers short at y 646 and keeps their drawing as it was', () => {
+    const { client, piece, keep } = build(646);
+    expect(piece('bg')).toMatchObject({ y: 0, h: 646 });
+    expect(keep(piece('bg')!.ref)!.v[0]).toBeCloseTo(646 / 720, 5);
+    expect(piece('low')).toMatchObject({ y: 600, h: 46 });
+    expect(keep(piece('low')!.ref)!.v[0]).toBeCloseTo(0.46, 5);
+    expect(piece('under')).toBeUndefined();
+    // A turned layer can't be cut along the screen's rows; it stays whole.
+    expect(piece('turned')).toMatchObject({ h: 100 });
+    const img = client.ops.find((o) => o.op === 'image')!;
+    expect(img).toMatchObject({ y: 620, h: 26, iw: 40, ih: 26 });
+    const px = client.ops.find((o) => o.op === 'pixels' && o.ref === img.ref)!;
+    expect(px.bytes).toBe(40 * 26 * 4);
+  });
+
+  it('draws everything whole with the strip covered', () => {
+    const { client, piece, keep } = build(null);
+    expect(piece('bg')).toMatchObject({ h: 720 });
+    expect(keep(piece('bg')!.ref)).toBeUndefined();
+    expect(piece('under')).toMatchObject({ y: 660, h: 40 });
+    expect(client.ops.find((o) => o.op === 'image')).toMatchObject({ h: 52, ih: 52 });
+  });
+});
+
 describe('MGU engine animations', () => {
   it('uploads one atlas and lets the renderer flip frames with no traffic per frame', () => {
     const sheet = new Uint8Array(8 * 4 * 4).fill(255);

@@ -633,7 +633,7 @@
       "id": "clock",
       "type": "clock",
       "x": 70,
-      "y": 640,
+      "y": 612,
       "width": 200,
       "height": 30,
       "props": {
@@ -652,7 +652,7 @@
       "id": "outside",
       "type": "value.digital",
       "x": 310,
-      "y": 640,
+      "y": 612,
       "width": 200,
       "height": 30,
       "binding": {

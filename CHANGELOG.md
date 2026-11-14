@@ -57,6 +57,16 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   on the shader's matrix, and the car preview); not tested in a vehicle.
 - In the editor, the `turn-left` and `turn-right` telltales point the way they are named. They
   were swapped there; the car's shader already drew them right. Tested locally.
+- Black boxes over the layout that stayed until the head unit restarted, seen on a G82 M4
+  (issue #7). Some KOMBIs, M cars among them, leave them over a full-screen layout that covers the
+  cluster's own bottom strip; cluster projects tested on cars found that a layout ending at y 646
+  leaves none. The car app now cuts every layer at y 646 by default, keeping its drawing as it was
+  (a new `u_keep` uniform in the shaders; image layers send only the rows above), so the car's own
+  strip shows below the layout. The new setting **Bottom strip** (_The car's own_ / _Covered by the
+  layout_) brings the old behaviour back. The Studio's car preview cuts the same way, the validator
+  warns about readings below y 646, and the texts of Supercar Track and Track that reached below
+  it sit a few pixels higher. Tested locally (unit tests and the car preview); not tested in a
+  vehicle.
 - The car app asks the engine unit for the fuel percentage only while the car is switched on
   (BMW's vehicle state `VehicleCondition`: ignition on, ready to drive, driving or switching off),
   or, before the car has told its state, within 3 minutes of moving or running. It asked every 10 s

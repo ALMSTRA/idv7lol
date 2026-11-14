@@ -50,6 +50,11 @@ Los detalles están en `docs/user/INSTALL_MAC.md`.
   (cubierta superior con testigos, marco de la marcha a la derecha, caja eDrive, franja inferior
   de testigos). En rojo, las esquinas del vidrio, donde no se ve nada. En azul, la ventana del
   mapa de serie, que es solo informativa. No pongas información esencial en las zonas de fábrica.
+  En el auto el diseño termina en y 646, para que se vea la franja inferior propia del auto
+  (marcha, modo de manejo, autonomía, hora, temperatura exterior): algunos KOMBI, entre ellos los
+  de los autos M, dejan recuadros negros encima de un diseño que la tapa, hasta reiniciar la
+  unidad. Lo que quede por debajo se recorta. El ajuste **Bottom strip > Covered by the layout** de
+  la app del auto lo dibuja completo.
 - El **Inspector** (derecha) muestra nombre, posición, tamaño, rotación, ancla y opacidad. Además
   tiene **Señal** (señal del catálogo, unidad, rango, suavizado y qué mostrar si no hay dato:
   guiones, ocultar, último valor o cero), **Propiedades** del tipo de componente, **Mostrar solo

@@ -19,7 +19,7 @@ const fs = require('fs');
 const path = require('path');
 const mgu = require('./kit/mgu');
 const { ClusterRender } = require('./cluster_render_client');
-const { ClusterEngine } = require('./engine');
+const { ClusterEngine, STRIP_Y } = require('./engine');
 const { startVehicle } = require('./vehicle');
 const index = require('./themes_index');
 const SHADERS = require('./shaders');
@@ -103,6 +103,9 @@ mgu.run({
       loadImage: (img) => fs.readFileSync(path.join(current.imageDir, img.file)),
       sweep: () => settings.get('sweep') !== 'off',
       utcOffsetMinutes: utcOffset,
+      // The layout ends above the cluster's own bottom strip unless the setting says otherwise:
+      // drawn over it, some KOMBIs leave black boxes until the head unit restarts (issue #7).
+      stripY: () => (settings.get('bottomStrip') === 'layout' ? null : STRIP_Y),
     });
     client.on('ready', () =>
       log.info('cluster-render connected: ' + client.backend + ' ' + client.targets),
@@ -129,6 +132,7 @@ mgu.run({
           log.warn('theme load failed: ' + e);
         }
       }
+      if (k === 'bottomStrip') engine.setTheme(current.theme, current.fonts);
       if (k === 'palette') engine.recolour();
       if (k === 'sweep' || k === 'utcOffset') return;
       render().catch(() => {});

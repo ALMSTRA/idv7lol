@@ -187,8 +187,8 @@ describe('validateTheme', () => {
     expect(codes(sparse)).not.toContain('gauge.labels-overlap');
   });
 
-  it('treats the zones reported by other projects as hints only', () => {
-    // Inside the M-car box and the bottom strip, but clear of every factory zone.
+  it('treats the M-car boxes as hints, and warns about readings below the bottom strip', () => {
+    // Inside the M-car box but clear of every factory zone.
     const inBox = createComponent('value.digital', {
       id: 'in-m-box',
       x: 800,
@@ -199,15 +199,44 @@ describe('validateTheme', () => {
     const low = createComponent('value.digital', {
       id: 'low',
       x: 100,
-      y: 650,
+      y: 620,
       width: 300,
       height: 60,
     });
     const r = validateTheme(theme([inBox, low]));
-    const mine = [...r.errors, ...r.warnings, ...r.infos].filter(
-      (f) => f.componentId === 'in-m-box' || f.componentId === 'low',
+    const all = [...r.errors, ...r.warnings, ...r.infos];
+    expect(all.filter((f) => f.componentId === 'in-m-box' && f.code.startsWith('layout.'))).toEqual(
+      [],
     );
-    expect(mine.filter((f) => f.code.startsWith('layout.'))).toEqual([]);
+    expect(r.warnings.filter((f) => f.componentId === 'low').map((f) => f.code)).toEqual([
+      'layout.bottom-strip',
+    ]);
+  });
+
+  it('judges an arc by the part of its sweep it draws, not its box', () => {
+    // The box reaches y 860, but an arc over the top half ends at its centre (y 560).
+    const top = createComponent('gauge.arc', {
+      id: 'top-arc',
+      x: 660,
+      y: 260,
+      width: 600,
+      height: 600,
+      props: { startAngle: 180, sweepAngle: 180 },
+    });
+    const full = createComponent('gauge.arc', {
+      id: 'full-arc',
+      x: 100,
+      y: 260,
+      width: 500,
+      height: 500,
+      props: { startAngle: 135, sweepAngle: 270 },
+    });
+    const r = validateTheme(theme([top, full]));
+    const codes = (id: string) =>
+      [...r.warnings, ...r.infos].filter((f) => f.componentId === id).map((f) => f.code);
+    expect(codes('top-arc')).not.toContain('layout.bottom-strip');
+    // 135° to 405° is lowest at its ends, sin 45° below the centre: y 687, past the strip.
+    expect(codes('full-arc')).toContain('layout.bottom-strip');
   });
 
   it("doesn't let a theme relax a factory zone by reusing its id", () => {

@@ -7,7 +7,7 @@ import { simulator } from '../store/sim.js';
 import { useT } from '../i18n/index.js';
 import { compileForCar, loadBakedFont, type BakedFont } from '../lib/carCompile.js';
 import type { View } from '../canvas/view.js';
-import { carEngineClass, type CarEngine } from './carModules.js';
+import { carEngineClass, carStripY, type CarEngine } from './carModules.js';
 import { WebGLClusterClient } from './webglClient.js';
 import type { ThemeEngine } from '@idv7lol/theme-engine';
 
@@ -141,6 +141,8 @@ export function CarPreview({
                   : (cur?.compiled?.paletteSelection.default ?? id);
               },
               loadImage: (img: { file: string }) => live.current?.images.get(img.file) ?? null,
+              // As the car app draws by default: cut at the cluster's own bottom strip.
+              stripY: () => carStripY(),
             });
           } else {
             l.engine.setTheme(compiled, fonts);

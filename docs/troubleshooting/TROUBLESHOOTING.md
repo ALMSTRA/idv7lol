@@ -46,6 +46,15 @@ app can be installed (mgu-store #102). Code the head unit again (BimmerCode, E-S
 workshop), then retry. See "Before you install the MGU Store" in
 [DEPLOYMENT.md](../user/DEPLOYMENT.md).
 
+**Black boxes on the cluster that stay after switching idv7lol off** (issue #7, a G82 M4).
+Some KOMBIs, M cars among them, put black boxes over a full-screen layout that covers the
+cluster's own bottom strip, in the middle and right of the panel, and keep them until the head unit
+restarts. From car app 0.2.3 the layout ends at y 646 so the bottom strip (gear, drive mode,
+ranges, time, outside temperature) shows below it; other cluster projects found that the boxes no
+longer appear then. If you see boxes: update the app, then restart the head unit (hold the volume
+knob for about 30 s) to clear them. The setting **Bottom strip > Covered by the layout** draws
+layouts whole again, boxes and all.
+
 **Install fails with a signal/interface error.** A field declared in `apps/idv7lol/app.json`
 `signals` does not exist in this car's SOME/IP catalog. Since the kit build of November 2026 the
 Store build leaves out fields and interfaces the unit lacks and logs what was left out

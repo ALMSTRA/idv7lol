@@ -102,6 +102,26 @@ function fillColor(f: Fill | undefined): Color | undefined {
 }
 
 /** Validate a theme document (parsed or raw JSON object). */
+/**
+ * The lowest y a component draws at: its box, or for an arc the lowest point of its sweep (an arc
+ * is inscribed in its box, angles clockwise from 3 o'clock).
+ */
+function drawnBottom(absY: number, c: Component): number {
+  if (c.type !== 'gauge.arc' && c.type !== 'arc') return absY + c.height;
+  const r = Math.min(c.width, c.height) / 2;
+  const { startAngle, sweepAngle } = c.props;
+  let low = -1;
+  for (let i = 0; i <= 64; i++) {
+    const a = ((startAngle + (sweepAngle * i) / 64) * Math.PI) / 180;
+    low = Math.max(low, Math.sin(a));
+  }
+  // 90° (straight down) within the sweep
+  const rel = (((90 - startAngle) % 360) + 360) % 360;
+  const relNeg = (((startAngle - 90) % 360) + 360) % 360;
+  if ((sweepAngle >= 0 && rel <= sweepAngle) || (sweepAngle < 0 && relNeg <= -sweepAngle)) low = 1;
+  return absY + c.height / 2 + r * low;
+}
+
 export function validateTheme(doc: unknown): ValidationReport {
   const out = new Collector();
   const parsed = parseTheme(doc);
@@ -432,6 +452,32 @@ export function validateTheme(doc: unknown): ValidationReport {
         `Decorative "${o.componentId}" overlaps "${o.zone.name}"; it will be partly hidden by factory content.`,
         { componentId: o.componentId },
       );
+  }
+
+  // The car app ends the layout at the cluster's own bottom strip by default: drawn over it, some
+  // KOMBIs (M cars among them) leave black boxes over the layout until the head unit restarts.
+  const strip = display?.reservedZones.find((z) => z.id === 'bottom-strip');
+  if (strip) {
+    for (const f of flat) {
+      const c = f.component;
+      if (c.type === 'group' || !c.visible || c.rotation) continue;
+      if (drawnBottom(f.absY, c) <= strip.y) continue;
+      if (INFORMATIVE_TYPES.has(c.type))
+        out.warning(
+          'layout.bottom-strip',
+          `"${c.id}" reaches below y ${strip.y}; by default the car shows its own bottom strip there and cuts the layout off.`,
+          {
+            componentId: c.id,
+            hint: `Keep readings above y ${strip.y}. The car app's setting Bottom strip > Covered by the layout draws it whole, but some cars then show black boxes.`,
+          },
+        );
+      else
+        out.info(
+          'layout.bottom-strip-decor',
+          `"${c.id}" reaches below y ${strip.y}; by default the car cuts it off there so the cluster's own bottom strip shows.`,
+          { componentId: c.id },
+        );
+    }
   }
 
   // --- compiler mapping: layer budget and shader sanity

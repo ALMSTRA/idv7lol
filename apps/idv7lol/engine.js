@@ -33,6 +33,10 @@ const LIVE_GRACE_MS = 1500;
 const SWEEP_MS = 700;
 // cluster-render's layer limit for one client (docs/architecture/RENDERER.md).
 const LAYERS_PER_CLIENT = 64;
+// Where the cluster's own bottom strip starts (gear, drive mode, ranges, time, outside
+// temperature). Cluster projects tested on cars found that a layout ending here leaves the KOMBI
+// no reason to put black boxes over it; 660 already touched the strip's drive mode.
+const STRIP_Y = 646;
 
 const ICON_P_CODE = 'P';
 const SECONDARY_START = '\u0001';
@@ -143,6 +147,9 @@ class ClusterEngine {
     this.signals = opts.signals;
     this.sweep = opts.sweep || (() => true);
     this.utcOffsetMinutes = opts.utcOffsetMinutes || (() => 0);
+    // The y the layout ends at so the cluster's own bottom strip shows (STRIP_Y), or null to draw
+    // over it. Read at each build.
+    this.stripY = opts.stripY || (() => null);
     this.now = opts.now || (() => Date.now());
     this.shown = false;
     this.pieces = []; // runtime state per piece
@@ -323,7 +330,15 @@ class ClusterEngine {
       this.messages++;
     });
     const defaultFamily = theme.fonts[0];
+    // A layer reaching below the strip is cut short there: its height on the screen, 0 when it
+    // is all below, or null when it stays whole (above the strip, the strip covered, or turned).
+    const strip = this.stripY();
+    const cutAt = (y, h, rotation) =>
+      typeof strip !== 'number' || rotation || y + h <= strip ? null : Math.max(0, strip - y);
+    this.cut = 0;
     this.pieces = theme.pieces.map((piece) => {
+      const shownH = cutAt(piece.y, piece.h, piece.rotation);
+      if (shownH !== null) this.cut++;
       const opts = {
         target,
         klass: 'content',
@@ -331,7 +346,7 @@ class ClusterEngine {
         x: piece.x,
         y: piece.y,
         w: piece.w,
-        h: piece.h,
+        h: shownH === null ? piece.h : shownH,
         visible: 1,
         fs: theme.shaders[piece.shader],
       };
@@ -344,7 +359,7 @@ class ClusterEngine {
         }
       }
       if (piece.usesTime) opts.time = true;
-      const ref = this._make('effect', opts);
+      const ref = shownH === 0 ? 0 : this._make('effect', opts);
       const st = {
         piece,
         ref,
@@ -357,11 +372,13 @@ class ClusterEngine {
         colorAnimBase: {},
       };
       if (!ref) {
-        this.log.warn('layer refused for ' + piece.key);
+        if (shownH !== 0) this.log.warn('layer refused for ' + piece.key);
         return st;
       }
       this.messages++;
       this.cr.uniform(ref, 'u_size', [piece.w, piece.h]);
+      if (shownH !== null)
+        this.cr.uniform(ref, 'u_keep', [Math.round((shownH / piece.h) * 1e6) / 1e6]);
       Object.keys(piece.statics).forEach((name) => {
         if (name[0] === '_') return;
         const v = piece.statics[name];
@@ -394,6 +411,9 @@ class ClusterEngine {
         this.log.warn('image ' + img.key + ': no usable pixels');
         return st;
       }
+      const shownH = cutAt(img.y, img.h, img.rotation);
+      if (shownH !== null) this.cut++;
+      if (shownH === 0) return st;
       if (img.sprite) {
         // The renderer plays the frames by itself: nothing is sent per frame.
         st.asset = this._make('asset', {
@@ -410,7 +430,7 @@ class ClusterEngine {
           x: img.x,
           y: img.y,
           w: img.w,
-          h: img.h,
+          h: shownH === null ? img.h : shownH,
           visible: 1,
           fs: theme.shaders.sprite,
         };
@@ -428,6 +448,8 @@ class ClusterEngine {
         this.cr.bind(st.ref, 'u_atlas', st.asset);
         const sp = img.sprite;
         this.cr.uniform(st.ref, 'u_size', [img.w, img.h]);
+        if (shownH !== null)
+          this.cr.uniform(st.ref, 'u_keep', [Math.round((shownH / img.h) * 1e6) / 1e6]);
         this.cr.uniform(st.ref, 'u_cells', [sp.columns, sp.rows]);
         // Half a texel of a cell; six decimals, so it doesn't round to 0 on wide cells.
         const r6 = (v) => Math.round(v * 1e6) / 1e6;
@@ -440,6 +462,11 @@ class ClusterEngine {
         st.anim = this._playSprite(st, 1, 0);
         return st;
       }
+      if (shownH !== null) {
+        // Only the rows above the strip go, at the layer's own scale.
+        const rows = Math.max(1, Math.round((img.ih * shownH) / img.h));
+        pixels = pixels.subarray(0, img.iw * rows * 4);
+      }
       const opts = {
         target,
         klass: 'content',
@@ -447,9 +474,9 @@ class ClusterEngine {
         x: img.x,
         y: img.y,
         w: img.w,
-        h: img.h,
+        h: shownH === null ? img.h : shownH,
         iw: img.iw,
-        ih: img.ih,
+        ih: shownH === null ? img.ih : pixels.length / (img.iw * 4),
         opacity: img.opacity,
         sampling: 'bilinear',
         visible: 1,
@@ -475,7 +502,8 @@ class ClusterEngine {
       'layout up: ' +
         this.pieces.filter((p) => p.ref).length +
         ' layers, palette ' +
-        this.lastPalette,
+        this.lastPalette +
+        (this.cut ? ', ' + this.cut + ' cut at the bottom strip' : ''),
     );
   }
 
@@ -1079,5 +1107,6 @@ module.exports = {
   resolveColor,
   parseColor,
   LIVE_GRACE_MS,
+  STRIP_Y,
   STALE_MS: conditions.STALE_MS,
 };

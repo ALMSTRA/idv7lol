@@ -115,6 +115,16 @@
       ]
     },
     {
+      "key": "bottomStrip",
+      "label": "Bottom strip",
+      "type": "choice",
+      "default": "car",
+      "options": [
+        ["car", "The car's own (no black boxes)"],
+        ["layout", "Covered by the layout"]
+      ]
+    },
+    {
       "key": "sweep",
       "label": "Start-up sweep",
       "type": "choice",

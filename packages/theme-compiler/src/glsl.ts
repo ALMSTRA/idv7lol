@@ -16,11 +16,15 @@ precision mediump float;
 #endif
 varying vec2 v_uv;
 uniform vec2 u_size;
+// The share of the layer's height on the screen: the car app cuts a layer short at the cluster's
+// bottom strip and keeps its drawing as it was. Unset (0) is all of it.
+uniform float u_keep;
+vec2 uvDrawn() { return vec2(v_uv.x, v_uv.y * (u_keep > 0.0 ? u_keep : 1.0)); }
 `;
 
 /** Shared helpers: pixel coordinates, 1-px anti-aliased coverage, straight-alpha compositing. */
 const COMMON = `
-vec2 px() { return v_uv * u_size; }
+vec2 px() { return uvDrawn() * u_size; }
 float cov(float d) { return clamp(0.5 - d, 0.0, 1.0); }
 vec4 over(vec4 dst, vec4 src) { float a = src.a + dst.a * (1.0 - src.a); return vec4((src.rgb * src.a + dst.rgb * dst.a * (1.0 - src.a)) / max(a, 1e-5), a); }
 float sdRoundBox(vec2 p, vec2 b, float r) { vec2 q = abs(p) - b + r; return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r; }
@@ -642,7 +646,7 @@ void main() {
   // Row first, with half a frame of margin, so mediump rounding can't pick the wrong row.
   float row = floor((f + 0.5) / u_cells.x);
   vec2 cell = vec2(f - row * u_cells.x, row);
-  vec2 uv = (cell + clamp(v_uv, u_texel, vec2(1.0) - u_texel)) / u_cells;
+  vec2 uv = (cell + clamp(uvDrawn(), u_texel, vec2(1.0) - u_texel)) / u_cells;
   vec4 c = texture2D(u_atlas, uv);
   gl_FragColor = vec4(c.rgb, c.a * u_opacity);
 }
