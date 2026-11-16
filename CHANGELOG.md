@@ -120,7 +120,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   data folder (`fuel.json`), and the app's page says where the level comes from. Both interfaces
   are optional: a car without them installs as before, with dashes. Tested locally (unit tests,
   and `vehicle.js` run against a fake car); the cluster's values were read on a G05 X5 xDrive45e
-  with a full 69 l tank (68 l); not tested in a vehicle with this code.
+  with a full 69 l tank (68 l). **Tested in vehicle** with car app 0.2.11 on an F98 X4 M
+  Competition: the level from the engine unit (30 %, 18 l) and the range (156 km).
 
 - Animations go to the car as ETC2 textures (`etc2rgba`, cluster-render 0.5.9): a quarter of
   the bytes of RGBA8, sent once and charged once against the renderer's pixel memory instead of
