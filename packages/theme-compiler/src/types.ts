@@ -1,4 +1,5 @@
 import type { Binding, Color, Condition, Theme, Zone } from '@idv7lol/theme-schema';
+import type { PreviewPrim } from './preview.js';
 
 /** Severity of a validation finding. Errors block compilation. */
 export type Severity = 'error' | 'warning' | 'info';
@@ -240,6 +241,8 @@ export interface CompiledTheme {
   signals: string[];
   /** Layer count including images. */
   layers: number;
+  /** A sketch of the theme for the car app's own page (preview.ts). */
+  preview?: PreviewPrim[];
   warnings: Finding[];
 }
 

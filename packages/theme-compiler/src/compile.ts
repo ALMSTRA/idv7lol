@@ -13,6 +13,7 @@ import { buildPieces } from './pieces.js';
 import { encodeEtc2Rgba } from './etc2.js';
 import { SHADERS } from './glsl.js';
 import { codeOf } from './font/glyphs.js';
+import { themePreview } from './preview.js';
 import { validateTheme } from './validate.js';
 import type { BundleFile, CompileResult, CompiledPiece, CompiledTheme, Finding } from './types.js';
 
@@ -97,6 +98,7 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
     ...(build.alerts.length ? { alerts: build.alerts } : {}),
     signals: [...signals].sort(),
     layers: build.pieces.length + build.images.length,
+    preview: themePreview(theme),
     warnings,
   };
 
