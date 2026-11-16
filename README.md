@@ -35,10 +35,11 @@ off, the car shows its factory cluster again.
 > Use it parked or on a closed course, keep the factory warnings visible, and read
 > [SECURITY.md](SECURITY.md) first.
 
-**Status: 0.2.0-beta.5, an experimental pre-release.** First car test done: on a 2021 X4 M
-Competition (iDrive 7) the app installed from the MGU Store, drew the Performance and Supercar
-Track themes on the cluster, and switching it off brought the factory cluster back. USB themes,
-pictures and animations haven't been tried on a car yet. Details in
+**Status: 0.2.0-beta.5, an experimental pre-release.** Tested on one car: on a 2021 X4 M
+Competition (iDrive 7) the app installs and updates from the MGU Store, its themes draw on the
+cluster with live car data (fuel and range included), and switching it off brings the factory
+cluster back. Its owner reports that everything tried worked well. Other cars and themes loaded
+from a USB stick haven't been confirmed yet. Details in
 [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
 **Download:** the Windows installer of idv7lol Studio is on the
@@ -115,7 +116,7 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
 | Bundled themes                               | pass validation, compiled into the car app                                            |
 | idv7lol Studio for Windows and macOS         | tested on a PC; Mac build compiled, not tested on a Mac; unsigned installers released |
 | Car app (Node 8)                             | installs and draws on a car (one car so far)                                          |
-| Tested in a vehicle                          | **yes**, X4 M Competition 2021, two themes                                            |
+| Tested in a vehicle                          | **yes**, X4 M Competition 2021: the car app, its themes and live data                 |
 
 ## Building it
 
@@ -210,8 +211,9 @@ npx tsx tools/build/build-mgu-themes.ts
 
 Then commit, push, and add your fork in the Store instead of `ALMSTRA/idv7lol`.
 
-On the car, the 12 V battery is not read yet and shows dashes; the fuel level, range and odometer
-come from the cluster (not tested in a vehicle yet). Opacity animations don't play there either. The current list of known limits is in the deployment guide.
+On the car, the 12 V battery is not read yet and shows dashes; the fuel level and range come from
+the cluster and the engine unit (read on the X4 M). Opacity animations don't play there either.
+The current list of known limits is in the deployment guide.
 
 ## How it works
 
