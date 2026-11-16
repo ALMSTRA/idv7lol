@@ -20,15 +20,27 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   leaning bars for oil, water, fuel and gearbox oil, the time and outside temperature, and a pill
   that says Low fuel. Its Track and Corsa palettes keep their names. Tested locally; not tested in
   a vehicle.
-- The car app is version 0.2.11, so the MGU Store's Releases channel offers alerts, your own icons
-  and needles, text styles, the X4 M fixes, VDO Classic M, Lily Pad, Neon Drive, Heritage 89, the
-  new Supercar Track, Volt Runner, the fuel readings, the needle fix, the bottom strip fix, ETC2
-  animations and the fixes taken from upstream below as an update. The `catalog` release holds the new package.
-- The car app requires cluster-render 0.5.9 or newer (was 0.5.2), so the Store brings its fixes
-  along: a scene the cluster accepted and then never mapped (a cluster still starting, or a lock
-  while parked) is asked for again instead of leaving the panel blank (0.5.5, 0.5.6), and a layer
-  whose atlas the renderer refused lets go of the cluster, which goes back to its own gauges,
-  instead of holding an empty panel (0.5.9). See `docs/architecture/RENDERER.md`.
+- The car app is version 0.2.12, so the MGU Store's Releases channel offers the newer
+  cluster-render and deploy tool below, alerts, your own icons and needles, text styles, the X4 M
+  fixes, VDO Classic M, Lily Pad, Neon Drive, Heritage 89, the new Supercar Track, Volt Runner, the
+  fuel readings, the needle fix, the bottom strip fix, ETC2 animations and the fixes taken from
+  upstream below as an update. The `catalog` release holds the new package.
+- The car app requires cluster-render 0.6.4 or newer (was 0.5.2, then 0.5.9), so the Store brings
+  its fixes along: a scene the cluster accepted and then never mapped (a cluster still starting, or
+  a lock while parked) is asked for again instead of leaving the panel blank (0.5.5, 0.5.6); a
+  layer whose atlas the renderer refused lets go of the cluster, which goes back to its own gauges,
+  instead of holding an empty panel (0.5.9); no mapping guard turns a target off for good after
+  two display drops, a drop is only logged (0.5.12); a picture layer stays hidden until its pixels
+  are written, so the cluster never shows its empty buffer for a moment (0.6.3); and a scene the
+  KOMBI removes during an upload lowers the upload rate for the rest of the run instead of
+  stepping up again (0.6.4). See `docs/architecture/RENDERER.md`. Not tested in a vehicle with
+  these versions.
+- The car app requires the Store's deploy tool 0.8.19 (was 0.8.12): it repairs missing tiles on
+  iDrive 7 (0.8.13), has the Store's safe mode (0.8.16), and on iDrive 7 MainApp 6.4.8 restarts
+  only the app it installs (0.8.19, mgu-store #273).
+- The MIT app kit's `kit/runtime/mgu.js` is refreshed from cauliflowermossgrape/idrive7-apps
+  (b288063): a SETTINGS state is looked for only when no menu screen shows the settings itself. No
+  change for idv7lol, which has a SETTINGS state.
 
 ### Added
 
