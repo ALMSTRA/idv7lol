@@ -10,6 +10,14 @@ updated when the material is added to the repository.
 | Barlow, Barlow Semi Condensed, Barlow Condensed fonts | Jeremy Tribby, [Barlow](https://github.com/jpt/barlow)                                                                                                             | SIL Open Font License 1.1 | `apps/studio/public/fonts/*.r8`, `apps/idv7lol/font_*.wad` (baked SDF atlases); `@fontsource/*` in the Studio |
 | MGU App Kit (`kit/`: tools, runtime, platform, icons) | cauliflowermossgrape and contributors, [idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps)                                                        | MIT (`kit/LICENSE`)       | `kit/` (vendored so the MGU Store can build the app on the head unit)                                         |
 
+The licence texts that must travel with those parts are in `LICENSES/` (the SIL Open Font License
+for Barlow, the MIT licence of the app kit); the car app's package carries them in its `NOTICE`
+with the GPL in its `LICENSE`, and the Studio's installers carry `LICENSE`,
+`THIRD_PARTY_NOTICES.md` and `LICENSES/`. The MPL-2.0 client keeps its header, which names the
+licence and where its source is. Two lines of the vendored kit differ from upstream:
+`kit/tools/build.py` takes an interface's methods and broadcasts as a list or a single name, and
+writes the app's `license` from `app.json` into its package instead of `UNLICENSED`.
+
 The Studio's interface icons come from [Lucide](https://lucide.dev) (ISC licence), through the
 `lucide-react` package.
 

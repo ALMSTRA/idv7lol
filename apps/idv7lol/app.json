@@ -5,6 +5,7 @@
   "version": "0.2.12",
   "startType": "autostart",
   "vendor": "custom",
+  "license": "GPL-3.0-or-later",
   "loggingId": "IDV7",
   "iconGlyph": "gauge",
   "signals": {

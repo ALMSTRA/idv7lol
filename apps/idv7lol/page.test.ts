@@ -169,3 +169,23 @@ describe('the app page', () => {
     for (let n = 0; n < 4; n++) page.textPage(new Recorder(page.W, page.H), t, n, model);
   });
 });
+
+describe('what ships in the car app’s package', () => {
+  it('has the licences its parts ask for', async () => {
+    const { readFileSync } = await import('node:fs');
+    // (a Windows checkout may hold either line ending)
+    const read = (p: string) =>
+      readFileSync(new URL(p, import.meta.url), 'utf8')
+        .split('\r')
+        .join('');
+    // the GPL itself, the same text as the repository's
+    expect(read('./LICENSE')).toBe(read('../../LICENSE'));
+    const notice = read('./NOTICE');
+    expect(notice).toContain(read('../../kit/LICENSE').trim());
+    expect(notice).toContain('SIL OPEN FONT LICENSE Version 1.1');
+    expect(notice).toContain('https://mozilla.org/MPL/2.0/');
+    expect((JSON.parse(read('./app.json')) as { license: string }).license).toBe(
+      'GPL-3.0-or-later',
+    );
+  });
+});

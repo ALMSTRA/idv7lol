@@ -535,7 +535,7 @@ def build(app_id, language='en', preview_only=False):
     # --- source/ (the npm package) ---
     pkg = {
         'name': app_id, 'version': ver, 'description': spec.get('description', spec['title']),
-        'main': 'javascript/app.js', 'private': False, 'author': spec.get('vendor', 'custom'), 'license': 'UNLICENSED',
+        'main': 'javascript/app.js', 'private': False, 'author': spec.get('vendor', 'custom'), 'license': spec.get('license', 'UNLICENSED'),
         'engines': {'node': '>=8.7.0'},
         'oapAppSettings': {
             'maxDiskUsage': spec.get('maxDiskUsage', 20971520), 'cpuLimit': spec.get('cpuLimit', 60),
