@@ -896,14 +896,13 @@ class ClusterEngine {
             if (!sweeping) this._easeTo(st, d.uniform, this._norm(d.binding, now), again, EPS);
             break;
           case 'angle':
-            if (!sweeping)
-              this._easeTo(
-                st,
-                d.uniform,
-                d.from + d.sweep * this._norm(d.binding, now),
-                again,
-                ANGLE_EPS,
-              );
+            if (!sweeping) {
+              // no value (stale with the "last" fallback): the needle stays where it is. Passed on
+              // as from + sweep * undefined it would be NaN, and the needle would never move again.
+              const n = this._norm(d.binding, now);
+              if (n !== undefined)
+                this._easeTo(st, d.uniform, d.from + d.sweep * n, again, ANGLE_EPS);
+            }
             break;
           case 'text':
             if (textsNow) this._text(st, d, pal, now, force);
@@ -976,7 +975,7 @@ class ClusterEngine {
   }
 
   _easeTo(st, uniform, target, force, eps) {
-    if (target === undefined) return;
+    if (target === undefined || target !== target) return;
     let e = st.eased[uniform];
     if (!e) {
       e = st.eased[uniform] = { cur: target, sent: NaN, at: this.now() };

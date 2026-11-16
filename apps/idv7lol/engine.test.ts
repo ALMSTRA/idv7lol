@@ -149,6 +149,48 @@ function setup(opts: { enabled?: boolean; live?: boolean; theme?: CompiledTheme 
 }
 
 describe('MGU engine', () => {
+  // A needle bound with the "last" fallback has no value once its signal is stale. That went on
+  // as an angle of NaN, which stuck: the needle never moved again when the signal came back.
+  it('moves a needle again after its signal was gone, with the "last" fallback', () => {
+    const doc = createEmptyTheme({ id: 'needle-last', name: 'Needle last' });
+    doc.components.push(
+      createComponent('rect', {
+        id: 'bg',
+        x: 0,
+        y: 0,
+        width: 1920,
+        height: 720,
+        props: { fill: '#000000' },
+      }),
+      createComponent('gauge.arc', {
+        id: 'revs',
+        x: 760,
+        y: 160,
+        width: 400,
+        height: 400,
+        binding: { signal: 'engine.rpm', min: 0, max: 8000, fallback: 'last' },
+        props: { needle: { show: true }, fill: { show: false } },
+      }),
+    );
+    const result = compileTheme(doc, {
+      fonts: { sans: { pixels: baked.pixels, metrics: baked.metrics } },
+    });
+    expect(result.report.errors).toEqual([]);
+    const t = setup({ theme: result.compiled as CompiledTheme });
+    t.feed({ 'engine.rpm': 2000 });
+    t.advance(1500);
+    const angles = () => t.client.uniforms('u_angle').map((o) => (o.v as number[])[0]!);
+    expect(angles().at(-1)).toBeCloseTo(135 + 270 * 0.25, 1);
+    // nothing for five seconds: the value is stale, the needle stays
+    t.advance(5000);
+    expect(angles().every((a) => Number.isFinite(a))).toBe(true);
+    const before = angles().length;
+    t.feed({ 'engine.rpm': 6000 });
+    t.advance(1500);
+    expect(angles().length).toBeGreaterThan(before);
+    expect(angles().at(-1)).toBeCloseTo(135 + 270 * 0.75, 1);
+  });
+
   it('drops what it built and stays off when a theme fails halfway, without retrying', () => {
     const broken = structuredClone(compiled);
     const bad = broken.pieces[Math.floor(broken.pieces.length / 2)]!;
