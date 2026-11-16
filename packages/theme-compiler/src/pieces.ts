@@ -1203,10 +1203,19 @@ function buildAlert(ctx: Ctx, f: FlatComponent): void {
     buildTelltale(ctx, { ...at(icon), absX: f.absX + pad, absY: f.absY + pad });
     left = pad * 2 + size;
   }
-  buildText(
-    ctx,
-    flat(part('text', 'text', left, c.width - left, { text: p.text, style: p.style }), left),
-  );
+  // An alert as tall as it is wide leaves its icon no room for the text: it keeps the box and the
+  // icon, and says so, instead of making a text of no width (which the schema refuses).
+  const room = c.width - left;
+  if (room >= 1)
+    buildText(ctx, flat(part('text', 'text', left, room, { text: p.text, style: p.style }), left));
+  else
+    warn(
+      ctx,
+      'alert.no-room',
+      'The alert is too narrow for its icon and its text: only the icon is drawn.',
+      c.id,
+      'Make the alert wider than it is tall, or set its icon to none.',
+    );
   for (const piece of ctx.pieces.slice(start)) {
     piece.alert = c.id;
     piece.componentId = c.id;
