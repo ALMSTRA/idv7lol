@@ -19,6 +19,7 @@ import { findComponent, flattenComponents } from '@idv7lol/theme-engine';
 import type { ImportedImage } from '../lib/imageStore.js';
 import { useUiStore } from './ui.js';
 import { translate } from '../i18n/index.js';
+import { MAX_TEXT_STYLE_NAME } from '../lib/limits.js';
 
 const HISTORY_LIMIT = 100;
 
@@ -242,7 +243,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     const theme = get().theme;
     const id = newTextStyleId(theme, name);
     const style: NamedTextStyle = {
-      name,
+      name: name.slice(0, MAX_TEXT_STYLE_NAME),
       font: from.font,
       size: from.size,
       weight: from.weight,
@@ -267,7 +268,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     if (!cur || !name.trim()) return;
     get().setTheme({
       ...theme,
-      textStyles: { ...theme.textStyles, [id]: { ...cur, name: name.trim() } },
+      textStyles: {
+        ...theme.textStyles,
+        [id]: { ...cur, name: name.trim().slice(0, MAX_TEXT_STYLE_NAME) },
+      },
     });
   },
   removeTextStyle: (id) => get().setTheme(detachTextStyle(get().theme, id)),

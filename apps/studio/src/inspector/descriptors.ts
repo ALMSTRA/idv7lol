@@ -27,6 +27,8 @@ export interface FieldDescriptor {
   min?: number;
   max?: number;
   step?: number;
+  /** The schema takes whole numbers only. */
+  integer?: boolean;
   options?: Array<{ value: string; label: string }>;
   hint?: string;
 }
@@ -76,7 +78,14 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
         { path: 'fill.color', label: 'Colour', kind: 'fill' },
         { path: 'fill.width', label: 'Width', kind: 'number', min: 0, max: 200 },
         { path: 'fill.mode', label: 'Mode', kind: 'select', options: opt(['solid', 'segments']) },
-        { path: 'fill.segments', label: 'Segments', kind: 'number', min: 2, max: 120 },
+        {
+          path: 'fill.segments',
+          label: 'Segments',
+          kind: 'number',
+          min: 2,
+          max: 120,
+          integer: true,
+        },
         { path: 'fill.segmentGap', label: 'Gap (°)', kind: 'number', min: 0, max: 45, step: 0.1 },
         { path: 'fill.zones', label: 'Zones', kind: 'zones' },
       ],
@@ -84,8 +93,8 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
     {
       title: 'Ticks',
       fields: [
-        { path: 'ticks.major', label: 'Major', kind: 'number', min: 0, max: 100 },
-        { path: 'ticks.minor', label: 'Minor', kind: 'number', min: 0, max: 20 },
+        { path: 'ticks.major', label: 'Major', kind: 'number', min: 0, max: 100, integer: true },
+        { path: 'ticks.minor', label: 'Minor', kind: 'number', min: 0, max: 20, integer: true },
         { path: 'ticks.majorLength', label: 'Major length', kind: 'number', min: 0, max: 100 },
         { path: 'ticks.minorLength', label: 'Minor length', kind: 'number', min: 0, max: 100 },
         {
@@ -112,7 +121,14 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
       title: 'Labels',
       fields: [
         { path: 'labels.show', label: 'Show', kind: 'bool' },
-        { path: 'labels.every', label: 'Every n ticks', kind: 'number', min: 1, max: 20 },
+        {
+          path: 'labels.every',
+          label: 'Every n ticks',
+          kind: 'number',
+          min: 1,
+          max: 20,
+          integer: true,
+        },
         { path: 'labels.divisor', label: 'Divisor', kind: 'number', min: 0.001, max: 100000 },
         { path: 'labels.inset', label: 'Inset', kind: 'number', min: -50, max: 200 },
         { path: 'labels.style', label: 'Style', kind: 'textstyle' },
@@ -207,7 +223,14 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
         { path: 'fill.color', label: 'Colour', kind: 'fill' },
         { path: 'fill.radius', label: 'Radius', kind: 'number', min: 0, max: 100 },
         { path: 'fill.mode', label: 'Mode', kind: 'select', options: opt(['solid', 'segments']) },
-        { path: 'fill.segments', label: 'Segments', kind: 'number', min: 2, max: 200 },
+        {
+          path: 'fill.segments',
+          label: 'Segments',
+          kind: 'number',
+          min: 2,
+          max: 200,
+          integer: true,
+        },
         { path: 'fill.segmentGap', label: 'Gap (px)', kind: 'number', min: 0, max: 50 },
         { path: 'fill.zones', label: 'Zones', kind: 'zones' },
       ],
@@ -216,7 +239,7 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
       title: 'Ticks & labels',
       fields: [
         { path: 'ticks.show', label: 'Ticks', kind: 'bool' },
-        { path: 'ticks.count', label: 'Count', kind: 'number', min: 2, max: 50 },
+        { path: 'ticks.count', label: 'Count', kind: 'number', min: 2, max: 50, integer: true },
         { path: 'ticks.length', label: 'Length', kind: 'number', min: 0, max: 60 },
         { path: 'ticks.width', label: 'Width', kind: 'number', min: 0, max: 10, step: 0.5 },
         { path: 'ticks.color', label: 'Colour', kind: 'color' },
@@ -303,7 +326,7 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
     {
       title: 'Lights',
       fields: [
-        { path: 'count', label: 'Count', kind: 'number', min: 1, max: 32 },
+        { path: 'count', label: 'Count', kind: 'number', min: 1, max: 32, integer: true },
         { path: 'shape', label: 'Shape', kind: 'select', options: opt(['circle', 'rect', 'pill']) },
         { path: 'gap', label: 'Gap', kind: 'number', min: 0, max: 60 },
         { path: 'from', label: 'First light at', kind: 'number' },
@@ -373,7 +396,7 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
       title: 'Alert',
       fields: [
         { path: 'text', label: 'Text', kind: 'text' },
-        { path: 'priority', label: 'Priority', kind: 'number', min: 1, max: 9 },
+        { path: 'priority', label: 'Priority', kind: 'number', min: 1, max: 9, integer: true },
         { path: 'flash', label: 'Flash', kind: 'bool' },
         {
           path: 'icon',

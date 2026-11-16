@@ -17,6 +17,7 @@ import { buildPieces } from '@idv7lol/theme-compiler';
 import { findComponent, resolveColor } from '@idv7lol/theme-engine';
 import { useProjectStore, useThemeForPanels } from '../store/project.js';
 import { fieldLabel, useT } from '../i18n/index.js';
+import { MAX_COMPONENT_NAME, MAX_NOTES } from '../lib/limits.js';
 import { useUiStore } from '../store/ui.js';
 import { importAssetOnly, replaceImage } from '../lib/imageActions.js';
 import { imageResolver, subscribeImages } from '../lib/imageStore.js';
@@ -131,6 +132,7 @@ export function InspectorPanel(): JSX.Element {
         <textarea
           rows={3}
           value={c.notes ?? ''}
+          maxLength={MAX_NOTES}
           onChange={(e) => update(c.id, { notes: e.target.value } as Partial<Component>, false)}
           onBlur={() => useProjectStore.getState().setTheme(useProjectStore.getState().theme)}
         />
@@ -413,6 +415,7 @@ function CommonSection({ comps, theme }: { comps: Component[]; theme: Theme }): 
             type="text"
             value={c.name ?? ''}
             placeholder={c.id}
+            maxLength={MAX_COMPONENT_NAME}
             onChange={(e) => update(c.id, { name: e.target.value } as Partial<Component>, false)}
             onBlur={() => useProjectStore.getState().setTheme(useProjectStore.getState().theme)}
           />
@@ -652,6 +655,7 @@ function PropField({
             min={f.min}
             max={f.max}
             step={f.step}
+            integer={f.integer}
             onChange={onChange}
           />
         </Field>

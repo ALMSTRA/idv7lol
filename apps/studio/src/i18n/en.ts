@@ -306,7 +306,7 @@ export const en = {
     downloadedUsb:
       'Downloaded {path}. Copy it to idv7lol/themes on a USB stick and plug it into the car.',
     usbHint:
-      'Compile, press Save for the car and pick your USB stick. The car app finds the theme on its own; choose it with Next theme.',
+      'Compile, press Save for the car and pick your USB stick. The car app finds the theme on its own; choose it with Theme.',
     usbHintBrowser:
       'Compile and press Save for the car. Copy the file to idv7lol/themes on a USB stick; the car app finds it on its own.',
     status: 'Status',
@@ -409,6 +409,8 @@ export const en = {
   },
   status: {
     saved: 'Saved',
+    cannotSave:
+      'Not saved: the Studio could not open this file again. Fix this first (the Validation tab lists it):',
     unsaved: 'Unsaved changes',
     zoom: 'Zoom',
     selection: '{n} selected',

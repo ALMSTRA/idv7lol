@@ -3,6 +3,7 @@ import type { AnimationClip, Easing, Theme } from '@idv7lol/theme-schema';
 import { flattenComponents } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
 import { useT } from '../i18n/index.js';
+import { MAX_CLIP_NAME } from '../lib/limits.js';
 import { NumberInput, Select } from '../inspector/fields.js';
 
 const EASINGS: Easing[] = [
@@ -120,6 +121,7 @@ export function TimelinePanel(): JSX.Element {
               <input
                 type="text"
                 value={clip.name ?? ''}
+                maxLength={MAX_CLIP_NAME}
                 onChange={(e) => setClip(selected, { ...clip, name: e.target.value })}
               />
               <button className="danger" onClick={() => removeClip(selected)}>

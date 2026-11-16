@@ -314,7 +314,7 @@ export const es: Dictionary = {
     downloadedUsb:
       'Se descargó {path}. Cópialo a idv7lol/themes en una memoria USB y conéctala al auto.',
     usbHint:
-      'Compila, pulsa Guardar para el auto y elige tu memoria USB. La app del auto encuentra el tema sola; lo eliges con Next theme en el auto.',
+      'Compila, pulsa Guardar para el auto y elige tu memoria USB. La app del auto encuentra el tema sola; lo eliges con Theme en el auto.',
     usbHintBrowser:
       'Compila y pulsa Guardar para el auto. Copia el archivo a idv7lol/themes en una memoria USB; la app del auto lo encuentra sola.',
     status: 'Estado',
@@ -417,6 +417,8 @@ export const es: Dictionary = {
   },
   status: {
     saved: 'Guardado',
+    cannotSave:
+      'No se guardó: el Studio no podría volver a abrir este archivo. Corrige esto primero (está en la pestaña Validación):',
     unsaved: 'Cambios sin guardar',
     zoom: 'Zoom',
     selection: '{n} seleccionado(s)',

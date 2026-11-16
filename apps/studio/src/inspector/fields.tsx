@@ -22,6 +22,7 @@ import {
   type UnitId,
 } from '@idv7lol/vehicle-signals';
 import { parseColor, toHex } from '@idv7lol/theme-engine';
+import { clampNumber } from '../lib/limits.js';
 
 /* ----- primitives ----- */
 
@@ -48,6 +49,7 @@ export function NumberInput({
   min,
   max,
   step,
+  integer,
   commit,
 }: {
   value: number;
@@ -55,6 +57,8 @@ export function NumberInput({
   min?: number;
   max?: number;
   step?: number;
+  /** Whole numbers only: what is typed is rounded. */
+  integer?: boolean;
   commit?: () => void;
 }): JSX.Element {
   const [text, setText] = useState<string | null>(null);
@@ -68,7 +72,8 @@ export function NumberInput({
       onChange={(e) => {
         setText(e.target.value);
         const n = parseFloat(e.target.value);
-        if (Number.isFinite(n)) onChange(n);
+        // the min/max attributes only steer the arrows; a typed value has to be held here
+        if (Number.isFinite(n)) onChange(clampNumber(n, min, max, integer));
       }}
       onBlur={() => {
         setText(null);

@@ -3,6 +3,7 @@ import type { Component } from '@idv7lol/theme-schema';
 import { allIds, useProjectStore } from '../store/project.js';
 import { useUiStore, type MenuItem } from '../store/ui.js';
 import { translate } from '../i18n/index.js';
+import { confirmDialog } from '../host/confirm.js';
 import { LIBRARY, LIBRARY_GROUPS } from './componentLibrary.js';
 import { usePiecesStore } from './savedPieces.js';
 import { browseAndPlace, replaceImage } from './imageActions.js';
@@ -260,8 +261,10 @@ export function openAssetMenu(x: number, y: number, assetId: string): void {
       label: tr('misc.remove'),
       danger: true,
       onSelect: () => {
-        if (uses === 0 || window.confirm(tr('image.confirmDelete', { n: uses })))
-          useProjectStore.getState().removeAsset(assetId);
+        void (async () => {
+          if (uses === 0 || (await confirmDialog(tr('image.confirmDelete', { n: uses }))))
+            useProjectStore.getState().removeAsset(assetId);
+        })();
       },
     },
   ]);

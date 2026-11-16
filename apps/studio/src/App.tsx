@@ -58,6 +58,8 @@ import {
   savePng,
   saveThemeFile,
 } from './host/files.js';
+import { confirmDialog } from './host/confirm.js';
+import { unsavableReasons } from './lib/limits.js';
 
 export function App(): JSX.Element {
   useEffect(() => {
@@ -130,9 +132,11 @@ export function App(): JSX.Element {
   const log = ui.logMessage;
 
   /* ----- file operations ----- */
+  /** Resolves once the user has answered; nothing that discards the project may start before. */
   const confirmDiscard = useCallback(
-    (): boolean => !project.dirty || window.confirm(t('confirm.discard')),
-    [project.dirty, t],
+    async (): Promise<boolean> =>
+      !useProjectStore.getState().dirty || (await confirmDialog(t('confirm.discard'))),
+    [t],
   );
 
   const loadFromText = useCallback(
@@ -160,14 +164,14 @@ export function App(): JSX.Element {
   );
 
   const doOpen = useCallback(async () => {
-    if (!confirmDiscard()) return;
+    if (!(await confirmDiscard())) return;
     const f = await openThemeFile();
     if (f) loadFromText(f.text, f.path, f.name);
   }, [confirmDiscard, loadFromText]);
 
   const doOpenPath = useCallback(
     async (path: string) => {
-      if (!confirmDiscard()) return;
+      if (!(await confirmDiscard())) return;
       try {
         loadFromText(await readTextAt(path), path, baseName(path));
       } catch (e) {
@@ -184,6 +188,14 @@ export function App(): JSX.Element {
         ...theme,
         meta: { ...theme.meta, createdWith: 'idv7lol Studio', modified: new Date().toISOString() },
       });
+      // A file the Studio could not open again is not written: see loadFromText.
+      const reasons = unsavableReasons(text);
+      if (reasons.length > 0) {
+        log('error', `${t('status.cannotSave')} ${reasons.join('; ')}`);
+        ui.setBottomTab('validation');
+        window.alert(`${t('status.cannotSave')}\n\n${reasons.slice(0, 6).join('\n')}`);
+        return;
+      }
       const path = await saveThemeFile(
         text,
         as ? null : useProjectStore.getState().filePath,
@@ -195,12 +207,12 @@ export function App(): JSX.Element {
         log('info', `${t('status.saved')}${path ? `: ${path}` : ''}`);
       }
     },
-    [project, log, t],
+    [project, ui, log, t],
   );
 
   const doNew = useCallback(
-    (template?: Theme) => {
-      if (!confirmDiscard()) return;
+    async (template?: Theme) => {
+      if (!(await confirmDiscard())) return;
       project.newTheme(template);
       ui.setWelcomeOpen(false);
     },
@@ -276,6 +288,35 @@ export function App(): JSX.Element {
     window.addEventListener('beforeunload', h);
     return () => window.removeEventListener('beforeunload', h);
   }, []);
+  /* The desktop window ignores beforeunload when it is closed (X, Alt+F4, Cmd+Q): ask there too. */
+  useEffect(() => {
+    if (!isTauri) return;
+    let stop: (() => void) | undefined;
+    let gone = false;
+    let asking = false;
+    (async () => {
+      const { getCurrentWindow } = await import('@tauri-apps/api/window');
+      const win = getCurrentWindow();
+      const unlisten = await win.onCloseRequested(async (event) => {
+        // Not dirty: the API closes the window itself once this handler returns.
+        if (!useProjectStore.getState().dirty) return;
+        event.preventDefault();
+        if (asking) return;
+        asking = true;
+        try {
+          if (await confirmDiscard()) await win.destroy();
+        } finally {
+          asking = false;
+        }
+      });
+      if (gone) unlisten();
+      else stop = unlisten;
+    })().catch(() => undefined);
+    return () => {
+      gone = true;
+      stop?.();
+    };
+  }, [confirmDiscard]);
 
   /* ----- images: keep pixels decoded; Ctrl+V pastes pictures or components ----- */
   useEffect(() => syncAssets(useProjectStore.getState().theme), [project.assets]);
@@ -691,7 +732,7 @@ export function App(): JSX.Element {
 
       {ui.welcomeOpen && (
         <WelcomeDialog
-          onPick={(th) => doNew(th)}
+          onPick={(th) => void doNew(th)}
           onOpen={() => void doOpen()}
           onOpenRecent={(p) => void doOpenPath(p)}
           onClose={() => ui.setWelcomeOpen(false)}

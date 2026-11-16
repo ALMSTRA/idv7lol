@@ -2,6 +2,7 @@ import { useMemo, useState, useSyncExternalStore } from 'react';
 import { flattenComponents } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
 import { useT } from '../i18n/index.js';
+import { confirmDialog } from '../host/confirm.js';
 import { browseAndPlace, importAndPlace } from '../lib/imageActions.js';
 import { getThumb, imageFilesOf, imagesVersion, subscribeImages } from '../lib/imageStore.js';
 import { openAssetMenu } from '../lib/contextMenus.js';
@@ -72,7 +73,10 @@ export function ImagesPanel(): JSX.Element {
                 onClick={(e) => {
                   e.stopPropagation();
                   const n = uses.get(id) ?? 0;
-                  if (n === 0 || window.confirm(t('image.confirmDelete', { n }))) remove(id);
+                  void (async () => {
+                    if (n === 0 || (await confirmDialog(t('image.confirmDelete', { n }))))
+                      remove(id);
+                  })();
                 }}
               >
                 ×

@@ -6,6 +6,7 @@ import { findComponent, RENDERER_LIMITS } from '@idv7lol/theme-engine';
 import { buildPieces } from '@idv7lol/theme-compiler';
 import { useProjectStore, useThemeForPanels } from '../store/project.js';
 import { useT } from '../i18n/index.js';
+import { MAX_COMPONENT_NAME } from '../lib/limits.js';
 import { openLayerMenu } from '../lib/contextMenus.js';
 
 export function LayersPanel(): JSX.Element {
@@ -111,6 +112,7 @@ export function LayersPanel(): JSX.Element {
                     autoFocus
                     type="text"
                     defaultValue={c.name ?? c.id}
+                    maxLength={MAX_COMPONENT_NAME}
                     onBlur={(e) => {
                       update(c.id, { name: e.target.value } as Partial<Component>);
                       setEditing(null);

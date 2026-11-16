@@ -316,7 +316,7 @@ export const ja: Dictionary = {
     downloadedUsb:
       '{path} をダウンロードしました。USB メモリの idv7lol/themes にコピーし、車両に挿してください。',
     usbHint:
-      'コンパイルして「車両用に保存」を押し、USB メモリを選択します。車両アプリが自動でテーマを見つけます。Next theme で選択してください。',
+      'コンパイルして「車両用に保存」を押し、USB メモリを選択します。車両アプリが自動でテーマを見つけます。Theme で選択してください。',
     usbHintBrowser:
       'コンパイルして「車両用に保存」を押します。ファイルを USB メモリの idv7lol/themes にコピーすると、車両アプリが自動で見つけます。',
     status: 'ステータス',
@@ -420,6 +420,8 @@ export const ja: Dictionary = {
   },
   status: {
     saved: '保存済み',
+    cannotSave:
+      '保存しませんでした。このままでは Studio でファイルを開き直せません。先に次の点を直してください（「検証」タブに表示されます）:',
     unsaved: '未保存の変更',
     zoom: 'ズーム',
     selection: '{n} 個を選択中',

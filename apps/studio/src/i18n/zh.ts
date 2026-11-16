@@ -304,8 +304,7 @@ export const zh: Dictionary = {
     saveUsb: '保存到车机 (USB)',
     savedUsb: '已保存 {path}。将 U 盘插入车辆，主题会自动安装。',
     downloadedUsb: '已下载 {path}。将其复制到 U 盘的 idv7lol/themes 中，然后插入车辆。',
-    usbHint:
-      '先编译，再点击“保存到车机”并选择你的 U 盘。车机应用会自动找到主题；用 Next theme 选择它。',
+    usbHint: '先编译，再点击“保存到车机”并选择你的 U 盘。车机应用会自动找到主题；用 Theme 选择它。',
     usbHintBrowser:
       '先编译，再点击“保存到车机”。将文件复制到 U 盘的 idv7lol/themes 中；车机应用会自动找到它。',
     status: '状态',
@@ -404,6 +403,7 @@ export const zh: Dictionary = {
   },
   status: {
     saved: '已保存',
+    cannotSave: '未保存：Studio 将无法再次打开此文件。请先修正以下问题（“验证”选项卡中已列出）：',
     unsaved: '有未保存的更改',
     zoom: '缩放',
     selection: '已选择 {n} 个',

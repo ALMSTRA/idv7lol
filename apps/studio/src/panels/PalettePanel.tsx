@@ -4,6 +4,7 @@ import { contrastRatio, parseColor, toHex } from '@idv7lol/theme-engine';
 import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
 import { useT } from '../i18n/index.js';
+import { MAX_PALETTE_NAME } from '../lib/limits.js';
 
 const MODES: DriveMode[] = ['ECO_PRO', 'COMFORT', 'SPORT', 'SPORT_PLUS', 'ADAPTIVE', 'TRACK'];
 
@@ -73,6 +74,7 @@ export function PalettePanel(): JSX.Element {
               <input
                 type="text"
                 value={pal.name}
+                maxLength={MAX_PALETTE_NAME}
                 onChange={(e) => setPalette(active, { ...pal, name: e.target.value })}
               />
             </div>

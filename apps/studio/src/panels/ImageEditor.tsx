@@ -18,6 +18,7 @@ import {
 import { useProjectStore } from '../store/project.js';
 import { useUiStore } from '../store/ui.js';
 import { useT } from '../i18n/index.js';
+import { confirmDialog } from '../host/confirm.js';
 import { frameRaster } from '@idv7lol/theme-engine';
 import {
   ensureSource,
@@ -438,8 +439,22 @@ function Editor({ componentId }: { componentId: string }): JSX.Element {
   }, []);
 
   const dirty = JSON.stringify(edits) !== JSON.stringify(comp?.props.edits ?? CLEAN);
+  // one question at a time: Escape pressed twice must not stack two dialogs
+  const asking = useRef(false);
   const cancel = useCallback(() => {
-    if (!dirty || window.confirm(t('image.discard'))) close(null);
+    if (!dirty) {
+      close(null);
+      return;
+    }
+    if (asking.current) return;
+    asking.current = true;
+    void confirmDialog(t('image.discard'))
+      .then((yes) => {
+        if (yes) close(null);
+      })
+      .finally(() => {
+        asking.current = false;
+      });
   }, [dirty, close, t]);
   const apply = () => {
     if (comp)
