@@ -1,7 +1,7 @@
 import { serializeTheme, type Theme } from '@idv7lol/theme-schema';
 import { validateTheme } from '@idv7lol/theme-compiler';
 import { downloadBlob, isTauri, openExternal, pickFolder } from '../host/files.js';
-import { TEMPLATES } from './templates.js';
+import { TEMPLATE_THEME_IDS } from './templates.js';
 
 /**
  * Sharing a theme with the project: save the theme file and a picture of it,
@@ -20,7 +20,7 @@ export function shareBlock(theme: Theme): ShareBlock | null {
   if (!report.ok) return { reason: 'errors', count: report.errors.length };
   if (!theme.author.trim()) return { reason: 'author' };
   // A theme started from a template keeps its id; shared as is, it would replace the template.
-  if (TEMPLATES.some((t) => t.theme.id === theme.id)) return { reason: 'id', id: theme.id };
+  if (TEMPLATE_THEME_IDS.has(theme.id)) return { reason: 'id', id: theme.id };
   return null;
 }
 

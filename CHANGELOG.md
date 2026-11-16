@@ -95,8 +95,9 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   check lamps, a gear window, a green-yellow-red row of lamps for the oil warming up and an amber
   on-board computer. Amber night, Daylight and Red night palettes. Tested locally; not tested in a
   vehicle.
-- The newest themes open the Studio's template list: Lily Pad, Supercar Track, Neon Drive,
-  Heritage 89, Volt Runner.
+- The newest themes open the Studio's template list: VDO Classic M, Lily Pad, Supercar Track, Neon
+  Drive, Heritage 89, Volt Runner. VDO Classic M carries its pictures in its file (1.2 MB), so it
+  loads when the list opens instead of with the Studio, which starts as fast as before.
 
 - **Volt Runner**, a new bright yellow theme built around an animation: a running lightning bolt
   (original pixel art) in the middle that runs faster the faster the car goes, the speed big on

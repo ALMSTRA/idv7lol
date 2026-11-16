@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Theme } from '@idv7lol/theme-schema';
 import { EngineState, ThemeEngine } from '@idv7lol/theme-engine';
 import { SignalBus } from '@idv7lol/vehicle-signals';
-import { TEMPLATES, blankTemplate, type Template } from '../lib/templates.js';
+import { TEMPLATES, blankTemplate, loadLargeTemplates, type Template } from '../lib/templates.js';
 import { useT } from '../i18n/index.js';
 import { isTauri, recentFiles } from '../host/files.js';
 
@@ -53,7 +53,17 @@ export function WelcomeDialog({
 }): JSX.Element {
   const t = useT();
   const recent = isTauri ? recentFiles() : [];
-  const community = TEMPLATES.filter((tp) => tp.community);
+  // the templates with pictures inside come in a moment later, at the head of the list
+  const [large, setLarge] = useState<Template[]>([]);
+  useEffect(() => {
+    let live = true;
+    void loadLargeTemplates().then((l) => live && setLarge(l));
+    return () => {
+      live = false;
+    };
+  }, []);
+  const all = [...large, ...TEMPLATES];
+  const community = all.filter((tp) => tp.community);
   const card = (tp: Template) => (
     <button key={tp.id} className="template-card" onClick={() => onPick(tp.theme)}>
       <div className="thumb">
@@ -74,7 +84,7 @@ export function WelcomeDialog({
           </div>
         </div>
         <div className="template-grid">
-          {TEMPLATES.filter((tp) => !tp.community).map(card)}
+          {all.filter((tp) => !tp.community).map(card)}
           <button className="template-card" onClick={() => onPick(blankTemplate())}>
             <div className="thumb" />
             <strong>{t('welcome.blank')}</strong>
