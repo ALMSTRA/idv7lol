@@ -162,7 +162,8 @@ class ClusterEngine {
     this.stripY = opts.stripY || (() => null);
     // The car's state for the layout (vehicle.js hold()): 'drop' takes it down, 'wait' puts up no
     // new one, null leaves it to Show and the signals. Mapping the panel while the car switches on
-    // or off counts against cluster-render's mapping guard, which turns a target off for good.
+    // or off can drop the display service (before cluster-render 0.5.12 two drops turned the target
+    // off for good).
     this.hold = opts.hold || (() => null);
     // How long the layout must be wanted without a break before it goes up (the car app: SETTLE_MS),
     // so services coming up one by one at start don't put it up and down.

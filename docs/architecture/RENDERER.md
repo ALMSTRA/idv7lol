@@ -36,13 +36,15 @@ theme.json ──compiler──▶ pieces (GLSL ES 1.00 + uniforms) ──runtim
 
 idv7lol targets `panel`. Since cluster-render 0.5.1 the panel has its own scene id,
 0x010004f8, so the panel and the HUD can show at the same time (upstream: "reported on one
-car"). If the cluster refuses that id, or the mapping guard turns it off, the panel falls back
-to 0x01000400, the HUD's, and then the two can't show together, as before 0.5.1
-(`cluster-render.conf`, `panel_scene_id` / `panel_fallback_scene_id`). The guard keeps the
-fallback once the panel's id has had two strikes, until `cluster-render guard-reset` (root, SSH)
-or a new cluster-render version (idrive-apps #128, #54).
+car"). If the cluster refuses that id, the panel falls back to 0x01000400, the HUD's, and then
+the two can't show together, as before 0.5.1 (`cluster-render.conf`, `panel_scene_id` /
+`panel_fallback_scene_id`). Since 0.5.12 that lasts until the service restarts. Before it, a
+mapping guard counted a strike when the display service went away within 10 s of a mapping and
+kept the fallback (or turned the target off) for good after two, until `cluster-render
+guard-reset`; 0.5.12 removed the guard, its file and `guard-reset`, and a drop is one log line
+(idrive-apps #128, #54; commit 0534f04).
 
-idv7lol requires cluster-render **0.5.9** or newer:
+idv7lol requires cluster-render **0.6.4** or newer:
 
 - before 0.5.2, stopping a renderer-side animation left RAMSES 19's animation system broken, and
   the next request for the target crashed the service (idrive-apps #132). The car app starts and
@@ -54,6 +56,13 @@ idv7lol requires cluster-render **0.5.9** or newer:
   target, as every other layer in error (idrive-apps #159). The panel stays while other layers
   want it; if the glyph atlas, which every text samples, were refused, the layout would keep only
   its shapes. The car app sends an animation's refused ETC2 atlas again as `rgba8`.
+- 0.6.3: an image layer stays hidden in each new scene until its first whole write has gone, so
+  no flush shows its buffer before it holds the picture (commit 93d31ef, documented in d7450ea).
+  The car app makes its picture layers first and writes their pixels after.
+- 0.6.4: a shown scene the KOMBI removes while the upload cap is above 4000 KB/s bars that cap
+  level until the service restarts, and a fetch the KOMBI fails within 1 s after such a removal
+  is asked again (up to four times) (commit 44934a6, mgu-store #292). Pictures and animations may
+  upload more slowly for the rest of that run; the car app logs the `budget` event.
 
 ## iDrive 8 (not supported by idv7lol)
 
@@ -170,9 +179,9 @@ Studio as hints (info zones, no findings) until someone checks them:
 - `drop` / socket close / SIGTERM release layers; the Store's uninstall removes
   `/var/opt/cluster-render`.
 - Real risks documented upstream: a crashing _service_ restarts the head unit; a bad slot
-  mapping restarts the cluster or HUD (guard file at `/var/opt/cluster-render/state/guard.txt`,
-  reset with `cluster-render guard-reset` as root). idv7lol only uses the allow-listed `panel`
-  target and never sends custom scene ids.
+  mapping restarts the cluster or HUD. (The guard file and `cluster-render guard-reset` are gone
+  since 0.5.12; the service removes an old guard file at start.) idv7lol only uses the
+  allow-listed `panel` target and never sends custom scene ids.
 - Vehicle data does **not** come from cluster-render: the app reads SOME/IP fields through
   the OAP SDK proxies declared in its manifest (see `docs/developer/SIGNALS.md`).
 
@@ -195,6 +204,8 @@ Studio as hints (info zones, no findings) until someone checks them:
 | cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive                                     |
 | cluster-render  | 0.5.0–0.5.5  | 0.5.0 scene files (off by default); 0.5.1 panel's own scene id; 0.5.3 `yield`; 0.5.4–0.5.5 fixes |
 | cluster-render  | 0.5.6–0.5.9  | 0.5.6 re-ask of an accepted, unmapped scene; 0.5.7 video compose; 0.5.8 exclusive; 0.5.9 ETC2    |
+| cluster-render  | 0.5.10–0.6.4 | 0.5.12 no mapping guard; 0.6.0 scene hosts; 0.6.3 images hidden until written; 0.6.4 upload cap  |
+| mgu-deploy      | 0.8.19       | required by idv7lol (0.8.12 code cache, 0.8.13 tiles, 0.8.16 safe mode, 0.8.19 MainApp 6.4.8)    |
 | Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                        |
 | Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`               |
 | mgu-deploy      | 0.7.11       | pinned by waze-on-cluster                                                                        |

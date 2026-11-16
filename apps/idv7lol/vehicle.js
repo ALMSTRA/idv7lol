@@ -616,8 +616,9 @@ function startVehicle(ctx, opts) {
  * or switching off (12); 'wait' (no new layout) while drive readiness is starting (8) or the car
  * sent a state it can't name; null otherwise, the demo drive, or a car that sends no state. The
  * kit's Redline holds its cluster-render layer back the same way (issue #141 there): a target
- * mapped while the KOMBI switches on or off took strikes from cluster-render's mapping guard, and
- * two turn the target off for good.
+ * mapped while the KOMBI switches on or off can drop the display service. Before cluster-render 0.5.12
+ * two such drops turned the target off for good (its mapping guard); now each is a log line, but a
+ * layout put up and taken down then still flashes and gains nothing.
  */
 function holdFor(d) {
   if (!d || d.demo) return null;

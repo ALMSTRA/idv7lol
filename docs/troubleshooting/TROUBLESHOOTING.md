@@ -69,8 +69,8 @@ apps missing from the menu (mgu-store #265). Update the Store's tools, then use 
 
 **An update installed, but the app behaves like the old version.** The Store's deploy tool before
 0.8.12 could run a cached copy of the previous code when the new bundle had the same length
-(mgu-store #261). idv7lol requires 0.8.12, so the Store updates it first; on an older Store, update
-its tools and restart the head unit.
+(mgu-store #261). idv7lol requires 0.8.19 (0.8.12 fixed this), so the Store updates it first; on an
+older Store, update its tools and restart the head unit.
 
 **The install rolled back with "run the install again later".** MainApp was busy installing
 something else, so the deploy tool didn't restart it (mgu-store #216). Wait a few minutes and
@@ -97,7 +97,7 @@ channel now offers an update only when the car app or the kit changes (`build.sh
 `mgu-repo.json`, mgu-store #205).
 
 **The app page says "not connected".** cluster-render is not installed or not running. Install
-it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.5.9+.
+it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.6.4+.
 
 **"Waiting for live car data".** No signal has arrived: with the engine off and the car asleep
 the bus is silent. Start the car, or set _Demo data: On_ to check the layout.
@@ -110,15 +110,15 @@ factory telltales and the KOMBI keeps its gear bracket. Keep readings out of the
 (the Studio draws them).
 
 **The cluster restarted.** Stop using the app (Show on the cluster: Off), note the theme and
-what you did, and open an issue. cluster-render's upstream documentation describes its
-mapping guard; `cluster-render guard-reset` (root SSH) clears it. Another project saw a cluster
+what you did, and open an issue. Since cluster-render 0.5.12 a dropped display service is only a
+line in its log; nothing is turned off afterwards. Another project saw a cluster
 restart twice from one heavy shader, with brake, ABS and stability warnings until the car slept
 (idrive7-apps #120); idv7lol keeps one small shader per piece for that reason.
 
-**The layout and a HUD app no longer show at the same time.** After two strikes on the panel's
-own scene id, cluster-render's guard keeps the panel on the HUD's id, and then the two can't
-show together. It stays that way until `cluster-render guard-reset` (root SSH) or a new
-cluster-render version (idrive-apps #128).
+**The layout and a HUD app no longer show at the same time.** The cluster refused the panel's own
+scene id, so the panel fell back to the HUD's and the two can't show together. Since
+cluster-render 0.5.12 that lasts only until the service restarts (restart the head unit); there is
+no guard to reset any more (idrive-apps #128).
 
 **The factory gauges flash for a moment when switching themes.** An empty panel hands the
 cluster back for an instant (seen by another cluster app, idrive7-cluster-info #9). Since the
