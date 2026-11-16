@@ -27,6 +27,8 @@ load('text.js');
 load('units.js');
 load('fuel.js');
 load('etc2.js');
+load('tz.js');
+load('page.js');
 // The kit's runtime goes into the app too (kit/tools/build.py). It needs the head unit's oap-sdk
 // to run, so here it is only compiled, which is enough to catch syntax this Node lacks.
 const vm = require('vm');
@@ -37,6 +39,21 @@ fs.readdirSync(KIT)
     const src = fs.readFileSync(path.join(KIT, f), 'utf8');
     new vm.Script(require('module').wrap(src), { filename: 'kit/runtime/' + f });
   });
+
+// main.js and vehicle.js need the kit, which is next to them only in the built app: compiled too,
+// with every other file of the app, so syntax newer than ES2017 never reaches a car.
+fs.readdirSync(APP)
+  .filter((f) => /\.js$/.test(f))
+  .forEach((f) => {
+    const src = fs.readFileSync(path.join(APP, f), 'utf8');
+    new vm.Script(require('module').wrap(src), { filename: 'apps/idv7lol/' + f });
+  });
+// The page: every bundled theme's sketch on a canvas that takes any call.
+const page = load('page.js');
+const anyCanvas = new Proxy(
+  {},
+  { get: (_t, name) => (name === 'textWidth' ? () => 100 : () => anyCanvas) },
+);
 
 class CountingClient extends EventEmitter {
   constructor() {
@@ -113,7 +130,13 @@ function check(name, theme) {
 
 console.log('Node ' + process.version + ', car app ' + spec.version);
 
-index.themes.forEach((t) => check(t.id, load(t.module + '.js')));
+index.themes.forEach((t) => {
+  const theme = load(t.module + '.js');
+  check(t.id, theme);
+  if (!Array.isArray(theme.preview) || !theme.preview.length)
+    throw new Error(t.id + ' has no sketch for the app page');
+  page.drawPreview(anyCanvas, theme, theme.paletteSelection.default, 0, 0, 820);
+});
 
 const dir = process.argv[2];
 if (dir) {

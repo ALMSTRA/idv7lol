@@ -5,9 +5,9 @@
  * The app runs on the head unit (Node 8). It reads the car's signals
  * (vehicle.js), loads a theme compiled by the idv7lol Studio / theme
  * compiler (theme_<id>.js) and draws it through the cluster-render service
- * (engine.js). Its own page on the central display shows status and
- * diagnostics; everything else is in the iDrive Settings menu the kit builds
- * from app.json.
+ * (engine.js). Its own page on the central display (page.js) shows the
+ * themes, the car's data and diagnostics; everything else is in the Settings
+ * the kit builds from app.json.
  *
  * Safety: off by default. The layout exists only while "Show on the
  * cluster" is on AND car data is live; it is dropped (and the factory
@@ -26,8 +26,11 @@ const index = require('./themes_index');
 const SHADERS = require('./shaders');
 const { ThemeLibrary, UsbWatcher, PREFIX } = require('./usb_themes');
 
-const W = 1600,
-  H = 520;
+const G = require('./kit/gauges');
+const page = require('./page');
+
+const W = page.W,
+  H = page.H;
 const APP_ID = 'idv7lol';
 
 function loadFonts(theme) {
@@ -72,14 +75,30 @@ mgu.run({
 
     const library = new ThemeLibrary({ dataDir: ctx.dataDir || process.cwd(), log });
     const themeKeys = () => index.themes.map((t) => t.id).concat(library.list().map((t) => t.key));
+    // The cluster's theme is the setting "clusterTheme". It was "theme", which is the kit's own
+    // key for the colours of this page: a theme chosen under the old name is carried over once.
+    const THEME = 'clusterTheme';
+    if (settings.get('_clusterThemeMoved') !== 1) {
+      const old = settings.get('theme');
+      const item = settings.item(THEME);
+      if (
+        typeof old === 'string' &&
+        item &&
+        settings.get(THEME) === item.default &&
+        old !== item.default &&
+        themeKeys().indexOf(old) >= 0
+      )
+        settings.set(THEME, old);
+      settings.set('_clusterThemeMoved', 1);
+    }
     let current;
     try {
-      current = loadTheme(settings.get('theme'), library);
+      current = loadTheme(settings.get(THEME), library);
     } catch (e) {
-      log.warn('theme ' + settings.get('theme') + ' failed, using the first bundled one: ' + e);
+      log.warn('theme ' + settings.get(THEME) + ' failed, using the first bundled one: ' + e);
       current = loadTheme(index.themes[0].id);
     }
-    let usbNote = 'Copy themes to idv7lol/themes on a USB stick and plug it in.';
+    let usbNote = '';
     const paletteId = () => {
       const manual = settings.get('palette');
       const sel = current.theme.paletteSelection;
@@ -131,53 +150,334 @@ mgu.run({
       if (engine.shown) client.status();
     }, 5000);
 
+    /* ---------- the app's own page (drawing in page.js) ---------- */
+    // "modern": tabs with the themes' sketches and the car's data, then the four text pages.
+    // "classic": the four text pages alone, as the app was before.
+    const classic = () => settings.get('interface') === 'classic';
+    let tab = 0; // modern: index into page.MODERN_TABS
+    let textPageNo = 0; // classic: 0 status, 1 signals, 2 renderer, 3 about
+    let drawn = null; // what the last frame showed: the page is drawn again only when it changes
+    const redraw = () => {
+      drawn = null;
+    };
+
+    // A theme's data for its sketch, without its fonts and pictures (kept: the page shows three).
+    const sketches = {};
+    const sketchOf = (key) => {
+      if (key === current.key) return current.theme;
+      if (!sketches[key]) {
+        try {
+          if (String(key).indexOf(PREFIX) === 0) sketches[key] = library.load(key).theme;
+          else {
+            const entry = index.themes.find((t) => t.id === key);
+            sketches[key] = entry ? require('./' + entry.module) : null;
+          }
+        } catch (e) {
+          log.warn('sketch of ' + key + ': ' + e);
+          sketches[key] = null;
+        }
+      }
+      return sketches[key];
+    };
+    const forgetUsbSketches = () =>
+      Object.keys(sketches).forEach((k) => {
+        if (k.indexOf(PREFIX) === 0) delete sketches[k];
+      });
+
+    const stateNow = () => {
+      const st = engine.status();
+      const vs = vehicle.status();
+      return page.stateOf({
+        showing: showing(),
+        connected: st.connected,
+        failed: st.failed,
+        shown: st.shown,
+        hold: vehicle.hold(),
+        demo: vs.demo,
+        theme: current.theme.name,
+        palette: st.palette,
+      });
+    };
+    const text = (id) => {
+      const s = vehicle.store.get(id);
+      return s && s.value !== undefined && s.value !== null ? String(s.value) : '';
+    };
+
+    function removeUsbTheme() {
+      if (current.key.indexOf(PREFIX) !== 0) {
+        usbNote = 'Only themes installed from USB can be removed. This one is built in.';
+        return;
+      }
+      const name = current.theme.name;
+      library.remove(current.key);
+      forgetUsbSketches();
+      settings.set(THEME, index.themes[0].id);
+      usbNote = 'Removed ' + name + '.';
+    }
+
     // The kit tells every setting it is given, the same value too (picked again in the HMI). Only a
     // real change rebuilds the layout: a rebuild that changes nothing still flashes the cluster.
-    const last = { theme: settings.get('theme'), bottomStrip: settings.get('bottomStrip') };
+    const last = { theme: settings.get(THEME), bottomStrip: settings.get('bottomStrip') };
     settings.onChange((k) => {
-      if ((k === 'theme' || k === 'bottomStrip') && settings.get(k) === last[k]) return;
-      if (k === 'theme' || k === 'bottomStrip') last[k] = settings.get(k);
-      if (k === 'theme') {
+      redraw();
+      if (k === THEME) {
+        if (settings.get(THEME) === last.theme) return;
+        last.theme = settings.get(THEME);
         try {
-          current = loadTheme(settings.get('theme'), library);
+          current = loadTheme(settings.get(THEME), library);
           engine.setTheme(current.theme, current.fonts);
           log.info('theme: ' + current.theme.id);
         } catch (e) {
           log.warn('theme load failed: ' + e);
         }
       }
-      if (k === 'bottomStrip') engine.setTheme(current.theme, current.fonts);
+      if (k === 'bottomStrip') {
+        if (settings.get('bottomStrip') === last.bottomStrip) return;
+        last.bottomStrip = settings.get('bottomStrip');
+        engine.setTheme(current.theme, current.fonts);
+      }
       if (k === 'palette') engine.recolour();
-      if (k === 'sweep' || k === 'utcOffset' || k === 'timeZone') return;
-      render().catch(() => {});
+      // "Theme from USB on show > Remove it from the car" is a one-off: it goes back to Keep
+      if (k === 'usbRemove' && settings.get('usbRemove') === 'remove') {
+        removeUsbTheme();
+        settings.set('usbRemove', 'keep');
+      }
     });
 
-    /* ---------- the app's own page ---------- */
-    let page = 0; // 0 status, 1 signals, 2 renderer, 3 about
-    const PAGES = 4;
+    function draw() {
+      const t = ctx.theme();
+      const cv = ctx.canvas(W, H).clear(t.bg);
+      const st = engine.status();
+      const vs = vehicle.status();
+      const state = stateNow();
+      const store = vehicle.store;
+      const pid = paletteId();
+      const modern = !classic();
+      if (modern && tab === 0) {
+        const keys = themeKeys();
+        const i = Math.max(0, keys.indexOf(current.key));
+        const side = (d) => {
+          if (keys.length < 2 || (keys.length === 2 && d < 0)) return null;
+          const th = sketchOf(keys[(i + d + keys.length) % keys.length]);
+          return th ? { theme: th, palette: th.paletteSelection.default } : null;
+        };
+        page.themesPage(cv, t, {
+          themes: [side(-1), { theme: current.theme, palette: pid }, side(1)],
+          state,
+          layers: current.theme.layers,
+          paletteName: settings.get('palette') === 'auto' ? 'Auto (' + pid + ')' : pid,
+          note: usbNote,
+          count: keys.length,
+          at: i + 1,
+        });
+      } else if (modern && tab === 1) {
+        const litres = store.number('fuel.volume');
+        const range = store.number('vehicle.range');
+        page.dataPage(cv, t, {
+          theme: { theme: current.theme, palette: pid },
+          state,
+          mode: text('drive.mode'),
+          source: vs.demo ? 'Demo' : vehicle.live() ? 'Live' : 'Not live',
+          speed: store.number('vehicle.speed'),
+          rpm: store.number('engine.rpm'),
+          redline: 7000,
+          gear: text('transmission.gear'),
+          programme: text('transmission.mode'),
+          fuelPct: store.number('fuel.level'),
+          fuelText:
+            (page.isNum(litres) ? page.fmt(litres) + ' l' : '') +
+            (page.isNum(litres) && page.isNum(range) ? '  ·  ' : '') +
+            (page.isNum(range) ? page.fmt(range) + ' km' : ''),
+          oil: store.number('engine.oil.temp'),
+          coolant: store.number('engine.coolant.temp'),
+        });
+      } else {
+        const n = modern ? tab - 2 : textPageNo;
+        const now = Date.now();
+        page.textPage(cv, t, n, {
+          version,
+          state,
+          themeLine:
+            current.theme.name +
+            '  ·  ' +
+            current.theme.layers +
+            ' layers  ·  ' +
+            current.theme.compiledWith,
+          rendererLine:
+            (st.connected ? 'connected (' + st.backend + ')' : 'not connected') +
+            '  ·  panel: ' +
+            st.target +
+            '  ·  refused ops: ' +
+            st.refused,
+          carLine:
+            (vs.demo ? 'DEMO' : vehicle.live() ? 'live' : 'not live') +
+            '  ·  ' +
+            page.fmt(store.number('vehicle.speed')) +
+            ' km/h  ·  ' +
+            page.fmt(store.number('engine.rpm')) +
+            ' rpm  ·  gear ' +
+            (text('transmission.gear') || '-') +
+            '  ·  oil ' +
+            page.fmt(store.number('engine.oil.temp')) +
+            '°  ·  coolant ' +
+            page.fmt(store.number('engine.coolant.temp')) +
+            '°',
+          modeLine:
+            (text('drive.mode') || '-') +
+            '  ·  shift programme ' +
+            (text('transmission.mode') || '-'),
+          fuel: vs.fuel,
+          providers: vs.providers,
+          usb:
+            library.list().length +
+            ' installed  ·  ' +
+            (usbNote || 'Copy themes to idv7lol/themes on a USB stick and plug it in.'),
+          demo: vs.demo,
+          signals: store
+            .ids()
+            .sort()
+            .map((id) => {
+              const s = store.get(id);
+              const v = typeof s.value === 'number' ? Math.round(s.value * 100) / 100 : s.value;
+              return {
+                text: id + '  =  ' + v + '   (' + Math.round((now - s.at) / 100) / 10 + ' s)',
+                fresh: s.valid && now - s.at < 3000,
+              };
+            }),
+          raw: Object.keys(vs.raw).map((k) => k + ': ' + vs.raw[k]),
+          connected: st.connected,
+          lines: (engine.rendererStatus || 'open this page with the layout showing')
+            .split('\n')
+            .filter((l) => !/effect of idv7lol/.test(l)),
+          footer:
+            'messages sent: ' +
+            st.messages +
+            '   layers: ' +
+            st.layers +
+            '   targets: ' +
+            st.targets,
+          versions:
+            'Versions: app ' +
+            version +
+            '  ·  theme ' +
+            current.theme.version +
+            '  ·  compiler ' +
+            current.theme.compiledWith,
+        });
+        if (!modern)
+          page.label(
+            cv,
+            'Show: ' +
+              (showing() ? 'ON' : 'off') +
+              '   ·   Theme: ' +
+              current.theme.name +
+              '   ·   Palette: ' +
+              settings.get('palette') +
+              '   ·   page ' +
+              (textPageNo + 1) +
+              '/' +
+              page.CLASSIC_PAGES,
+            48,
+            504,
+            15,
+            t.dim,
+          );
+      }
+      if (modern) G.frame(cv, t, page.MODERN_TABS, tab, [vs.demo && { text: 'DEMO' }]);
+      return cv;
+    }
+
+    /** What the page shows now, as one string: it is drawn again only when this changes. */
+    function shownNow() {
+      const store = vehicle.store;
+      const state = stateNow();
+      const modern = !classic();
+      const parts = [
+        modern ? 'm' + tab : 'c' + textPageNo,
+        state.label,
+        state.detail,
+        current.key,
+        paletteId(),
+        settings.get('palette'),
+        usbNote,
+        ctx.theme().name,
+      ];
+      const n = (id, step) => {
+        const v = store.number(id);
+        return page.isNum(v) ? Math.round(v / step) * step : '-';
+      };
+      if (modern && tab === 0) parts.push(themeKeys().length);
+      else if (modern && tab === 1)
+        parts.push(
+          n('vehicle.speed', 1),
+          n('engine.rpm', 20),
+          text('transmission.gear'),
+          text('transmission.mode'),
+          text('drive.mode'),
+          n('fuel.level', 1),
+          n('fuel.volume', 1),
+          n('vehicle.range', 1),
+          n('engine.oil.temp', 1),
+          n('engine.coolant.temp', 1),
+          vehicle.status().demo,
+          vehicle.live(),
+        );
+      // the text pages show values and their ages: twice a second (About: never by itself)
+      else if ((modern ? tab - 2 : textPageNo) !== 3) parts.push(Math.floor(Date.now() / 500));
+      return parts.join('|');
+    }
+
+    function render(force) {
+      const now = shownNow();
+      if (!force && now === drawn) return Promise.resolve();
+      drawn = now;
+      return ui.image('MAIN_GFX', draw());
+    }
+    // A button's own frame at once; a failure there is logged, never thrown at the kit.
+    const show = () => render(true).catch((e) => log.warn('page: ' + ((e && e.stack) || e)));
+
     ui.onClick('BTN_SHOW', () => {
       settings.set('show', showing() ? 'off' : 'on');
-      return render();
+      return show();
     });
     ui.onClick('BTN_THEME', () => {
       const ids = themeKeys();
       const i = ids.indexOf(current.key);
-      settings.set('theme', ids[(i + 1) % ids.length]);
-      return render();
+      usbNote = '';
+      settings.set(THEME, ids[(i + 1) % ids.length]);
+      return show();
     });
-    ui.onClick('BTN_REMOVE', () => {
-      if (current.key.indexOf(PREFIX) !== 0) {
-        usbNote = 'Only themes installed from USB can be removed. This one is built in.';
-        return render();
-      }
-      const name = current.theme.name;
-      library.remove(current.key);
-      settings.set('theme', index.themes[0].id);
-      usbNote = 'Removed ' + name + '.';
-      return render();
+    ui.onClick('BTN_PALETTE', () => {
+      const ids = ['auto'].concat(Object.keys(current.theme.palettes));
+      const i = ids.indexOf(settings.get('palette'));
+      settings.set('palette', ids[(i + 1) % ids.length]);
+      return show();
     });
+    // Page: the next tab (the kit leaves this button out where its tabs can be tapped)
+    ui.onClick('BTN_PAGE', () => {
+      if (classic()) textPageNo = (textPageNo + 1) % page.CLASSIC_PAGES;
+      else tab = (tab + 1) % page.MODERN_TABS.length;
+      return show();
+    });
+    ctx.onTab((i) => {
+      if (classic() || i === tab || i < 0 || i >= page.MODERN_TABS.length) return;
+      tab = i;
+      show();
+    });
+    if (ctx.onLayout) ctx.onLayout(redraw);
+    ui.onVisible((name, on) => {
+      if (name === 'MAIN' && on) redraw();
+    });
+    if (ui.onFocus)
+      ui.onFocus((name, on) => {
+        if (name === 'MAIN' && on) redraw();
+      });
 
-    // Themes on a USB stick install by themselves; the driver picks them with Next theme.
+    ctx.loop('MAIN', 2, () => render(false));
+    show();
+
+    // Themes on a USB stick install by themselves; the driver picks them with Theme. Started
+    // last: a stick that is in already reports at once, and by then the page can be drawn.
     const usb = new UsbWatcher({
       library,
       log,
@@ -187,6 +487,7 @@ mgu.run({
       onChange: (results) => {
         const ok = results.filter((r) => r.ok).map((r) => r.theme.name);
         const bad = results.filter((r) => !r.ok);
+        forgetUsbSketches();
         // A new copy of the theme on show replaced its files: reload it so the
         // layout and its pictures come from the same version.
         if (results.some((r) => r.ok && r.theme.key === current.key)) {
@@ -198,199 +499,15 @@ mgu.run({
           }
         }
         usbNote =
-          (ok.length ? 'Installed from USB: ' + ok.join(', ') + '. Press Next theme.' : '') +
+          (ok.length ? 'Installed from USB: ' + ok.join(', ') + '. Press Theme to pick it.' : '') +
           (bad.length
             ? (ok.length ? '  ' : '') +
               'Refused ' +
               bad.map((r) => r.file + ' (' + r.reason + ')').join(', ')
             : '');
-        render().catch(() => {});
+        show();
       },
     });
     usb.start();
-    ui.onClick('BTN_PALETTE', () => {
-      const ids = ['auto'].concat(Object.keys(current.theme.palettes));
-      const i = ids.indexOf(settings.get('palette'));
-      settings.set('palette', ids[(i + 1) % ids.length]);
-      return render();
-    });
-    ui.onClick('BTN_DIAG', () => {
-      page = (page + 1) % PAGES;
-      return render();
-    });
-
-    const isNum = (v) => typeof v === 'number' && isFinite(v);
-    const fmt = (v, d) => (isNum(v) ? v.toFixed(d || 0) : '--');
-    function render() {
-      const t = ctx.theme();
-      const cv = ctx.canvas(W, H).clear(t.bg);
-      const st = engine.status();
-      const vs = vehicle.status();
-      const text = (s, x, y, size, c, opts) =>
-        cv.text(
-          String(s).slice(0, 140),
-          x,
-          y,
-          size,
-          c,
-          Object.assign({ literal: true }, opts || {}),
-        );
-      text('idv7lol ' + version, 48, 72, 40, t.text, { font: 'bold' });
-      if (page === 0) {
-        const lines = [
-          [
-            'On the cluster',
-            !showing()
-              ? 'Off - the factory cluster shows. Press "Show on the cluster".'
-              : st.shown
-                ? 'Showing ' + current.theme.name + '  ·  palette ' + st.palette
-                : 'Waiting for live car data (' + (vs.demo ? 'demo' : 'no signals yet') + ')',
-          ],
-          [
-            'Theme',
-            current.theme.name +
-              '  ·  ' +
-              current.theme.layers +
-              ' layers  ·  ' +
-              current.theme.compiledWith,
-          ],
-          [
-            'Cluster renderer',
-            (st.connected ? 'connected (' + st.backend + ')' : 'not connected') +
-              '  ·  panel: ' +
-              st.target +
-              '  ·  refused ops: ' +
-              st.refused,
-          ],
-          [
-            'Car data',
-            (vs.demo ? 'DEMO' : vehicle.live() ? 'live' : 'not live') +
-              '  ·  ' +
-              fmt(vehicle.store.number('vehicle.speed')) +
-              ' km/h  ·  ' +
-              fmt(vehicle.store.number('engine.rpm')) +
-              ' rpm  ·  gear ' +
-              ((vehicle.store.get('transmission.gear') || {}).value || '-') +
-              '  ·  oil ' +
-              fmt(vehicle.store.number('engine.oil.temp')) +
-              '°  ·  coolant ' +
-              fmt(vehicle.store.number('engine.coolant.temp')) +
-              '°',
-          ],
-          [
-            'Drive mode',
-            ((vehicle.store.get('drive.mode') || {}).value || '-') +
-              '  ·  gearbox ' +
-              ((vehicle.store.get('transmission.mode') || {}).value || '-'),
-          ],
-          ['Fuel', vs.fuel || '-'],
-          ['Providers', vs.providers || '-'],
-          ['USB themes', library.list().length + ' installed  ·  ' + usbNote],
-          [
-            'Safety',
-            'Experimental software. Factory warnings stay on top. Deactivate here or uninstall from the MGU Store to restore everything.',
-          ],
-        ];
-        lines.forEach(([k, v], i) => {
-          // 9 rows: 40 px apart so the last stays clear of the footer at y 500
-          text(k, 48, 140 + i * 40, 20, t.dim, { font: 'bold' });
-          text(v, 300, 140 + i * 40, k === 'Safety' || k === 'USB themes' ? 16 : 19, t.text, {
-            font: 'label',
-          });
-        });
-      } else if (page === 1) {
-        text(
-          'Signals (' + (vs.demo ? 'demo' : 'car') + ')  ·  catalog id, value, age',
-          48,
-          120,
-          22,
-          t.dim,
-          { font: 'bold' },
-        );
-        const ids = vehicle.store.ids().sort();
-        const now = Date.now();
-        ids.slice(0, 24).forEach((id, i) => {
-          const s = vehicle.store.get(id);
-          const col = i % 2,
-            row = Math.floor(i / 2);
-          const v = typeof s.value === 'number' ? Math.round(s.value * 100) / 100 : s.value;
-          text(
-            id + '  =  ' + v + '   (' + Math.round((now - s.at) / 100) / 10 + ' s)',
-            48 + col * 780,
-            156 + row * 26,
-            16,
-            s.valid && now - s.at < 3000 ? t.text : t.dim,
-            { font: 'label' },
-          );
-        });
-        let y = 156 + 12 * 26 + 10;
-        Object.keys(vs.raw)
-          .slice(0, 4)
-          .forEach((k) => {
-            text(k + ': ' + vs.raw[k], 48, y, 14, t.dim, { font: 'label' });
-            y += 20;
-          });
-      } else if (page === 2) {
-        text(
-          'Cluster renderer status (' + (st.connected ? 'connected' : 'disconnected') + ')',
-          48,
-          120,
-          22,
-          t.dim,
-          { font: 'bold' },
-        );
-        const lines = (engine.rendererStatus || 'press again with the layout showing')
-          .split('\n')
-          .filter((l) => !/effect of idv7lol/.test(l));
-        lines
-          .slice(0, 16)
-          .forEach((l, i) => text(l, 48, 156 + i * 22, 15, t.text, { font: 'label' }));
-        text(
-          'messages sent: ' + st.messages + '   layers: ' + st.layers + '   targets: ' + st.targets,
-          48,
-          500,
-          14,
-          t.dim,
-          { font: 'label' },
-        );
-      } else {
-        text('About', 48, 120, 22, t.dim, { font: 'bold' });
-        [
-          'idv7lol is free, open-source software (GPL-3.0-or-later): github.com/ALMSTRA/idv7lol',
-          'Not affiliated with BMW AG. Experimental: use parked, keep the factory warnings in view.',
-          'Themes are made with idv7lol Studio and compiled to one GPU layer per piece.',
-          'Drawing by cluster-render (Robert Nisipeanu, MPL-2.0 client). Fonts: Barlow (SIL OFL 1.1).',
-          'App kit: cauliflowermossgrape/idrive7-apps (MIT).',
-          'Versions: app ' +
-            version +
-            '  ·  theme ' +
-            current.theme.version +
-            '  ·  compiler ' +
-            current.theme.compiledWith,
-        ].forEach((l, i) => text(l, 48, 160 + i * 36, 17, t.text, { font: 'label' }));
-      }
-      text(
-        'Show: ' +
-          (showing() ? 'ON' : 'off') +
-          '   ·   Theme: ' +
-          current.theme.name +
-          '   ·   Palette: ' +
-          settings.get('palette') +
-          '   ·   page ' +
-          (page + 1) +
-          '/' +
-          PAGES,
-        48,
-        500,
-        15,
-        t.dim,
-        { font: 'label' },
-      );
-      return ui.image('MAIN_GFX', cv);
-    }
-    ctx.loop('MAIN', 2, render);
-    Promise.resolve()
-      .then(render)
-      .catch((e) => log.warn('first render: ' + ((e && e.stack) || e)));
   },
 });

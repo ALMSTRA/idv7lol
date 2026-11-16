@@ -86,11 +86,11 @@
       "kind": "canvas",
       "title": "idv7lol",
       "buttons": [
-        ["BTN_SHOW", "Show on the cluster"],
-        ["BTN_DIAG", "Diagnostics"],
-        ["BTN_THEME", "Next theme"],
+        ["BTN_SHOW", "Show"],
+        ["BTN_THEME", "Theme"],
         ["BTN_PALETTE", "Palette"],
-        ["BTN_REMOVE", "Remove USB theme"]
+        ["BTN_PAGE", "Page"],
+        ["BTN_SETTINGS", "Settings"]
       ]
     }
   ],
@@ -106,7 +106,7 @@
       ]
     },
     {
-      "key": "theme",
+      "key": "clusterTheme",
       "label": "Theme",
       "type": "choice",
       "default": "idv7lol-performance",
@@ -151,6 +151,26 @@
         ["corsa", "Palette: corsa"],
         ["volt", "Palette: volt"],
         ["dusk", "Palette: dusk"]
+      ]
+    },
+    {
+      "key": "interface",
+      "label": "App screen",
+      "type": "choice",
+      "default": "modern",
+      "options": [
+        ["modern", "Modern (tabs and previews)"],
+        ["classic", "Classic (text pages)"]
+      ]
+    },
+    {
+      "key": "usbRemove",
+      "label": "Theme from USB on show",
+      "type": "choice",
+      "default": "keep",
+      "options": [
+        ["keep", "Keep it"],
+        ["remove", "Remove it from the car"]
       ]
     },
     {

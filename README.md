@@ -166,11 +166,13 @@ needs root SSH access once; its README explains how.
 2. Open **idv7lol** in the list and press **Install**. The Store installs `cluster-render` first if
    it is missing, then builds idv7lol on the head unit. That takes about a minute.
 3. Restart the head unit if the Store asks for it.
-4. Open the **idv7lol** app from the apps menu. Nothing is drawn on the cluster until you press
-   **Show on the cluster**, and the layout only appears while car data is live.
-5. Pick the theme and palette with **Next theme** and **Palette**, or in the app's settings.
-6. To go back to the factory cluster, turn **Show on the cluster** off. To uninstall, use
-   **Remove** in the Store's list of installed apps.
+4. Open the **idv7lol** app from the apps menu. Its first tab, **Themes**, shows a sketch of the
+   theme on show with its neighbours. Nothing is drawn on the cluster until you press **Show**, and
+   the layout only appears while car data is live.
+5. Pick the theme and palette with **Theme** and **Palette**, or in **Settings**. **Page** (or a
+   tap on a tab) goes to the car's data and the diagnostics pages.
+6. To go back to the factory cluster, press **Show** again. To uninstall, use **Remove** in the
+   Store's list of installed apps.
 
 No internet on the head unit? Copy the repository to a USB stick and add it in the Store with
 **Add from USB**. The Store builds it the same way.
@@ -185,9 +187,10 @@ rebuild and no internet.
 2. Plug the stick into the car with the idv7lol app open. Within a few seconds the app finds the
    theme, checks it and installs it. The app page says what it installed, or why a file was
    refused.
-3. Press **Next theme** until your theme shows. Nothing changes on the cluster before that.
-4. To delete it, show it and press **Remove USB theme**. Themes built into the app can't be removed. If the
-   file is still on the stick, it installs again the next time you plug the stick in.
+3. Press **Theme** until your theme shows. Nothing changes on the cluster before that.
+4. To delete it, show it and choose **Settings > Theme from USB on show > Remove it from the car**.
+   Themes built into the app can't be removed. If the file is still on the stick, it installs again
+   the next time you plug the stick in.
 
 The car checks every package before installing it: layer count, image sizes, renderer memory,
 that everything sits on the panel and that it only names shaders the app already has. Packages

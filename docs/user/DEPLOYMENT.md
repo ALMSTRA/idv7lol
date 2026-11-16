@@ -27,10 +27,11 @@ ones instead, add them to the repository or your fork under `themes/<id>/theme.j
 2. Open the idv7lol app on the car and plug the stick in. The app looks at `/media/<label>` (and
    `/run/media/<user>/<label>`) every 5 seconds, checks each new package and copies the good ones to
    its data folder. The status page shows "Installed from USB: …" or why a file was refused.
-3. **Next theme** now cycles through the built-in themes and the installed ones. Installing never
+3. **Theme** now cycles through the built-in themes and the installed ones. Installing never
    changes what the cluster shows.
-4. **Remove USB theme** deletes the theme being shown, if it came from a stick. Take the file off
-   the stick too, or it installs again the next time the stick is plugged in.
+4. **Settings > Theme from USB on show > Remove it from the car** deletes the theme being shown, if
+   it came from a stick. Take the file off the stick too, or it installs again the next time the
+   stick is plugged in.
 
 What the app checks before installing: package format and minimum app version, file size (32 MB),
 at most 64 layers and 15 animations, image sizes, renderer memory (16 MiB), that every layer is on
@@ -106,18 +107,23 @@ This is about installing the Store, not idv7lol: idv7lol itself doesn't flash or
    the new code), then installs idv7lol: on **Releases** the ready package, on **Branch** after
    building it from source on the unit (Python + Node, about a minute).
 3. Restart the head unit if the Store asks.
-4. Open the **idv7lol** app from the apps menu. Its page shows status, car data and the renderer
-   connection. Diagnostics pages follow with the **Diagnostics** button.
-5. Nothing is drawn on the cluster until you press **Show on the cluster** (or set _Show on the
-   cluster: On_ in the app's Settings). The layout appears only while car data is live.
-6. Choose the theme and palette with **Next theme** / **Palette** or in Settings. _Start-up
+4. Open the **idv7lol** app from the apps menu. Its tabs are **Themes** (a sketch of the theme on
+   show, with the one before and after), **Data** (speed, revs, gear, fuel, temperatures) and four
+   diagnostics pages: **Status**, **Signals**, **Renderer** and **About**. Tap a tab where the
+   Store's renderer draws the page, or press **Page**. _Settings > App screen > Classic_ brings
+   back the four text pages alone.
+5. Nothing is drawn on the cluster until you press **Show** (or set _Show on the cluster: On_ in
+   the app's Settings). The layout appears only while car data is live. The page says which it
+   is: Off, Waiting for the car, Waiting for car data, Renderer not connected, Layout failed or On
+   the cluster.
+6. Choose the theme and palette with **Theme** / **Palette** or in **Settings**. _Start-up
    sweep_, _Clock offset from UTC_ and _Demo data_ are there too.
 
 ## Checking that it worked
 
 - The app page says _Showing <theme>_ and _connected (id7)_.
 - The cluster shows the layout; factory telltales and pop-ups remain on top.
-- Turn **Show on the cluster** off: the factory cluster is back within a second.
+- Press **Show** again (Show on the cluster: Off): the factory cluster is back within a second.
 
 ## Removing
 

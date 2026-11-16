@@ -7,7 +7,7 @@
  * apps/idv7lol/theme_<id>.js (a CommonJS module with the compiled theme) and
  * each font family apps/idv7lol/font_<family>.wad (R8 atlas) plus
  * font_<family>.js (metrics). themes_index.js lists them and app.json's
- * "theme" and "palette" settings are refreshed from the result.
+ * "clusterTheme" and "palette" settings are refreshed from the result.
  */
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -93,7 +93,7 @@ if (existsSync(appJsonPath)) {
   const app = JSON.parse(readFileSync(appJsonPath, 'utf8')) as {
     settings: Array<{ key: string; options?: string[][]; default?: string }>;
   };
-  const themeSetting = app.settings.find((s) => s.key === 'theme');
+  const themeSetting = app.settings.find((s) => s.key === 'clusterTheme');
   if (themeSetting) {
     themeSetting.options = index.map((t) => [t.id, t.name]);
     if (!index.some((t) => t.id === themeSetting.default))

@@ -23,9 +23,10 @@ off. USB themes, images and animations are not confirmed on a car yet.
 Runtime constraints: Node 8 (CommonJS, ES2017 syntax, builtins + `./kit/*` only). ESLint parses
 this folder with `ecmaVersion: 2017`.
 
-Controls on the car: Show on the cluster (off by default), Next theme, Remove USB theme, Palette and Diagnostics
-(status, signals, renderer, about), plus the Settings screen the kit builds (show, theme,
-palette, start-up sweep, clock UTC offset, demo data).
+Controls on the car: Show (off by default), Theme, Palette, Page and Settings. The page
+(`page.js`) has the tabs Themes, Data, Status, Signals, Renderer and About; the Settings the kit
+builds hold the rest (show, theme, palette, app screen modern or classic, removing a theme that
+came from USB, bottom strip, start-up sweep, time zone, demo data, tank size).
 
 Safety: the layout exists only while it is enabled and car data is live; it is dropped when data
 goes stale (3 s + 1.5 s grace), when the app stops or when the render service dies. Factory

@@ -49,7 +49,8 @@ app's page and the Store confirm on the car:
 - providers `VehicleCondition`, `DisplayDataServer` and `VehicleStabilizationManagement` answer.
 
 Seen and still open: `BasicDataSet` reports an error and `DisplayDataServer2` gives nothing on
-this car; the page showed gear R while the gearbox said D, parked. The layout was off in the
+this car. The page showed gear R beside "gearbox D": the car was in reverse, and the second is the
+shift programme (D/S/M), now labelled so. The layout was off in the
 photos, so alerts, your own pictures and needles on the cluster are still unconfirmed.
 
 ## Architecture (short)
@@ -102,8 +103,7 @@ stick, that the new button appears, and that an installed theme draws like a bui
    version. Record them in `COMPATIBILITY.md`.
 2. Map more signals on the car: 12 V battery, cruise, lights, hybrid values (shared tmpfs from
    eDrive Live as Cluster Layouts does). Fuel level and range are mapped (`KombiIF` and OBD-II)
-   and were read on the X4 M with 0.2.11; the odometer and the gear shown parked still need a
-   check.
+   and were read on the X4 M with 0.2.11; the odometer still needs a check.
 3. Theme upload path: done for USB sticks (car app 0.2.0); a download path with a short code needs
    a web service and stays planned.
 4. Studio: PNG export of scenario sequences, project folders with assets. Done on 2026-11-09:
