@@ -35,7 +35,7 @@ off, the car shows its factory cluster again.
 > Use it parked or on a closed course, keep the factory warnings visible, and read
 > [SECURITY.md](SECURITY.md) first.
 
-**Status: 0.2.0-beta.5, an experimental pre-release.** Tested on one car: on a 2021 X4 M
+**Status: 0.2.0-beta.6, an experimental pre-release.** Tested on one car: on a 2021 X4 M
 Competition (iDrive 7) the app installs and updates from the MGU Store, its themes draw on the
 cluster with live car data (fuel and range included), and switching it off brings the factory
 cluster back. Its owner reports that everything tried worked well. Other cars and themes loaded
@@ -162,7 +162,7 @@ needs root SSH access once; its README explains how.
    and enter `ALMSTRA/idv7lol`. The Store offers **Releases** first: that works (it reads the
    `catalog` release, a ready package), and so does **Branch** `main` (the Store builds the app on
    the head unit from the latest code). Don't pick Tags: it skips pre-release tags like
-   `v0.2.0-beta.5`.
+   `v0.2.0-beta.6`.
 2. Open **idv7lol** in the list and press **Install**. The Store installs `cluster-render` first if
    it is missing, then builds idv7lol on the head unit. That takes about a minute.
 3. Restart the head unit if the Store asks for it.
