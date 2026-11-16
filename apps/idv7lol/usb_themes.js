@@ -78,16 +78,114 @@ function fail(reason) {
 }
 
 /**
+ * Inflate a gzip file without ever holding more than `cap` bytes of what comes out: a file of a
+ * megabyte or two can inflate to gigabytes, and gunzipSync has no limit on Node 8. The file goes
+ * in slice by slice and no more is fed once the output passes the cap.
+ * cb(err, buffer); err.refused is set, with the reason as its message.
+ */
+function gunzipCapped(buf, cap, cb) {
+  const gz = zlib.createGunzip();
+  const parts = [];
+  let total = 0;
+  let done = false;
+  const end = (reason, out) => {
+    if (done) return;
+    done = true;
+    gz.removeAllListeners('data');
+    // Stopped early: no more goes in, and the stream is ended once it is back from the slice it
+    // is on (closing it from inside its own callback throws on Node 8). What it still gives out
+    // is dropped; the error the cut-off file then raises is caught by the listener below.
+    if (reason)
+      setImmediate(() => {
+        try {
+          gz.end();
+        } catch (_e) {
+          /* ended already */
+        }
+      });
+    if (!reason) return cb(null, out);
+    const e = new Error(reason);
+    e.refused = true;
+    return cb(e);
+  };
+  gz.on('data', (c) => {
+    total += c.length;
+    if (total > cap) end('package too large');
+    else parts.push(c);
+  });
+  gz.on('error', () => end('not a theme package (not gzip)'));
+  gz.on('end', () => end(null, Buffer.concat(parts, total)));
+  // 8 KiB of a file inflate to 8 MiB at the very most
+  const STEP = 8192;
+  let i = 0;
+  const feed = () => {
+    if (done) return;
+    if (i >= buf.length) {
+      gz.end();
+      return;
+    }
+    const more = gz.write(buf.slice(i, i + STEP));
+    i += STEP;
+    if (more) setImmediate(feed);
+    else gz.once('drain', feed);
+  };
+  feed();
+}
+
+/** The size a gzip file says it inflates to (its last four bytes), or -1 for a file too short. */
+function declaredSize(buf) {
+  return buf.length >= 18 ? buf.readUInt32LE(buf.length - 4) : -1;
+}
+
+const PREVIEW_MAX = 160;
+const COLOUR_RE = /^(\$[a-z0-9-]{1,32}|#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?)$/;
+// how many numbers each shape of a sketch carries before its colour (a text is checked apart)
+const PREVIEW_SHAPES = { r: 5, o: 6, c: 3, a: 6, l: 5 };
+
+/** A theme's sketch for the app's page (theme-compiler preview.ts) with anything odd left out. */
+function cleanPreview(list) {
+  if (!Array.isArray(list)) return [];
+  const num = (v) => isNum(v) && Math.abs(v) <= 8192;
+  return list.slice(0, PREVIEW_MAX).filter((p) => {
+    if (!Array.isArray(p) || typeof p[0] !== 'string') return false;
+    if (p[0] === 't')
+      return (
+        p.length === 8 &&
+        typeof p[1] === 'string' &&
+        p[1].length <= 24 &&
+        [p[2], p[3], p[4], p[6], p[7]].every(num) &&
+        p[4] > 0 &&
+        typeof p[5] === 'string' &&
+        COLOUR_RE.test(p[5])
+      );
+    const n = PREVIEW_SHAPES[p[0]];
+    return (
+      n !== undefined &&
+      p.length === n + 2 &&
+      p.slice(1, n + 1).every(num) &&
+      typeof p[n + 1] === 'string' &&
+      COLOUR_RE.test(p[n + 1])
+    );
+  });
+}
+
+/**
  * Read and check a package. Returns { meta, theme, images } with the theme's
  * shaders filled in from `shaders`, or throws an Error whose message says why.
+ * `inflated` is the package's JSON when the caller inflated it already (the USB watcher does,
+ * with gunzipCapped); without it the file is inflated here in one go, so only for files whose
+ * own header says they stay under the limit.
  */
-function readPackage(buf, opts) {
+function readPackage(buf, opts, inflated) {
   if (buf.length > LIMITS.fileBytes) fail('file too large');
-  let json;
-  try {
-    json = zlib.gunzipSync(buf);
-  } catch (_e) {
-    fail('not a theme package (not gzip)');
+  let json = inflated;
+  if (!json) {
+    if (declaredSize(buf) > LIMITS.jsonBytes) fail('package too large');
+    try {
+      json = zlib.gunzipSync(buf);
+    } catch (_e) {
+      fail('not a theme package (not gzip)');
+    }
   }
   if (json.length > LIMITS.jsonBytes) fail('package too large');
   let pkg;
@@ -203,6 +301,7 @@ function readPackage(buf, opts) {
   );
   theme.fonts = fonts.length ? fonts : opts.fonts.slice(0, 1);
   theme.shaders = shaders;
+  theme.preview = cleanPreview(theme.preview);
 
   return {
     meta: {
@@ -388,39 +487,77 @@ class UsbWatcher {
     this.timer = null;
   }
 
-  /** One look at the sticks; returns this round's results (empty when nothing new). */
-  tick() {
+  /**
+   * One look at the sticks. New packages are read and inflated a piece at a time, so a large or
+   * a bad one never stalls the cluster; `onChange(results)` is called once this round's files are
+   * all installed or refused (never from inside tick itself). `done(results)`, if given, is
+   * called at the end of every round, with an empty list when there was nothing new. Returns how
+   * many files it took up.
+   */
+  tick(done) {
     const o = this.opts;
-    const results = [];
     const present = {};
+    const fresh = [];
     findPackages(this.roots).forEach((p) => {
       const mark = p.size + ':' + p.mtime;
       present[p.file] = mark;
       if (this.seen[p.file] === mark) return;
       this.seen[p.file] = mark;
-      const name = path.basename(p.file);
-      try {
-        const buf = fs.readFileSync(p.file);
-        const hash = crypto.createHash('sha256').update(buf).digest('hex');
-        if (o.library.has(hash)) return;
-        const checked = readPackage(buf, o);
-        const meta = o.library.install(checked, hash, 'usb');
-        results.push({ file: name, ok: true, theme: meta });
-        if (o.log) o.log.info('usb: installed ' + meta.id + ' ' + meta.version + ' from ' + name);
-      } catch (e) {
-        results.push({ file: name, ok: false, reason: e.message });
-        if (o.log) o.log.warn('usb: ' + name + ' refused: ' + e.message);
-      }
+      fresh.push(p);
     });
     // forget files that went away, so the same stick is read again next time
     Object.keys(this.seen).forEach((f) => {
       if (!present[f]) delete this.seen[f];
     });
-    if (results.length) {
-      this.last = { at: Date.now(), results };
-      if (o.onChange) o.onChange(results);
+    if (!fresh.length) {
+      if (done) done([]);
+      return 0;
     }
-    return results;
+    const results = [];
+    let left = fresh.length;
+    const settle = () => {
+      if (--left) return;
+      if (results.length) {
+        this.last = { at: Date.now(), results };
+        try {
+          if (o.onChange) o.onChange(results);
+        } catch (e) {
+          if (o.log) o.log.warn('usb: ' + ((e && e.stack) || e));
+        }
+      }
+      if (done) done(results);
+    };
+    fresh.forEach((p) => {
+      const name = path.basename(p.file);
+      const refuse = (reason) => {
+        results.push({ file: name, ok: false, reason });
+        if (o.log) o.log.warn('usb: ' + name + ' refused: ' + reason);
+        settle();
+      };
+      // the size first: a file over the limit is never read
+      if (p.size > LIMITS.fileBytes) return refuse('file too large');
+      let buf;
+      let hash;
+      try {
+        buf = fs.readFileSync(p.file);
+        hash = crypto.createHash('sha256').update(buf).digest('hex');
+      } catch (e) {
+        return refuse(e.message);
+      }
+      if (o.library.has(hash)) return settle();
+      return gunzipCapped(buf, LIMITS.jsonBytes, (err, json) => {
+        if (err) return refuse(err.message);
+        try {
+          const meta = o.library.install(readPackage(buf, o, json), hash, 'usb');
+          results.push({ file: name, ok: true, theme: meta });
+          if (o.log) o.log.info('usb: installed ' + meta.id + ' ' + meta.version + ' from ' + name);
+        } catch (e) {
+          return refuse(e.message);
+        }
+        return settle();
+      });
+    });
+    return fresh.length;
   }
 }
 
@@ -431,6 +568,8 @@ module.exports = {
   LIMITS,
   MEDIA_ROOTS,
   compareVersions,
+  gunzipCapped,
+  cleanPreview,
   readPackage,
   findPackages,
   ThemeLibrary,

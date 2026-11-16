@@ -44,7 +44,13 @@ const usb = require('./usb_themes.js') as {
     };
     remove(key: string): boolean;
   };
-  UsbWatcher: new (o: Record<string, unknown>) => { tick(): Result[] };
+  UsbWatcher: new (o: Record<string, unknown>) => {
+    tick(done?: (results: Result[]) => void): number;
+  };
+  gunzipCapped(buf: Buffer, cap: number, cb: (err: Error | null, out?: Buffer) => void): void;
+  cleanPreview(list: unknown): unknown[];
+  readPackage(buf: Buffer, opts: Record<string, unknown>): { theme: { preview: unknown[] } };
+  LIMITS: { fileBytes: number; jsonBytes: number };
   compareVersions(a: string, b: string): number;
 };
 const SHADERS = require('./shaders.js') as Record<string, string>;
@@ -84,8 +90,12 @@ const put = (pkg: unknown, name = 'usb-test.idv7pkg', raw?: Buffer) => {
   mkdirSync(stick, { recursive: true });
   writeFileSync(join(stick, name), raw ?? gzipSync(Buffer.from(JSON.stringify(pkg))));
 };
-const watcher = () =>
+type Watcher = ReturnType<typeof watcher>;
+/** One look at the stick: what was installed or refused this round. */
+const look = (w: Watcher) => new Promise<Result[]>((resolve) => w.tick(resolve));
+const watcher = (extra: Record<string, unknown> = {}) =>
   new usb.UsbWatcher({
+    ...extra,
     library: new usb.ThemeLibrary({ dataDir }),
     roots: [join(root, 'media')],
     appVersion: '0.2.0',
@@ -101,16 +111,16 @@ beforeEach(() => {
 afterEach(() => rmSync(root, { recursive: true, force: true }));
 
 describe('themes from a USB stick', () => {
-  it('installs a package from the stick once, with the app’s own shaders', () => {
+  it('installs a package from the stick once, with the app’s own shaders', async () => {
     const pkg = samplePackage();
     expect(packageFileName(pkg.id)).toBe('usb-test.idv7pkg');
     expect(pkg.theme).not.toHaveProperty('shaders');
     put(pkg);
     const w = watcher();
-    const first = w.tick();
+    const first = await look(w);
     expect(first).toHaveLength(1);
     expect(first[0]).toMatchObject({ ok: true, theme: { id: 'usb-test', key: 'usb:usb-test' } });
-    expect(w.tick()).toEqual([]);
+    expect(await look(w)).toEqual([]);
 
     const lib = new usb.ThemeLibrary({ dataDir });
     expect(lib.list().map((t) => t.key)).toEqual(['usb:usb-test']);
@@ -123,7 +133,7 @@ describe('themes from a USB stick', () => {
     expect(lib.list()).toEqual([]);
   });
 
-  it('refuses packages that could hurt or don’t fit', () => {
+  it('refuses packages that could hurt or don’t fit', async () => {
     const cases: Array<[string, (p: ThemePackage) => void, RegExp]> = [
       ['shader.idv7pkg', (p) => (p.theme.pieces[0]!.shader = 'evil' as never), /unknown shader/],
       [
@@ -166,7 +176,7 @@ describe('themes from a USB stick', () => {
       put(p, name);
     }
     put(null, 'junk.idv7pkg', Buffer.from('not gzip'));
-    const results = watcher().tick();
+    const results = await look(watcher());
     expect(results.every((r) => !r.ok)).toBe(true);
     for (const [name, , reason] of cases)
       expect(results.find((r) => r.file === name)?.reason).toMatch(reason);
@@ -174,17 +184,76 @@ describe('themes from a USB stick', () => {
     expect(existsSync(join(dataDir, 'themes', 'usb-test'))).toBe(false);
   });
 
-  it('reads a new copy again after the stick changes', () => {
+  it('reads a new copy again after the stick changes', async () => {
     put(samplePackage());
     const w = watcher();
-    expect(w.tick()).toHaveLength(1);
+    expect(await look(w)).toHaveLength(1);
     const p = samplePackage();
     p.version = '0.2.0';
     put(p);
-    const again = w.tick();
+    const again = await look(w);
     expect(again[0]).toMatchObject({ ok: true });
     const meta = JSON.parse(readFileSync(join(dataDir, 'themes', 'usb-test', 'meta.json'), 'utf8'));
     expect(meta.version).toBe('0.2.0');
+  });
+
+  // A megabyte of file can hold gigabytes of zeros: the app must stop long before it has them.
+  it('stops inflating a package that grows past the limit', async () => {
+    const bomb = gzipSync(Buffer.alloc(96 * 1024 * 1024), { level: 9 });
+    expect(bomb.length).toBeLessThan(200 * 1024);
+    const before = process.memoryUsage().rss;
+    const err = await new Promise<Error | null>((resolve) =>
+      usb.gunzipCapped(bomb, 8 * 1024 * 1024, (e) => resolve(e)),
+    );
+    expect(err?.message).toBe('package too large');
+    expect(process.memoryUsage().rss - before).toBeLessThan(64 * 1024 * 1024);
+    // on a stick it is refused with that reason, and the page hears of it after tick, not inside it
+    put(null, 'bomb.idv7pkg', gzipSync(Buffer.alloc(80 * 1024 * 1024), { level: 9 }));
+    let told = 0;
+    const w = watcher({ onChange: () => told++ });
+    const round = look(w);
+    expect(told).toBe(0);
+    expect((await round)[0]).toMatchObject({ ok: false, reason: 'package too large' });
+    expect(told).toBe(1);
+  });
+
+  it('inflates a good file whole, and says which are not gzip or cut short', async () => {
+    const data = Buffer.from(JSON.stringify({ text: 'x'.repeat(300000) }));
+    const gz = gzipSync(data);
+    const run = (buf: Buffer) =>
+      new Promise<[Error | null, Buffer | undefined]>((resolve) =>
+        usb.gunzipCapped(buf, 1 << 22, (e, out) => resolve([e, out])),
+      );
+    expect((await run(gz))[1]?.equals(data)).toBe(true);
+    expect((await run(Buffer.from('not gzip at all, not at all')))[0]?.message).toMatch(/not gzip/);
+    expect((await run(gz.subarray(0, gz.length - 40)))[0]?.message).toMatch(/not gzip/);
+  });
+
+  it('keeps a theme’s sketch only as far as it is well formed', () => {
+    expect(
+      usb.cleanPreview([
+        ['r', 0, 0, 100, 50, 8, '$surface'],
+        ['a', 300, 300, 184, 200, 225, 495, '#3d8bff'],
+        ['t', '112', 950, 260, 96, '$text', 1, 1],
+        ['r', 0, 0, 100, 50, 8, 'red; drop'],
+        ['r', 0, 0, 1e9, 50, 8, '#ffffff'],
+        ['t', 'x'.repeat(200), 0, 0, 20, '#ffffff', 0, 0],
+        ['x', 1, 2, 3],
+        'nope',
+      ]),
+    ).toEqual([
+      ['r', 0, 0, 100, 50, 8, '$surface'],
+      ['a', 300, 300, 184, 200, 225, 495, '#3d8bff'],
+      ['t', '112', 950, 260, 96, '$text', 1, 1],
+    ]);
+    expect(usb.cleanPreview('nope')).toEqual([]);
+    // a package from the Studio carries one, and it survives the checks
+    const read = usb.readPackage(gzipSync(Buffer.from(JSON.stringify(samplePackage()))), {
+      appVersion: '0.2.0',
+      shaders: SHADERS,
+      fonts: ['sans'],
+    });
+    expect(read.theme.preview.length).toBeGreaterThan(0);
   });
 
   it('compares versions', () => {
