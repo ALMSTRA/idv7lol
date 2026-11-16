@@ -12,7 +12,13 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
-- Diagnostics is the second button (as the fifth it wasn't shown on some units).
+- The car app's buttons are **Show**, **Theme**, **Palette**, **Page** and **Settings**: the five
+  labels were wider than the screen (Palette was cut and Remove USB theme never showed), and
+  there was no way to open the app's Settings (time zone, tank size, bottom strip). A theme that
+  came from USB is removed with _Settings > Theme from USB on show > Remove it from the car_.
+- The cluster's theme is the setting `clusterTheme`. It was `theme`, which is the kit's own name
+  for the colours of an app's page: the kit could set it back to the first theme once, and the
+  page could not follow the kit's colour scheme. The theme chosen before is carried over.
 - **Supercar Track** is redrawn closer to an Italian supercar's digital cluster: a thick rev band
   of 30 blocks counting to 10 (red from 7) under a yellow and red rim, a yellow inner line with the
   numbers, a huge red gear with the drive mode beside it and the odometer to its right, the speed
@@ -20,8 +26,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   leaning bars for oil, water, fuel and gearbox oil, the time and outside temperature, and a pill
   that says Low fuel. Its Track and Corsa palettes keep their names. Tested locally; not tested in
   a vehicle.
-- The car app is version 0.2.12, so the MGU Store's Releases channel offers the newer
-  cluster-render and deploy tool below, alerts, your own icons and needles, text styles, the X4 M
+- The car app is version 0.2.13, so the MGU Store's Releases channel offers the new app screen,
+  the idv7lol icon, the fixes below, the newer cluster-render and deploy tool, alerts, your own icons and needles, text styles, the X4 M
   fixes, VDO Classic M, Lily Pad, Neon Drive, Heritage 89, the new Supercar Track, Volt Runner, the
   fuel readings, the needle fix, the bottom strip fix, ETC2 animations and the fixes taken from
   upstream below as an update. The `catalog` release holds the new package.
@@ -44,6 +50,21 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **A new screen for the car app.** Tabs instead of one page of text: **Themes** shows a sketch of
+  the theme on show, with the one before and the one after, its palette and whether it is on the
+  cluster; **Data** shows the car's speed, revs, gear, shift programme, fuel and temperatures;
+  **Status**, **Signals**, **Renderer** and **About** are the pages the app had. The sketches are
+  flat shapes the theme compiler makes from each theme (`preview` in a compiled theme, in USB
+  packages too), because the Store's renderer takes no pictures on an app's page. The page is
+  drawn again only when what it shows changes. _Settings > App screen > Classic_ brings the old
+  text pages back as they were. Tested locally (the real kit on a PC, Node 8.16.2 and Node 24,
+  software drawing); not tested in a vehicle.
+- The car app's icon is the idv7lol logo (it was the kit's generic gauge), in the Store and in the
+  car's app list.
+- The car app's package carries its licences: the GPL in `LICENSE`, and the MIT licence of the app
+  kit and the SIL Open Font License of Barlow in `NOTICE`; its `package.json` says
+  GPL-3.0-or-later instead of UNLICENSED. The Studio's installers carry `LICENSE`,
+  `THIRD_PARTY_NOTICES.md` and `LICENSES/`.
 - **Needle on a photo.** A button in the canvas toolbar turns three clicks on a dial in a picture
   (its centre, its first mark and its last mark) into a needle-only circular gauge placed, sized
   and turned to match, bound to the signal and range you pick. Tested locally; not tested in a
@@ -136,6 +157,32 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- Studio (desktop): the question before discarding unsaved changes is waited for. `window.confirm`
+  returns a promise inside the desktop app, so a new template, a recent file or an opened file
+  replaced the work whatever the answer, and deleting a picture in use or leaving the image editor
+  went ahead too. Closing the window with unsaved changes now asks as well. Tested locally (unit
+  tests); not tried in the desktop app yet.
+- Studio: a file it saves can be opened again. A number typed outside its range (an alert's
+  priority above 9) is brought back into it, names stop at the length the format allows, and a
+  theme that would not open is not written: the Studio says what is wrong instead.
+- An alert with an icon that is as tall as it is wide, or taller, no longer breaks validation and
+  the build: it keeps its box and its icon, with a warning that there is no room for the text.
+- Car app: with a USB stick in when the app starts, a new or a refused theme left the app's page
+  blank and its buttons dead until a restart (the page was drawn before it was ready). The stick
+  is read last, and a failure there is logged.
+- Car app: a theme package is inflated a piece at a time and stopped at the limit. A file of a
+  megabyte or two made to inflate to gigabytes was read whole before it was refused, with the
+  cluster frozen meanwhile; a file over the size limit is no longer read at all. Tested on Node
+  8.16.2: 300 kB of such a file are refused in a third of a second.
+- Car app: a needle whose signal uses the "last value" fallback moves again when the signal comes
+  back. Without a value its angle became not-a-number, and stayed so until the layout was rebuilt.
+- Car app: the page no longer says the layout is showing when cluster-render is not connected. One
+  state everywhere: Off, Waiting for the car, Waiting for car data, Renderer not connected, Layout
+  failed, On the cluster.
+- Car app: theme names and messages with accented letters are written without the accent on the
+  page (the kit's fonts have none; they came out as "?").
+- The Node 8 check compiles every file of the car app, `main.js`, `vehicle.js` and `tz.js` too, so
+  syntax newer than ES2017 can't reach a car, and draws every bundled theme's sketch.
 - The car app's diagnostic link (TASU) never reached the car: app.json named its method and broadcast
   as plain strings, which `kit/tools/build.py` checked letter by letter against the unit's catalog, so
   the whole interface was dropped on install and every engine-unit read failed silently. They are
