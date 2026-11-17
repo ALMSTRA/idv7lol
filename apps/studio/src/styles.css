@@ -1771,3 +1771,376 @@ table.plain th {
 .calibrate-form label input {
   width: 72px;
 }
+
+/* ---------- the new view: steps along the top, one thing at a time on the left ---------- */
+
+.app.modern {
+  grid-template-rows: 58px minmax(0, 1fr) 26px;
+  --radius: 10px;
+  --radius-sm: 8px;
+}
+.m-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+.m-logo {
+  height: 30px;
+  flex: none;
+}
+.m-top button:not(.primary) {
+  border-color: transparent;
+  background: transparent;
+}
+.m-top button:not(.primary):hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+.m-name {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 5px 10px;
+  min-width: 0;
+  max-width: 260px;
+  text-align: left;
+}
+.m-name span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+}
+.m-name strong {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.m-name small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+.m-name small i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+}
+.m-name small i.unsaved {
+  background: var(--warning);
+}
+.stepper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.stepper button {
+  position: relative;
+  gap: 8px;
+  padding: 7px 14px 7px 8px;
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+/* the line that joins one step to the next */
+.stepper button + button {
+  margin-left: 26px;
+}
+.stepper button + button::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  width: 18px;
+  height: 1px;
+  background: var(--border-strong);
+}
+.stepper button.done + button::before {
+  background: var(--accent);
+}
+.stepper b {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.stepper button.done b {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.m-top .stepper button.current {
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--text);
+}
+.stepper button.current b {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+}
+.m-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+.m-next {
+  margin: 0 6px;
+  padding: 8px 14px;
+  font-weight: 600;
+}
+
+.m-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-height: 0;
+}
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 68px;
+  padding: 8px 6px;
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  overflow: hidden auto;
+  scrollbar-width: none;
+}
+.rail .grow {
+  flex: 1;
+}
+.rail button {
+  position: relative;
+  flex-direction: column;
+  gap: 4px;
+  padding: 9px 2px 7px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  white-space: normal;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.rail button:hover {
+  color: var(--text);
+}
+.rail button.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.rail button.active::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+.m-main {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+}
+.app.modern .panel-header {
+  min-height: 42px;
+  padding: 8px 14px;
+  font-size: 14px;
+  color: var(--text);
+}
+/* driving and checking get more room under the canvas than designing does */
+.app.modern[data-step='simulate'] .bottom .bottom-body,
+.app.modern[data-step='validate'] .bottom .bottom-body {
+  height: min(calc(var(--pane-bottom) + 60px), 46vh);
+}
+.workspace[hidden] {
+  display: none;
+}
+.car-page {
+  min-height: 0;
+  overflow: auto;
+  background: var(--canvas-bg);
+  user-select: text;
+}
+.car-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+}
+.car-head {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 14px;
+  padding: 0 10px;
+}
+.car-head .thumb {
+  flex: none;
+  width: 300px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: #000;
+  overflow: hidden;
+}
+.car-head .thumb canvas {
+  display: block;
+  width: 100%;
+}
+.car-head h2 {
+  margin: 0 0 4px;
+  font-size: 24px;
+  font-weight: 600;
+}
+.car-head p.lead {
+  margin: 0 0 10px;
+  color: var(--text-muted);
+  max-width: 52ch;
+}
+
+/* "classic or new view" */
+.view-ask {
+  z-index: 95;
+  background: rgba(2, 6, 16, 0.78);
+}
+.view-modal {
+  width: 720px;
+}
+.view-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.view-choice {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  text-align: left;
+  white-space: normal;
+}
+.view-choice:hover:not(:disabled),
+.view-choice:focus-visible {
+  border-color: var(--accent);
+  background: var(--bg-elev);
+  outline: none;
+}
+.view-choice svg {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--canvas-bg);
+  margin-bottom: 6px;
+}
+.view-choice strong {
+  font-size: 15px;
+}
+.view-choice small {
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+.sk-bar {
+  fill: var(--bg-elev);
+}
+.sk-panel {
+  fill: var(--bg-hover);
+}
+.sk-canvas {
+  fill: #000;
+  stroke: var(--border-strong);
+}
+.sk-dim {
+  fill: var(--border-strong);
+}
+.sk-on {
+  fill: var(--accent);
+}
+
+.update-banner {
+  position: fixed;
+  right: 16px;
+  bottom: 40px;
+  z-index: 92;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 10px 12px 10px 16px;
+  border-radius: var(--radius);
+  background: var(--bg-elev);
+  border: 1px solid var(--accent);
+  box-shadow: var(--shadow);
+}
+.update-banner span {
+  flex: 1 1 200px;
+}
+
+@media (max-width: 1280px) {
+  .m-next span {
+    display: none;
+  }
+  .stepper button + button {
+    margin-left: 14px;
+  }
+  .stepper button + button::before {
+    left: -12px;
+    width: 10px;
+  }
+}
+@media (max-width: 1000px) {
+  .stepper button {
+    padding: 7px 8px;
+  }
+  .stepper button:not(.current) > span:not(.badge) {
+    display: none;
+  }
+  .m-name {
+    max-width: 150px;
+  }
+  .car-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 760px) {
+  .m-top {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .m-logo,
+  .m-name small {
+    display: none;
+  }
+  .rail {
+    width: 52px;
+  }
+  .rail button span {
+    display: none;
+  }
+  .view-choices {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .view-choice svg {
+    display: none;
+  }
+}

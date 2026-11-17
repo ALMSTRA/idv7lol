@@ -1,9 +1,14 @@
 import { create } from 'zustand';
 import { systemLang, type Lang } from '../i18n/languages.js';
+import type { FoundUpdate } from '../lib/updater.js';
 
 export type ColorScheme = 'dark' | 'light';
 export type RightTab = 'inspector' | 'layers' | 'palettes';
 export type BottomTab = 'simulator' | 'validation' | 'timeline' | 'build' | 'console';
+/** The classic window shows every panel; the new one goes a step at a time. */
+export type StudioView = 'classic' | 'modern';
+export type Step = 'design' | 'simulate' | 'validate' | 'car';
+export type Rail = 'pieces' | 'layers' | 'images' | 'palettes' | 'animate';
 
 export interface LogEntry {
   at: number;
@@ -32,6 +37,17 @@ interface UiState {
   closeMenu(): void;
   lang: Lang;
   scheme: ColorScheme;
+  view: StudioView;
+  /** The question "classic or new view" is on screen. */
+  askView: boolean;
+  /** New view: the step on screen and what the left panel holds. */
+  step: Step;
+  rail: Rail;
+  /** Desktop app: look for a newer release when it starts. */
+  checkUpdates: boolean;
+  /** Install what it finds without asking; otherwise it asks first. */
+  autoUpdate: boolean;
+  update: FoundUpdate | null;
   leftOpen: boolean;
   rightOpen: boolean;
   bottomOpen: boolean;
@@ -57,6 +73,13 @@ interface UiState {
 
   setLang(lang: Lang): void;
   setScheme(scheme: ColorScheme): void;
+  chooseView(view: StudioView): void;
+  setAskView(open: boolean): void;
+  setStep(step: Step): void;
+  setRail(rail: Rail): void;
+  setCheckUpdates(on: boolean): void;
+  setAutoUpdate(on: boolean): void;
+  setUpdate(update: FoundUpdate | null): void;
   toggle(
     key:
       | 'leftOpen'
@@ -80,10 +103,24 @@ interface UiState {
   clearLog(): void;
 }
 
+const desktop = typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window;
+
 const PREFS_KEY = 'idv7lol.studio.prefs';
 
 function loadPrefs(): Partial<
-  Pick<UiState, 'lang' | 'scheme' | 'showZones' | 'showGrid' | 'snap' | 'gridSize' | 'showRulers'>
+  Pick<
+    UiState,
+    | 'lang'
+    | 'scheme'
+    | 'view'
+    | 'checkUpdates'
+    | 'autoUpdate'
+    | 'showZones'
+    | 'showGrid'
+    | 'snap'
+    | 'gridSize'
+    | 'showRulers'
+  >
 > {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
@@ -101,6 +138,9 @@ function savePrefs(s: UiState): void {
       JSON.stringify({
         lang: s.lang,
         scheme: s.scheme,
+        view: s.view,
+        checkUpdates: s.checkUpdates,
+        autoUpdate: s.autoUpdate,
         showZones: s.showZones,
         showGrid: s.showGrid,
         snap: s.snap,
@@ -119,6 +159,14 @@ export const useUiStore = create<UiState>((set, get) => {
   return {
     lang: prefs.lang ?? 'en',
     scheme: prefs.scheme ?? 'dark',
+    view: prefs.view === 'classic' ? 'classic' : 'modern',
+    // The desktop app asks the first time it runs; the web editor asks every time it opens.
+    askView: typeof window !== 'undefined' && (!desktop || !prefs.view),
+    step: 'design',
+    rail: 'pieces',
+    checkUpdates: prefs.checkUpdates ?? true,
+    autoUpdate: prefs.autoUpdate ?? false,
+    update: null,
     leftOpen: true,
     rightOpen: true,
     bottomOpen: true,
@@ -154,12 +202,62 @@ export const useUiStore = create<UiState>((set, get) => {
       document.documentElement.dataset['theme'] = scheme;
       persist();
     },
+    chooseView: (view) => {
+      set({ view, askView: false });
+      persist();
+    },
+    setAskView: (askView) => set({ askView }),
+    setStep: (step) => {
+      const tab = get().bottomTab;
+      set({
+        step,
+        bottomTab:
+          step === 'validate'
+            ? 'validation'
+            : step === 'car'
+              ? 'build'
+              : step === 'simulate' || tab === 'validation' || tab === 'build'
+                ? 'simulator'
+                : tab,
+        ...(step === 'simulate' ? { bottomOpen: true } : {}),
+      });
+    },
+    setRail: (rail) => {
+      const s = get();
+      // the one already open closes its panel, as a toggle
+      if (s.rail === rail && s.leftOpen && rail !== 'animate') return set({ leftOpen: false });
+      set({
+        rail,
+        leftOpen: true,
+        ...(rail === 'animate' ? { bottomTab: 'timeline' as const, bottomOpen: true } : {}),
+      });
+    },
+    setCheckUpdates: (checkUpdates) => {
+      set({ checkUpdates });
+      persist();
+    },
+    setAutoUpdate: (autoUpdate) => {
+      set({ autoUpdate });
+      persist();
+    },
+    setUpdate: (update) => set({ update }),
     toggle: (key) => {
       set({ [key]: !get()[key] } as Partial<UiState>);
       persist();
     },
-    setRightTab: (rightTab) => set({ rightTab, rightOpen: true }),
-    setBottomTab: (bottomTab) => set({ bottomTab, bottomOpen: true }),
+    // Anything that opens a classic tab also lands on its place in the new view.
+    setRightTab: (rightTab) =>
+      set({
+        rightTab,
+        rightOpen: true,
+        ...(rightTab === 'inspector' ? {} : { rail: rightTab, step: 'design' as const }),
+      }),
+    setBottomTab: (bottomTab) =>
+      set({
+        bottomTab,
+        bottomOpen: true,
+        step: bottomTab === 'validation' ? 'validate' : bottomTab === 'build' ? 'car' : get().step,
+      }),
     setPreviewPalette: (previewPalette) => set({ previewPalette }),
     setWelcomeOpen: (welcomeOpen) => set({ welcomeOpen }),
     setImageEditorFor: (imageEditorFor) => set({ imageEditorFor }),

@@ -92,13 +92,24 @@ jobs:
           workspaces: apps/studio/src-tauri
       - run: npm ci
       - name: Build Studio installer
-        run: npm run tauri:build
+        working-directory: apps/studio
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        # The signed files the Studio updates itself from are made only where the key is,
+        # so a pull request from a fork still builds.
+        run: |
+          if ($env:TAURI_SIGNING_PRIVATE_KEY) { npx tauri build --config src-tauri/tauri.updater.conf.json }
+          else { npx tauri build }
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Upload development artifacts
         uses: actions/upload-artifact@v4
         with:
           name: idv7lol-studio-windows
           path: |
             apps/studio/src-tauri/target/release/bundle/nsis/*.exe
+            apps/studio/src-tauri/target/release/bundle/nsis/*.sig
           if-no-files-found: warn
           retention-days: 14
 
@@ -124,7 +135,15 @@ jobs:
       - run: npm ci
       - name: Build Studio app and disk image
         working-directory: apps/studio
-        run: npx tauri build --target universal-apple-darwin --bundles app,dmg
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            npx tauri build --target universal-apple-darwin --bundles app,dmg --config src-tauri/tauri.updater.conf.json
+          else
+            npx tauri build --target universal-apple-darwin --bundles app,dmg
+          fi
       - name: Check the app bundle
         run: |
           APP="apps/studio/src-tauri/target/universal-apple-darwin/release/bundle/macos/idv7lol Studio.app"
@@ -137,5 +156,7 @@ jobs:
           name: idv7lol-studio-macos
           path: |
             apps/studio/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+            apps/studio/src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app.tar.gz
+            apps/studio/src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app.tar.gz.sig
           if-no-files-found: error
           retention-days: 14

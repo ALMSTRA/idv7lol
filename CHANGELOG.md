@@ -50,6 +50,24 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **A new view for the Studio**, beside the classic one. The work goes as steps along the top:
+  Template, Design, Simulate, Validate, To the car, with a Continue button to the next one. Design
+  has a bar of icons on the left (Pieces, Layers, Images, Palettes, Animate) that puts one thing
+  in the left panel at a time, the Inspector on the right and the simulator under the canvas;
+  Simulate gives the canvas the whole width; Validate lists the findings under it; To the car is a
+  page of its own with the build. It holds the same panels as the classic window, which stays as
+  it was. The desktop app asks which view you want the first time it runs and the web editor every
+  time it opens; _… > View_ switches at any time. Tested locally in a browser.
+- **The desktop Studio looks for a newer version when it starts** and asks whether to update: it
+  downloads the signed installer from the project's GitHub releases, installs it and restarts.
+  _… > Install updates without asking_ does it unasked when nothing unsaved is open, _… > Look for
+  updates at startup_ turns the check off, and _… > Look for updates now_ runs it. The check reads
+  one file from GitHub and sends nothing about you or your themes. Updating works from beta 7 on:
+  earlier versions have no updater, so install this one by hand. Compiled on Windows; the update
+  itself is not tested until a later release exists, and not on a Mac.
+- The Windows installer also comes in Russian, Japanese and Simplified Chinese, the languages
+  the Studio has besides English and Spanish.
+
 - **A new screen for the car app.** Tabs instead of one page of text: **Themes** shows a sketch of
   the theme on show, with the one before and the one after, its palette and whether it is on the
   cluster; **Data** shows the car's speed, revs, gear, shift programme, fuel and temperatures;
@@ -157,6 +175,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- Build & Deploy listed cluster-render 0.5.9 and mgu-deploy 0.7.11 as what the car needs; the
+  car app asks for 0.6.4 and 0.8.19.
 - Studio (desktop): the question before discarding unsaved changes is waited for. `window.confirm`
   returns a promise inside the desktop app, so a new template, a recent file or an opened file
   replaced the work whatever the answer, and deleting a picture in use or leaving the image editor

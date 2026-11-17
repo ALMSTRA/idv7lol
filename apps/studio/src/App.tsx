@@ -60,6 +60,10 @@ import {
 } from './host/files.js';
 import { confirmDialog } from './host/confirm.js';
 import { unsavableReasons } from './lib/limits.js';
+import { ModernShell } from './shell/ModernShell.js';
+import { ViewDialog } from './panels/ViewDialog.js';
+import { UpdateBanner } from './panels/UpdateBanner.js';
+import { lookForUpdate } from './lib/updater.js';
 
 export function App(): JSX.Element {
   useEffect(() => {
@@ -88,6 +92,10 @@ export function App(): JSX.Element {
     useShallow((s) => ({
       lang: s.lang,
       scheme: s.scheme,
+      view: s.view,
+      askView: s.askView,
+      checkUpdates: s.checkUpdates,
+      autoUpdate: s.autoUpdate,
       leftOpen: s.leftOpen,
       rightOpen: s.rightOpen,
       bottomOpen: s.bottomOpen,
@@ -277,6 +285,11 @@ export function App(): JSX.Element {
     return () => stop?.();
   }, []);
 
+  /* ----- a newer release, looked for once when the desktop app starts ----- */
+  useEffect(() => {
+    if (isTauri && useUiStore.getState().checkUpdates) void lookForUpdate(false);
+  }, []);
+
   /* ----- window title & unload guard ----- */
   useEffect(() => {
     document.title = `${project.dirty ? '• ' : ''}${project.themeName} — idv7lol Studio`;
@@ -354,6 +367,11 @@ export function App(): JSX.Element {
           target.isContentEditable);
       const mod = e.ctrlKey || e.metaKey;
       const p = useProjectStore.getState();
+      // "Classic or new view" waits for its answer; its two buttons take the keyboard.
+      if (useUiStore.getState().askView) {
+        if (e.key === 'F5' || (mod && /^[snrpo]$/i.test(e.key))) e.preventDefault();
+        return;
+      }
       // While the welcome window is up, nothing acts on the theme behind it.
       if (useUiStore.getState().welcomeOpen) {
         if (e.key === 'Escape') {
@@ -517,6 +535,10 @@ export function App(): JSX.Element {
     { separator: true },
     { label: t('menu.share'), onSelect: () => void doShare() },
   ];
+  const openHelp = () =>
+    void openExternal(
+      'https://github.com/ALMSTRA/idv7lol/blob/main/docs/user/STUDIO_USER_GUIDE.md',
+    );
   const moreMenu = (): MenuItem[] => [
     {
       label: t('menu.language'),
@@ -530,13 +552,98 @@ export function App(): JSX.Element {
       label: t('menu.theme'),
       onSelect: () => ui.setScheme(ui.scheme === 'dark' ? 'light' : 'dark'),
     },
-    { separator: true },
     {
-      label: t('menu.help'),
-      onSelect: () =>
-        openExternal('https://github.com/ALMSTRA/idv7lol/blob/main/docs/user/STUDIO_USER_GUIDE.md'),
+      label: t('view.menu'),
+      items: (['modern', 'classic'] as const).map((v) => ({
+        label: t(`view.${v}`),
+        checked: ui.view === v,
+        onSelect: () => useUiStore.getState().chooseView(v),
+      })),
     },
+    ...(isTauri
+      ? [
+          { separator: true },
+          { label: t('update.now'), onSelect: () => void lookForUpdate(true) },
+          {
+            label: t('update.atStartup'),
+            checked: ui.checkUpdates,
+            onSelect: () => useUiStore.getState().setCheckUpdates(!ui.checkUpdates),
+          },
+          {
+            label: t('update.auto'),
+            checked: ui.autoUpdate,
+            onSelect: () => useUiStore.getState().setAutoUpdate(!ui.autoUpdate),
+          },
+        ]
+      : []),
+    { separator: true },
+    { label: t('menu.help'), onSelect: openHelp },
   ];
+
+  const status = (
+    <div className="statusbar">
+      <span>
+        <span
+          className="dot"
+          style={{ background: project.dirty ? 'var(--warning)' : 'var(--success)' }}
+        />
+        {project.dirty ? t('status.unsaved') : t('status.saved')}
+      </span>
+      <span>{t('status.selection', { n: project.selectionCount })}</span>
+      <CursorReadout />
+      <span className="grow" />
+      <LayerCount />
+      <LiveStats />
+      <span className="opt">
+        {project.layoutWidth}×{project.layoutHeight} · {project.display}
+      </span>
+      <button
+        className="ghost icon"
+        style={{ padding: 0 }}
+        onClick={() => force((x) => x + 1)}
+        title="refresh"
+      >
+        <RefreshCw size={12} />
+      </button>
+    </div>
+  );
+  /* What sits over either window. */
+  const overlays = (
+    <>
+      <ImageEditor />
+
+      <ContextMenu />
+
+      <Notices />
+
+      <UpdateBanner />
+
+      {ui.welcomeOpen && !ui.askView && (
+        <WelcomeDialog
+          onPick={(th) => void doNew(th)}
+          onOpen={() => void doOpen()}
+          onOpenRecent={(p) => void doOpenPath(p)}
+          onClose={() => ui.setWelcomeOpen(false)}
+        />
+      )}
+
+      {ui.askView && <ViewDialog />}
+    </>
+  );
+
+  if (ui.view === 'modern')
+    return (
+      <>
+        <ModernShell
+          onSave={() => void doSave(false)}
+          onHelp={openHelp}
+          fileMenu={fileMenu}
+          moreMenu={moreMenu}
+          status={status}
+        />
+        {overlays}
+      </>
+    );
 
   return (
     <div className="app">
@@ -698,46 +805,9 @@ export function App(): JSX.Element {
         )}
       </div>
 
-      <div className="statusbar">
-        <span>
-          <span
-            className="dot"
-            style={{ background: project.dirty ? 'var(--warning)' : 'var(--success)' }}
-          />
-          {project.dirty ? t('status.unsaved') : t('status.saved')}
-        </span>
-        <span>{t('status.selection', { n: project.selectionCount })}</span>
-        <CursorReadout />
-        <span className="grow" />
-        <LayerCount />
-        <LiveStats />
-        <span className="opt">
-          {project.layoutWidth}×{project.layoutHeight} · {project.display}
-        </span>
-        <button
-          className="ghost icon"
-          style={{ padding: 0 }}
-          onClick={() => force((x) => x + 1)}
-          title="refresh"
-        >
-          <RefreshCw size={12} />
-        </button>
-      </div>
+      {status}
 
-      <ImageEditor />
-
-      <ContextMenu />
-
-      <Notices />
-
-      {ui.welcomeOpen && (
-        <WelcomeDialog
-          onPick={(th) => void doNew(th)}
-          onOpen={() => void doOpen()}
-          onOpenRecent={(p) => void doOpenPath(p)}
-          onClose={() => ui.setWelcomeOpen(false)}
-        />
-      )}
+      {overlays}
     </div>
   );
 }

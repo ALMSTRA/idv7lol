@@ -1,7 +1,7 @@
 //! idv7lol Studio desktop shell.
 //!
 //! The editor itself is the web front end in `../src`; this crate only
-//! provides the window, file dialogs, file system access, the opener and a few
+//! provides the window, file dialogs, file system access, the opener, updates and a few
 //! commands that need the host (version info, data directory, environment).
 
 use serde::Serialize;
@@ -53,6 +53,8 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri::generate_handler![host_info, launch_args])
         .build(tauri::generate_context!())
         .expect("error while running idv7lol Studio")

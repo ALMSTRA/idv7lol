@@ -108,6 +108,36 @@ Tag `vX.Y.Z` only for documented, tested milestones. Attach the Studio installer
 artifact. The MGU Store reads the repository tree (`mgu-repo.json`) on a branch or tag. Its Tags
 channel skips tags with a pre-release suffix, so `v0.2.0-beta.6` is not offered there.
 
+### Studio releases and the updater
+
+The desktop Studio updates itself from `studio-latest.json` in the `catalog` release (Tauri's
+updater plugin; the address and the public key are in `apps/studio/src-tauri/tauri.conf.json`).
+The update files are signed in CI with the repository secret `TAURI_SIGNING_PRIVATE_KEY`; without
+the secret (a pull request from a fork) the Studio still builds, without them. Whoever holds the
+private key can publish updates, and losing it means installed copies can no longer be updated:
+keep it out of the repository and keep a copy.
+
+For a release `vX.Y.Z[-beta.N]`:
+
+1. Set that version in `apps/studio/src-tauri/tauri.conf.json` and in `RELEASE`
+   (`apps/studio/src/lib/release.ts`); a test keeps the two equal. Push and wait for CI.
+2. Download the `idv7lol-studio-windows` and `idv7lol-studio-macos` artifacts and publish the
+   release with the files named `idv7lol-Studio-<version>-x64-setup.exe`,
+   `idv7lol-Studio-<version>-universal.dmg` and `idv7lol-Studio-<version>-universal.app.tar.gz`.
+3. Write the list from the `.sig` files of the same artifacts and upload it:
+
+```bash
+python tools/build/studio-update-manifest.py <version> <folder with the artifacts>
+```
+
+```bash
+gh release upload catalog dist/studio-update/studio-latest.json --clobber
+```
+
+Installed copies offer the update from then on, so upload the list last.
+
+### The car app's catalogue
+
 On the **Releases** channel, which the Store offers first once a repository has releases, it
 reads the `catalog.json` of a release named `catalog`. After a car-app change, rebuild that
 release:

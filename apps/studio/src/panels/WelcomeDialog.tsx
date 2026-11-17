@@ -23,7 +23,8 @@ thumbBus.set('vehicle.odometer', 48213);
 thumbBus.set('fuel.consumption.average', 7.4);
 const thumbEngine = new ThemeEngine(new EngineState(thumbBus, 0));
 
-function Thumb({ theme }: { theme: Theme }): JSX.Element {
+/** A small still of a theme with sample values. */
+export function Thumb({ theme }: { theme: Theme }): JSX.Element {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const c = ref.current;

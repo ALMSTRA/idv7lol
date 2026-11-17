@@ -23,6 +23,16 @@ The top bar has the **File** menu (New, Open, Save, Save as, Add images, Export 
 Add images, Simulate, Validate (shows the error count), Build, three buttons that show or hide the
 panels, and a **…** menu with language, light/dark and help.
 
+That is the **classic view**. The **new view** holds the same panels in another order: the steps
+Template, Design, Simulate, Validate and To the car run along the top, with **Continue** to the
+next one; in Design a bar of icons on the left chooses what the left panel shows (Pieces, Layers,
+Images, Palettes, Animate), the Inspector stays on the right and the simulator sits under the
+canvas. The desktop app asks which one you want the first time it runs, the web editor every time
+it opens, and **… > View** switches at any time.
+
+The desktop app looks for a newer version when it starts and asks before updating. **… > Install
+updates without asking** and **… > Look for updates at startup** change that.
+
 Drag the edge of a panel to resize it, and double-click the edge to reset it. In a small window the
 side panels open as drawers over the canvas.
 

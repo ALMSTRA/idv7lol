@@ -42,6 +42,13 @@ cluster back. Its owner reports that everything tried worked well. Other cars an
 from a USB stick haven't been confirmed yet. Details in
 [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md).
 
+**New in beta 7:** the Studio has a **new view** that takes the work a step at a time (Template,
+Design, Simulate, Validate, To the car). It asks which one you want, and the classic view is still
+there under **…** > View. The desktop app **looks for a newer version when it starts** and can
+update itself, asking first unless you tell it not to; that works from beta 7 on, so install this
+one by hand. The Windows installer now comes in all five languages. In the car, the app has a new
+screen with tabs, sketches of the themes and the idv7lol icon (app 0.2.13).
+
 **Download:** the Windows installer of idv7lol Studio is on the
 [Releases page](https://github.com/ALMSTRA/idv7lol/releases). It isn't signed, so Windows
 SmartScreen warns the first time; choose _More info_ and _Run anyway_. The Studio speaks English,
