@@ -51,7 +51,9 @@ Some KOMBIs, M cars among them, put black boxes over a full-screen layout that c
 cluster's own bottom strip, in the middle and right of the panel, and keep them until the head unit
 restarts. From car app 0.2.3 the layout ends at y 646 so the bottom strip (gear, drive mode,
 ranges, time, outside temperature) shows below it; other cluster projects found that the boxes no
-longer appear then. If you see boxes: update the app, then restart the head unit (hold the volume
+longer appear then. A measurement on a 2022 G80 M3 says the same (idrive-apps #199): a 1920x720
+layer left two boxes, about 240x100 at 820, 250 and 160x70 at 1240, 280, that opening a door
+cleared, and a layer that stopped at y 646 left none. If you see boxes: update the app, then restart the head unit (hold the volume
 knob for about 30 s) to clear them. The setting **Bottom strip > Covered by the layout** draws
 layouts whole again, boxes and all.
 
@@ -69,7 +71,7 @@ apps missing from the menu (mgu-store #265). Update the Store's tools, then use 
 
 **An update installed, but the app behaves like the old version.** The Store's deploy tool before
 0.8.12 could run a cached copy of the previous code when the new bundle had the same length
-(mgu-store #261). idv7lol requires 0.8.19 (0.8.12 fixed this), so the Store updates it first; on an
+(mgu-store #261). idv7lol requires 0.8.21 (0.8.12 fixed this), so the Store updates it first; on an
 older Store, update its tools and restart the head unit.
 
 **The install rolled back with "run the install again later".** MainApp was busy installing
@@ -97,7 +99,7 @@ channel now offers an update only when the car app or the kit changes (`build.sh
 `mgu-repo.json`, mgu-store #205).
 
 **The app page says "not connected".** cluster-render is not installed or not running. Install
-it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.6.4+.
+it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.6.6+.
 
 **"Waiting for live car data".** No signal has arrived: with the engine off and the car asleep
 the bus is silent. Start the car, or set _Demo data: On_ to check the layout.

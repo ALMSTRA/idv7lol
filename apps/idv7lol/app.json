@@ -2,7 +2,7 @@
   "id": "idv7lol",
   "title": "idv7lol",
   "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "startType": "autostart",
   "vendor": "custom",
   "license": "GPL-3.0-or-later",
@@ -181,7 +181,7 @@
       "default": "car",
       "options": [
         ["car", "The car's own (no black boxes)"],
-        ["layout", "Covered by the layout"]
+        ["layout", "Covered by the layout (may leave black boxes)"]
       ]
     },
     {
@@ -304,7 +304,7 @@
     }
   },
   "requires": {
-    "cluster-render": "0.6.4",
-    "mgu-deploy": "0.8.19"
+    "cluster-render": "0.6.6",
+    "mgu-deploy": "0.8.21"
   }
 }

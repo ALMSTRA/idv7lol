@@ -12,6 +12,22 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
+- The car app is version 0.2.14 and requires cluster-render 0.6.6 (was 0.6.4) and the Store's
+  deploy tool 0.8.21 (was 0.8.19). cluster-render 0.6.5 remembers across drives the upload level
+  the KOMBI accepts, and 0.6.6 keeps the scene through a warning or an open door and maps it
+  again when the slot unlocks, instead of leaving the panel blank until a new fetch. mgu-deploy
+  0.8.21 refuses, before changing anything, an app that asks for something the head unit lacks,
+  and restores other apps the app manager dropped during an install. Not tested in a vehicle.
+- The app kit's `kit/runtime/signals.js` is refreshed from cauliflowermossgrape/idrive7-apps
+  (bae1732): method calls and the set-up of their proxies go ahead of the `watch()` set-ups
+  waiting, and after four of them in a row a set-up goes next. The car app reads fuel over
+  diagnostics while it watches some fifteen interfaces, so those reads no longer wait behind
+  every set-up. Tested locally.
+- `apps/idv7lol/cluster_render_client.js` is the upstream file again (idrive-apps dd61304): it
+  had fallen behind by `host()`, the `host` event and a scene's `layers` options, which idv7lol
+  does not use.
+- The setting _Bottom strip > Covered by the layout_ says it may leave black boxes. A measurement
+  on a G80 M3 (idrive-apps #199) agrees with the default: a layout that ends at y 646 leaves none.
 - The car app's buttons are **Show**, **Theme**, **Palette**, **Page** and **Settings**: the five
   labels were wider than the screen (Palette was cut and Remove USB theme never showed), and
   there was no way to open the app's Settings (time zone, tank size, bottom strip). A theme that

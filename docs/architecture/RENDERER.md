@@ -44,7 +44,7 @@ kept the fallback (or turned the target off) for good after two, until `cluster-
 guard-reset`; 0.5.12 removed the guard, its file and `guard-reset`, and a drop is one log line
 (idrive-apps #128, #54; commit 0534f04).
 
-idv7lol requires cluster-render **0.6.4** or newer:
+idv7lol requires cluster-render **0.6.6** or newer:
 
 - before 0.5.2, stopping a renderer-side animation left RAMSES 19's animation system broken, and
   the next request for the target crashed the service (idrive-apps #132). The car app starts and
@@ -63,6 +63,14 @@ idv7lol requires cluster-render **0.6.4** or newer:
   level until the service restarts, and a fetch the KOMBI fails within 1 s after such a removal
   is asked again (up to four times) (commit 44934a6, mgu-store #292). Pictures and animations may
   upload more slowly for the rest of that run; the car app logs the `budget` event.
+- 0.6.5: that lower level is remembered across drives (`/var/opt/cluster-render/state/upload-ceiling`),
+  so a later drive starts there instead of losing the scene again on the way up; after three
+  clean drives the service tries one step higher (commit b163331, mgu-store #292). The `budget`
+  event has no field for the remembered level, so the car app shows only what the event carries.
+- 0.6.6: a slot the cluster locks during a warning or with a door open no longer drops the scene:
+  it stays fetched and is mapped again, without a new fetch, at the first report of the slot
+  unlocked; a lock longer than 3 min releases it and the scene is asked for whole (commit 996bb41).
+  Nothing changes in the client. Not tested in a vehicle with idv7lol.
 
 ## iDrive 8 (not supported by idv7lol)
 
@@ -167,12 +175,12 @@ X4 M) but has **not measured these zones there yet**.
 Other projects report more, measured on their cars or from photos. idv7lol shows them in the
 Studio as hints (info zones, no findings) until someone checks them:
 
-| Zone                         | Rect (x, y, w, h)  | Source                                                                                                 |
-| ---------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------ |
-| Bottom strip                 | 0, 646, 1920, 74   | Cluster Layouts ends layouts at `STRIP_Y = 646` so the cluster doesn't draw black boxes; bimmer-lab #5 |
-| M cars: two cluster boxes    | 793, 289, 246, 92  | Cluster Layouts `M_BOXES`, "from one photo of a car" (±10 px)                                          |
-|                              | 1223, 328, 171, 78 |                                                                                                        |
-| Driver camera notch (if any) | 740, 128, 440, 19  | cruzen991/Cluster: the notch reaches y ≈ 147                                                           |
+| Zone                         | Rect (x, y, w, h)  | Source                                                                                                                   |
+| ---------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| Bottom strip                 | 0, 646, 1920, 74   | Cluster Layouts ends layouts at `STRIP_Y = 646` so the cluster doesn't draw black boxes; bimmer-lab #5, idrive-apps #199 |
+| M cars: two cluster boxes    | 793, 289, 246, 92  | Cluster Layouts `M_BOXES`, "from one photo of a car" (±10 px)                                                            |
+|                              | 1223, 328, 171, 78 |                                                                                                                          |
+| Driver camera notch (if any) | 740, 128, 440, 19  | cruzen991/Cluster: the notch reaches y ≈ 147                                                                             |
 
 ## Recovery and risks
 
@@ -199,13 +207,14 @@ Studio as hints (info zones, no findings) until someone checks them:
 
 ## Versions seen
 
-| Component       | Version      | Note                                                                                             |
-| --------------- | ------------ | ------------------------------------------------------------------------------------------------ |
-| cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive                                     |
-| cluster-render  | 0.5.0–0.5.5  | 0.5.0 scene files (off by default); 0.5.1 panel's own scene id; 0.5.3 `yield`; 0.5.4–0.5.5 fixes |
-| cluster-render  | 0.5.6–0.5.9  | 0.5.6 re-ask of an accepted, unmapped scene; 0.5.7 video compose; 0.5.8 exclusive; 0.5.9 ETC2    |
-| cluster-render  | 0.5.10–0.6.4 | 0.5.12 no mapping guard; 0.6.0 scene hosts; 0.6.3 images hidden until written; 0.6.4 upload cap  |
-| mgu-deploy      | 0.8.19       | required by idv7lol (0.8.12 code cache, 0.8.13 tiles, 0.8.16 safe mode, 0.8.19 MainApp 6.4.8)    |
-| Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                        |
-| Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`               |
-| mgu-deploy      | 0.7.11       | pinned by waze-on-cluster                                                                        |
+| Component       | Version      | Note                                                                                              |
+| --------------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive                                      |
+| cluster-render  | 0.5.0–0.5.5  | 0.5.0 scene files (off by default); 0.5.1 panel's own scene id; 0.5.3 `yield`; 0.5.4–0.5.5 fixes  |
+| cluster-render  | 0.5.6–0.5.9  | 0.5.6 re-ask of an accepted, unmapped scene; 0.5.7 video compose; 0.5.8 exclusive; 0.5.9 ETC2     |
+| cluster-render  | 0.5.10–0.6.4 | 0.5.12 no mapping guard; 0.6.0 scene hosts; 0.6.3 images hidden until written; 0.6.4 upload cap   |
+| cluster-render  | 0.6.5–0.6.6  | 0.6.5 upload ceiling kept across drives; 0.6.6 scene kept through a slot lock (required)          |
+| mgu-deploy      | 0.8.21       | required by idv7lol (0.8.13 tiles, 0.8.16 safe mode, 0.8.19 MainApp 6.4.8, 0.8.21 manifest check) |
+| Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                         |
+| Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`                |
+| mgu-deploy      | 0.7.11       | pinned by waze-on-cluster                                                                         |

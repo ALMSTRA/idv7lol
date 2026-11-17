@@ -157,12 +157,12 @@ export function BuildPanel(): JSX.Element {
           <tbody>
             <tr>
               <td>cluster-render</td>
-              <td>≥ 0.6.4</td>
+              <td>≥ 0.6.6</td>
               <td>robertnisipeanu/idrive-apps</td>
             </tr>
             <tr>
               <td>mgu-deploy</td>
-              <td>≥ 0.8.19</td>
+              <td>≥ 0.8.21</td>
               <td>robertnisipeanu/mgu-store</td>
             </tr>
           </tbody>
