@@ -206,6 +206,19 @@ function drawPreview(cv, theme, pid, x, y, w) {
       case 'l':
         cv.line(X(p[1]), Y(p[2]), X(p[3]), Y(p[4]), Math.max(1, p[5] * k), col(p[6]));
         break;
+      case 'm': {
+        // a tile of a picture's mosaic, on whole pixels so that neighbours leave no seam
+        const x0 = Math.floor(X(p[1]));
+        const y0 = Math.floor(Y(p[2]));
+        cv.fillRect(
+          x0,
+          y0,
+          Math.ceil(X(p[1] + p[3])) - x0,
+          Math.ceil(Y(p[2] + p[4])) - y0,
+          col(p[5]),
+        );
+        break;
+      }
       case 't': {
         const size = p[4] * k;
         if (size < 9) break;
@@ -305,34 +318,85 @@ function meter(cv, t, x, y, w, frac, c) {
   if (f > 0) cv.roundRect(x, y, Math.max(10, w * f), 10, 5, c);
 }
 
+/** Where the Themes tab draws its three sketches (page px): the one on show and its neighbours. */
+const THEMES = (() => {
+  const cw = 820;
+  const sw = 300;
+  const cy = TOP + 14;
+  const ch = Math.round((cw * 720) / 1920);
+  const sh = Math.round((sw * 720) / 1920);
+  const sy = cy + Math.round((ch - sh) / 2);
+  return {
+    centre: { x: (W - cw) / 2, y: cy, w: cw, h: ch },
+    prev: { x: 40, y: sy, w: sw, h: sh },
+    next: { x: W - 40 - sw, y: sy, w: sw, h: sh },
+    /** A finger moved this far sideways changes the theme. */
+    swipe: 90,
+  };
+})();
+
+/** Which neighbour a point of the Themes tab is on: -1 the one before, 1 the one after, else 0. */
+function themeAt(x, y) {
+  const inside = (r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h + 40;
+  return inside(THEMES.prev) ? -1 : inside(THEMES.next) ? 1 : 0;
+}
+
 /**
  * The Themes tab. `m`: { themes: [prev, current, next] as { theme, palette } (prev and next may
- * be null), state (stateOf), layers, paletteName, note, count, at }.
+ * be null), state (stateOf), layers, paletteName, note, count, at, dx (the sketches follow a
+ * finger this far, page px), go(d) (the neighbour's sketch is a place to press: the theme before
+ * or after) }.
  */
 function themesPage(cv, t, m) {
   const cur = m.themes[1];
-  const cw = 820;
-  const cx = (W - cw) / 2;
-  const cy = TOP + 14;
-  const sw = 300;
-  const sh = Math.round((sw * 720) / 1920);
-  const sy = cy + Math.round(((cw * 720) / 1920 - sh) / 2);
+  const dx = Math.max(-260, Math.min(260, m.dx || 0));
+  const cw = THEMES.centre.w;
+  const cx = THEMES.centre.x + dx;
+  const cy = THEMES.centre.y;
+  const sw = THEMES.prev.w;
+  const sh = THEMES.prev.h;
+  const sy = THEMES.prev.y;
+  // the neighbour the finger is pulling in shows clearer the further it has come
+  const pull = Math.min(1, Math.abs(dx) / THEMES.swipe);
   [
-    [m.themes[0], 40],
-    [m.themes[2], W - 40 - sw],
+    [m.themes[0], THEMES.prev.x, -1],
+    [m.themes[2], THEMES.next.x, 1],
   ].forEach((side) => {
     const it = side[0];
     if (!it) return;
-    drawPreview(cv, it.theme, it.palette, side[1], sy, sw);
-    cv.fillRect(side[1], sy, sw, sh, withAlpha(t.bg, 0.55));
-    cv.strokeRoundRect(side[1], sy, sw, sh, 4, 1, t.panelEdge);
-    label(cv, it.theme.name, side[1] + sw / 2, sy + sh + 30, 19, t.dim, { align: 'center' });
+    const x = side[1] + dx;
+    const coming = (dx > 0 && side[2] < 0) || (dx < 0 && side[2] > 0);
+    drawPreview(cv, it.theme, it.palette, x, sy, sw);
+    cv.fillRect(x, sy, sw, sh, withAlpha(t.bg, coming ? 0.4 * (1 - pull) : 0.4));
+    cv.strokeRoundRect(
+      x,
+      sy,
+      sw,
+      sh,
+      4,
+      coming && pull >= 1 ? 2 : 1,
+      coming && pull >= 1 ? ACCENT : t.panelEdge,
+    );
+    label(cv, it.theme.name, x + sw / 2, sy + sh + 30, 19, t.dim, { align: 'center' });
+    if (m.go && cv.target && !dx)
+      cv.target(
+        side[1],
+        sy,
+        sw,
+        sh + 40,
+        () => m.go(side[2]),
+        side[2] < 0 ? 'theme-prev' : 'theme-next',
+        4,
+      );
   });
   const ch = drawPreview(cv, cur.theme, cur.palette, cx, cy, cw);
   const on = m.state.tone === 'on';
   cv.strokeRoundRect(cx - 3, cy - 3, cw + 6, ch + 6, 6, on ? 3 : 1.5, on ? ACCENT : t.panelEdge);
   pill(cv, t, cx + 14, cy + 12, m.state.label, m.state.tone);
-  label(cv, cur.theme.name, W / 2, cy + ch + 50, 40, t.text, { align: 'center', font: 'bold' });
+  label(cv, cur.theme.name, W / 2 + dx, cy + ch + 50, 40, t.text, {
+    align: 'center',
+    font: 'bold',
+  });
   const sub =
     m.layers + ' layers  ·  ' + m.at + ' of ' + m.count + '  ·  Palette: ' + m.paletteName;
   const subW = cv.textWidth(ascii(sub), 19, { literal: true });
@@ -510,6 +574,10 @@ function textPage(cv, t, n, m) {
 module.exports = {
   W,
   H,
+  TOP,
+  BOTTOM,
+  THEMES,
+  themeAt,
   MODERN_TABS,
   CLASSIC_PAGES,
   ascii,

@@ -12,7 +12,18 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
-- The car app is version 0.2.15 and requires cluster-render 0.6.9 (was 0.6.6) and the Store's
+- **Themes tab of the car app (0.2.16):** a finger pulled sideways moves the three sketches with
+  it and, past 90 px, changes the theme (to the left: the next one); a tap on the sketch of the
+  theme before or after picks it; and both sketches are places the controller's knob stops at and
+  presses. The Theme button still goes to the next one. Touch needs the Store's renderer drawing
+  the page, as on the car this was reported from. Tested locally (the kit's display code driven
+  on a PC); not tested in a vehicle.
+- **A theme's sketch shows its pictures**, as a mosaic of their colours (at most 900 tiles, the
+  tiles growing until they fit); before, a picture was left out, or a plain panel when it covered
+  most of the layout, so a theme made of pictures looked nearly empty. The compiler writes the
+  tiles into `theme.preview`, so themes exported from the Studio from now on carry them too; a
+  turned picture is still left out. The neighbours' sketches are dimmed less.
+- Car app 0.2.15 requires cluster-render 0.6.9 (was 0.6.6) and the Store's
   deploy tool 0.8.27 (was 0.8.21). cluster-render 0.6.9 gives up at 5 s a fetch the KOMBI accepts
   and never completes and publishes the scene fresh instead of leaving the panel waiting, and at
   start-up waits for the cluster's own content before its first request. mgu-deploy 0.8.23 to

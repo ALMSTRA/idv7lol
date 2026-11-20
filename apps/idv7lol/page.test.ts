@@ -15,6 +15,8 @@ const page = require('./page.js') as {
   W: number;
   H: number;
   MODERN_TABS: string[];
+  THEMES: { prev: Box; next: Box; centre: Box; swipe: number };
+  themeAt(x: number, y: number): number;
   ascii(s: unknown): string;
   stateOf(s: Record<string, unknown>): { tone: string; label: string; detail: string };
   drawPreview(cv: object, theme: object, pid: string, x: number, y: number, w: number): number;
@@ -22,6 +24,12 @@ const page = require('./page.js') as {
   dataPage(cv: object, t: object, m: object): void;
   textPage(cv: object, t: object, n: number, m: object): void;
 };
+interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
 const index = require('./themes_index.js') as { themes: Array<{ id: string; module: string }> };
 interface Compiled {
   name: string;
@@ -112,6 +120,55 @@ describe('the app page', () => {
     const text = calls.find((c) => c[0] === 'text')!;
     expect(text.slice(1, 3)).toEqual(['112', 580]);
     expect(calls.at(-1)![0]).toBe('noclip');
+  });
+
+  it('draws a picture’s tiles on whole pixels, edge to edge', () => {
+    const { cv, calls } = spy();
+    const theme = {
+      name: 'Tiles',
+      background: '#000000',
+      palettes: { p: { colors: {} } },
+      preview: [
+        ['m', 0, 0, 24, 24, '#ff0000'],
+        ['m', 24, 0, 24, 24, '#00ff00'],
+      ],
+    };
+    page.drawPreview(cv, theme, 'p', 10, 20, 820);
+    const tiles = calls.filter((c) => c[0] === 'fillRect').slice(1) as number[][];
+    expect(tiles).toHaveLength(2);
+    for (const t of tiles) for (const v of t.slice(1, 5)) expect(Number.isInteger(v)).toBe(true);
+    // the second starts where the first ends, or before it: no seam between them
+    expect(tiles[1]![1]).toBeLessThanOrEqual(tiles[0]![1]! + tiles[0]![3]!);
+  });
+
+  it('knows which neighbour a touch is on, and makes both places to press', () => {
+    const { prev, next, centre } = page.THEMES;
+    expect(page.themeAt(prev.x + 5, prev.y + 5)).toBe(-1);
+    expect(page.themeAt(next.x + next.w - 5, next.y + next.h + 20)).toBe(1);
+    expect(page.themeAt(centre.x + centre.w / 2, centre.y + 50)).toBe(0);
+
+    const cv = new Recorder(page.W, page.H).clear('#000000') as Canvas & {
+      targets: Array<{ key: string; run(): void; x: number }>;
+    };
+    const went: number[] = [];
+    const item = { theme: themes[0], palette: themes[0]!.paletteSelection.default };
+    const m = {
+      themes: [item, item, item],
+      state: page.stateOf({ showing: false }),
+      layers: 1,
+      paletteName: 'x',
+      count: 3,
+      at: 1,
+      go: (d: number) => went.push(d),
+    };
+    page.themesPage(cv, kitThemes.theme(), m);
+    expect(cv.targets.map((t) => t.key)).toEqual(['theme-prev', 'theme-next']);
+    cv.targets.forEach((t) => t.run());
+    expect(went).toEqual([-1, 1]);
+    // while a finger pulls the sketches there is nothing to press under them
+    const moving = new Recorder(page.W, page.H).clear('#000000') as typeof cv;
+    page.themesPage(moving, kitThemes.theme(), { ...m, dx: 120 });
+    expect(moving.targets).toEqual([]);
   });
 
   it('draws every bundled theme and every page on the kit’s own canvas', () => {

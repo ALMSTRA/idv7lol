@@ -157,6 +157,9 @@ mgu.run({
     let tab = 0; // modern: index into page.MODERN_TABS
     let textPageNo = 0; // classic: 0 status, 1 signals, 2 renderer, 3 about
     let drawn = null; // what the last frame showed: the page is drawn again only when it changes
+    let dragX = 0; // Themes tab: how far a finger has pulled the sketches sideways (page px)
+    let touchDown = null; // where that finger went down
+    let dragBusy = false; // a frame of that pull is being drawn
     const redraw = () => {
       drawn = null;
     };
@@ -269,6 +272,8 @@ mgu.run({
           note: usbNote,
           count: keys.length,
           at: i + 1,
+          dx: dragX,
+          go: stepTheme,
         });
       } else if (modern && tab === 1) {
         const litres = store.number('fuel.volume');
@@ -401,6 +406,7 @@ mgu.run({
         settings.get('palette'),
         usbNote,
         ctx.theme().name,
+        Math.round(dragX / 4),
       ];
       const n = (id, step) => {
         const v = store.number(id);
@@ -440,13 +446,50 @@ mgu.run({
       settings.set('show', showing() ? 'off' : 'on');
       return show();
     });
-    ui.onClick('BTN_THEME', () => {
+    /** The theme d places on (1: the next, -1: the one before), round the list. */
+    function stepTheme(d) {
       const ids = themeKeys();
-      const i = ids.indexOf(current.key);
+      if (ids.length < 2) return show();
+      const i = Math.max(0, ids.indexOf(current.key));
       usbNote = '';
-      settings.set(THEME, ids[(i + 1) % ids.length]);
+      settings.set(THEME, ids[(i + d + ids.length) % ids.length]);
       return show();
-    });
+    }
+    ui.onClick('BTN_THEME', () => stepTheme(1));
+    // Themes tab, where the kit hands the page a finger's whole gesture: the sketches follow it,
+    // far enough sideways is the next theme (to the left) or the one before, and a tap on a
+    // neighbour's sketch is that theme. Anywhere else the kit keeps the touch.
+    if (ctx.onTouch)
+      ctx.onTouch((phase, x, y) => {
+        if (phase === 1) {
+          touchDown = null;
+          if (classic() || tab !== 0 || y < page.TOP || y > page.BOTTOM) return false;
+          touchDown = { x, y, far: 0 };
+          return true;
+        }
+        if (!touchDown) return false;
+        const dx = x - touchDown.x;
+        touchDown.far = Math.max(touchDown.far, Math.abs(dx), Math.abs(y - touchDown.y));
+        if (phase === 2) {
+          dragX = Math.abs(dx) < 12 ? 0 : dx;
+          // a frame per move, one at a time (the page's own loop runs twice a second)
+          if (!dragBusy) {
+            dragBusy = true;
+            const done = () => {
+              dragBusy = false;
+            };
+            render(true).then(done, done);
+          }
+          return true;
+        }
+        const down = touchDown;
+        touchDown = null;
+        dragX = 0;
+        if (Math.abs(dx) >= page.THEMES.swipe) stepTheme(dx < 0 ? 1 : -1);
+        else if (down.far < 30 && page.themeAt(x, y)) stepTheme(page.themeAt(x, y));
+        else show();
+        return true;
+      });
     ui.onClick('BTN_PALETTE', () => {
       const ids = ['auto'].concat(Object.keys(current.theme.palettes));
       const i = ids.indexOf(settings.get('palette'));
