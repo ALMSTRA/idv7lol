@@ -406,7 +406,7 @@ export const es: Dictionary = {
   welcome: {
     community: 'Plantillas gratuitas de la comunidad',
     communityNote:
-      'Conversiones opcionales de diseños con licencia GPL de otros autores. Cada tema incluye sus créditos.',
+      'Conversiones opcionales de diseños de código abierto (GPL o MIT) de otros autores. Cada tema incluye sus créditos y su licencia.',
     title: 'Bienvenido a idv7lol Studio',
     lead: 'Diseña un cuadro de instrumentos personalizado para tu BMW iDrive 7. Empieza desde una plantilla, abre un tema o parte de un lienzo vacío.',
     blank: 'Lienzo vacío',

@@ -392,7 +392,7 @@ export const zh: Dictionary = {
   },
   welcome: {
     community: '免费社区布局',
-    communityNote: '其他作者 GPL 许可布局的可选转换版本。署名信息见各主题。',
+    communityNote: '其他作者开源布局（GPL 或 MIT）的可选转换版本。署名和许可证见各主题。',
     title: '欢迎使用 idv7lol Studio',
     lead: '为你的 BMW iDrive 7 设计自定义仪表盘。可以从模板开始、打开主题，或从空白布局起步。',
     blank: '空白布局',

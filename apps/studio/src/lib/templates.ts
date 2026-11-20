@@ -16,7 +16,7 @@ export interface Template {
   name: string;
   description: string;
   theme: Theme;
-  /** Conversions of other people's GPL layouts, offered as optional starting points. */
+  /** Conversions of other people's GPL or MIT layouts, offered as optional starting points. */
   community: boolean;
 }
 
