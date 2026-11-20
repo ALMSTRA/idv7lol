@@ -13,7 +13,7 @@ import { buildPieces } from './pieces.js';
 import { encodeEtc2Rgba } from './etc2.js';
 import { SHADERS } from './glsl.js';
 import { codeOf } from './font/glyphs.js';
-import { themePreview } from './preview.js';
+import { themePreview, type PreviewPicture } from './preview.js';
 import { validateTheme } from './validate.js';
 import type { BundleFile, CompileResult, CompiledPiece, CompiledTheme, Finding } from './types.js';
 
@@ -119,6 +119,7 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
 
   // Bake each image component: edits first, then fitted to exactly its layer size.
   const palette = theme.palettes[theme.palette.default];
+  const pictures: Record<string, PreviewPicture> = {};
   for (const ref of build.assetRefs) {
     const img = opts.images?.[ref.asset];
     const entry = compiled.images.find((i) => i.key === ref.key);
@@ -153,6 +154,7 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
           cellH,
           component.props.fit,
         );
+        if (i === 0) pictures[ref.componentId] = { width: cellW, height: cellH, rgba: cell.data };
         const ox = (i % columns) * cellW;
         const oy = Math.floor(i / columns) * cellH;
         for (let y = 0; y < cellH; y++)
@@ -172,6 +174,7 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
       palette ? resolveColor(c, palette) : c,
     );
     const baked = fitRaster(edited, entry.iw, entry.ih, component.props.fit);
+    pictures[ref.componentId] = { width: entry.iw, height: entry.ih, rgba: baked.data };
     files.push({
       path: entry.file,
       data: new Uint8Array(
@@ -210,6 +213,9 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
     );
     files.push({ path: ref.file, data: ref.mask ? maskOf(rgba) : new Uint8Array(rgba) });
   }
+
+  // The sketch again, now with the pictures as their components show them.
+  if (Object.keys(pictures).length) compiled.preview = themePreview(theme, pictures);
 
   // Last, so it records every value settled above.
   files.unshift({ path: 'theme.json', data: JSON.stringify(compiled, null, 2) });

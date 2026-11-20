@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createComponent, createEmptyTheme, parseTheme, type Theme } from '@idv7lol/theme-schema';
-import { PREVIEW_MAX, themePreview } from './preview.js';
+import { MOSAIC_MAX, PREVIEW_MAX, mosaic, themePreview } from './preview.js';
 
 const bundled = (id: string): Theme => {
   const doc = JSON.parse(
@@ -71,6 +71,69 @@ describe('theme sketch for the car app', () => {
       }),
     );
     expect(themePreview(parseOk(theme))).toEqual([['r', 0, 0, 100, 50, 8, '#ff0000']]);
+  });
+
+  it('shows a picture as tiles of its colours, runs of one colour as one tile', () => {
+    // 80x40: the left half red, the right half clear but for a blue square at the bottom right
+    const pic = { width: 80, height: 40, rgba: new Uint8Array(80 * 40 * 4) };
+    for (let y = 0; y < 40; y++)
+      for (let x = 0; x < 80; x++) {
+        const i = (y * 80 + x) * 4;
+        if (x < 40) pic.rgba.set([255, 0, 0, 255], i);
+        else if (x >= 60 && y >= 20) pic.rgba.set([0, 0, 255, 255], i);
+      }
+    expect(mosaic(pic, 100, 200, 160, 80, 40)).toEqual([
+      ['m', 100, 200, 80, 80, '#ff0000'],
+      ['m', 220, 240, 40, 40, '#0000ff'],
+    ]);
+
+    const theme = createEmptyTheme({ id: 'pic', name: 'Pic' });
+    theme.assets.photo = { type: 'image', path: 'assets/photo.png', width: 80, height: 40 };
+    theme.components.push(
+      createComponent('image', {
+        id: 'photo',
+        x: 100,
+        y: 200,
+        width: 160,
+        height: 80,
+        props: { asset: 'photo', fit: 'stretch' },
+      }),
+    );
+    const parsed = parseOk(theme);
+    // without its pixels a small picture leaves nothing; with them, its tiles
+    expect(themePreview(parsed)).toEqual([]);
+    const tiles = themePreview(parsed, { photo: pic });
+    expect(tiles.length).toBeGreaterThan(0);
+    expect(tiles.every((t) => t[0] === 'm')).toBe(true);
+    // a turned picture is left out: the tiles would lie about where it is
+    parsed.components[0]!.rotation = 30;
+    expect(themePreview(parsed, { photo: pic })).toEqual([]);
+  });
+
+  it('keeps a noisy picture within the tile limit by making the tiles larger', () => {
+    const pic = { width: 960, height: 360, rgba: new Uint8Array(960 * 360 * 4) };
+    for (let i = 0; i < pic.rgba.length; i += 4) {
+      // blocks of 8 px of one colour, so tiles differ from their neighbours
+      const block =
+        (Math.floor(i / 4 / 960 / 8) * 131 + Math.floor(((i / 4) % 960) / 8)) * 2654435761;
+      pic.rgba.set([block & 255, (block >>> 8) & 255, (block >>> 16) & 255, 255], i);
+    }
+    expect(mosaic(pic, 0, 0, 1920, 720, 20).length).toBeGreaterThan(MOSAIC_MAX);
+    const theme = createEmptyTheme({ id: 'noise', name: 'Noise' });
+    theme.assets.noise = { type: 'image', path: 'assets/noise.png', width: 960, height: 360 };
+    theme.components.push(
+      createComponent('image', {
+        id: 'noise',
+        x: 0,
+        y: 0,
+        width: 1920,
+        height: 720,
+        props: { asset: 'noise', fit: 'stretch' },
+      }),
+    );
+    const tiles = themePreview(parseOk(theme), { noise: pic });
+    expect(tiles.length).toBeGreaterThan(0);
+    expect(tiles.length).toBeLessThanOrEqual(MOSAIC_MAX);
   });
 
   it('gives every bundled theme a sketch the car app can draw', () => {

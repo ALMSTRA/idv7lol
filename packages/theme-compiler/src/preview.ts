@@ -15,6 +15,7 @@ import { convert, getSignal } from '@idv7lol/vehicle-signals';
  *   ['a', cx, cy, r0, r1, a0, a1, colour]        ring from a0 to a1, degrees clockwise from 12 o'clock
  *   ['l', x1, y1, x2, y2, width, colour]         line
  *   ['t', text, x, y, size, colour, align, bold] text; y is its middle, align 0 left 1 centre 2 right
+ *   ['m', x, y, w, h, colour]                    one tile of a picture's mosaic (always a literal)
  */
 export type PreviewPrim =
   | ['r', number, number, number, number, number, string]
@@ -22,10 +23,22 @@ export type PreviewPrim =
   | ['c', number, number, number, string]
   | ['a', number, number, number, number, number, number, string]
   | ['l', number, number, number, number, number, string]
-  | ['t', string, number, number, number, string, 0 | 1 | 2, 0 | 1];
+  | ['t', string, number, number, number, string, 0 | 1 | 2, 0 | 1]
+  | ['m', number, number, number, number, string];
+
+/** A picture as its component shows it: baked to the component's layer, RGBA8. */
+export interface PreviewPicture {
+  width: number;
+  height: number;
+  rgba: Uint8Array | Uint8ClampedArray;
+}
 
 /** Never more than this many shapes: the page draws three sketches at a time. */
 export const PREVIEW_MAX = 140;
+/** Never more than this many mosaic tiles in a sketch: the tiles grow until they fit. */
+export const MOSAIC_MAX = 900;
+/** Tile sizes tried, in layout pixels, finest first. */
+const TILES = [20, 24, 32, 40, 48, 64, 96];
 
 /** What the car "reads" in a sketch: a calm drive, the values the Studio's thumbnails use. */
 const SAMPLE: Record<string, number | string> = {
@@ -86,11 +99,107 @@ function valueText(b: Binding | undefined, format: string | undefined): string {
   return typeof value === 'string' ? value : formatNumber(value, format ?? '0');
 }
 
+const hex2 = (n: number): string => (n < 16 ? '0' : '') + n.toString(16);
+
 /**
- * The sketch of `theme`. Hidden components, ones that only show on a condition, alerts and
- * pictures are left out; a picture that covers most of the layout leaves a plain panel.
+ * A picture in the box x, y, w, h as tiles of one colour each, `tile` layout pixels wide: a run
+ * of the same colour along a row is one tile, and the same run in the rows under it too. Tiles
+ * the picture leaves clear are left out.
  */
-export function themePreview(source: Theme): PreviewPrim[] {
+export function mosaic(
+  pic: PreviewPicture,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  tile: number,
+): PreviewPrim[] {
+  const cols = Math.max(1, Math.round(w / tile));
+  const rows = Math.max(1, Math.round(h / tile));
+  if (pic.width < 1 || pic.height < 1 || pic.rgba.length < pic.width * pic.height * 4) return [];
+  const cell: (string | null)[] = [];
+  for (let r = 0; r < rows; r++) {
+    const y0 = Math.floor((r * pic.height) / rows);
+    const y1 = Math.max(y0 + 1, Math.floor(((r + 1) * pic.height) / rows));
+    for (let c = 0; c < cols; c++) {
+      const x0 = Math.floor((c * pic.width) / cols);
+      const x1 = Math.max(x0 + 1, Math.floor(((c + 1) * pic.width) / cols));
+      // a few samples of the tile are enough for a sketch
+      const sx = Math.max(1, Math.floor((x1 - x0) / 6));
+      const sy = Math.max(1, Math.floor((y1 - y0) / 6));
+      let pr = 0;
+      let pg = 0;
+      let pb = 0;
+      let pa = 0;
+      let n = 0;
+      for (let py = y0; py < y1; py += sy)
+        for (let px = x0; px < x1; px += sx) {
+          const i = (py * pic.width + px) * 4;
+          const a = pic.rgba[i + 3]!;
+          pr += pic.rgba[i]! * a;
+          pg += pic.rgba[i + 1]! * a;
+          pb += pic.rgba[i + 2]! * a;
+          pa += a;
+          n++;
+        }
+      const alpha = pa / n;
+      if (alpha < 48) {
+        cell.push(null);
+        continue;
+      }
+      const q = (v: number): number => Math.min(255, Math.round(v / pa / 8) * 8);
+      const rgb = '#' + hex2(q(pr)) + hex2(q(pg)) + hex2(q(pb));
+      cell.push(alpha >= 208 ? rgb : rgb + hex2(Math.round(alpha / 32) * 32));
+    }
+  }
+  const tw = w / cols;
+  const th = h / rows;
+  const out: PreviewPrim[] = [];
+  const used = new Uint8Array(cols * rows);
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++) {
+      const col = cell[r * cols + c];
+      if (!col || used[r * cols + c]) continue;
+      let c1 = c + 1;
+      while (c1 < cols && cell[r * cols + c1] === col && !used[r * cols + c1]) c1++;
+      const same = (rr: number): boolean => {
+        for (let k = c; k < c1; k++)
+          if (cell[rr * cols + k] !== col || used[rr * cols + k]) return false;
+        return true;
+      };
+      let rEnd = r + 1;
+      while (rEnd < rows && same(rEnd)) rEnd++;
+      for (let rr = r; rr < rEnd; rr++) for (let k = c; k < c1; k++) used[rr * cols + k] = 1;
+      const px = r1(x + c * tw);
+      const py = r1(y + r * th);
+      out.push(['m', px, py, r1(x + c1 * tw) - px, r1(y + rEnd * th) - py, col]);
+    }
+  return out;
+}
+
+/**
+ * The sketch of `theme`. Hidden components, ones that only show on a condition and alerts are
+ * left out. A picture shows as a mosaic of its colours when `pictures` has it (by component id,
+ * as the compiler bakes it), unless it is turned; without it, a picture that covers most of the
+ * layout leaves a plain panel.
+ */
+export function themePreview(
+  source: Theme,
+  pictures?: Record<string, PreviewPicture>,
+): PreviewPrim[] {
+  let best: PreviewPrim[] = [];
+  for (const tile of TILES) {
+    best = sketch(source, pictures, tile);
+    if (best.filter((p) => p[0] === 'm').length <= MOSAIC_MAX) return best;
+  }
+  return best.filter((p) => p[0] !== 'm');
+}
+
+function sketch(
+  source: Theme,
+  pictures: Record<string, PreviewPicture> | undefined,
+  tile: number,
+): PreviewPrim[] {
   const theme = resolveTextStyles(source);
   const out: PreviewPrim[] = [];
   const W = theme.layout.width;
@@ -219,9 +328,14 @@ export function themePreview(source: Theme): PreviewPrim[] {
         if (!p.wrap) text(s.trim(), p.style, x, y, w, h);
         break;
       }
-      case 'image':
-        if (w * h > W * H * 0.5) out.push(['r', r1(x), r1(y), r1(w), r1(h), 0, '$surface']);
+      case 'image': {
+        const pic = pictures?.[c.id];
+        if (pic && !c.rotation && w >= tile && h >= tile)
+          out.push(...mosaic(pic, x, y, w, h, tile));
+        else if (!pic && w * h > W * H * 0.5)
+          out.push(['r', r1(x), r1(y), r1(w), r1(h), 0, '$surface']);
         break;
+      }
       case 'gauge.arc': {
         const p = c.props;
         const r = Math.min(w, h) / 2;
@@ -326,6 +440,7 @@ function weight(p: PreviewPrim): number {
   switch (p[0]) {
     case 'r':
     case 'o':
+    case 'm':
       return p[3] * p[4];
     case 'c':
       return p[3] * p[3] * 3;
@@ -338,15 +453,16 @@ function weight(p: PreviewPrim): number {
   }
 }
 
-/** At most PREVIEW_MAX shapes, in drawing order: the smallest go first. */
+/** At most PREVIEW_MAX shapes besides the mosaics' tiles, in drawing order: the smallest go first. */
 function trim(prims: PreviewPrim[]): PreviewPrim[] {
-  if (prims.length <= PREVIEW_MAX) return prims;
+  if (prims.filter((p) => p[0] !== 'm').length <= PREVIEW_MAX) return prims;
   const keep = new Set(
     prims
       .map((p, i) => ({ i, w: weight(p) }))
+      .filter((e) => prims[e.i]![0] !== 'm')
       .sort((a, b) => b.w - a.w)
       .slice(0, PREVIEW_MAX)
       .map((e) => e.i),
   );
-  return prims.filter((_p, i) => keep.has(i));
+  return prims.filter((p, i) => p[0] === 'm' || keep.has(i));
 }
