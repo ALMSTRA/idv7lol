@@ -215,7 +215,10 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
   }
 
   // The sketch again, now with the pictures as their components show them.
-  if (Object.keys(pictures).length) compiled.preview = themePreview(theme, pictures);
+  if (Object.keys(pictures).length) {
+    const sketch = themePreview(theme, pictures);
+    if (sketch.some((p) => p[0] === 'm')) compiled.sketch = sketch;
+  }
 
   // Last, so it records every value settled above.
   files.unshift({ path: 'theme.json', data: JSON.stringify(compiled, null, 2) });

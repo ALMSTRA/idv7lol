@@ -243,6 +243,12 @@ export interface CompiledTheme {
   layers: number;
   /** A sketch of the theme for the car app's own page (preview.ts). */
   preview?: PreviewPrim[];
+  /**
+   * The same sketch with the theme's pictures as mosaics, when it has pictures. Apart from
+   * `preview` because car apps before 0.2.17 keep only the first 160 shapes of that one and know
+   * no mosaic tiles: they go on drawing `preview`.
+   */
+  sketch?: PreviewPrim[];
   warnings: Finding[];
 }
 

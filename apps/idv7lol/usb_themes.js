@@ -138,15 +138,17 @@ function declaredSize(buf) {
 }
 
 const PREVIEW_MAX = 160;
+/** `sketch` adds the pictures' mosaic tiles to those (theme-compiler MOSAIC_MAX). */
+const SKETCH_MAX = PREVIEW_MAX + 900;
 const COLOUR_RE = /^(\$[a-z0-9-]{1,32}|#[0-9a-fA-F]{6}([0-9a-fA-F]{2})?)$/;
 // how many numbers each shape of a sketch carries before its colour (a text is checked apart)
-const PREVIEW_SHAPES = { r: 5, o: 6, c: 3, a: 6, l: 5 };
+const PREVIEW_SHAPES = { r: 5, o: 6, c: 3, a: 6, l: 5, m: 4 };
 
 /** A theme's sketch for the app's page (theme-compiler preview.ts) with anything odd left out. */
-function cleanPreview(list) {
+function cleanPreview(list, max) {
   if (!Array.isArray(list)) return [];
   const num = (v) => isNum(v) && Math.abs(v) <= 8192;
-  return list.slice(0, PREVIEW_MAX).filter((p) => {
+  return list.slice(0, max || PREVIEW_MAX).filter((p) => {
     if (!Array.isArray(p) || typeof p[0] !== 'string') return false;
     if (p[0] === 't')
       return (
@@ -301,7 +303,8 @@ function readPackage(buf, opts, inflated) {
   );
   theme.fonts = fonts.length ? fonts : opts.fonts.slice(0, 1);
   theme.shaders = shaders;
-  theme.preview = cleanPreview(theme.preview);
+  theme.preview = cleanPreview(theme.preview).filter((p) => p[0] !== 'm');
+  theme.sketch = cleanPreview(theme.sketch, SKETCH_MAX);
 
   return {
     meta: {

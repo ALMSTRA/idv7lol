@@ -148,7 +148,13 @@ function drawPreview(cv, theme, pid, x, y, w) {
     kitColour(typeof c === 'string' && c[0] === '$' ? pal[c.slice(1)] : c, '#808080');
   const bg = theme.background === 'transparent' || !theme.background ? '#000000' : theme.background;
   cv.fillRect(x, y, w, h, col(bg)[3] ? col(bg) : [0, 0, 0, 255]);
-  const prims = Array.isArray(theme.preview) ? theme.preview : [];
+  // `sketch` is the one with the theme's pictures as mosaics, where the theme has pictures
+  const prims =
+    Array.isArray(theme.sketch) && theme.sketch.length
+      ? theme.sketch
+      : Array.isArray(theme.preview)
+        ? theme.preview
+        : [];
   if (!prims.length) {
     cv.text(
       ascii(theme.name).slice(0, 28),

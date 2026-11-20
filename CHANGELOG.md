@@ -12,7 +12,7 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
-- **Themes tab of the car app (0.2.16):** a finger pulled sideways moves the three sketches with
+- **Themes tab of the car app (0.2.16, 0.2.17):** a finger pulled sideways moves the three sketches with
   it and, past 90 px, changes the theme (to the left: the next one); a tap on the sketch of the
   theme before or after picks it; and both sketches are places the controller's knob stops at and
   presses. The Theme button still goes to the next one. Touch needs the Store's renderer drawing
@@ -20,9 +20,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   on a PC); not tested in a vehicle.
 - **A theme's sketch shows its pictures**, as a mosaic of their colours (at most 900 tiles, the
   tiles growing until they fit); before, a picture was left out, or a plain panel when it covered
-  most of the layout, so a theme made of pictures looked nearly empty. The compiler writes the
-  tiles into `theme.preview`, so themes exported from the Studio from now on carry them too; a
-  turned picture is still left out. The neighbours' sketches are dimmed less.
+  most of the layout, so a theme made of pictures looked nearly empty. The compiler writes that
+  sketch into `theme.sketch` and leaves `theme.preview` as it was, so themes exported from the
+  Studio from now on carry both and a car app before 0.2.17 goes on drawing the plain one; a
+  turned picture is still left out. Car app 0.2.17 reads `sketch` from a package installed from
+  USB too (0.2.16 drew the mosaic of bundled themes only). The neighbours' sketches are dimmed less.
 - Car app 0.2.15 requires cluster-render 0.6.9 (was 0.6.6) and the Store's
   deploy tool 0.8.27 (was 0.8.21). cluster-render 0.6.9 gives up at 5 s a fetch the KOMBI accepts
   and never completes and publishes the scene fresh instead of leaving the panel waiting, and at

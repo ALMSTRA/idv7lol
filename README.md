@@ -47,7 +47,7 @@ Design, Simulate, Validate, To the car). It asks which one you want, and the cla
 there under **…** > View. The desktop app **looks for a newer version when it starts** and can
 update itself, asking first unless you tell it not to; that works from beta 7 on, so install this
 one by hand. The Windows installer now comes in all five languages. In the car, the app has a new
-screen with tabs, sketches of the themes and the idv7lol icon; since app 0.2.16 a swipe or a tap on a neighbour changes the theme there, and
+screen with tabs, sketches of the themes and the idv7lol icon; since app 0.2.17 a swipe or a tap on a neighbour changes the theme there, and
 the sketches show a theme's pictures too. Its Settings can show its log as QR codes to photograph.
 
 **Download:** the Windows installer of idv7lol Studio is on the

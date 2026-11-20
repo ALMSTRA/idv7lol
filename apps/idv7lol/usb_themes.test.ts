@@ -49,7 +49,12 @@ const usb = require('./usb_themes.js') as {
   };
   gunzipCapped(buf: Buffer, cap: number, cb: (err: Error | null, out?: Buffer) => void): void;
   cleanPreview(list: unknown): unknown[];
-  readPackage(buf: Buffer, opts: Record<string, unknown>): { theme: { preview: unknown[] } };
+  readPackage(
+    buf: Buffer,
+    opts: Record<string, unknown>,
+  ): {
+    theme: { preview: unknown[]; sketch: unknown[] };
+  };
   LIMITS: { fileBytes: number; jsonBytes: number };
   compareVersions(a: string, b: string): number;
 };
@@ -254,6 +259,23 @@ describe('themes from a USB stick', () => {
       fonts: ['sans'],
     });
     expect(read.theme.preview.length).toBeGreaterThan(0);
+    // the sketch with a picture's tiles is kept beside it, tiles and all, past the first 160
+    const withTiles = samplePackage() as unknown as { theme: { sketch: unknown[] } };
+    withTiles.theme.sketch = Array.from({ length: 400 }, (_v, i) => [
+      'm',
+      (i % 40) * 24,
+      Math.floor(i / 40) * 24,
+      24,
+      24,
+      '#102030',
+    ]);
+    const tiled = usb.readPackage(gzipSync(Buffer.from(JSON.stringify(withTiles))), {
+      appVersion: '0.2.0',
+      shaders: SHADERS,
+      fonts: ['sans'],
+    });
+    expect(tiled.theme.sketch).toHaveLength(400);
+    expect(tiled.theme.preview.some((q) => (q as unknown[])[0] === 'm')).toBe(false);
   });
 
   it('compares versions', () => {
