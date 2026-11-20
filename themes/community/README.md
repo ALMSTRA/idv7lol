@@ -1,6 +1,7 @@
 # Community themes
 
-Layouts shared by people who use idv7lol, plus the converted Cluster Layouts below. To share one,
+Layouts shared by people who use idv7lol, plus the converted Cluster Layouts and KurdBimmer
+Themes below. To share one,
 see "Sharing a layout" in [CONTRIBUTING.md](../../CONTRIBUTING.md). Every folder here shows up in
 the Studio's welcome window as a template; each shared theme carries its author and licence.
 
@@ -20,6 +21,44 @@ Hand conversions of the seven cluster layouts from
   JavaScript, font or image is included.
 - Each theme's `author` and `description` credit upstream. Upstream's on-cluster credit mark
   (drawn by its own engine) has no equivalent in this format and is not reproduced.
+
+## KurdBimmer Themes conversions
+
+The sixteen folders that start with `kb-` are hand conversions of the cluster themes in
+[FDX100/KB](https://github.com/FDX100/KB) (`apps/kurdbimmer_themes/`, KurdBimmer Themes 0.20.5),
+made by [FDX100](https://github.com/FDX100): Apex, Alpina, Concept, Live Cockpit, Eco, Classic,
+Classic Map, Night Drive, M Digital, Blue Dials, ePower, Digital Rain, Neon City, Glass, E46 M3
+and Hybrid.
+
+- Original themes: Copyright (c) 2026 FDX100, MIT (the repository also names bimmer-lab, whose
+  Cluster Themes app it is built on). The conversions keep the MIT licence, and each theme's
+  `author` and `description` credit FDX100.
+- Only the arrangement, proportions, colours and readouts were taken over, from the theme
+  pictures and layout files. No upstream shader, JavaScript, font or image is included.
+- Upstream says of itself that it was not yet tried on a real car; neither were these.
+
+What differs from upstream, all sixteen:
+
+- Upstream draws each theme with its own shader over the whole 1920x720 panel. Here every theme
+  is redrawn with this format's gauges, bars, texts and shapes at 0.66 of its size, at the left of
+  the panel (x 88 to 1355, y 150 to 625), so that nothing sits under the cowl, the gear bracket,
+  the eDrive box or the bottom strip. Clock, range and outside temperature are in a column right
+  of the gear bracket instead of along the bottom.
+- Chevron and curved scales (Alpina, Live Cockpit, M Digital) are straight segmented bars; the
+  curved gauges of Concept are arcs of a circle.
+- No wordmarks or brand stripes: the ALPINA wordmark, the M stripe and the texts on the E46 M3
+  dial faces are left out. The names of the themes are FDX100's.
+- Shader effects have no equivalent: the falling glyphs of Digital Rain are still columns, the
+  skyline of Neon City is a few plain towers without windows, the hatched bands, glass shine and
+  glowing floors are plain fills and lines, the analog clock of ePower is a digital one.
+- The Waze map window, the per-drive-mode theme choice, the shift lights, the G-meter, the alerts
+  and the Kurdish (Sorani) settings pages belong to upstream's app and are not part of a theme.
+- Units are fixed to km/h, °C and bar. The gear shows the gear or the selector position, not both
+  (`D3` reads `3`).
+- The E46 M3 display is orange figures on a dark panel, not dark figures on orange, to stay
+  legible against the layout's background check.
+- Eco's "POWER %" reads the engine load; ePower's right dial reads the battery power in kW with
+  the charge sector above it, and Hybrid and ePower target the `phev` profile.
 
 ## Status
 

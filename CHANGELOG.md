@@ -94,6 +94,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Sixteen community templates converted from FDX100's KurdBimmer Themes**
+  ([FDX100/KB](https://github.com/FDX100/KB), MIT): Apex, Alpina, Concept, Live Cockpit, Eco,
+  Classic, Classic Map, Night Drive, M Digital, Blue Dials, ePower, Digital Rain, Neon City,
+  Glass, E46 M3 and Hybrid, in `themes/community/kb-*`. Each is redrawn with this format's own
+  components at 0.66 of its size, clear of the factory zones, and credits FDX100; no upstream
+  shader, script, font or image is included, and wordmarks are left out. What differs from the
+  originals is in `themes/community/README.md`. They show in the Studio's welcome window with the
+  other community templates. Tested locally (validator clean, drawn by the Studio's engine); not
+  tested in a vehicle, and upstream was not either.
 - The car app's **Settings > QR log** shows its log as QR codes to photograph, so a problem can
   be reported without SSH; `python kit/tools/qrlog_decode.py <photos>` turns the photos back into
   the log (needs `pip install zxing-cpp pillow`). It comes with the app kit (idrive7-apps

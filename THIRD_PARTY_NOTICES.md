@@ -35,6 +35,12 @@ is not part of idv7lol): eroobeeroo/idrive7-apps and robertnisipeanu/mgu-store (
 2026 eroobeeroo, GPL-3.0-or-later. Their arrangement, proportions, colours and readouts were carried
 over; no upstream code, shader, font or image was copied. See `themes/community/README.md`.
 
+The sixteen `themes/community/kb-*` themes are hand conversions of the cluster themes in
+[FDX100/KB](https://github.com/FDX100/KB) (KurdBimmer Themes), Copyright (c) 2026 bimmer-lab,
+Copyright (c) 2026 FDX100 (the KurdBimmer themes and changes), MIT. Their arrangement, proportions,
+colours and readouts were carried over; no upstream code, shader, font or image was copied. The
+conversions stay under the MIT licence. See `themes/community/README.md`.
+
 Runtime dependencies of the Studio and tooling (React, Vite, Tauri, zod, zustand, …) are
 listed with their licences in the generated `apps/studio/src-tauri/THIRD_PARTY.txt` and
 `package-lock.json`.
