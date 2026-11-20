@@ -12,8 +12,23 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
-- The car app is version 0.2.14 and requires cluster-render 0.6.6 (was 0.6.4) and the Store's
-  deploy tool 0.8.21 (was 0.8.19). cluster-render 0.6.5 remembers across drives the upload level
+- The car app is version 0.2.15 and requires cluster-render 0.6.9 (was 0.6.6) and the Store's
+  deploy tool 0.8.27 (was 0.8.21). cluster-render 0.6.9 gives up at 5 s a fetch the KOMBI accepts
+  and never completes and publishes the scene fresh instead of leaving the panel waiting, and at
+  start-up waits for the cluster's own content before its first request. mgu-deploy 0.8.23 to
+  0.8.27 keep the head unit from restarting when an updated program crashes, free app user ids
+  left held by earlier installs, count starts that end in a power cut or an early crash towards
+  safe mode, and write less to the unit's storage on installs. Not tested in a vehicle.
+- The app kit's runtime is refreshed from cauliflowermossgrape/idrive7-apps (35bca28): a
+  diagnostic read no longer takes another app's answer to a different identifier as its own, or
+  lets another app's refusal replace an answer; a tall glyph atlas goes to the head unit's
+  renderer in pieces; `ctx.onTouch` for a gesture; an engine's own Auto redline. The Spanish
+  build of the kit (`--language es`) and its iDrive 8 screen description are not taken:
+  `kit/tools/build.py` stays as it was.
+- `apps/idv7lol/cluster_render_client.js` follows upstream (idrive-apps 2dcead2): `host()` can
+  ask for an edge on a hosted picture, which idv7lol does not use.
+- Before it, car app 0.2.14 raised them to cluster-render 0.6.6 (from 0.6.4) and the Store's
+  deploy tool 0.8.21 (from 0.8.19). cluster-render 0.6.5 remembers across drives the upload level
   the KOMBI accepts, and 0.6.6 keeps the scene through a warning or an open door and maps it
   again when the slot unlocks, instead of leaving the panel blank until a new fetch. mgu-deploy
   0.8.21 refuses, before changing anything, an app that asks for something the head unit lacks,
@@ -65,6 +80,12 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   change for idv7lol, which has a SETTINGS state.
 
 ### Added
+
+- The car app's **Settings > QR log** shows its log as QR codes to photograph, so a problem can
+  be reported without SSH; `python kit/tools/qrlog_decode.py <photos>` turns the photos back into
+  the log (needs `pip install zxing-cpp pillow`). It comes with the app kit (idrive7-apps
+  94b6e8f, 7e96aff). The codes hold the app's own log lines; look at them before sharing a
+  photo. Tested locally; not tested in a vehicle.
 
 - **A new view for the Studio**, beside the classic one. The work goes as steps along the top:
   Template, Design, Simulate, Validate, To the car, with a Continue button to the next one. Design

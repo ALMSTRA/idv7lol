@@ -44,7 +44,7 @@ kept the fallback (or turned the target off) for good after two, until `cluster-
 guard-reset`; 0.5.12 removed the guard, its file and `guard-reset`, and a drop is one log line
 (idrive-apps #128, #54; commit 0534f04).
 
-idv7lol requires cluster-render **0.6.6** or newer:
+idv7lol requires cluster-render **0.6.9** or newer:
 
 - before 0.5.2, stopping a renderer-side animation left RAMSES 19's animation system broken, and
   the next request for the target crashed the service (idrive-apps #132). The car app starts and
@@ -71,6 +71,15 @@ idv7lol requires cluster-render **0.6.6** or newer:
   it stays fetched and is mapped again, without a new fetch, at the first report of the slot
   unlocked; a lock longer than 3 min releases it and the scene is asked for whole (commit 996bb41).
   Nothing changes in the client. Not tested in a vehicle with idv7lol.
+- 0.6.7: a video layer's optional `always_packed` (commit fe9dc44), which idv7lol does not use.
+- 0.6.9: a fetch the KOMBI accepts and never completes is given up at 5 s; from the second in a
+  row the scene is unpublished and published fresh at the next request, and every third in a row
+  the display framework reconnects, at most once a minute. At start-up the first request waits
+  until the stock HMI's content is mapped, or 10 s, so it does not race the KOMBI's own first
+  fetches (commit d431c87). Nothing changes in the client. Not tested in a vehicle with idv7lol.
+- After 0.6.9, not in a release yet: a `host` message may ask for an edge on the hosted picture
+  (`edge_top`, `edge_bottom`, `edge_fade`, `edge_dim`, `edge_blur`) from a service whose hello
+  has `host_edge` 1 (commit 243da9b). idv7lol hosts nothing.
 
 ## iDrive 8 (not supported by idv7lol)
 
@@ -207,14 +216,14 @@ Studio as hints (info zones, no findings) until someone checks them:
 
 ## Versions seen
 
-| Component       | Version      | Note                                                                                              |
-| --------------- | ------------ | ------------------------------------------------------------------------------------------------- |
-| cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive                                      |
-| cluster-render  | 0.5.0–0.5.5  | 0.5.0 scene files (off by default); 0.5.1 panel's own scene id; 0.5.3 `yield`; 0.5.4–0.5.5 fixes  |
-| cluster-render  | 0.5.6–0.5.9  | 0.5.6 re-ask of an accepted, unmapped scene; 0.5.7 video compose; 0.5.8 exclusive; 0.5.9 ETC2     |
-| cluster-render  | 0.5.10–0.6.4 | 0.5.12 no mapping guard; 0.6.0 scene hosts; 0.6.3 images hidden until written; 0.6.4 upload cap   |
-| cluster-render  | 0.6.5–0.6.6  | 0.6.5 upload ceiling kept across drives; 0.6.6 scene kept through a slot lock (required)          |
-| mgu-deploy      | 0.8.21       | required by idv7lol (0.8.13 tiles, 0.8.16 safe mode, 0.8.19 MainApp 6.4.8, 0.8.21 manifest check) |
-| Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                         |
-| Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`                |
-| mgu-deploy      | 0.7.11       | pinned by waze-on-cluster                                                                         |
+| Component       | Version      | Note                                                                                                                                          |
+| --------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| cluster-render  | 0.4.2, 0.4.3 | 0.4.2 raised layers from 8 to 64/96; 0.4.3 zero-copy receive                                                                                  |
+| cluster-render  | 0.5.0–0.5.5  | 0.5.0 scene files (off by default); 0.5.1 panel's own scene id; 0.5.3 `yield`; 0.5.4–0.5.5 fixes                                              |
+| cluster-render  | 0.5.6–0.5.9  | 0.5.6 re-ask of an accepted, unmapped scene; 0.5.7 video compose; 0.5.8 exclusive; 0.5.9 ETC2                                                 |
+| cluster-render  | 0.5.10–0.6.4 | 0.5.12 no mapping guard; 0.6.0 scene hosts; 0.6.3 images hidden until written; 0.6.4 upload cap                                               |
+| cluster-render  | 0.6.5–0.6.9  | 0.6.5 upload ceiling kept across drives; 0.6.6 scene kept through a slot lock; 0.6.9 stalled fetch recovered (required)                       |
+| mgu-deploy      | 0.8.27       | required by idv7lol (0.8.16 safe mode, 0.8.19 MainApp 6.4.8, 0.8.21 manifest check, 0.8.26 safe mode counts every start, 0.8.27 fewer writes) |
+| Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                                                                     |
+| Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`                                                            |
+| mgu-deploy      | 0.7.11       | pinned by waze-on-cluster                                                                                                                     |

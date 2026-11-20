@@ -18,8 +18,8 @@ time from cluster-render's `hello` (`backend`, `targets`), never assumed from th
 
 | Component                                    | Minimum                           | Source                      |
 | -------------------------------------------- | --------------------------------- | --------------------------- |
-| MGU Store (mgu-deploy, app-privacy, updater) | mgu-deploy 0.8.21                 | robertnisipeanu/mgu-store   |
-| cluster-render                               | 0.6.6 (see RENDERER.md)           | robertnisipeanu/idrive-apps |
+| MGU Store (mgu-deploy, app-privacy, updater) | mgu-deploy 0.8.27                 | robertnisipeanu/mgu-store   |
+| cluster-render                               | 0.6.9 (see RENDERER.md)           | robertnisipeanu/idrive-apps |
 | Node.js on the unit                          | 8.7+ (8.16.2 on current firmware) | BMW firmware                |
 | Python on the unit (build from source)       | mgu-python                        | installed by the Store      |
 
@@ -27,10 +27,15 @@ mgu-deploy 0.8.12 makes an update run the new code (mgu-store #261) and 0.8.19 s
 MainApp 6.4.8, where an install restarts only that app (mgu-store #273, #294). 0.8.21 refuses,
 before it changes anything and naming what is missing, an app whose manifest asks for an
 interface the head unit does not have, and gives back the registry entry of any other app the
-app manager dropped during an install (mgu-store #321). idv7lol requires 0.8.21, so the Store
-installs it first. cluster-render 0.6.3 hides a picture layer until its pixels are written, 0.6.4
-and 0.6.5 handle the KOMBI removing a scene while pictures upload, and 0.6.6 keeps the scene
-through a warning or an open door.
+app manager dropped during an install (mgu-store #321). 0.8.23 keeps the head unit from
+restarting when a program whose file an update replaced crashes, 0.8.24 frees the app user ids
+that homes left behind by earlier installs kept held ("No free user Ids left"), 0.8.26 counts a
+start that ends in a power cut, a reset or an early crash towards safe mode, and 0.8.27 unpacks
+and checks packages in RAM, so an install writes less to the unit's storage. idv7lol requires
+0.8.27, so the Store installs it first. cluster-render 0.6.3 hides a picture layer until its pixels are written, 0.6.4
+and 0.6.5 handle the KOMBI removing a scene while pictures upload, 0.6.6 keeps the scene
+through a warning or an open door, and 0.6.9 asks again, from fresh, for a scene the KOMBI
+accepted and never finished fetching.
 
 ## Vehicle signals
 

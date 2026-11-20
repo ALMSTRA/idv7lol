@@ -103,7 +103,7 @@ This is about installing the Store, not idv7lol: idv7lol itself doesn't flash or
    Don't pick Tags: it skips pre-release tags such as `v0.2.0-beta.7`.
 
 2. The Store lists **idv7lol**. Open it and press **Install**. The Store installs what idv7lol
-   needs first (`cluster-render` 0.6.6, and its own deploy tool 0.8.21, which makes an update run
+   needs first (`cluster-render` 0.6.9, and its own deploy tool 0.8.27, which makes an update run
    the new code), then installs idv7lol: on **Releases** the ready package, on **Branch** after
    building it from source on the unit (Python + Node, about a minute).
 3. Restart the head unit if the Store asks.

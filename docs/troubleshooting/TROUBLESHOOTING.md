@@ -71,7 +71,7 @@ apps missing from the menu (mgu-store #265). Update the Store's tools, then use 
 
 **An update installed, but the app behaves like the old version.** The Store's deploy tool before
 0.8.12 could run a cached copy of the previous code when the new bundle had the same length
-(mgu-store #261). idv7lol requires 0.8.21 (0.8.12 fixed this), so the Store updates it first; on an
+(mgu-store #261). idv7lol requires 0.8.27 (0.8.12 fixed this), so the Store updates it first; on an
 older Store, update its tools and restart the head unit.
 
 **The install rolled back with "run the install again later".** MainApp was busy installing
@@ -99,7 +99,7 @@ channel now offers an update only when the car app or the kit changes (`build.sh
 `mgu-repo.json`, mgu-store #205).
 
 **The app page says "not connected".** cluster-render is not installed or not running. Install
-it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.6.6+.
+it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.6.9+.
 
 **"Waiting for live car data".** No signal has arrived: with the engine off and the car asleep
 the bus is silent. Start the car, or set _Demo data: On_ to check the layout.
@@ -136,6 +136,8 @@ the previous state of tools it changed.
 - Studio: Console tab, Validation tab, and the exported bundle's `theme.json`.
 - Car: the app's Diagnostics pages (status, signals with raw payloads, renderer status, versions)
   and the app log `oap_<uid>/data/idv7lol.log` on the unit; cluster-render's log is
-  `/var/opt/cluster-render/log/cluster-render.log`.
+  `/var/opt/cluster-render/log/cluster-render.log`. Without SSH, **Settings > QR log** in the app
+  (0.2.15 or newer) shows the app log as QR codes: photograph them and run
+  `python kit/tools/qrlog_decode.py <photos>` on a computer (`pip install zxing-cpp pillow`).
 
 Never include your VIN, GPS position or personal data in an issue.
