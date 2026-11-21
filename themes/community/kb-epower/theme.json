@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "kb-epower",
   "name": "ePower",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "FDX100 (FDX100/KB), converted to idv7lol",
   "description": "Conversion to idv7lol of \"ePower\" from KurdBimmer Themes by FDX100 (github.com/FDX100/KB), MIT. Plug-in hybrid dials: speed on the left, battery power with a charge sector on the right, fuel and battery in the corners.",
   "license": "MIT",
