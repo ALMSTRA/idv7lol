@@ -7,9 +7,12 @@ the Studio's welcome window as a template; each shared theme carries its author 
 
 ## Cluster Layouts conversions
 
-Hand conversions of the seven cluster layouts from
+Hand conversions of the twelve cluster layouts from
 [eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info)
-(`apps/cluster_layouts/`, Cluster Layouts 0.13.2) to idv7lol's declarative theme format.
+(`apps/cluster_layouts/`) to idv7lol's declarative theme format: seven from Cluster Layouts
+0.13.2, and `gt3`, `pulse`, `sport`, `m-cluster` and `classic-m-cluster` from Cluster Layouts
+0.27.2 (commit 637223f, 10 November 2026), the last version published under GPL-3.0-or-later.
+Upstream's later versions are under PolyForm Noncommercial and nothing was taken from them.
 
 ## Licence and attribution
 
@@ -24,11 +27,11 @@ Hand conversions of the seven cluster layouts from
 
 ## KurdBimmer Themes conversions
 
-The sixteen folders that start with `kb-` are hand conversions of the cluster themes in
-[FDX100/KB](https://github.com/FDX100/KB) (`apps/kurdbimmer_themes/`, KurdBimmer Themes 0.20.5),
-made by [FDX100](https://github.com/FDX100): Apex, Alpina, Concept, Live Cockpit, Eco, Classic,
-Classic Map, Night Drive, M Digital, Blue Dials, ePower, Digital Rain, Neon City, Glass, E46 M3
-and Hybrid.
+The seventeen folders that start with `kb-` are hand conversions of the cluster themes in
+[FDX100/KB](https://github.com/FDX100/KB) (`apps/kurdbimmer_themes/`, KurdBimmer Themes 0.20.5,
+and Luxe from 0.23.0), made by [FDX100](https://github.com/FDX100): Apex, Alpina, Concept, Live
+Cockpit, Eco, Classic, Classic Map, Night Drive, M Digital, Blue Dials, ePower, Digital Rain, Neon
+City, Glass, E46 M3, Hybrid and Luxe.
 
 - Original themes: Copyright (c) 2026 FDX100, MIT (the repository also names bimmer-lab, whose
   Cluster Themes app it is built on). The conversions keep the MIT licence, and each theme's
@@ -37,7 +40,7 @@ and Hybrid.
   pictures and layout files. No upstream shader, JavaScript, font or image is included.
 - Upstream says of itself that it was not yet tried on a real car; neither were these.
 
-What differs from upstream, all sixteen:
+What differs from upstream, all seventeen:
 
 - Upstream draws each theme with its own shader over the whole 1920x720 panel. Here every theme
   is redrawn with this format's gauges, bars, texts and shapes at 0.66 of its size, at the left of
@@ -59,6 +62,9 @@ What differs from upstream, all sixteen:
   legible against the layout's background check.
 - Eco's "POWER %" reads the engine load; ePower's right dial reads the battery power in kW with
   the charge sector above it, and Hybrid and ePower target the `phev` profile.
+- Luxe: the right dial reads the battery power in kW (upstream: the car's power meter in %); its
+  charging view (charge power, time to full) and the badge spot with your own logo are left out,
+  having no catalog signal or no equivalent in a theme; the analog clock is a digital one.
 
 ## Status
 
@@ -134,3 +140,62 @@ locally. Nothing here has been tested in a vehicle.
 - The 0-60 timer and the drive's peak power tiles are omitted: both are values upstream computes
   in its app, with no catalog signal. The space below the speed stays empty.
 - The xDrive split is omitted: no catalog signal.
+
+### gt3
+
+- Converted from upstream commit 637223f (Cluster Layouts 0.27.2), the last one under
+  GPL-3.0-or-later.
+- The right-hand tiles sit right of the gear bracket (x 1672-1900) and are 228 px wide instead
+  of 290; upstream's stand on the gear bracket.
+- The last-shift tile and its grade (EARLY, SPOT ON, LATE...) are omitted: upstream scores each
+  upshift in its app, with no catalog signal. The shift lights use a fixed 4000-6700 rpm window
+  instead of upstream's oil-temperature-dependent shift point.
+- Tyre temperatures are omitted (no catalog signal); pressures are shown in bar.
+- Battery power is always green; upstream turns it green only while regenerating.
+
+### pulse
+
+- Converted from upstream commit 637223f. Upstream's full-screen variant (clock and outside
+  temperature in the top corners, drive mode under the cowl) with the bottom row of readings of its
+  strip variant, which the picture shows.
+- `ENGINE RPM` moved left (x 1220-1400) to clear the gear bracket.
+- Power is always green; upstream turns it green only while regenerating.
+
+### sport
+
+- Converted from upstream commit 637223f.
+- The slanted speed and rev brackets are straight segmented vertical bars, and their numerals are
+  linear (0-280 km/h, 0-7) instead of upstream's stretched low end. The rev scale starts below
+  the eDrive box and right of the gear bracket, so it is shorter than the speed scale.
+- The ePower scale that replaces the rev numerals on electricity alone is omitted.
+- The cruise control icon is omitted; its set speed shows in green while it holds.
+- The oil gauge reads 50-150 °C and sits lower, below the gear bracket.
+- The clock, range and outside temperature sit in the middle above the bottom bar, since upstream
+  puts them on the car's own strip.
+- The bottom bar's power half reads 0-100 kW of battery power; regeneration is not drawn.
+
+### m-cluster
+
+- Converted from upstream commit 637223f (layout "M"). Only its full-screen centre; the map window
+  variant and the M-car box placements are omitted.
+- The curved blades are straight segmented vertical bars bound to engine speed (0-8000, lit red
+  from 7000). The right blade's numerals are separate texts on its inner side; it does not switch
+  to battery power on electricity alone.
+- The right card is split into two cards, above and below the gear bracket: battery power above
+  (regeneration as a separate green bar left of its 0, 33 kW, the draw to a fixed 100 kW), battery
+  temperature below.
+- Icons are replaced by text names (WATER, OIL, POWER, BATTERY, FUEL, CHARGE).
+- The drive-logic bars beside the gear and the gearbox-oil and boost/torque variants for
+  combustion cars are omitted; the drive mode sits where upstream's stripes were.
+- Readings past their red zone keep the normal colour (upstream turns them red).
+
+### classic-m-cluster
+
+- Converted from upstream commit 637223f (layout "Classic M"). Named "Classic Cluster".
+- Dials are 476 px across and the whole group sits left (x 88-1358), so the tach clears the gear
+  bracket; the right of the screen stays empty.
+- Speed scale 0-330 km/h with numerals every 30, as upstream's km/h scale.
+- The tach does not switch to battery power on electricity alone; the amber display always shows
+  battery power, gear, speed and charge (upstream shows boost and coolant on combustion cars).
+- The ring's glow and the needles' glow are omitted; the ring is a flat light-blue track.
+- The sport palette (warm ring, red-orange display) is new; upstream has one look.

@@ -108,8 +108,8 @@ These are screenshots of the Studio running on a PC. They are not photos of a ca
   speed in turning holo rings, a segmented rev bar and a glitch past 130), Heritage 89 (round
   dials with chrome bezels and amber lighting, inspired by late-80s and 90s BMW clusters) and Volt
   Runner (bright yellow, with a running bolt in the middle). Then Performance, Modern, Classic,
-  Night Minimal and Rally Dash, plus seven free community layouts converted from eroobeeroo's
-  Cluster Layouts (GPL, credited in each theme) and sixteen converted from FDX100's KurdBimmer
+  Night Minimal and Rally Dash, plus twelve free community layouts converted from eroobeeroo's
+  Cluster Layouts (GPL, credited in each theme) and seventeen converted from FDX100's KurdBimmer
   Themes (MIT, credited in each theme).
 - **The car app**, which runs on the head unit, draws the active theme through `cluster-render`,
   and lets you turn it on or off and switch themes from the iDrive menu.
@@ -264,10 +264,10 @@ It is built on top of other people's open-source work. Thank you to all of them.
 
 - **[eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info)**:
   Cluster Layouts proved that a fully custom layout works on the KOMBI, and it is the project this
-  one started from. Its seven layouts are included as free templates, converted to idv7lol's format
+  one started from. Its twelve layouts are included as free templates, converted to idv7lol's format
   (GPL-3.0-or-later, see [themes/community/README.md](themes/community/README.md)).
 - **[FDX100/KB](https://github.com/FDX100/KB)**: KurdBimmer Themes, by
-  [FDX100](https://github.com/FDX100). Its sixteen cluster themes are included as free templates,
+  [FDX100](https://github.com/FDX100). Its seventeen cluster themes are included as free templates,
   converted to idv7lol's format (MIT, see [themes/community/README.md](themes/community/README.md)).
 - **[cauliflowermossgrape/idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps)**:
   the app kit and GPU renderer. The kit is included in `kit/` under the MIT licence.

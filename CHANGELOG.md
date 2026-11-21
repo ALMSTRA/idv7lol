@@ -94,6 +94,16 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Five more community templates from eroobeeroo's Cluster Layouts**: GT3, Pulse, Sport, M Cluster
+  and Classic Cluster (`themes/community/gt3`, `pulse`, `sport`, `m-cluster`, `classic-m-cluster`),
+  converted from Cluster Layouts 0.27.2, the last version published under GPL-3.0-or-later; its
+  later versions are PolyForm Noncommercial and were not used. Redrawn with this format's own
+  components, no upstream code, shader, font or image, no logos or M stripe; differences in
+  `themes/community/README.md`. Tested locally (validator clean, drawn by the Studio's engine); not
+  tested in a vehicle.
+- **Luxe**, a seventeenth community template from FDX100's KurdBimmer Themes 0.23.0 (MIT,
+  `themes/community/kb-luxe`): gold-rimmed dials for speed and battery power with a charge sector.
+  Tested locally; not tested in a vehicle.
 - **Sixteen community templates converted from FDX100's KurdBimmer Themes**
   ([FDX100/KB](https://github.com/FDX100/KB), MIT): Apex, Alpina, Concept, Live Cockpit, Eco,
   Classic, Classic Map, Night Drive, M Digital, Blue Dials, ePower, Digital Rain, Neon City,
@@ -234,6 +244,8 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- ePower (community template): its charge sector lit while the battery was being drawn from; it
+  now fills only while charging (negative battery power).
 - Build & Deploy listed cluster-render 0.5.9 and mgu-deploy 0.7.11 as what the car needs; the
   car app asks for 0.6.4 and 0.8.19.
 - Studio (desktop): the question before discarding unsaved changes is waited for. `window.confirm`

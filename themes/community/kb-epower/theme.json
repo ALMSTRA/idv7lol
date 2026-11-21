@@ -885,7 +885,7 @@
         "signal": "hybrid.battery.power",
         "min": 0,
         "max": 60,
-        "scale": 1,
+        "scale": -1,
         "offset": 0,
         "clamp": true,
         "smoothing": 0.1,

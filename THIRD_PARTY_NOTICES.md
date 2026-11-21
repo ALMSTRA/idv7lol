@@ -30,12 +30,12 @@ implementation with its own search; its blocks decode the same with that script'
 Reference projects studied but **not copied** (their code stays under their own licences and
 is not part of idv7lol): eroobeeroo/idrive7-apps and robertnisipeanu/mgu-store (GPL-3.0-or-later).
 
-`themes/community/` holds hand conversions of the seven layouts in
+`themes/community/` holds hand conversions of twelve layouts in
 [eroobeeroo/idrive7-cluster-info](https://github.com/eroobeeroo/idrive7-cluster-info), Copyright (C)
 2026 eroobeeroo, GPL-3.0-or-later. Their arrangement, proportions, colours and readouts were carried
 over; no upstream code, shader, font or image was copied. See `themes/community/README.md`.
 
-The sixteen `themes/community/kb-*` themes are hand conversions of the cluster themes in
+The seventeen `themes/community/kb-*` themes are hand conversions of the cluster themes in
 [FDX100/KB](https://github.com/FDX100/KB) (KurdBimmer Themes), Copyright (c) 2026 bimmer-lab,
 Copyright (c) 2026 FDX100 (the KurdBimmer themes and changes), MIT. Their arrangement, proportions,
 colours and readouts were carried over; no upstream code, shader, font or image was copied. The
