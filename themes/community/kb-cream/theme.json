@@ -1,0 +1,1894 @@
+{
+  "schemaVersion": 1,
+  "id": "kb-cream",
+  "name": "Cream",
+  "version": "0.1.0",
+  "author": "FDX100 (FDX100/KB), converted to idv7lol",
+  "description": "Conversion to idv7lol of \"Cream\" from KurdBimmer Themes by FDX100 (github.com/FDX100/KB), MIT. A retro cluster: two big cream-faced dials (revs in hundreds, speed) with a ticked band, a black fill and a red zone, two small gauges, the gear selector with the current gear boxed in green, and an LCD with trip and range.",
+  "license": "MIT",
+  "target": {
+    "platform": "idrive7-mgu",
+    "display": "kombi-id7-12.3",
+    "renderer": "cluster-render"
+  },
+  "vehicleProfile": "turbo-ice",
+  "layout": {
+    "width": 1920,
+    "height": 720,
+    "background": "$face",
+    "reservedZones": [
+      {
+        "x": 730,
+        "y": 0,
+        "width": 460,
+        "height": 128,
+        "id": "cowl",
+        "name": "Top cowl (factory telltales)",
+        "kind": "factory"
+      },
+      {
+        "x": 1410,
+        "y": 262,
+        "width": 252,
+        "height": 192,
+        "id": "gear-bracket",
+        "name": "Gear bracket (factory gear display)",
+        "kind": "factory"
+      },
+      {
+        "x": 1770,
+        "y": 170,
+        "width": 150,
+        "height": 95,
+        "id": "edrive-box",
+        "name": "eDrive status box (hybrids)",
+        "kind": "factory"
+      },
+      {
+        "x": 560,
+        "y": 652,
+        "width": 960,
+        "height": 68,
+        "id": "telltales-bottom",
+        "name": "Bottom telltale strip",
+        "kind": "factory"
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "width": 394.5454545454545,
+        "height": 217,
+        "id": "glass-corner-left",
+        "name": "Glass corner (left)",
+        "kind": "keep-clear",
+        "polygon": [
+          {
+            "x": 0,
+            "y": 0
+          },
+          {
+            "x": 394.5454545454545,
+            "y": 0
+          },
+          {
+            "x": 0,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "x": 1525.4545454545455,
+        "y": 0,
+        "width": 394.5454545454545,
+        "height": 217,
+        "id": "glass-corner-right",
+        "name": "Glass corner (right)",
+        "kind": "keep-clear",
+        "polygon": [
+          {
+            "x": 1920,
+            "y": 0
+          },
+          {
+            "x": 1525.4545454545455,
+            "y": 0
+          },
+          {
+            "x": 1920,
+            "y": 217
+          }
+        ]
+      },
+      {
+        "x": 416,
+        "y": 120,
+        "width": 1088,
+        "height": 480,
+        "id": "stock-map-window",
+        "name": "Stock map window (slot 0x100)",
+        "kind": "info"
+      },
+      {
+        "x": 0,
+        "y": 646,
+        "width": 1920,
+        "height": 74,
+        "id": "bottom-strip",
+        "name": "Bottom strip: the car's own (the car app cuts layouts here)",
+        "kind": "info"
+      },
+      {
+        "x": 793,
+        "y": 289,
+        "width": 246,
+        "height": 92,
+        "id": "m-box-left",
+        "name": "M cars: cluster box (approx. ±10 px)",
+        "kind": "info"
+      },
+      {
+        "x": 1223,
+        "y": 328,
+        "width": 171,
+        "height": 78,
+        "id": "m-box-right",
+        "name": "M cars: cluster box (approx. ±10 px)",
+        "kind": "info"
+      },
+      {
+        "x": 740,
+        "y": 128,
+        "width": 440,
+        "height": 19,
+        "id": "driver-camera",
+        "name": "Driver camera notch (cars with it, to y ≈ 147)",
+        "kind": "info"
+      }
+    ]
+  },
+  "palettes": {
+    "cream": {
+      "name": "Cream",
+      "colors": {
+        "background": "#151513",
+        "surface": "#0b0b0a",
+        "text": "#e6e2b4",
+        "text-muted": "#9a987c",
+        "accent": "#ff6a1a",
+        "track": "#1c1c1c",
+        "success": "#2cd246",
+        "warning": "#ffb020",
+        "danger": "#d42a22",
+        "face": "#e6e2b4",
+        "face-low": "#c9c58e",
+        "band": "#d6d2a2",
+        "bezel": "#0a0a09",
+        "ink": "#24241e",
+        "edge": "#34342f",
+        "dim": "#3a3a34",
+        "dim-text": "#606058",
+        "lcd": "#d8d9c8",
+        "side": "#787872",
+        "side-muted": "#6a6a64"
+      }
+    },
+    "ivory": {
+      "name": "Ivory",
+      "colors": {
+        "background": "#131416",
+        "surface": "#0a0b0c",
+        "text": "#eceae4",
+        "text-muted": "#9a9c9e",
+        "accent": "#ff6a1a",
+        "track": "#1c1c1c",
+        "success": "#2cd246",
+        "warning": "#ffb020",
+        "danger": "#d42a22",
+        "face": "#eceae4",
+        "face-low": "#cbc9c2",
+        "band": "#dbd9d2",
+        "bezel": "#08090a",
+        "ink": "#1e2024",
+        "edge": "#30343a",
+        "dim": "#363a40",
+        "dim-text": "#5c6068",
+        "lcd": "#d4d8d6",
+        "side": "#74787c",
+        "side-muted": "#666a6e"
+      }
+    }
+  },
+  "palette": {
+    "default": "cream",
+    "byDriveMode": {},
+    "allowManual": true
+  },
+  "fonts": {
+    "default": {
+      "family": "sans"
+    },
+    "disp": {
+      "family": "display"
+    }
+  },
+  "textStyles": {},
+  "assets": {},
+  "animations": {},
+  "components": [
+    {
+      "id": "bg",
+      "name": "Background",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 720,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": true,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "fill": "$background",
+        "radius": 0
+      }
+    },
+    {
+      "id": "rev-face",
+      "x": 115,
+      "y": 201,
+      "width": 421,
+      "height": 421,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "ellipse",
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$face"
+            },
+            {
+              "offset": 1,
+              "color": "$face-low"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$bezel",
+          "width": 9,
+          "cap": "butt"
+        }
+      }
+    },
+    {
+      "id": "rev-dial",
+      "x": 209,
+      "y": 295,
+      "width": 234,
+      "height": 234,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.rpm",
+        "min": 0,
+        "max": 8000,
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.06,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "gauge.arc",
+      "props": {
+        "startAngle": 157,
+        "sweepAngle": 226,
+        "track": {
+          "show": true,
+          "color": "$band",
+          "width": 20,
+          "cap": "butt"
+        },
+        "fill": {
+          "show": true,
+          "color": "$ink",
+          "width": 9,
+          "mode": "solid",
+          "segments": 40,
+          "segmentGap": 1.5,
+          "cap": "butt",
+          "zones": []
+        },
+        "ticks": {
+          "major": 8,
+          "minor": 1,
+          "majorLength": 20,
+          "minorLength": 10,
+          "majorWidth": 1.584,
+          "minorWidth": 1,
+          "color": "$ink",
+          "inset": -24
+        },
+        "labels": {
+          "show": true,
+          "every": 1,
+          "style": {
+            "font": "default",
+            "size": 20,
+            "weight": "medium",
+            "color": "$ink",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "divisor": 100,
+          "format": "0",
+          "inset": -59
+        },
+        "needle": {
+          "show": false,
+          "color": "$accent",
+          "width": 6,
+          "length": 0.9,
+          "tail": 0.1,
+          "shape": "tapered",
+          "cap": {
+            "show": true,
+            "radius": 14,
+            "color": "$surface"
+          }
+        },
+        "redline": {
+          "show": true,
+          "from": 6500,
+          "color": "$danger",
+          "width": 20,
+          "placement": "track"
+        },
+        "valueText": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 64,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "showUnit": false,
+          "unitStyle": {
+            "font": "default",
+            "size": 22,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 18
+        }
+      }
+    },
+    {
+      "id": "rev-name",
+      "x": 253,
+      "y": 349,
+      "width": 145,
+      "height": 28,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "ENGINE",
+        "style": {
+          "font": "default",
+          "size": 20,
+          "weight": "medium",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "revs",
+      "x": 240,
+      "y": 384,
+      "width": 172,
+      "height": 89,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.rpm",
+        "scale": 0.01,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "value.digital",
+      "props": {
+        "format": "0",
+        "showUnit": false,
+        "label": "",
+        "layout": "stacked",
+        "valueStyle": {
+          "font": "default",
+          "size": 69,
+          "weight": "bold",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "unitStyle": {
+          "font": "default",
+          "size": 24,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "labelStyle": {
+          "font": "default",
+          "size": 20,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": true
+        },
+        "zones": [],
+        "radius": 0,
+        "padding": 0,
+        "tabular": true
+      }
+    },
+    {
+      "id": "rev-unit",
+      "x": 246,
+      "y": 489,
+      "width": 158,
+      "height": 24,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "RPM x100",
+        "style": {
+          "font": "default",
+          "size": 17,
+          "weight": "medium",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "speed-face",
+      "x": 907,
+      "y": 201,
+      "width": 421,
+      "height": 421,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "ellipse",
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$face"
+            },
+            {
+              "offset": 1,
+              "color": "$face-low"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$bezel",
+          "width": 9,
+          "cap": "butt"
+        }
+      }
+    },
+    {
+      "id": "speed-dial",
+      "x": 1001,
+      "y": 295,
+      "width": 234,
+      "height": 234,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "vehicle.speed",
+        "min": 0,
+        "max": 240,
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.06,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "gauge.arc",
+      "props": {
+        "startAngle": 157,
+        "sweepAngle": 226,
+        "track": {
+          "show": true,
+          "color": "$band",
+          "width": 20,
+          "cap": "butt"
+        },
+        "fill": {
+          "show": true,
+          "color": "$ink",
+          "width": 9,
+          "mode": "solid",
+          "segments": 40,
+          "segmentGap": 1.5,
+          "cap": "butt",
+          "zones": []
+        },
+        "ticks": {
+          "major": 12,
+          "minor": 1,
+          "majorLength": 20,
+          "minorLength": 10,
+          "majorWidth": 1.584,
+          "minorWidth": 1,
+          "color": "$ink",
+          "inset": -24
+        },
+        "labels": {
+          "show": true,
+          "every": 1,
+          "style": {
+            "font": "default",
+            "size": 20,
+            "weight": "medium",
+            "color": "$ink",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "divisor": 1,
+          "format": "0",
+          "inset": -59
+        },
+        "needle": {
+          "show": false,
+          "color": "$accent",
+          "width": 6,
+          "length": 0.9,
+          "tail": 0.1,
+          "shape": "tapered",
+          "cap": {
+            "show": true,
+            "radius": 14,
+            "color": "$surface"
+          }
+        },
+        "redline": {
+          "show": false,
+          "from": 6500,
+          "color": "$danger",
+          "width": 10,
+          "placement": "outer"
+        },
+        "valueText": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 64,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "showUnit": false,
+          "unitStyle": {
+            "font": "default",
+            "size": 22,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 18
+        }
+      }
+    },
+    {
+      "id": "speed-name",
+      "x": 1045,
+      "y": 349,
+      "width": 145,
+      "height": 28,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "SPEED",
+        "style": {
+          "font": "default",
+          "size": 20,
+          "weight": "medium",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "speed",
+      "x": 1032,
+      "y": 384,
+      "width": 172,
+      "height": 89,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "vehicle.speed",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "value.digital",
+      "props": {
+        "format": "0",
+        "showUnit": false,
+        "label": "",
+        "layout": "stacked",
+        "valueStyle": {
+          "font": "default",
+          "size": 69,
+          "weight": "bold",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "unitStyle": {
+          "font": "default",
+          "size": 24,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "labelStyle": {
+          "font": "default",
+          "size": 20,
+          "weight": "regular",
+          "color": "$text-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": true
+        },
+        "zones": [],
+        "radius": 0,
+        "padding": 0,
+        "tabular": true
+      }
+    },
+    {
+      "id": "speed-unit",
+      "x": 1065,
+      "y": 488,
+      "width": 106,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "km/h",
+        "style": {
+          "font": "default",
+          "size": 18,
+          "weight": "medium",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "water-face",
+      "x": 574,
+      "y": 174,
+      "width": 145,
+      "height": 145,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "ellipse",
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$face"
+            },
+            {
+              "offset": 1,
+              "color": "$face-low"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$bezel",
+          "width": 5,
+          "cap": "butt"
+        }
+      }
+    },
+    {
+      "id": "water-dial",
+      "x": 592,
+      "y": 192,
+      "width": 111,
+      "height": 111,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "min": 50,
+        "max": 130,
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.06,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "gauge.arc",
+      "props": {
+        "startAngle": 80,
+        "sweepAngle": -160,
+        "track": {
+          "show": true,
+          "color": "$band",
+          "width": 16,
+          "cap": "butt"
+        },
+        "fill": {
+          "show": true,
+          "color": "$ink",
+          "width": 7,
+          "mode": "solid",
+          "segments": 40,
+          "segmentGap": 1.5,
+          "cap": "butt",
+          "zones": []
+        },
+        "ticks": {
+          "major": 2,
+          "minor": 3,
+          "majorLength": 16,
+          "minorLength": 8,
+          "majorWidth": 1.5,
+          "minorWidth": 1,
+          "color": "$ink",
+          "inset": -20
+        },
+        "labels": {
+          "show": false,
+          "every": 1,
+          "style": {
+            "font": "default",
+            "size": 22,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "divisor": 1,
+          "format": "0",
+          "inset": 30
+        },
+        "needle": {
+          "show": false,
+          "color": "$accent",
+          "width": 6,
+          "length": 0.9,
+          "tail": 0.1,
+          "shape": "tapered",
+          "cap": {
+            "show": true,
+            "radius": 14,
+            "color": "$surface"
+          }
+        },
+        "redline": {
+          "show": true,
+          "from": 115,
+          "color": "$danger",
+          "width": 16,
+          "placement": "track"
+        },
+        "valueText": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 64,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "showUnit": false,
+          "unitStyle": {
+            "font": "default",
+            "size": 22,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 18
+        }
+      }
+    },
+    {
+      "id": "water-icon",
+      "x": 620,
+      "y": 233,
+      "width": 28,
+      "height": 28,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "engine.coolant.temp",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "coolant",
+        "onColor": "$ink",
+        "offColor": "$ink",
+        "hideWhenOff": false
+      }
+    },
+    {
+      "id": "water-hot",
+      "x": 617,
+      "y": 209,
+      "width": 26,
+      "height": 18,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "H",
+        "style": {
+          "font": "default",
+          "size": 13,
+          "weight": "bold",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "water-cold",
+      "x": 617,
+      "y": 267,
+      "width": 26,
+      "height": 18,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "C",
+        "style": {
+          "font": "default",
+          "size": 13,
+          "weight": "bold",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "fuel-face",
+      "x": 713,
+      "y": 174,
+      "width": 145,
+      "height": 145,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "ellipse",
+      "props": {
+        "fill": {
+          "type": "linear",
+          "angle": 90,
+          "stops": [
+            {
+              "offset": 0,
+              "color": "$face"
+            },
+            {
+              "offset": 1,
+              "color": "$face-low"
+            }
+          ]
+        },
+        "stroke": {
+          "color": "$bezel",
+          "width": 5,
+          "cap": "butt"
+        }
+      }
+    },
+    {
+      "id": "fuel-dial",
+      "x": 730,
+      "y": 192,
+      "width": 111,
+      "height": 111,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "fuel.level",
+        "min": 0,
+        "max": 100,
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0.06,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "gauge.arc",
+      "props": {
+        "startAngle": 100,
+        "sweepAngle": 160,
+        "track": {
+          "show": true,
+          "color": "$band",
+          "width": 16,
+          "cap": "butt"
+        },
+        "fill": {
+          "show": true,
+          "color": "$ink",
+          "width": 7,
+          "mode": "solid",
+          "segments": 40,
+          "segmentGap": 1.5,
+          "cap": "butt",
+          "zones": []
+        },
+        "ticks": {
+          "major": 2,
+          "minor": 3,
+          "majorLength": 16,
+          "minorLength": 8,
+          "majorWidth": 1.5,
+          "minorWidth": 1,
+          "color": "$ink",
+          "inset": -20
+        },
+        "labels": {
+          "show": false,
+          "every": 1,
+          "style": {
+            "font": "default",
+            "size": 22,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "divisor": 1,
+          "format": "0",
+          "inset": 30
+        },
+        "needle": {
+          "show": false,
+          "color": "$accent",
+          "width": 6,
+          "length": 0.9,
+          "tail": 0.1,
+          "shape": "tapered",
+          "cap": {
+            "show": true,
+            "radius": 14,
+            "color": "$surface"
+          }
+        },
+        "redline": {
+          "show": false,
+          "from": 6500,
+          "color": "$danger",
+          "width": 10,
+          "placement": "outer"
+        },
+        "valueText": {
+          "show": false,
+          "style": {
+            "font": "default",
+            "size": 64,
+            "weight": "bold",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "format": "0",
+          "showUnit": false,
+          "unitStyle": {
+            "font": "default",
+            "size": 22,
+            "weight": "regular",
+            "color": "$text",
+            "align": "center",
+            "baseline": "middle",
+            "letterSpacing": 0,
+            "uppercase": false
+          },
+          "offsetX": 0,
+          "offsetY": 0
+        },
+        "glow": {
+          "show": false,
+          "color": "$accent",
+          "blur": 18
+        }
+      }
+    },
+    {
+      "id": "fuel-full",
+      "x": 789,
+      "y": 209,
+      "width": 26,
+      "height": 18,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "F",
+        "style": {
+          "font": "default",
+          "size": 13,
+          "weight": "bold",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "fuel-empty",
+      "x": 789,
+      "y": 267,
+      "width": 26,
+      "height": 18,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "E",
+        "style": {
+          "font": "default",
+          "size": 13,
+          "weight": "bold",
+          "color": "$ink",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "fuel-icon",
+      "x": 792,
+      "y": 234,
+      "width": 26,
+      "height": 26,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "fuel.low",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "fuel",
+        "onColor": "$danger",
+        "offColor": "$ink",
+        "hideWhenOff": false
+      }
+    },
+    {
+      "id": "turn-left",
+      "x": 472,
+      "y": 190,
+      "width": 46,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "light.turn.left",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "turn-left",
+        "onColor": "$success",
+        "offColor": "$dim",
+        "hideWhenOff": false
+      }
+    },
+    {
+      "id": "turn-right",
+      "x": 924,
+      "y": 190,
+      "width": 46,
+      "height": 46,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "light.turn.right",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "telltale",
+      "props": {
+        "icon": "turn-right",
+        "onColor": "$success",
+        "offColor": "$dim",
+        "hideWhenOff": false
+      }
+    },
+    {
+      "id": "panel",
+      "x": 611,
+      "y": 353,
+      "width": 226,
+      "height": 256,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "fill": "$surface",
+        "stroke": {
+          "color": "$edge",
+          "width": 1.5,
+          "cap": "butt"
+        },
+        "radius": 7
+      }
+    },
+    {
+      "id": "gear-p-box",
+      "x": 705,
+      "y": 365,
+      "width": 30,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "stroke": {
+          "color": "$dim",
+          "width": 2,
+          "cap": "butt"
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "gear-p",
+      "x": 705,
+      "y": 366,
+      "width": 30,
+      "height": 28,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "P",
+        "style": {
+          "font": "default",
+          "size": 20,
+          "weight": "medium",
+          "color": "$dim-text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "gear-p-on",
+      "x": 705,
+      "y": 365,
+      "width": 30,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "P"
+      },
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "stroke": {
+          "color": "$success",
+          "width": 2.5,
+          "cap": "butt"
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "gear-r-box",
+      "x": 705,
+      "y": 404,
+      "width": 30,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "stroke": {
+          "color": "$dim",
+          "width": 2,
+          "cap": "butt"
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "gear-r",
+      "x": 705,
+      "y": 405,
+      "width": 30,
+      "height": 28,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "R",
+        "style": {
+          "font": "default",
+          "size": 20,
+          "weight": "medium",
+          "color": "$dim-text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "gear-r-on",
+      "x": 705,
+      "y": 404,
+      "width": 30,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "R"
+      },
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "stroke": {
+          "color": "$success",
+          "width": 2.5,
+          "cap": "butt"
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "gear-n-box",
+      "x": 705,
+      "y": 443,
+      "width": 30,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "stroke": {
+          "color": "$dim",
+          "width": 2,
+          "cap": "butt"
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "gear-n",
+      "x": 705,
+      "y": 444,
+      "width": 30,
+      "height": 28,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "N",
+        "style": {
+          "font": "default",
+          "size": 20,
+          "weight": "medium",
+          "color": "$dim-text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "gear-n-on",
+      "x": 705,
+      "y": 443,
+      "width": 30,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "visibleWhen": {
+        "signal": "transmission.gear",
+        "op": "eq",
+        "value": "N"
+      },
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "stroke": {
+          "color": "$success",
+          "width": 2.5,
+          "cap": "butt"
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "gear-d-box",
+      "x": 705,
+      "y": 482,
+      "width": 30,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "stroke": {
+          "color": "$dim",
+          "width": 2,
+          "cap": "butt"
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "gear-d",
+      "x": 705,
+      "y": 483,
+      "width": 30,
+      "height": 28,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "D",
+        "style": {
+          "font": "default",
+          "size": 20,
+          "weight": "medium",
+          "color": "$dim-text",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "gear-d-on",
+      "x": 705,
+      "y": 482,
+      "width": 30,
+      "height": 30,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "visibleWhen": {
+        "not": {
+          "any": [
+            {
+              "signal": "transmission.gear",
+              "op": "eq",
+              "value": "P"
+            },
+            {
+              "signal": "transmission.gear",
+              "op": "eq",
+              "value": "R"
+            },
+            {
+              "signal": "transmission.gear",
+              "op": "eq",
+              "value": "N"
+            }
+          ]
+        }
+      },
+      "animations": [],
+      "type": "rect",
+      "props": {
+        "stroke": {
+          "color": "$success",
+          "width": 2.5,
+          "cap": "butt"
+        },
+        "radius": 0
+      }
+    },
+    {
+      "id": "lcd",
+      "x": 617,
+      "y": 538,
+      "width": 209,
+      "height": 66,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "status.panel",
+      "props": {
+        "rows": [
+          {
+            "label": "TRIP",
+            "binding": {
+              "signal": "vehicle.trip.distance",
+              "scale": 1,
+              "offset": 0,
+              "clamp": true,
+              "smoothing": 0,
+              "fallback": "dash"
+            },
+            "format": "0.0",
+            "showUnit": true
+          },
+          {
+            "label": "RANGE",
+            "binding": {
+              "signal": "vehicle.range",
+              "scale": 1,
+              "offset": 0,
+              "clamp": true,
+              "smoothing": 0,
+              "fallback": "dash"
+            },
+            "format": "0",
+            "showUnit": true
+          }
+        ],
+        "rowHeight": 29,
+        "labelStyle": {
+          "font": "default",
+          "size": 13,
+          "weight": "bold",
+          "color": "$ink",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "valueStyle": {
+          "font": "disp",
+          "size": 26,
+          "weight": "medium",
+          "color": "$ink",
+          "align": "right",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "unitStyle": {
+          "font": "default",
+          "size": 13,
+          "weight": "bold",
+          "color": "$ink",
+          "align": "left",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "background": "$lcd",
+        "radius": 0,
+        "padding": 6
+      }
+    },
+    {
+      "id": "clock",
+      "x": 1672,
+      "y": 296,
+      "width": 216,
+      "height": 44,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "clock",
+      "props": {
+        "format": "24h",
+        "showSeconds": false,
+        "showSuffix": false,
+        "style": {
+          "font": "default",
+          "size": 34,
+          "weight": "medium",
+          "color": "$side",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "blinkColon": false
+      }
+    },
+    {
+      "id": "outside",
+      "x": 1672,
+      "y": 424,
+      "width": 216,
+      "height": 36,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "binding": {
+        "signal": "environment.outside.temp",
+        "scale": 1,
+        "offset": 0,
+        "clamp": true,
+        "smoothing": 0,
+        "fallback": "dash"
+      },
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "{value} °C",
+        "style": {
+          "font": "default",
+          "size": 26,
+          "weight": "medium",
+          "color": "$side",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "+0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    },
+    {
+      "id": "outside-label",
+      "x": 1672,
+      "y": 460,
+      "width": 216,
+      "height": 20,
+      "rotation": 0,
+      "opacity": 1,
+      "visible": true,
+      "locked": false,
+      "anchor": "top-left",
+      "animations": [],
+      "type": "text",
+      "props": {
+        "text": "OUTSIDE",
+        "style": {
+          "font": "default",
+          "size": 14,
+          "weight": "medium",
+          "color": "$side-muted",
+          "align": "center",
+          "baseline": "middle",
+          "letterSpacing": 0,
+          "uppercase": false
+        },
+        "format": "0",
+        "clip": false,
+        "wrap": false,
+        "lineHeight": 1.2
+      }
+    }
+  ],
+  "meta": {
+    "tags": ["community", "converted", "kurdbimmer"]
+  }
+}

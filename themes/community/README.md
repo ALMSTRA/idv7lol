@@ -27,11 +27,12 @@ Upstream's later versions are under PolyForm Noncommercial and nothing was taken
 
 ## KurdBimmer Themes conversions
 
-The seventeen folders that start with `kb-` are hand conversions of the cluster themes in
+The twenty-three folders that start with `kb-` are hand conversions of the cluster themes in
 [FDX100/KB](https://github.com/FDX100/KB) (`apps/kurdbimmer_themes/`, KurdBimmer Themes 0.20.5,
-and Luxe from 0.23.0), made by [FDX100](https://github.com/FDX100): Apex, Alpina, Concept, Live
-Cockpit, Eco, Classic, Classic Map, Night Drive, M Digital, Blue Dials, ePower, Digital Rain, Neon
-City, Glass, E46 M3, Hybrid and Luxe.
+Luxe from 0.23.0 and six more from 0.35.0), made by [FDX100](https://github.com/FDX100): Apex,
+Alpina, Concept, Live Cockpit, Eco, Classic, Classic Map, Night Drive, M Digital, Blue Dials,
+ePower, Digital Rain, Neon City, Glass, E46 M3, Hybrid, Luxe, Arc Digital, Cream, Dewdrop, Radar,
+Radar Red and Starlight.
 
 - Original themes: Copyright (c) 2026 FDX100, MIT (the repository also names bimmer-lab, whose
   Cluster Themes app it is built on). The conversions keep the MIT licence, and each theme's
@@ -40,7 +41,7 @@ City, Glass, E46 M3, Hybrid and Luxe.
   pictures and layout files. No upstream shader, JavaScript, font or image is included.
 - Upstream says of itself that it was not yet tried on a real car; neither were these.
 
-What differs from upstream, all seventeen:
+What differs from upstream, all of them:
 
 - Upstream draws each theme with its own shader over the whole 1920x720 panel. Here every theme
   is redrawn with this format's gauges, bars, texts and shapes at 0.66 of its size, at the left of
@@ -65,6 +66,20 @@ What differs from upstream, all seventeen:
 - Luxe: the right dial reads the battery power in kW (upstream: the car's power meter in %); its
   charging view (charge power, time to full) and the badge spot with your own logo are left out,
   having no catalog signal or no equivalent in a theme; the analog clock is a digital one.
+- Arc Digital: the rev scale is even from 0 to 9 (upstream spaces its numbers unevenly), the speed
+  is in the display font without the dim ghost digits, and the ABS lamp is left out.
+- Cream: numerals stand upright in a sans face instead of turning along the arc in a serif one;
+  the headlamp icons are left out. Its layout background is the cream of the faces, under a dark
+  panel, so that the dark readings pass the contrast check.
+- Dewdrop: the drops are four rings of square beads, the outer one lit by the revs; the music
+  disc, title and progress have no signal and are left out. The slanted glass is made of two wide
+  gauge tracks and two rectangles.
+- Radar and Radar Red: upright numerals, a plain dark sector in place of the halftone behind the
+  needle, a circular arc for the neon one, and the headlamps as a few plain strokes with no glow.
+- Starlight: the rev numbers are a bar's own, evenly spaced and all white; the curtain of light is
+  a leaned gradient with no dust; twelve still dots for the sky. Its power bar reads the engine
+  power over 0 to 300 kW.
+- In these six the badge spot, the M stripes and model badges are left out, like every wordmark.
 
 ## Status
 
