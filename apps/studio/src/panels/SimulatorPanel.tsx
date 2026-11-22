@@ -1,3 +1,4 @@
+import type { UnitSystem } from '@idv7lol/theme-schema';
 import {
   ArrowLeft,
   ArrowRight,
@@ -128,6 +129,18 @@ export function SimulatorPanel(): JSX.Element {
                 {theme.palettes[p]?.name ?? p}
               </option>
             ))}
+          </select>
+        </div>
+        <div className="sim-row" title={t('sim.unitsHint')}>
+          <span>{t('sim.units')}</span>
+          <select
+            value={ui.previewUnits}
+            onChange={(e) => ui.setPreviewUnits(e.target.value as UnitSystem)}
+            style={{ gridColumn: '2 / 4' }}
+          >
+            <option value="metric">km/h · °C · bar</option>
+            <option value="mph-celsius">mph · °C · bar</option>
+            <option value="mph-fahrenheit">mph · °F · psi</option>
           </select>
         </div>
       </div>

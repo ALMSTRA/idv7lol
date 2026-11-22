@@ -4,6 +4,7 @@
  * head unit runs.
  */
 import engine from '../../../idv7lol/engine.js?car';
+import units from '../../../idv7lol/units.js?car';
 
 export interface CarEngine {
   shown: boolean;
@@ -22,4 +23,13 @@ export function carEngineClass(): CarEngineClass {
 /** Where the car app ends a layout so the cluster's own bottom strip shows (its default). */
 export function carStripY(): number {
   return (engine as { STRIP_Y: number }).STRIP_Y;
+}
+
+/** A compiled theme in a unit system, swapped as the car app swaps it (units.js). */
+export function carThemeInUnits<T>(theme: T, system: string): T {
+  const u = units as {
+    SYSTEMS: Record<string, string[]>;
+    applyUnits(theme: unknown, groups: string[]): unknown;
+  };
+  return u.applyUnits(theme, u.SYSTEMS[system] ?? []) as T;
 }

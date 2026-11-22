@@ -23,7 +23,13 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CarPreview } from '../preview/CarPreview.js';
 import { usePiecesStore } from '../lib/savedPieces.js';
-import type { Component, Theme } from '@idv7lol/theme-schema';
+import {
+  UNIT_SYSTEMS,
+  convertThemeUnits,
+  type Component,
+  type Theme,
+  type UnitSystem,
+} from '@idv7lol/theme-schema';
 import {
   EngineState,
   ThemeEngine,
@@ -125,6 +131,19 @@ function applyRects(
   return { ...theme, components: walk(theme.components) };
 }
 
+/** The theme as the preview's units show it; the last one is kept, a frame draws it again. */
+let unitsCache: { source: Theme; units: UnitSystem; shown: Theme } | null = null;
+function inUnits(theme: Theme, units: UnitSystem): Theme {
+  if (units === 'metric') return theme;
+  if (!unitsCache || unitsCache.source !== theme || unitsCache.units !== units)
+    unitsCache = {
+      source: theme,
+      units,
+      shown: convertThemeUnits(theme, UNIT_SYSTEMS[units]).theme,
+    };
+  return unitsCache.shown;
+}
+
 export function CanvasView(): JSX.Element {
   perf.canvasRenders += 1;
   const t = useT();
@@ -220,8 +239,9 @@ export function CanvasView(): JSX.Element {
       if (useSimStore.getState().running) simulator.tick(now);
       const frameStart = now;
       const v = viewRef.current;
-      const th = themeRef.current;
       const uiState = useUiStore.getState();
+      // drawn in the units picked for the preview; the theme being edited stays as it is
+      const th = inUnits(themeRef.current, uiState.previewUnits);
       engine.state.manualPalette = uiState.previewPalette;
 
       // Nothing to draw behind the full-window image editor.

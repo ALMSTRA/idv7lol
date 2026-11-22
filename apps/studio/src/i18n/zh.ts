@@ -289,6 +289,8 @@ export const zh: Dictionary = {
     exportRecording: '导出录制',
     health: '信号状态',
     palette: '预览调色板',
+    units: '预览单位',
+    unitsHint: '驾驶者在车上选择其他单位时看到的同一主题。主题本身不会改变。',
     auto: '自动（驾驶模式）',
   },
   validation: {

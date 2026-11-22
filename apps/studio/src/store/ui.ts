@@ -1,3 +1,4 @@
+import type { UnitSystem } from '@idv7lol/theme-schema';
 import { create } from 'zustand';
 import { systemLang, type Lang } from '../i18n/languages.js';
 import type { FoundUpdate } from '../lib/updater.js';
@@ -63,6 +64,8 @@ interface UiState {
   carPreview: boolean;
   /** Manual palette for the preview (null = automatic by driving mode). */
   previewPalette: string | null;
+  /** The units the preview shows the theme in, as a driver may pick them in the car. */
+  previewUnits: UnitSystem;
   welcomeOpen: boolean;
   /** Component whose picture is open in the image editor. */
   imageEditorFor: string | null;
@@ -95,6 +98,7 @@ interface UiState {
   setRightTab(tab: RightTab): void;
   setBottomTab(tab: BottomTab): void;
   setPreviewPalette(id: string | null): void;
+  setPreviewUnits(units: UnitSystem): void;
   setWelcomeOpen(open: boolean): void;
   setImageEditorFor(id: string | null): void;
   setEditingText(id: string | null): void;
@@ -180,6 +184,7 @@ export const useUiStore = create<UiState>((set, get) => {
     carPreview: false,
     showBounds: false,
     previewPalette: null,
+    previewUnits: 'metric',
     welcomeOpen: true,
     imageEditorFor: null,
     editingText: null,
@@ -259,6 +264,7 @@ export const useUiStore = create<UiState>((set, get) => {
         step: bottomTab === 'validation' ? 'validate' : bottomTab === 'build' ? 'car' : get().step,
       }),
     setPreviewPalette: (previewPalette) => set({ previewPalette }),
+    setPreviewUnits: (previewUnits) => set({ previewUnits }),
     setWelcomeOpen: (welcomeOpen) => set({ welcomeOpen }),
     setImageEditorFor: (imageEditorFor) => set({ imageEditorFor }),
     setEditingText: (editingText) => set({ editingText }),

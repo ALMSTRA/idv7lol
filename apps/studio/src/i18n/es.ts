@@ -297,6 +297,9 @@ export const es: Dictionary = {
     exportRecording: 'Exportar grabación',
     health: 'Salud de señales',
     palette: 'Paleta de la vista previa',
+    units: 'Unidades de la vista previa',
+    unitsHint:
+      'El mismo tema como lo ve un conductor que elige otras unidades en el auto. El tema no cambia.',
     auto: 'Automática (modo de conducción)',
   },
   validation: {

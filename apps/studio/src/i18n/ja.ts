@@ -298,6 +298,8 @@ export const ja: Dictionary = {
     exportRecording: '記録を書き出す',
     health: '信号の状態',
     palette: 'プレビューのパレット',
+    units: 'プレビューの単位',
+    unitsHint: '車で別の単位を選んだドライバーに見える同じテーマです。テーマ自体は変わりません。',
     auto: '自動（ドライブモード）',
   },
   validation: {

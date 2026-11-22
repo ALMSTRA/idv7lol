@@ -289,6 +289,9 @@ export const en = {
     exportRecording: 'Export recording',
     health: 'Signal health',
     palette: 'Preview palette',
+    units: 'Preview units',
+    unitsHint:
+      'The same theme as a driver sees it with other units picked in the car. The theme itself is not changed.',
     auto: 'Automatic (driving mode)',
   },
   validation: {

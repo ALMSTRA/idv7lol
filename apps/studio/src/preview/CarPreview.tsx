@@ -7,7 +7,8 @@ import { simulator } from '../store/sim.js';
 import { useT } from '../i18n/index.js';
 import { compileForCar, loadBakedFont, type BakedFont } from '../lib/carCompile.js';
 import type { View } from '../canvas/view.js';
-import { carEngineClass, carStripY, type CarEngine } from './carModules.js';
+import { carEngineClass, carStripY, carThemeInUnits, type CarEngine } from './carModules.js';
+import { useUiStore } from '../store/ui.js';
 import { WebGLClusterClient } from './webglClient.js';
 import type { ThemeEngine } from '@idv7lol/theme-engine';
 
@@ -29,6 +30,7 @@ export function CarPreview({
 }): JSX.Element {
   const t = useT();
   const theme = useProjectStore((s) => s.theme);
+  const previewUnits = useUiStore((s) => s.previewUnits);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const live = useRef<{
     client: WebGLClusterClient;
@@ -119,7 +121,7 @@ export function CarPreview({
             l.engine = new Engine({
               client: l.client,
               log: { info: () => undefined, warn: (m: string) => console.warn('car engine:', m) },
-              theme: compiled,
+              theme: carThemeInUnits(compiled, previewUnits),
               fonts,
               signals: {
                 // The simulator keeps its own clock; the preview treats every sample as fresh.
@@ -145,7 +147,7 @@ export function CarPreview({
               stripY: () => carStripY(),
             });
           } else {
-            l.engine.setTheme(compiled, fonts);
+            l.engine.setTheme(carThemeInUnits(compiled, previewUnits), fonts);
           }
           const st = l.engine.status();
           setStatus(
@@ -164,7 +166,7 @@ export function CarPreview({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [theme, editorEngine]);
+  }, [theme, editorEngine, previewUnits]);
 
   return (
     <>
