@@ -496,6 +496,24 @@ export function validateTheme(doc: unknown): ValidationReport {
   const build = buildPieces(theme);
   out.findings.push(...build.findings);
   const layers = build.pieces.length + build.images.length;
+  // The car app refuses a package with a layer far outside the panel (usb_themes.js `inside`):
+  // a gauge on a very large circle, of which only a slice shows, is such a layer.
+  {
+    const W = theme.layout.width;
+    const H = theme.layout.height;
+    const far = new Set<string>();
+    for (const p of [...build.pieces, ...build.images])
+      if (p.x < -W || p.y < -H || p.x + p.w > 2 * W || p.y + p.h > 2 * H) far.add(p.componentId);
+    for (const id of far)
+      out.error(
+        'layout.too-large',
+        `"${id}" needs a layer that reaches more than a panel's size outside the layout; the car refuses the theme.`,
+        {
+          componentId: id,
+          hint: 'Make its box smaller: a smaller circle with a wider sweep draws the same arc.',
+        },
+      );
+  }
   if (layers > RENDERER_LIMITS.layersPerApp)
     out.error(
       'budget.layers',
