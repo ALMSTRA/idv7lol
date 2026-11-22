@@ -1,4 +1,10 @@
-import { getDisplayProfile, type Theme } from '@idv7lol/theme-schema';
+import {
+  UNIT_GROUPS,
+  convertThemeUnits,
+  getDisplayProfile,
+  type Theme,
+  type UnitChoice,
+} from '@idv7lol/theme-schema';
 import {
   applyImageEdits,
   createRaster,
@@ -214,6 +220,41 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
     files.push({ path: ref.file, data: ref.mask ? maskOf(rgba) : new Uint8Array(rgba) });
   }
 
+  // The same theme in the other units a driver may pick: only the pieces that differ.
+  const units: NonNullable<CompiledTheme['units']> = {};
+  for (const group of UNIT_GROUPS) {
+    const choice: UnitChoice =
+      group === 'speed'
+        ? { speed: 'mph' }
+        : group === 'temperature'
+          ? { temperature: 'fahrenheit' }
+          : { pressure: 'psi' };
+    const other = convertThemeUnits(theme, choice);
+    if (!other.changed.length) continue;
+    const swapped = unitPieces(build.pieces, buildPieces(other.theme).pieces, codeP);
+    if (swapped === null)
+      warnings.push({
+        severity: 'warning',
+        code: 'units.' + group,
+        message: `The theme could not be prepared in other ${group} units; the car shows it as drawn.`,
+      });
+    else {
+      // a piece that shows two kinds of unit at once can follow only one of them
+      for (const done of Object.values(units))
+        for (const key of Object.keys(swapped))
+          if (done && key in done) {
+            delete swapped[key];
+            warnings.push({
+              severity: 'warning',
+              code: 'units.mixed',
+              message: `"${key}" shows values of more than one kind of unit; it follows only the first when the driver changes units.`,
+            });
+          }
+      if (Object.keys(swapped).length) units[group] = swapped;
+    }
+  }
+  if (Object.keys(units).length) compiled.units = units;
+
   // The sketch again, now with the pictures as their components show them.
   if (Object.keys(pictures).length) {
     const sketch = themePreview(theme, pictures);
@@ -223,6 +264,31 @@ export function compileTheme(doc: unknown, opts: CompileOptions = {}): CompileRe
   // Last, so it records every value settled above.
   files.unshift({ path: 'theme.json', data: JSON.stringify(compiled, null, 2) });
   return { report, compiled, files };
+}
+
+/**
+ * The pieces of `other` (the theme in other units) that differ from `base`, by key. Null when the
+ * two do not line up piece for piece, which the car app's swap depends on.
+ */
+function unitPieces(
+  base: CompiledPiece[],
+  other: CompiledPiece[],
+  codeP: number,
+): Record<string, CompiledPiece> | null {
+  if (base.length !== other.length) return null;
+  for (const p of other) if (p.shader === 'telltale') p.statics['u_code_p'] = [codeP];
+  const out: Record<string, CompiledPiece> = {};
+  const seen = new Set<string>();
+  for (let i = 0; i < base.length; i++) {
+    const a = base[i]!;
+    const b = other[i]!;
+    if (a.key !== b.key || a.componentId !== b.componentId || a.shader !== b.shader) return null;
+    if (seen.has(a.key)) return null;
+    seen.add(a.key);
+    if (JSON.stringify(a.texture ?? null) !== JSON.stringify(b.texture ?? null)) return null;
+    if (JSON.stringify(a) !== JSON.stringify(b)) out[a.key] = b;
+  }
+  return out;
 }
 
 /** Font family used by a text-capable piece (from the component's style), defaulting to the theme default. */

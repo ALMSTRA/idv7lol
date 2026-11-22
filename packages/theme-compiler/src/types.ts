@@ -249,6 +249,14 @@ export interface CompiledTheme {
    * no mosaic tiles: they go on drawing `preview`.
    */
   sketch?: PreviewPrim[];
+  /**
+   * The pieces that differ when the driver wants other units (theme-schema unit-systems.ts):
+   * `speed` for mph and miles, `temperature` for °F, `pressure` for psi. Each maps a piece's `key`
+   * to that piece in those units; the car app swaps them in place. A piece is in one group at
+   * most. Absent: the theme has nothing in that unit, or shows it in a unit of its author's
+   * choice. Car apps before 0.2.18 ignore it.
+   */
+  units?: Partial<Record<'speed' | 'temperature' | 'pressure', Record<string, CompiledPiece>>>;
   warnings: Finding[];
 }
 

@@ -154,6 +154,22 @@ or links a text to one; editing a linked text changes the style and every text t
 Palettes panel lists the styles to rename or remove them; texts that used a removed style keep its
 look. The texts carry the style's values too, so a theme read by an older Studio looks the same.
 
+## Units
+
+Draw a theme in km/h, km, °C and bar and leave `binding.unit` unset. The car app's **Units**
+setting (Auto follows the car's own board computer) then shows it in mph and miles, °F and psi:
+the compiler adds those pieces to the compiled theme (`convertThemeUnits`, theme-schema
+`unit-systems.ts`) and the car swaps them. For that to come out well:
+
+- Let the gauge draw its numerals (`labels.show`). It gets a round scale in the other unit. A
+  scale painted in a picture cannot change: its needle stays right for the painted km/h.
+- Write unit words as `km/h`, `km`, `°C` and `bar`, or use `{unit}` / `showUnit`. A caption that
+  ends in the unit (`BOOST BAR`) follows; other prose is left alone.
+- Conditions and animation triggers always compare with the car's own value (km/h, °C, bar).
+- A value you set to another unit yourself (`"unit": "psi"`) is yours: it never changes.
+
+**Preview units** in the Studio's Simulator panel shows the result.
+
 ## Keeping out of the factory's way
 
 The 1920×720 panel sits above the factory gauges and below its telltales and pop-ups. Keep
