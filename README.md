@@ -65,6 +65,23 @@ compiled but not tested on a Mac yet; how to get it and open it the first time i
 
 ## Screenshots
 
+### The editor has two styles: the new modern one and the classic one
+
+**New (modern) style**, the default since beta 7. It takes the work a step at a time along the
+top: Template, Design, Simulate, Validate, To the car.
+
+![idv7lol Studio in its new modern style](docs/assets/screenshots/studio-new-view.jpg)
+
+**Classic style**, every panel at once, as the versions before beta 7 looked. Nothing was taken
+away: it is the same editor with the same tools.
+
+![idv7lol Studio in its classic style](docs/assets/screenshots/studio-classic-view.jpg)
+
+The Studio asks which one you want the first time, and **…** > View switches between them at any
+time. The pictures below were taken in the classic style.
+
+### More of the editor
+
 The editor with the Performance theme while the simulator drives a track lap:
 
 ![idv7lol Studio editing the Performance theme](docs/assets/screenshots/editor.jpg)
@@ -94,16 +111,6 @@ Theme details and sharing a theme with the community:
 ![Theme details and File › Share with the community](docs/assets/screenshots/theme-details-share.jpg)
 
 These are screenshots of the Studio running on a PC. They are not photos of a car.
-
-### The Studio's two views
-
-The **new view** takes the work a step at a time: Template, Design, Simulate, Validate, To the
-car. The **classic view** shows every panel at once, as the versions before beta 7 did. The Studio
-asks which one you want, and **…** > View switches at any time.
-
-| New view                                                              | Classic view                                                                  |
-| --------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| ![The Studio's new view](docs/assets/screenshots/studio-new-view.jpg) | ![The Studio's classic view](docs/assets/screenshots/studio-classic-view.jpg) |
 
 ### The app in the car
 
