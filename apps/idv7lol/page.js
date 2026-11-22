@@ -437,8 +437,10 @@ function dataPage(cv, t, m) {
   // speed
   card(cv, t, 540, y0, 520, 250);
   head('SPEED', 564, y0 + 30);
-  label(cv, fmt(m.speed), 564, y0 + 196, 150, t.text, { font: 'num' });
-  label(cv, 'km/h', 564, y0 + 232, 22, t.dim);
+  // in the driver's units, as the layout shows it (m.mph: units.js unitGroups has 'speed')
+  const speed = m.mph && isNum(m.speed) ? m.speed * 0.621371192 : m.speed;
+  label(cv, fmt(speed), 564, y0 + 196, 150, t.text, { font: 'num' });
+  label(cv, m.mph ? 'mph' : 'km/h', 564, y0 + 232, 22, t.dim);
   // engine speed
   card(cv, t, 1080, y0, 480, 118);
   head('ENGINE', 1104, y0 + 30);

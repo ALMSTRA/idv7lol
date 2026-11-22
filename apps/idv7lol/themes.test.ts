@@ -22,7 +22,11 @@ const { readPackage } = require('./usb_themes.js') as {
   readPackage(
     buf: Buffer,
     o: Record<string, unknown>,
-  ): { theme: { pieces: unknown[]; images: unknown[] } };
+  ): { theme: { pieces: unknown[]; images: unknown[]; units?: unknown } };
+};
+const { applyUnits, SYSTEMS } = require('./units.js') as {
+  applyUnits<T>(theme: T, groups: string[]): T;
+  SYSTEMS: Record<string, string[]>;
 };
 const SHADERS = require('./shaders.js') as Record<string, string>;
 
@@ -112,6 +116,34 @@ describe('every bundled theme on the car path', () => {
       expect(engine.status().layers).toBe(compiled.pieces.length + compiled.images.length);
       (engine as unknown as { setShown(v: boolean): void }).setShown(false);
       expect(client.live.size).toBe(0);
+
+      // the same theme in the driver's other units: as it came through a package, as many
+      // layers, every one a shader the app has
+      expect(read.theme.units).toEqual(
+        compiled.units ? JSON.parse(JSON.stringify(compiled.units)) : undefined,
+      );
+      for (const groups of Object.values(SYSTEMS)) {
+        const shown = applyUnits(read.theme, groups) as unknown as typeof compiled;
+        expect(shown.pieces).toHaveLength(compiled.pieces.length);
+        expect(shown.pieces.map((p) => p.key)).toEqual(compiled.pieces.map((p) => p.key));
+        for (const p of shown.pieces) expect(SHADERS[p.shader], p.shader).toBeTypeOf('string');
+        const c2 = new CountingClient();
+        const e2 = new ClusterEngine({
+          client: c2,
+          log: { info: () => undefined, warn: () => undefined },
+          theme: shown,
+          fonts: { sans: { metrics: baked.metrics, pixels: Buffer.from(baked.pixels) } },
+          signals: {
+            get: (id: string) => ({ value: id.includes('temp') ? 90 : 100, t: 1_000_000 }),
+          },
+          sweep: () => false,
+          now: () => 1_000_000,
+        });
+        e2.tick();
+        e2.tick();
+        expect(e2.status().failed, groups.join('+')).toBe(false);
+        expect(e2.status().layers).toBe(compiled.pieces.length + compiled.images.length);
+      }
     });
   }
 });

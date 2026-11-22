@@ -312,6 +312,40 @@ function averageConsumptionOf(raw) {
   return v / 10;
 }
 
+/**
+ * KombiIF.statusBordcomputerAverage: the units the car's own board computer shows, as the kit's
+ * Live Data app reads them (cauliflowermossgrape/idrive7-apps apps/live_data/signals.js):
+ * statusUnitOfMeasurementSpeedBC (1 KM_S_H__KM, 2 MPH__MLS) and
+ * statusUnitOfMeasurementConsumptionBC (1 l/100 km, 2 mpg UK, 3 mpg US, 4 km/l). Null for a member
+ * the car does not send or a value not known.
+ */
+function carUnitsOf(raw) {
+  const speed = enumOf(member(raw, 'statusUnitOfMeasurementSpeedBC'), {
+    KM_S_H__KM: 1,
+    MPH__MLS: 2,
+  });
+  const cons = enumOf(member(raw, 'statusUnitOfMeasurementConsumptionBC'), {
+    VERBRAUCH_IN_L_S_100KM: 1,
+    VERBRAUCH_IN_MPG_UK: 2,
+    VERBRAUCH_IN_MPG_US: 3,
+    VERBRAUCH_IN_KM_S_L: 4,
+  });
+  if (!raw || typeof raw !== 'object') return { speed: null, consumption: null };
+  return {
+    speed: speed === 1 ? 'kmh' : speed === 2 ? 'mph' : null,
+    consumption:
+      cons === 1
+        ? 'l_100km'
+        : cons === 2
+          ? 'mpg_uk'
+          : cons === 3
+            ? 'mpg_us'
+            : cons === 4
+              ? 'km_l'
+              : null,
+  };
+}
+
 /** FES.statusSwitchDriveDynamicSport2.displayBoostPressure: hundredths of a bar, 255 = no value. */
 function boostOf(raw) {
   return typeof raw === 'number' && raw >= 0 && raw < 255 ? raw / 100 : null;
@@ -346,4 +380,5 @@ module.exports = {
   cruiseOf,
   tripOf,
   averageConsumptionOf,
+  carUnitsOf,
 };

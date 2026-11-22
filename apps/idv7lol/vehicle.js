@@ -32,6 +32,7 @@ const {
   handBrakeOf,
   cruiseOf,
   averageConsumptionOf,
+  carUnitsOf,
   dippedBeamOf,
   parkingBrakeOf,
   dscModeOf,
@@ -289,6 +290,7 @@ function startVehicle(ctx, opts) {
   const seen = (field, v) => {
     raw[field] = JSON.stringify(v).slice(0, 160);
   };
+  let carUnits = null; // the board computer's units, once the car has named them (signals.js carUnitsOf)
   let modeFallbackSince = Date.now();
   // An M car names its mode in M Drive (the engine mode of M Setup); once it has, the driving
   // experience switch (FES), which stays on COMFORT there, no longer sets the mode.
@@ -330,6 +332,8 @@ function startVehicle(ctx, opts) {
       statusBordcomputerAverage: (v) => {
         seen('statusBordcomputerAverage', v);
         flag('fuel.consumption.average', averageConsumptionOf(v));
+        const u = carUnitsOf(v);
+        if (u.speed) carUnits = u;
       },
     },
     'de.bmw.body.Light': {
@@ -606,6 +610,8 @@ function startVehicle(ctx, opts) {
     live,
     hold,
     status,
+    /** { speed: 'kmh' | 'mph', consumption } as the car's board computer shows them, or null. */
+    carUnits: () => carUnits,
     stop: () => Promise.all(car.subs.map((s) => s.shutdown())),
   };
 }

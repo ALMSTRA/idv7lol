@@ -25,6 +25,7 @@ const tz = require('./tz');
 const index = require('./themes_index');
 const SHADERS = require('./shaders');
 const { ThemeLibrary, UsbWatcher, PREFIX } = require('./usb_themes');
+const { unitGroups, applyUnits } = require('./units');
 
 const G = require('./kit/gauges');
 const page = require('./page');
@@ -115,12 +116,28 @@ mgu.run({
       return sel.default;
     };
 
+    // Units: the Units setting, or with Auto the car's own (its board computer names them a
+    // little after the start, so what it said last time is kept for the next start).
+    const carUnits = () => {
+      const now = vehicle.carUnits();
+      if (now) {
+        const text = now.speed + ',' + (now.consumption || '');
+        if (settings.get('_carUnits') !== text) settings.set('_carUnits', text);
+        return now;
+      }
+      const kept = String(settings.get('_carUnits') || '').split(',');
+      return kept[0] ? { speed: kept[0], consumption: kept[1] || null } : null;
+    };
+    const groups = () => unitGroups(settings.get('units') || 'auto', carUnits());
+    /** The theme on show in the driver's units (the theme's own pieces where it has no others). */
+    const themeShown = () => applyUnits(current.theme, groups());
+
     const client = new ClusterRender(APP_ID);
     const engine = new ClusterEngine({
       client,
       log,
       target: 'panel',
-      theme: current.theme,
+      theme: themeShown(),
       fonts: current.fonts,
       paletteId,
       enabled: showing,
@@ -146,8 +163,18 @@ mgu.run({
     );
     client.connect();
     engine.start();
+    let unitsShown = groups().join(',');
+    /** Draw the layout again when the units changed, and only then: a rebuild flashes the cluster. */
+    const followUnits = () => {
+      const now = groups().join(',');
+      if (now === unitsShown) return;
+      unitsShown = now;
+      log.info('units: ' + (now || 'as drawn'));
+      engine.setTheme(themeShown(), current.fonts);
+    };
     setInterval(() => {
       if (engine.shown) client.status();
+      followUnits();
     }, 5000);
 
     /* ---------- the app's own page (drawing in page.js) ---------- */
@@ -228,7 +255,7 @@ mgu.run({
         last.theme = settings.get(THEME);
         try {
           current = loadTheme(settings.get(THEME), library);
-          engine.setTheme(current.theme, current.fonts);
+          engine.setTheme(themeShown(), current.fonts);
           log.info('theme: ' + current.theme.id);
         } catch (e) {
           log.warn('theme load failed: ' + e);
@@ -237,8 +264,9 @@ mgu.run({
       if (k === 'bottomStrip') {
         if (settings.get('bottomStrip') === last.bottomStrip) return;
         last.bottomStrip = settings.get('bottomStrip');
-        engine.setTheme(current.theme, current.fonts);
+        engine.setTheme(themeShown(), current.fonts);
       }
+      if (k === 'units') followUnits();
       if (k === 'palette') engine.recolour();
       // "Theme from USB on show > Remove it from the car" is a one-off: it goes back to Keep
       if (k === 'usbRemove' && settings.get('usbRemove') === 'remove') {
@@ -284,6 +312,7 @@ mgu.run({
           mode: text('drive.mode'),
           source: vs.demo ? 'Demo' : vehicle.live() ? 'Live' : 'Not live',
           speed: store.number('vehicle.speed'),
+          mph: groups().indexOf('speed') >= 0,
           rpm: store.number('engine.rpm'),
           redline: 7000,
           gear: text('transmission.gear'),
@@ -407,6 +436,7 @@ mgu.run({
         usbNote,
         ctx.theme().name,
         Math.round(dragX / 4),
+        groups().join(','),
       ];
       const n = (id, step) => {
         const v = store.number(id);
@@ -536,7 +566,7 @@ mgu.run({
         if (results.some((r) => r.ok && r.theme.key === current.key)) {
           try {
             current = loadTheme(current.key, library);
-            engine.setTheme(current.theme, current.fonts);
+            engine.setTheme(themeShown(), current.fonts);
           } catch (e) {
             log.warn('theme reload failed: ' + e);
           }

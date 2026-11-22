@@ -94,6 +94,36 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Units for every theme: mph, miles, °F and psi (car app 0.2.18).** Themes are drawn in km/h,
+  km, °C and bar; the car app's new **Units** setting shows any of them in mph and miles, or in
+  mph, miles, °F and psi, without a second copy of the theme. With **Auto**, the default, the
+  layout follows the car's own board computer: its mph (KombiIF `statusBordcomputerAverage`,
+  `statusUnitOfMeasurementSpeedBC`, the signal the kit's Live Data app reads) for speed and
+  distance, and °F and psi too where it counts consumption in US miles per gallon; a car that
+  shows km/h sees every theme exactly as before. What the car said is remembered, so the next
+  start draws the layout in the right units at once. The app's own Data tab shows the speed in
+  the same unit.
+  How: `convertThemeUnits` (theme-schema `unit-systems.ts`) rewrites a theme for a choice of
+  units: bindings, ranges, colour zones, redlines, markers and shift lights are converted; a
+  gauge that draws its own numerals gets a round scale (0–260 km/h becomes 0–160 mph in tens)
+  with no more numerals than its author fitted; a gauge without drawn numerals keeps its needle
+  exactly where it was (a dial painted in a picture stays right); unit words in texts and labels
+  follow (`km/h`, `km`, `°C`, `bar`, in the case they were written in), and a psi figure shows
+  one decimal less than its bar one. A value its author set to another unit (a boost gauge in
+  psi), a scaled value, and everything compared with the car's own value (conditions, animation
+  triggers, an animated picture's speed) are left alone. The compiler puts the pieces that
+  differ into the compiled theme (`units.speed`, `units.temperature`, `units.pressure`, about a
+  sixth more JSON) and the car app only swaps them, so bundled themes, themes from a USB stick
+  and themes from the site all follow, with no arithmetic of their own on the head unit. A
+  package's unit pieces pass the same checks as its layers and are dropped whole if one does not
+  fit. Themes installed before this stay as drawn until exported again; car apps before 0.2.18
+  ignore the new field. Consumption stays in l/100 km. Studio: **Preview units** in the
+  Simulator panel shows the theme being edited as a driver would see it, in the editor's
+  preview and in the car-shader preview; the theme itself is not changed.
+  Tested locally: all 41 themes converted to both systems validate with no new finding and run
+  through a package and the car's engine in each; drawn by the Studio's engine. Not tested in a
+  vehicle: the board computer's unit signal is read as the kit reads it but has not been seen
+  from a car set to miles.
 - **Five more community templates from eroobeeroo's Cluster Layouts**: GT3, Pulse, Sport, M Cluster
   and Classic Cluster (`themes/community/gt3`, `pulse`, `sport`, `m-cluster`, `classic-m-cluster`),
   converted from Cluster Layouts 0.27.2, the last version published under GPL-3.0-or-later; its

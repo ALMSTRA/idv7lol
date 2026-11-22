@@ -102,7 +102,22 @@ function fontsFor(theme) {
 
 let failures = 0;
 
+const units = load('units.js');
+
+/** The theme as drawn, then in each of the driver's other units (units.js). */
 function check(name, theme) {
+  checkOne(name, theme);
+  if (!theme.units) return;
+  Object.keys(units.SYSTEMS).forEach((system) => {
+    const groups = units.SYSTEMS[system];
+    if (!groups.length) return;
+    const shown = units.applyUnits(theme, groups);
+    if (shown === theme) return;
+    checkOne(name + ' in ' + system, shown, { get: () => ({ value: 90, t: 1000000 }) });
+  });
+}
+
+function checkOne(name, theme, signals) {
   try {
     const client = new CountingClient();
     const engine = new ClusterEngine({
@@ -110,11 +125,12 @@ function check(name, theme) {
       log: { info() {}, warn() {} },
       theme,
       fonts: fontsFor(theme),
-      signals: { get: () => undefined },
+      signals: signals || { get: () => undefined },
       sweep: () => false,
       now: () => 1000000,
     });
     engine.tick();
+    if (signals) engine.tick();
     const st = engine.status();
     const want = theme.pieces.length + (theme.images || []).length;
     if (st.failed) throw new Error('the engine gave up building it');

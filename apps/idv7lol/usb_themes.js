@@ -178,6 +178,51 @@ function cleanPreview(list, max) {
  * with gunzipCapped); without it the file is inflated here in one go, so only for files whose
  * own header says they stay under the limit.
  */
+const UNIT_GROUPS = ['speed', 'temperature', 'pressure'];
+
+/** A theme's `units` with every piece checked, or undefined. */
+function cleanUnits(theme, shaders, inside) {
+  const units = theme.units;
+  if (!units || typeof units !== 'object' || Array.isArray(units)) return undefined;
+  const base = {};
+  theme.pieces.forEach((p) => {
+    base[p.key] = p;
+  });
+  const out = {};
+  const taken = {};
+  let ok = true;
+  UNIT_GROUPS.forEach((g) => {
+    const set = units[g];
+    if (set === undefined) return;
+    if (!set || typeof set !== 'object' || Array.isArray(set)) {
+      ok = false;
+      return;
+    }
+    Object.keys(set).forEach((key) => {
+      const p = set[key];
+      const b = has(base, key) ? base[key] : null;
+      if (
+        !b ||
+        has(taken, key) ||
+        !p ||
+        typeof p !== 'object' ||
+        p.key !== key ||
+        p.shader !== b.shader ||
+        !has(shaders, p.shader) ||
+        !p.statics ||
+        typeof p.statics !== 'object' ||
+        !inside(p) ||
+        JSON.stringify(p.texture === undefined ? null : p.texture) !==
+          JSON.stringify(b.texture === undefined ? null : b.texture)
+      )
+        ok = false;
+      taken[key] = true;
+    });
+    out[g] = set;
+  });
+  return ok && Object.keys(out).length ? out : undefined;
+}
+
 function readPackage(buf, opts, inflated) {
   if (buf.length > LIMITS.fileBytes) fail('file too large');
   let json = inflated;
@@ -296,6 +341,11 @@ function readPackage(buf, opts, inflated) {
     fail('more than ' + LIMITS.sprites + ' animations, custom icons and needle pictures');
   if (sprites > LIMITS.sprites) fail('more than ' + LIMITS.sprites + ' animations');
   if (pixelBytes > LIMITS.pixelBytes) fail('images use too much renderer memory');
+
+  // The pieces for other units (theme-compiler types.ts `units`): each takes the place of the
+  // piece with its key, so it must be the same kind of layer and pass the same checks. Anything
+  // else and the theme is installed without them, shown as drawn.
+  theme.units = cleanUnits(theme, opts.shaders, inside);
 
   // Fonts: the ones this app ships; anything else falls back to the first.
   const fonts = (Array.isArray(theme.fonts) ? theme.fonts : []).filter(

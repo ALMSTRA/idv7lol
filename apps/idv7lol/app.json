@@ -2,7 +2,7 @@
   "id": "idv7lol",
   "title": "idv7lol",
   "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
-  "version": "0.2.17",
+  "version": "0.2.18",
   "startType": "autostart",
   "vendor": "custom",
   "license": "GPL-3.0-or-later",
@@ -182,6 +182,18 @@
       "options": [
         ["car", "The car's own (no black boxes)"],
         ["layout", "Covered by the layout (may leave black boxes)"]
+      ]
+    },
+    {
+      "key": "units",
+      "label": "Units",
+      "type": "choice",
+      "default": "auto",
+      "options": [
+        ["auto", "Auto (the car's own)"],
+        ["metric", "km/h, °C, bar"],
+        ["mph-celsius", "mph, °C, bar"],
+        ["mph-fahrenheit", "mph, °F, psi"]
       ]
     },
     {

@@ -49,4 +49,46 @@ function convert(value, from, to) {
   return canonical * b.f + b.o;
 }
 
-module.exports = { UNITS, convert };
+/**
+ * The units a driver sees, as groups of a compiled theme's `units` (theme-compiler types.ts):
+ * 'speed' (mph and miles), 'temperature' (°F), 'pressure' (psi). `setting` is the Units setting;
+ * with 'auto' they follow the car's own board computer (signals.js carUnitsOf): its mph for speed
+ * and distance, and °F and psi where it counts consumption in US miles per gallon. A car that
+ * has said nothing yet shows the theme as drawn.
+ */
+const SYSTEMS = {
+  metric: [],
+  'mph-celsius': ['speed'],
+  'mph-fahrenheit': ['speed', 'temperature', 'pressure'],
+};
+function unitGroups(setting, car) {
+  if (Object.prototype.hasOwnProperty.call(SYSTEMS, setting)) return SYSTEMS[setting];
+  if (!car || car.speed !== 'mph') return SYSTEMS.metric;
+  return car.consumption === 'mpg_us' ? SYSTEMS['mph-fahrenheit'] : SYSTEMS['mph-celsius'];
+}
+
+/**
+ * `theme` with the pieces of `groups` swapped in. The theme itself is not changed; without
+ * anything to swap it comes back as it is.
+ */
+function applyUnits(theme, groups) {
+  const units = theme && theme.units;
+  if (!units || !groups || !groups.length) return theme;
+  const swap = {};
+  let any = false;
+  groups.forEach((g) => {
+    const set = units[g];
+    if (!set) return;
+    Object.keys(set).forEach((key) => {
+      swap[key] = set[key];
+      any = true;
+    });
+  });
+  if (!any) return theme;
+  const pieces = theme.pieces.map((p) =>
+    Object.prototype.hasOwnProperty.call(swap, p.key) ? swap[p.key] : p,
+  );
+  return Object.assign({}, theme, { pieces });
+}
+
+module.exports = { UNITS, convert, SYSTEMS, unitGroups, applyUnits };
