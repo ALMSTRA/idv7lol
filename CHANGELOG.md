@@ -40,6 +40,12 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   `kit/tools/build.py` stays as it was.
 - `apps/idv7lol/cluster_render_client.js` follows upstream (idrive-apps 2dcead2): `host()` can
   ask for an edge on a hosted picture, which idv7lol does not use.
+- `apps/idv7lol/cluster_render_client.js` follows upstream again (idrive-apps a3b9058,
+  cluster-render 0.8.0): a layer can ask for its target to stay loaded off screen (`preload`) and
+  for upload bandwidth (`others_fps`), and the client tells when another app holds its videos
+  (`fps_cap`). idv7lol uses none of them yet, so it still asks for cluster-render 0.6.9.
+- README: pictures of the Studio's new and classic views and of the car app's modern and classic
+  screens (drawn on a PC), and a short guide to using the app in the car.
 - Before it, car app 0.2.14 raised them to cluster-render 0.6.6 (from 0.6.4) and the Store's
   deploy tool 0.8.21 (from 0.8.19). cluster-render 0.6.5 remembers across drives the upload level
   the KOMBI accepts, and 0.6.6 keeps the scene through a warning or an open door and maps it

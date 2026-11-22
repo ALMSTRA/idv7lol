@@ -95,6 +95,67 @@ Theme details and sharing a theme with the community:
 
 These are screenshots of the Studio running on a PC. They are not photos of a car.
 
+### The Studio's two views
+
+The **new view** takes the work a step at a time: Template, Design, Simulate, Validate, To the
+car. The **classic view** shows every panel at once, as the versions before beta 7 did. The Studio
+asks which one you want, and **…** > View switches at any time.
+
+| New view                                                              | Classic view                                                                  |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![The Studio's new view](docs/assets/screenshots/studio-new-view.jpg) | ![The Studio's classic view](docs/assets/screenshots/studio-classic-view.jpg) |
+
+### The app in the car
+
+The car app has two screens too. The **modern** one has tabs: Themes, with a sketch of the theme
+on show and its neighbours, Data, and four pages for diagnostics. The **classic** one is four
+pages of text. _Settings > App screen_ picks between them.
+
+| Modern: Themes                                                           | Modern: Data                                                         |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| ![Themes tab of the car app](docs/assets/screenshots/car-app-themes.jpg) | ![Data tab of the car app](docs/assets/screenshots/car-app-data.jpg) |
+
+![The car app's classic screen](docs/assets/screenshots/car-app-classic.jpg)
+
+These three are drawn on a PC by the car app's own code with demo data, not photographed in a
+car: that is why they say _Renderer not connected_. In the car the head unit adds its own title
+and the row of buttons under the page.
+
+## Using it in the car
+
+A short guide for once the app is installed
+([docs/user/DEPLOYMENT.md](docs/user/DEPLOYMENT.md) has the installation, the requirements and
+the warning about the SSH unlock; read it first).
+
+1. **Open it.** Apps menu > **idv7lol**. Nothing changes on the cluster yet.
+2. **Pick a theme.** On the Themes tab, swipe sideways or tap the sketch of the theme before or
+   after; the controller's knob stops on both sketches too. The **Theme** button under the page
+   goes to the next one. **Palette** changes its colours where the theme has several.
+3. **Show it.** Press **Show**. The layout appears on the cluster while the car is sending data;
+   the page says where it stands: _Off_, _Waiting for the car_, _Waiting for car data_,
+   _Renderer not connected_, _Layout failed_ or _On the cluster_.
+4. **Give the cluster back.** Press **Show** again: the factory cluster is back within a second.
+   The car's own warnings and telltales stay on top the whole time.
+5. **Settings** (the button under the page):
+   - _Units_: Auto follows the car (mph and miles when the car shows miles), or pick km/h, mph, or
+     mph with °F and psi.
+   - _App screen_: Modern (tabs) or Classic (text pages).
+   - _Bottom strip_: leave it on _The car's own_ unless you know your cluster takes a layout over
+     it.
+   - _Start-up sweep_, _Time zone_, _Fuel tank size_ and _Demo data_.
+   - _QR log_: the log of the app as QR codes to photograph, for a bug report without SSH.
+6. **Your own themes.** Save a theme from the Studio to a USB stick (**To the car**), or download
+   one from [idv7lol.com](https://www.idv7lol.com). Plug the stick into the car: the app installs
+   it by itself in a few seconds and it shows up on the Themes tab.
+7. **The other tabs.** Data shows what the app reads from the car. Status, Signals, Renderer and
+   About are for finding out why something does not show; **Page** steps through the tabs where
+   they cannot be tapped.
+
+If the cluster looks wrong, press **Show** to switch the layout off. Uninstalling the app from the
+MGU Store removes it completely. This is experimental software: see
+[docs/troubleshooting/TROUBLESHOOTING.md](docs/troubleshooting/TROUBLESHOOTING.md) and the
+[Putting it on the car](#putting-it-on-the-car) before relying on it.
+
 ## What you get
 
 - **idv7lol Studio**, the editor for Windows and macOS. Drag gauges, bars, readouts and text onto the layout,
