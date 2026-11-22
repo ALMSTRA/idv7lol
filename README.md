@@ -8,7 +8,7 @@ Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus an editor for W
 
 ### 🎉 Now in beta: [idv7lol.com](https://www.idv7lol.com)
 
-**Browse** 13 themes with a live preview, **download** any of them for the car (a USB stick, no
+**Browse** 47 themes with a live preview, **download** any of them for the car (a USB stick, no
 account needed), **sign in** to **upload** your own layouts and **vote** for the ones you like.
 
 **New: the [web editor](https://www.idv7lol.com/editor/).** idv7lol Studio in the browser, nothing
@@ -182,7 +182,7 @@ MGU Store removes it completely. This is experimental software: see
   dials with chrome bezels and amber lighting, inspired by late-80s and 90s BMW clusters) and Volt
   Runner (bright yellow, with a running bolt in the middle). Then Performance, Modern, Classic,
   Night Minimal and Rally Dash, plus twelve free community layouts converted from eroobeeroo's
-  Cluster Layouts (GPL, credited in each theme) and seventeen converted from FDX100's KurdBimmer
+  Cluster Layouts (GPL, credited in each theme) and twenty-three converted from FDX100's KurdBimmer
   Themes (MIT, credited in each theme).
 - **The car app**, which runs on the head unit, draws the active theme through `cluster-render`,
   and lets you turn it on or off and switch themes from the iDrive menu.
@@ -340,7 +340,7 @@ It is built on top of other people's open-source work. Thank you to all of them.
   one started from. Its twelve layouts are included as free templates, converted to idv7lol's format
   (GPL-3.0-or-later, see [themes/community/README.md](themes/community/README.md)).
 - **[FDX100/KB](https://github.com/FDX100/KB)**: KurdBimmer Themes, by
-  [FDX100](https://github.com/FDX100). Its seventeen cluster themes are included as free templates,
+  [FDX100](https://github.com/FDX100). Its twenty-three cluster themes are included as free templates,
   converted to idv7lol's format (MIT, see [themes/community/README.md](themes/community/README.md)).
 - **[cauliflowermossgrape/idrive7-apps](https://github.com/cauliflowermossgrape/idrive7-apps)**:
   the app kit and GPU renderer. The kit is included in `kit/` under the MIT licence.

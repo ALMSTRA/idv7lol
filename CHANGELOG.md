@@ -100,6 +100,16 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Six more community templates from FDX100's KurdBimmer Themes** (0.35.0, MIT): Arc Digital,
+  Cream, Dewdrop, Radar, Radar Red and Starlight, in `themes/community/kb-*`, redrawn with this
+  format's own components and credited like the other seventeen; what differs from the originals
+  is in `themes/community/README.md`. Like every theme they follow the driver's units. Tested
+  locally (validator clean in km/h and in mph, drawn by the Studio's engine); not tested in a
+  vehicle.
+- Car app 0.2.19: the cluster-render client below, nothing else.
+- Validator: a layer that reaches more than a panel's size outside the layout is an error
+  (`layout.too-large`). The car app has always refused such a package from a USB stick; before,
+  only the car said so. A gauge on a very large circle is the usual cause.
 - **Units for every theme: mph, miles, °F and psi (car app 0.2.18).** Themes are drawn in km/h,
   km, °C and bar; the car app's new **Units** setting shows any of them in mph and miles, or in
   mph, miles, °F and psi, without a second copy of the theme. With **Auto**, the default, the
