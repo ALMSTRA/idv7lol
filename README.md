@@ -70,12 +70,17 @@ compiled but not tested on a Mac yet; how to get it and open it the first time i
 **New (modern) style**, the default since beta 7. It takes the work a step at a time along the
 top: Template, Design, Simulate, Validate, To the car.
 
-![idv7lol Studio in its new modern style](docs/assets/screenshots/studio-new-view.jpg)
+![idv7lol Studio in its new modern style, on the Simulate step with the Lily Pad theme](docs/assets/screenshots/studio-new-view.jpg)
+
+Each step shows only what it needs. The last one, To the car, checks the theme and saves it for a
+USB stick:
+
+![The To the car step of the new style](docs/assets/screenshots/studio-new-view-to-the-car.jpg)
 
 **Classic style**, every panel at once, as the versions before beta 7 looked. Nothing was taken
 away: it is the same editor with the same tools.
 
-![idv7lol Studio in its classic style](docs/assets/screenshots/studio-classic-view.jpg)
+![idv7lol Studio in its classic style, with the Supercar Track theme](docs/assets/screenshots/studio-classic-view.jpg)
 
 The Studio asks which one you want the first time, and **…** > View switches between them at any
 time. The pictures below were taken in the classic style.
