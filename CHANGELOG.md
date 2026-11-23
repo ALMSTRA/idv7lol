@@ -100,6 +100,13 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **The car app's own pages in Simplified Chinese**, by JackieZ123430
+  ([#11](https://github.com/ALMSTRA/idv7lol/pull/11)): settings, page headings and messages
+  translated, 61 more glyphs in the kit's Noto Sans SC atlas, and labels drawn through the kit's
+  translator in a build made with `python kit/tools/build.py --language zh-CN idv7lol`. The
+  English build draws as before. Tested locally (both builds stage, Node 8 checks pass); not
+  tested in a vehicle.
+- README: "Get it on your car in five steps" near the top, the MGU Store way.
 - **Six more community templates from FDX100's KurdBimmer Themes** (0.35.0, MIT): Arc Digital,
   Cream, Dewdrop, Radar, Radar Red and Starlight, in `themes/community/kb-*`, redrawn with this
   format's own components and credited like the other seventeen; what differs from the originals

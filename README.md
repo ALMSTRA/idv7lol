@@ -30,6 +30,30 @@ against the limits of the cluster renderer, and build a package that the
 [MGU Store](https://github.com/robertnisipeanu/mgu-store) can install. When idv7lol is switched
 off, the car shows its factory cluster again.
 
+## Get it on your car in five steps
+
+The recommended way is the [MGU Store](https://github.com/robertnisipeanu/mgu-store): it installs
+the app, what the app needs, and its updates. Do it parked, with the car on stable power.
+
+1. **Have the MGU Store on the head unit.** Installing the Store needs root SSH access once; its
+   README explains how. Read the
+   [warning about the SSH unlock](docs/user/DEPLOYMENT.md#before-you-install-the-mgu-store-the-ssh-unlock-erases-the-head-units-coding)
+   first: that flash erases the head unit's coding.
+2. **Add this repository.** In the Store on the car: **Settings** > **Sources** > **Add GitHub
+   repository**, and type `ALMSTRA/idv7lol`. Leave it on **Releases**, the Store's own choice
+   (not Tags).
+3. **Install idv7lol.** Open it in the Store's list and press **Install**. The Store installs
+   `cluster-render` first if it is missing. Restart the head unit if the Store asks.
+4. **Open it and press Show.** Apps menu > **idv7lol**. Pick a theme on the Themes tab, then
+   **Show** puts it on the cluster; **Show** again gives the factory cluster back.
+5. **Get more themes.** Download any from [idv7lol.com](https://www.idv7lol.com) or save your own
+   from the Studio to a USB stick, into `idv7lol/themes/`. Plug it in and the app installs it.
+
+No internet on the head unit? The Store also installs from a USB stick. The longer version, what
+you need and how to remove everything are in [Putting it on the car](#putting-it-on-the-car), and
+day-to-day use is in [Using it in the car](#using-it-in-the-car). It has worked on one car so
+far; see the status below.
+
 > **Disclaimer.** This is an unofficial hobby project. It has nothing to do with BMW AG. Changing
 > what your cluster shows can distract you, and it may affect your warranty or break local rules.
 > Use it parked or on a closed course, keep the factory warnings visible, and read
