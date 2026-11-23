@@ -103,6 +103,9 @@ mgu.run({
       current = loadTheme(index.themes[0].id);
     }
     let usbNote = '';
+    // '' or why a theme from a stick could not be saved here (Status page)
+    let storage = library.storage();
+    if (storage) log.warn('usb: ' + storage);
     const paletteId = () => {
       const manual = settings.get('palette');
       const sel = current.theme.paletteSelection;
@@ -371,7 +374,10 @@ mgu.run({
           usb:
             library.list().length +
             ' installed  ·  ' +
-            (usbNote || 'Copy themes to idv7lol/themes on a USB stick and plug it in.'),
+            (usbNote ||
+              (storage
+                ? 'Themes cannot be saved: ' + storage
+                : 'Copy themes to idv7lol/themes on a USB stick and plug it in.')),
           demo: vs.demo,
           signals: store
             .ids()
@@ -567,6 +573,7 @@ mgu.run({
         const ok = results.filter((r) => r.ok).map((r) => r.theme.name);
         const bad = results.filter((r) => !r.ok);
         forgetUsbSketches();
+        storage = library.storage();
         // A new copy of the theme on show replaced its files: reload it so the
         // layout and its pictures come from the same version.
         if (results.some((r) => r.ok && r.theme.key === current.key)) {

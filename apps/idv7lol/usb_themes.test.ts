@@ -4,6 +4,7 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   statSync,
@@ -43,6 +44,7 @@ const usb = require('./usb_themes.js') as {
       imageDir: string;
     };
     remove(key: string): boolean;
+    storage(): string;
   };
   UsbWatcher: new (o: Record<string, unknown>) => {
     tick(done?: (results: Result[]) => void): number;
@@ -187,6 +189,32 @@ describe('themes from a USB stick', () => {
       expect(results.find((r) => r.file === name)?.reason).toMatch(reason);
     expect(results.find((r) => r.file === 'junk.idv7pkg')?.reason).toMatch(/not gzip/);
     expect(existsSync(join(dataDir, 'themes', 'usb-test'))).toBe(false);
+  });
+
+  it('says in plain words why a good theme could not be saved', async () => {
+    // the app still running from an install that an update replaced: its folders are gone
+    dataDir = join(root, 'oap_old', 'data');
+    put(samplePackage());
+    const gone = await look(watcher());
+    expect(gone[0]).toMatchObject({ ok: false });
+    expect(gone[0]!.reason).toMatch(/data folder is gone.*Restart the head unit/);
+    expect(gone[0]!.reason).not.toContain(root);
+    expect(existsSync(join(root, 'oap_old'))).toBe(false);
+    expect(new usb.ThemeLibrary({ dataDir }).storage()).toMatch(/gone/);
+
+    // something in the way of the themes folder: the system's error, without its path
+    dataDir = join(root, 'data');
+    mkdirSync(dataDir);
+    writeFileSync(join(dataDir, 'themes'), 'not a folder');
+    const blocked = await look(watcher());
+    expect(blocked[0]).toMatchObject({ ok: false });
+    expect(blocked[0]!.reason).toMatch(/cannot write to its data folder \(E[A-Z]+\)/);
+    expect(blocked[0]!.reason).not.toContain(root);
+
+    rmSync(join(dataDir, 'themes'));
+    const lib = new usb.ThemeLibrary({ dataDir });
+    expect(lib.storage()).toBe('');
+    expect(readdirSync(dataDir)).toEqual([]);
   });
 
   it('reads a new copy again after the stick changes', async () => {

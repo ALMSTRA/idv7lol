@@ -117,6 +117,15 @@ line in its log; nothing is turned off afterwards. Another project saw a cluster
 restart twice from one heavy shader, with brake, ABS and stability warnings until the car slept
 (idrive7-apps #120); idv7lol keeps one small shader per piece for that reason.
 
+**A theme from the stick is "Refused" with a text about the data folder, or about `mkdir`.** The
+theme itself is fine: it passed every check and the app could not save it on the head unit. The
+usual cause is that the app was updated from the Store and the copy still running is the old one,
+whose folder is gone. Restart the head unit, open idv7lol and plug the stick in again. From car app
+0.2.20 the text says which case it is (folder gone, cannot write, no space, read-only) and the
+Status tab says "Themes cannot be saved" while it lasts; before that it was the system's own
+error. If it stays after a restart, uninstall idv7lol in the MGU Store and install it again. This
+cause is worked out from the code and one report, not confirmed in a car.
+
 **The layout and a HUD app no longer show at the same time.** The cluster refused the panel's own
 scene id, so the panel fell back to the HUD's and the two can't show together. Since
 cluster-render 0.5.12 that lasts only until the service restarts (restart the head unit); there is

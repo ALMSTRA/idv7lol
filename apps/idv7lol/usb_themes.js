@@ -387,11 +387,54 @@ function rmrf(p) {
   } else fs.unlinkSync(p);
 }
 
+const RESTART = 'Restart the head unit and plug the stick in again.';
+
+/**
+ * Why a theme could not be written, in words for the page: the system's own text
+ * ("EACCES: permission denied, mkdir '/var/...'") says little there and goes to the log.
+ */
+function storageReason(e) {
+  const code = (e && e.code) || 'error';
+  if (code === 'ENOSPC') return 'no space left on the head unit (ENOSPC)';
+  if (code === 'EROFS') return "the head unit's storage is read-only right now (EROFS). " + RESTART;
+  if (code === 'EGONE')
+    return "the app's data folder is gone, as after an update of the app. " + RESTART;
+  return 'the app cannot write to its data folder (' + code + '). ' + RESTART;
+}
+
 /** The themes installed in the app's data folder. */
 class ThemeLibrary {
   constructor(opts) {
+    this.root = opts.dataDir;
     this.dir = path.join(opts.dataDir, 'themes');
     this.log = opts.log;
+  }
+
+  /**
+   * '' when the data folder takes a file, else why not (storageReason). An app left running
+   * from an install that an update replaced has no folder any more; nothing is made above it.
+   */
+  storage() {
+    try {
+      this._root();
+      const probe = path.join(this.root, '.write-test-' + process.pid);
+      fs.writeFileSync(probe, '');
+      fs.unlinkSync(probe);
+      return '';
+    } catch (e) {
+      return storageReason(e);
+    }
+  }
+
+  /** The data folder itself: made when only it is missing, never the folders above it. */
+  _root() {
+    if (fs.existsSync(this.root)) return;
+    if (!fs.existsSync(path.dirname(this.root))) {
+      const e = new Error('data folder gone: ' + this.root);
+      e.code = 'EGONE';
+      throw e;
+    }
+    fs.mkdirSync(this.root);
   }
 
   /** [{ key, id, name, author, version, hash }], sorted by name. */
@@ -426,6 +469,16 @@ class ThemeLibrary {
     const replacing = fs.existsSync(path.join(this.dir, id));
     if (!replacing && this.list().length >= LIMITS.themes)
       fail('already ' + LIMITS.themes + ' themes installed');
+    try {
+      return this._write(checked, hash, source, id);
+    } catch (e) {
+      if (this.log) this.log.warn('usb: could not save ' + id + ': ' + ((e && e.message) || e));
+      return fail(storageReason(e));
+    }
+  }
+
+  _write(checked, hash, source, id) {
+    this._root();
     mkdirp(this.dir);
     const tmp = path.join(this.dir, '.tmp-' + id);
     rmrf(tmp);

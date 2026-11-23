@@ -297,6 +297,14 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Fixed
 
+- Car app 0.2.20: a theme from a USB stick that passed every check but could not be saved was
+  "Refused" with the system's raw error (`... mkdir ...`,
+  [#10](https://github.com/ALMSTRA/idv7lol/issues/10)). The text now says what happened and what
+  to do (data folder gone after an update, cannot write, no space, read-only: restart the head
+  unit and plug the stick in again), the raw error goes to the log, and the Status tab says
+  "Themes cannot be saved" while it lasts. The app no longer tries to make folders above its own
+  data folder when that one is gone. Also ships the Simplified Chinese pages above. Tested
+  locally; the cause in the reporter's car is not confirmed.
 - ePower (community template): its charge sector lit while the battery was being drawn from; it
   now fills only while charging (negative battery power).
 - Build & Deploy listed cluster-render 0.5.9 and mgu-deploy 0.7.11 as what the car needs; the
