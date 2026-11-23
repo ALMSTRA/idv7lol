@@ -24,6 +24,7 @@ export const DEFAULT_SIZES: Readonly<Record<ComponentType, { width: number; heig
   telltale: { width: 64, height: 64 },
   'status.panel': { width: 360, height: 220 },
   alert: { width: 420, height: 72 },
+  map: { width: 540, height: 360 },
   group: { width: 400, height: 300 },
 };
 

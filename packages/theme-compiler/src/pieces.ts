@@ -1294,6 +1294,65 @@ function buildStatusPanel(ctx: Ctx, f: FlatComponent): void {
 
 /* -------------------------------------------------------------------------- */
 
+/** The map window: one layer, its frame and its fill while no map is there. */
+function buildMap(ctx: Ctx, f: FlatComponent): void {
+  const c = f.component;
+  if (c.type !== 'map') return;
+  const p = c.props;
+  const piece = basePiece(ctx, f, c.id, 'map', {
+    x: f.absX,
+    y: f.absY,
+    w: c.width,
+    h: c.height,
+  });
+  if (c.rotation !== 0) {
+    warn(ctx, 'map.rotation', 'A map window is drawn unrotated on the car.', c.id);
+    piece.rotation = 0;
+    delete piece.statics['_pivot'];
+  }
+  piece.colors['u_fill'] = p.fill;
+  piece.colors['u_stroke'] = p.stroke?.color ?? TRANSPARENT;
+  piece.statics['u_shape'] = [
+    Math.min(p.radius, piece.w / 2, piece.h / 2),
+    p.stroke?.width ?? 0,
+    0,
+    0,
+  ];
+  piece.statics['u_on'] = [0];
+  ctx.pieces.push(piece);
+}
+
+/**
+ * The car draws the map under the theme's lowest layer over the window, not at the window's
+ * place in the layer list. So plain rectangles under the window are cut open there, and anything
+ * else under it is reported: on the car it would be drawn over the map.
+ */
+function openMapWindow(ctx: Ctx): void {
+  const map = ctx.pieces.find((p) => p.shader === 'map');
+  if (!map) return;
+  const over = (o: { x: number; y: number; w: number; h: number }) =>
+    o.x < map.x + map.w && o.x + o.w > map.x && o.y < map.y + map.h && o.y + o.h > map.y;
+  const covering = new Set<string>();
+  for (const p of ctx.pieces) {
+    if (p === map || p.z > map.z || !over(p)) continue;
+    const shape = p.statics['u_shape'];
+    if (p.shader === 'flat' && shape && shape[0] === 0 && !p.rotation) {
+      p.shader = 'flat-hole';
+      p.statics['u_hole'] = [map.x - p.x, map.y - p.y, map.w, map.h];
+      p.statics['u_hole_r'] = [map.statics['u_shape']![0]!];
+    } else covering.add(p.componentId);
+  }
+  for (const i of ctx.images) if (i.z < map.z && over(i)) covering.add(i.componentId);
+  for (const id of covering)
+    warn(
+      ctx,
+      'map.covered',
+      `"${id}" is under the map window in the layers but the car draws it over the map.`,
+      id,
+      'Move it out of the window, or use a plain rectangle there: rectangles are cut open for the map.',
+    );
+}
+
 export function buildPieces(theme: Theme): PieceBuild {
   // texts that use a named style follow it
   theme = resolveTextStyles(theme);
@@ -1374,12 +1433,16 @@ export function buildPieces(theme: Theme): PieceBuild {
       case 'alert':
         buildAlert(ctx, f);
         break;
+      case 'map':
+        buildMap(ctx, f);
+        break;
       case 'group':
         if (c.props.clip)
           info(ctx, 'group.clip', 'Group clipping is not applied on the car.', c.id);
         break;
     }
   }
+  openMapWindow(ctx);
   return {
     pieces: ctx.pieces,
     images: ctx.images,

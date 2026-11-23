@@ -12,6 +12,7 @@ import {
   telltaleRenderer,
 } from './indicators.js';
 import { imageRenderer } from './image.js';
+import { mapRenderer } from './map.js';
 
 export type { ComponentRenderer } from './types.js';
 export { shiftLightsLit } from './indicators.js';
@@ -37,6 +38,7 @@ export const RENDERERS: Readonly<Record<Exclude<ComponentType, 'group'>, AnyRend
   telltale: telltaleRenderer as AnyRenderer,
   'status.panel': statusPanelRenderer as AnyRenderer,
   alert: alertRenderer as AnyRenderer,
+  map: mapRenderer as AnyRenderer,
 };
 
 export function rendererFor(type: ComponentType): AnyRenderer | undefined {

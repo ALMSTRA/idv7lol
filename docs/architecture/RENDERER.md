@@ -44,7 +44,9 @@ kept the fallback (or turned the target off) for good after two, until `cluster-
 guard-reset`; 0.5.12 removed the guard, its file and `guard-reset`, and a drop is one log line
 (idrive-apps #128, #54; commit 0534f04).
 
-idv7lol requires cluster-render **0.6.9** or newer:
+idv7lol requires cluster-render **0.8.7** or newer since car app 0.2.21 (0.6.9 before): its
+client is the one of that release (idrive-apps 7dd5e04, copied verbatim), and the map window
+below needs 0.8.2. What the releases up to 0.6.9 fixed, which is why that was the floor:
 
 - before 0.5.2, stopping a renderer-side animation left RAMSES 19's animation system broken, and
   the next request for the target crashed the service (idrive-apps #132). The car app starts and
@@ -79,7 +81,24 @@ idv7lol requires cluster-render **0.6.9** or newer:
   fetches (commit d431c87). Nothing changes in the client. Not tested in a vehicle with idv7lol.
 - After 0.6.9, not in a release yet: a `host` message may ask for an edge on the hosted picture
   (`edge_top`, `edge_bottom`, `edge_fade`, `edge_dim`, `edge_blur`) from a service whose hello
-  has `host_edge` 1 (commit 243da9b). idv7lol hosts nothing.
+  has `host_edge` 1 (commit 243da9b). idv7lol sends no edge.
+- 0.7.0 `preload`, 0.8.0 `others_fps` (bandwidth for a layer), 0.8.1 render state, mipmaps and
+  samplers, 0.8.3 canvases, 0.8.5 eased animations, part hierarchies, instances, cube maps,
+  shared values and a text helper, 0.8.6 instances on by default on iDrive 7: all in the client,
+  none used by idv7lol yet.
+- 0.8.2: **hosting from layers**. A client that draws a target with layers only hosts another
+  target there: `host` with `into` (PROTOCOL.md "Hosting from layers"), to a service whose hello
+  has `host_layers` 1. idv7lol uses it for a theme's map window: `host` into `panel` of target
+  `map` at the window's rect, with the middle part of the map in the window's proportions
+  (`src_x`, `src_y`, `src_w`, `src_h`, from the `map:WxH` of the hello's `targets`), and `unhost`
+  before the layout's layers go. The service draws the producer's picture just under the
+  client's lowest layer over the rect, so the compiler cuts the rectangles under the window open
+  (`flat-hole` shader). The `hosting` event says whether the host is `live` or `waiting` and why;
+  the window's own layer keeps its fill until it is live (`u_on`). A producer that follows hosts
+  is needed for anything to show (waze-on-cluster). Not tested in a vehicle.
+- 0.8.4: the cluster map no longer disappears about 2 s after it shows when a cluster theme is
+  installed and the car's logging has RAMSES's messages off. 0.8.7: a finished session's
+  animations are freed on iDrive 7.
 
 ## iDrive 8 (not supported by idv7lol)
 
@@ -223,6 +242,7 @@ Studio as hints (info zones, no findings) until someone checks them:
 | cluster-render  | 0.5.6–0.5.9  | 0.5.6 re-ask of an accepted, unmapped scene; 0.5.7 video compose; 0.5.8 exclusive; 0.5.9 ETC2                                                 |
 | cluster-render  | 0.5.10–0.6.4 | 0.5.12 no mapping guard; 0.6.0 scene hosts; 0.6.3 images hidden until written; 0.6.4 upload cap                                               |
 | cluster-render  | 0.6.5–0.6.9  | 0.6.5 upload ceiling kept across drives; 0.6.6 scene kept through a slot lock; 0.6.9 stalled fetch recovered (required)                       |
+| cluster-render  | 0.7.0–0.8.7  | 0.8.2 hosting from layers (the map window); 0.8.4 map kept with a theme installed; 0.8.7 session memory freed (required)                      |
 | mgu-deploy      | 0.8.27       | required by idv7lol (0.8.16 safe mode, 0.8.19 MainApp 6.4.8, 0.8.21 manifest check, 0.8.26 safe mode counts every start, 0.8.27 fewer writes) |
 | Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                                                                     |
 | Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`                                                            |

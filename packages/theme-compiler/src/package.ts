@@ -15,6 +15,8 @@ export const PACKAGE_EXTENSION = '.idv7pkg';
 export const USB_THEMES_DIR = 'idv7lol/themes';
 /** The first car app version that reads packages. */
 export const PACKAGE_MIN_APP_VERSION = '0.2.0';
+/** The first car app version that shows a map window; an older one would call its layer unknown. */
+export const MAP_MIN_APP_VERSION = '0.2.21';
 
 export interface ThemePackage {
   idv7pkg: typeof PACKAGE_FORMAT;
@@ -68,7 +70,9 @@ export function buildThemePackage(
     name: compiled.name,
     author: compiled.author,
     version: compiled.version,
-    minAppVersion: PACKAGE_MIN_APP_VERSION,
+    minAppVersion: compiled.pieces.some((p) => p.shader === 'map')
+      ? MAP_MIN_APP_VERSION
+      : PACKAGE_MIN_APP_VERSION,
     createdAt: (opts.now ?? (() => new Date()))().toISOString(),
     theme,
     images,

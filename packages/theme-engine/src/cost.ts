@@ -52,6 +52,7 @@ const WEIGHTS: Record<Component['type'], number> = {
   telltale: 1.5,
   'status.panel': 4,
   alert: 3,
+  map: 1,
   group: 0,
 };
 

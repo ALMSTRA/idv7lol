@@ -568,6 +568,25 @@ export const StatusPanelPropsSchema = z.object({
 });
 
 /* -------------------------------------------------------------------------- */
+/* Map window                                                                 */
+/* -------------------------------------------------------------------------- */
+
+/** The smallest window the car's renderer hosts a map in (cluster-render PROTOCOL.md). */
+export const MAP_MIN_SIZE = { width: 64, height: 32 } as const;
+
+/**
+ * A window in which the car shows the navigation map another app draws on the cluster (Waze,
+ * Android Auto or CarPlay maps through waze-on-cluster). The theme only says where: the middle
+ * of the map is shown, cut to the window's proportions. One per theme, not rotated.
+ */
+export const MapPropsSchema = z.object({
+  /** What the window shows while no map is there: in the Studio, and in the car with the map off. */
+  fill: ColorSchema.default('#11161c'),
+  radius: z.number().min(0).default(0),
+  stroke: StrokeSchema.optional(),
+});
+
+/* -------------------------------------------------------------------------- */
 /* Union                                                                      */
 /* -------------------------------------------------------------------------- */
 
@@ -595,6 +614,7 @@ export const ClockComponentSchema = C('clock', ClockPropsSchema.prefault({}));
 export const TelltaleComponentSchema = C('telltale', TelltalePropsSchema.prefault({}));
 export const StatusPanelComponentSchema = C('status.panel', StatusPanelPropsSchema);
 export const AlertComponentSchema = C('alert', AlertPropsSchema.prefault({}));
+export const MapComponentSchema = C('map', MapPropsSchema.prefault({}));
 
 export type RectComponent = z.infer<typeof RectComponentSchema>;
 export type EllipseComponent = z.infer<typeof EllipseComponentSchema>;
@@ -611,6 +631,7 @@ export type ClockComponent = z.infer<typeof ClockComponentSchema>;
 export type TelltaleComponent = z.infer<typeof TelltaleComponentSchema>;
 export type StatusPanelComponent = z.infer<typeof StatusPanelComponentSchema>;
 export type AlertComponent = z.infer<typeof AlertComponentSchema>;
+export type MapComponent = z.infer<typeof MapComponentSchema>;
 
 export interface GroupComponent extends BaseComponent {
   type: 'group';
@@ -637,6 +658,7 @@ export type Component =
   | TelltaleComponent
   | StatusPanelComponent
   | AlertComponent
+  | MapComponent
   | GroupComponent;
 
 export type ComponentType = Component['type'];
@@ -656,7 +678,8 @@ type NonGroupInput =
   | z.input<typeof ClockComponentSchema>
   | z.input<typeof TelltaleComponentSchema>
   | z.input<typeof StatusPanelComponentSchema>
-  | z.input<typeof AlertComponentSchema>;
+  | z.input<typeof AlertComponentSchema>
+  | z.input<typeof MapComponentSchema>;
 
 export interface GroupComponentInput extends z.input<typeof BaseComponentSchema> {
   type: 'group';
@@ -691,6 +714,7 @@ export const ComponentSchema: z.ZodType<Component, ComponentInput> = z.lazy(() =
     TelltaleComponentSchema,
     StatusPanelComponentSchema,
     AlertComponentSchema,
+    MapComponentSchema,
     GroupComponentSchema as unknown as typeof RectComponentSchema,
   ]),
 ) as unknown as z.ZodType<Component, ComponentInput>;
@@ -711,6 +735,7 @@ export const COMPONENT_TYPES: readonly ComponentType[] = [
   'telltale',
   'status.panel',
   'alert',
+  'map',
   'group',
 ];
 
@@ -731,4 +756,5 @@ export const COMPONENT_PROPS_SCHEMAS = {
   telltale: TelltalePropsSchema,
   'status.panel': StatusPanelPropsSchema,
   alert: AlertPropsSchema,
+  map: MapPropsSchema,
 } as const;

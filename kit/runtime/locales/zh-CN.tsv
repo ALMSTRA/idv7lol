@@ -1716,6 +1716,7 @@ The car's own (no black boxes)	原车底栏（无黑块）
 Covered by the layout (may leave black boxes)	由布局覆盖（可能出现黑块）
 Auto (the car's own)	自动（使用原车单位）
 Start-up sweep	启动时指针扫表
+Map in the theme	主题中的地图
 Time zone	时区
 Fixed offset (Clock: offset from UTC)	固定偏移（在设置中选择 UTC 偏移）
 Clock: offset from UTC (Time zone: Fixed offset)	时钟 UTC 偏移（固定偏移模式）

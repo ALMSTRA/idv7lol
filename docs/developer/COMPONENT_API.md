@@ -130,6 +130,15 @@ boolean signal; it never replaces factory telltales. Car: 1 layer (custom icons 
 `valueStyle`, `unitStyle`, `background`, `radius`, `padding`, `divider`. Car: 1 layer per row
 (label as secondary glyphs) + 1 panel with dividers.
 
+### `map`
+
+A window for the navigation map another app draws on the cluster (Waze, Android Auto or CarPlay
+maps through waze-on-cluster). `fill` (`#11161c`: what the window shows while no map is there, in
+the Studio and in the car), `radius` (0), `stroke`. One per theme, at least 64x32, inside the
+layout, not rotated. The car shows the middle of the map, cut to the window's proportions; a
+window of 720x480 shows it at its own size. Car: 1 layer. See "A map window" in
+THEME_DEVELOPMENT.md for what goes under and over it.
+
 ## Adding a component type
 
 1. Props schema + union member in `packages/theme-schema/src/components.ts`, default size in

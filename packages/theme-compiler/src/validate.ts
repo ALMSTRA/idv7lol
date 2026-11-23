@@ -1,5 +1,6 @@
 import {
   REQUIRED_PALETTE_TOKENS,
+  MAP_MIN_SIZE,
   getDisplayProfile,
   parseTheme,
   resolveTextStyles,
@@ -490,6 +491,48 @@ export function validateTheme(doc: unknown): ValidationReport {
           { componentId: c.id },
         );
     }
+  }
+
+  // --- the map window: the car's renderer hosts one map, in a window of at least 64x32
+  {
+    const maps = flat.filter((f) => f.component.type === 'map' && f.component.visible);
+    for (const f of maps.slice(1))
+      out.error(
+        'map.multiple',
+        `"${f.component.id}" is a second map window; the car shows one map.`,
+        {
+          componentId: f.component.id,
+          hint: 'Keep one map window in the theme.',
+        },
+      );
+    for (const f of maps) {
+      const c = f.component;
+      if (c.width < MAP_MIN_SIZE.width || c.height < MAP_MIN_SIZE.height)
+        out.error(
+          'map.small',
+          `"${c.id}" is ${Math.round(c.width)}x${Math.round(c.height)}; the car draws no map smaller than ${MAP_MIN_SIZE.width}x${MAP_MIN_SIZE.height}.`,
+          { componentId: c.id },
+        );
+      if (
+        f.absX < 0 ||
+        f.absY < 0 ||
+        f.absX + c.width > theme.layout.width ||
+        f.absY + c.height > theme.layout.height
+      )
+        out.error(
+          'map.outside',
+          `"${c.id}" must be inside the layout; the car refuses a map window that is not.`,
+          {
+            componentId: c.id,
+          },
+        );
+    }
+    if (maps.length)
+      out.info(
+        'map.needs',
+        'The map window shows a map only while another app draws one on the cluster (Waze, Android Auto or CarPlay maps through waze-on-cluster) and cluster-render is 0.8.2 or newer; otherwise it shows its fill.',
+        { componentId: maps[0]!.component.id },
+      );
   }
 
   // --- compiler mapping: layer budget and shader sanity

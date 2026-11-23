@@ -74,6 +74,7 @@ export const ja: Dictionary = {
     'value.digital': 'デジタル表示',
     'indicator.gear': 'ギア表示',
     'indicator.shiftlights': 'シフトライト',
+    map: 'マップウィンドウ',
     clock: '時計',
     telltale: '警告灯',
     'status.panel': 'ステータスパネル',
@@ -115,6 +116,8 @@ export const ja: Dictionary = {
     gearDesc: 'D/S/M モード付きのギア表示',
     shift: 'シフトライト',
     shiftDesc: '5000〜7000 rpm で点灯する 10 灯',
+    map: 'マップウィンドウ',
+    mapDesc: 'Waze、Android Auto、CarPlay のマップを表示',
     clock: '時計',
     clockDesc: '24 時間表示',
     turnLeft: 'ウインカー（左）',
@@ -347,7 +350,7 @@ export const ja: Dictionary = {
     howToInstall: '車両へのインストール方法',
     deps: 'ヘッドユニットの依存関係',
     depsNote:
-      'idv7lol には cluster-render ≥ 0.6.9 を含む MGU Store が必要です。車両にインストールされている内容は Studio では確認できません。',
+      'idv7lol には cluster-render ≥ 0.8.7 を含む MGU Store が必要です。車両にインストールされている内容は Studio では確認できません。',
   },
   timeline: {
     clips: 'クリップ',
@@ -667,6 +670,7 @@ export const JA_FIELD_LABELS: Record<string, string> = {
   Panel: 'パネル',
   'Pie fill': '扇形の塗り',
   Placement: '配置',
+  'Map window': 'マップウィンドウ',
   Radius: '半径',
   Readout: '数値表示',
   Rectangle: '長方形',

@@ -33,6 +33,16 @@ module.exports = {
       ]
     },
     {
+      "id": "idv7lol-map-view",
+      "name": "IDV7LOL Map View",
+      "module": "theme_idv7lol_map_view",
+      "palettes": [
+        "night",
+        "sport",
+        "eco"
+      ]
+    },
+    {
       "id": "idv7lol-modern",
       "name": "IDV7LOL Modern",
       "module": "theme_idv7lol_modern",

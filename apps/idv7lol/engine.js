@@ -49,6 +49,39 @@ const STRIP_Y = 646;
 const BAND = { h: 16, notchFrom: 1196, notchTo: 1424, notchH: 12 };
 
 const ICON_P_CODE = 'P';
+// The target other apps draw a navigation map on (Waze, Android Auto and CarPlay maps through
+// waze-on-cluster), and the smallest window the renderer hosts it in (cluster-render PROTOCOL.md,
+// "Hosting from layers").
+const MAP_TARGET = 'map';
+const MAP_MIN = { w: 64, h: 32 };
+const MAP_SYNC_TICKS = 30;
+
+/** { w, h } of a target in the renderer's hello ('map:1088x480,panel:1920x720'), or null. */
+function targetSize(targets, name) {
+  const m = new RegExp('(?:^|,)' + name + ':(\\d+)x(\\d+)').exec(String(targets || ''));
+  return m ? { w: Number(m[1]), h: Number(m[2]) } : null;
+}
+
+/**
+ * The part of a tw x th map that a w x h window shows: its middle, as large as fits, in the
+ * window's proportions, so the map is never squashed.
+ */
+function mapPart(tw, th, w, h) {
+  let sw = tw;
+  let sh = Math.round((tw * h) / w);
+  if (sh > th) {
+    sh = th;
+    sw = Math.round((th * w) / h);
+  }
+  sw = Math.max(MAP_MIN.w, Math.min(tw, sw));
+  sh = Math.max(MAP_MIN.h, Math.min(th, sh));
+  return {
+    src_x: Math.floor((tw - sw) / 2),
+    src_y: Math.floor((th - sh) / 2),
+    src_w: sw,
+    src_h: sh,
+  };
+}
 const SECONDARY_START = '\u0001';
 const SECONDARY_END = '\u0002';
 
@@ -160,6 +193,11 @@ class ClusterEngine {
     // The y the layout ends at so the cluster's own bottom strip shows (STRIP_Y), or null to draw
     // over it. Read at each build.
     this.stripY = opts.stripY || (() => null);
+    // whether a theme's map window may show the map (a setting)
+    this.mapOn = opts.map || (() => true);
+    this.mapHost = ''; // the host asked of the renderer, as JSON, or ''
+    this.mapLive = false; // the renderer says the map is drawn in the window
+    this.mapWhy = '';
     // The car's state for the layout (vehicle.js hold()): 'drop' takes it down, 'wait' puts up no
     // new one, null leaves it to Show and the signals. Mapping the panel while the car switches on
     // or off can drop the display service (before cluster-render 0.5.12 two drops turned the target
@@ -208,6 +246,16 @@ class ClusterEngine {
     });
     this.cr.on('status', (text) => {
       this.rendererStatus = text;
+    });
+    this.cr.on('hosting', (target, ev) => {
+      if (target !== MAP_TARGET || !ev) return;
+      const live = ev.state === 'live';
+      const why = live ? '' : String(ev.reason || '');
+      if (live !== this.mapLive || why !== this.mapWhy)
+        this.log.info('map window: ' + (live ? 'the map is drawn in it' : 'waiting, ' + why));
+      this.mapLive = live;
+      this.mapWhy = why;
+      this._mapLit();
     });
   }
 
@@ -290,7 +338,83 @@ class ClusterEngine {
       theme: this.theme.id,
       failed: this.failed === this.theme,
       messages: this.messages,
+      map: this.mapStatus(),
     };
+  }
+
+  /* ----- the map window ----- */
+
+  /** The theme's map window as it is on the screen: { st, x, y, w, h }, or null. */
+  _mapWindow() {
+    const st = this.pieces.filter((p) => p.ref && p.piece.shader === 'map')[0];
+    if (!st) return null;
+    const p = st.piece;
+    const strip = this.stripY();
+    const h = typeof strip === 'number' ? Math.min(p.h, strip - p.y) : p.h;
+    const x = Math.max(0, p.x);
+    const y = Math.max(0, p.y);
+    const w = Math.min(1920, p.x + p.w) - x;
+    const hh = Math.min(720, p.y + h) - y;
+    if (w < MAP_MIN.w || hh < MAP_MIN.h) return null;
+    return { st, x, y, w, h: hh };
+  }
+
+  /**
+   * Ask the renderer for the map in the theme's window, or give it back, when what is wanted
+   * changed: the theme, the setting, or a renderer that came (its hello says whether it hosts
+   * from layers and how large the map is). Cheap when nothing changed.
+   */
+  _mapSync() {
+    const cr = this.cr;
+    if (typeof cr.host !== 'function' || typeof cr.unhost !== 'function') return;
+    const win = this.mapOn() ? this._mapWindow() : null;
+    const size = win && cr.ready && cr.hostLayers ? targetSize(cr.targets, MAP_TARGET) : null;
+    let msg = null;
+    if (win && size) {
+      msg = Object.assign(
+        { target: MAP_TARGET, x: win.x, y: win.y, w: win.w, h: win.h },
+        mapPart(size.w, size.h, win.w, win.h),
+      );
+    }
+    const want = msg ? JSON.stringify(msg) : '';
+    if (want !== this.mapHost) {
+      if (msg) cr.host(this.target, msg);
+      else cr.unhost(MAP_TARGET);
+      this.mapHost = want;
+      this.mapLive = false;
+      this.mapWhy = '';
+      this.messages++;
+      this.log.info(
+        msg
+          ? 'map window: asked for the map at ' + msg.x + ',' + msg.y + ' ' + msg.w + 'x' + msg.h
+          : 'map window: the map goes back to its own place',
+      );
+    }
+    if (!cr.ready) this.mapLive = false;
+    this._mapLit();
+  }
+
+  /** The window's fill gives way only while the renderer says the map is drawn there. */
+  _mapLit() {
+    const st = this.pieces.filter((p) => p.ref && p.piece.shader === 'map')[0];
+    if (!st) return;
+    const on = this.mapHost && this.mapLive ? 1 : 0;
+    if (st.mapLit === on) return;
+    st.mapLit = on;
+    this.cr.uniform(st.ref, 'u_on', [on]);
+  }
+
+  /** '' without a map window in the theme, else what it shows and why, for the Status page. */
+  mapStatus() {
+    if (!this.theme.pieces.some((p) => p.shader === 'map')) return '';
+    if (!this.mapOn()) return 'off (setting)';
+    if (!this.shown) return 'layout not shown';
+    if (!this.cr.ready) return 'renderer not connected';
+    if (!this.cr.hostLayers) return 'needs cluster-render 0.8.2 or newer';
+    if (!targetSize(this.cr.targets, MAP_TARGET)) return 'this cluster has no map target';
+    if (!this.mapHost) return 'window too small or cut off';
+    if (this.mapLive) return 'the map is drawn in the window';
+    return 'waiting' + (this.mapWhy ? ': ' + this.mapWhy : ' for the renderer');
   }
 
   /* ----- build / teardown ----- */
@@ -507,6 +631,7 @@ class ClusterEngine {
     this.startedAt = this.now();
     this._update(true);
     if (this.sweep()) this._sweep();
+    this._mapSync();
     this.log.info(
       'layout up: ' +
         this.pieces.filter((p) => p.ref).length +
@@ -518,6 +643,14 @@ class ClusterEngine {
 
   _teardown() {
     this.alertNow = null;
+    // the map back to its own place before the window's layers go
+    if (this.mapHost) {
+      this.cr.unhost(MAP_TARGET);
+      this.mapHost = '';
+      this.mapLive = false;
+      this.mapWhy = '';
+      this.log.info('map window: the map goes back to its own place');
+    }
     this.pieces.forEach((p) => {
       if (p.ref) this.cr.drop(p.ref);
       if (p.texAsset) this.cr.drop(p.texAsset);
@@ -668,6 +801,7 @@ class ClusterEngine {
       this.recolour();
     }
     this._update(false);
+    if (this.tickCount % MAP_SYNC_TICKS === 0) this._mapSync();
   }
 
   /**
@@ -1279,6 +1413,8 @@ class ClusterEngine {
 
 module.exports = {
   ClusterEngine,
+  mapPart,
+  targetSize,
   resolveColor,
   parseColor,
   LIVE_GRACE_MS,

@@ -12,6 +12,13 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
+- `apps/idv7lol/cluster_render_client.js` follows upstream again (idrive-apps 7dd5e04,
+  cluster-render 0.8.7): hosting from layers, canvases, shared values, eased animations, the text
+  helper's messages and the rest of 0.7.0 to 0.8.7. Copied verbatim; loads on Node 8.9.4.
+- `kit/runtime/car.js` from idrive7-apps 683a4a4: a manual's gear no longer stays on R after
+  reverse, and learned gear ratios are kept between drives (`gear_ratios.json` in the app's data
+  folder). The kit's new Traditional Chinese is not taken: the vendored kit has no localization
+  fonts, and the app's own strings have no zh-TW translation.
 - **Themes tab of the car app (0.2.16, 0.2.17):** a finger pulled sideways moves the three sketches with
   it and, past 90 px, changes the theme (to the left: the next one); a tap on the sketch of the
   theme before or after picks it; and both sketches are places the controller's knob stops at and
@@ -100,6 +107,19 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **A map window in themes**: the new `map` component is a window where the car shows the map
+  another app draws on the cluster (Waze, Android Auto or CarPlay maps through waze-on-cluster).
+  The theme says where; the car app asks cluster-render for the map there (`host` into `panel`,
+  cluster-render 0.8.2) and shows the middle of it in the window's proportions. The compiler cuts
+  the rectangles under the window open, since the renderer draws the map under the theme's
+  layers, and warns about anything else under it. The window keeps its fill until the renderer
+  says the map is drawn in it, and with no map app, an older renderer or the new setting
+  **Map in the theme** off. The Studio has the component in its library and draws sample streets.
+  New bundled theme **Map View**. Packages with a map window ask for car app 0.2.21. Tested
+  locally (the car's shaders drawn on WebGL, the messages against the protocol's own example);
+  **not tested in a vehicle**.
+- Car app 0.2.21: the map window, the client and the kit fix below. It now requires
+  cluster-render 0.8.7 (0.6.9 before), which the Store installs with it.
 - **The car app's own pages in Simplified Chinese**, by JackieZ123430
   ([#11](https://github.com/ALMSTRA/idv7lol/pull/11)): settings, page headings and messages
   translated, 61 more glyphs in the kit's Noto Sans SC atlas, and labels drawn through the kit's

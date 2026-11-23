@@ -93,7 +93,8 @@ describe('every bundled theme on the car path', () => {
       // As a USB package, checked by the car app.
       const pkg = buildThemePackage(result, { now: () => new Date('2026-11-09T00:00:00Z') });
       const read = readPackage(gzipSync(Buffer.from(encodeThemePackage(pkg))), {
-        appVersion: '0.2.0',
+        // the app's own version: a theme with a map window asks for 0.2.21
+        appVersion: (require('./app.json') as { version: string }).version,
         shaders: SHADERS,
         fonts: ['sans'],
       });

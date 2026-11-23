@@ -8,7 +8,7 @@ Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus an editor for W
 
 ### 🎉 Now in beta: [idv7lol.com](https://www.idv7lol.com)
 
-**Browse** 47 themes with a live preview, **download** any of them for the car (a USB stick, no
+**Browse** 48 themes with a live preview, **download** any of them for the car (a USB stick, no
 account needed), **sign in** to **upload** your own layouts and **vote** for the ones you like.
 
 **New: the [web editor](https://www.idv7lol.com/editor/).** idv7lol Studio in the browser, nothing
@@ -127,6 +127,11 @@ The welcome window, where you start from a template, open a theme or begin with 
 | ----------------------------------------------------------------------- | --------------------------------------------------------------- |
 | ![Classic theme in light mode](docs/assets/screenshots/light-theme.jpg) | ![Digital Dash](docs/assets/screenshots/community-template.jpg) |
 
+Map View, with its window for the Waze, Android Auto or CarPlay map (the streets are the
+Studio's sample; the car puts the live map there):
+
+![Map View](docs/assets/screenshots/map-view.jpg)
+
 | Template: Rally Dash                                  | Template: Night Minimal (Sport palette)                     |
 | ----------------------------------------------------- | ----------------------------------------------------------- |
 | ![Rally Dash](docs/assets/screenshots/rally-dash.jpg) | ![Night Minimal](docs/assets/screenshots/night-minimal.jpg) |
@@ -176,6 +181,8 @@ the warning about the SSH unlock; read it first).
    - _Units_: Auto follows the car (mph and miles when the car shows miles), or pick km/h, mph, or
      mph with °F and psi.
    - _App screen_: Modern (tabs) or Classic (text pages).
+   - _Map in the theme_: a theme with a map window (Map View) shows the map that Waze, Android
+     Auto or CarPlay draw on the cluster, through waze-on-cluster. Off keeps the window plain.
    - _Bottom strip_: leave it on _The car's own_ unless you know your cluster takes a layout over
      it.
    - _Start-up sweep_, _Time zone_, _Fuel tank size_ and _Demo data_.
@@ -204,7 +211,8 @@ MGU Store removes it completely. This is experimental software: see
   and a hexagon floor, in the style of Italian supercar clusters), Neon Drive (cyberpunk: neon
   speed in turning holo rings, a segmented rev bar and a glitch past 130), Heritage 89 (round
   dials with chrome bezels and amber lighting, inspired by late-80s and 90s BMW clusters) and Volt
-  Runner (bright yellow, with a running bolt in the middle). Then Performance, Modern, Classic,
+  Runner (bright yellow, with a running bolt in the middle). Map View has a window for the map
+  that Waze, Android Auto or CarPlay draw on the cluster. Then Performance, Modern, Classic,
   Night Minimal and Rally Dash, plus twelve free community layouts converted from eroobeeroo's
   Cluster Layouts (GPL, credited in each theme) and twenty-three converted from FDX100's KurdBimmer
   Themes (MIT, credited in each theme).

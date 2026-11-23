@@ -508,6 +508,7 @@ function BindingSection({ c, theme }: { c: Component; theme: Theme }): JSX.Eleme
     c.type === 'arc' ||
     c.type === 'image' ||
     c.type === 'clock' ||
+    c.type === 'map' ||
     c.type === 'status.panel' ||
     c.type === 'alert'
   )

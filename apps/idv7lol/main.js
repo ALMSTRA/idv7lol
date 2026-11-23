@@ -151,6 +151,8 @@ mgu.run({
       signals: vehicle.store,
       loadImage: (img) => fs.readFileSync(path.join(current.imageDir, img.file)),
       sweep: () => settings.get('sweep') !== 'off',
+      // a theme's map window shows the map another app draws, unless switched off
+      map: () => settings.get('map') !== 'off',
       utcOffsetMinutes: utcOffset,
       // The layout ends above the cluster's own bottom strip unless the setting says otherwise:
       // drawn over it, some KOMBIs leave black boxes until the head unit restarts (issue #7).
@@ -351,7 +353,8 @@ mgu.run({
             '  ·  panel: ' +
             st.target +
             '  ·  refused ops: ' +
-            st.refused,
+            st.refused +
+            (st.map ? '  ·  map: ' + String(st.map).slice(0, 48) : ''),
           carLine:
             (vs.demo ? 'DEMO' : vehicle.live() ? 'live' : 'not live') +
             '  ·  ' +

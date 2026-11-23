@@ -73,6 +73,7 @@ export const es: Dictionary = {
     'value.digital': 'Lectura digital',
     'indicator.gear': 'Indicador de marcha',
     'indicator.shiftlights': 'Shift lights',
+    map: 'Ventana de mapa',
     clock: 'Reloj',
     telltale: 'Testigo',
     'status.panel': 'Panel de estado',
@@ -114,6 +115,8 @@ export const es: Dictionary = {
     gearDesc: 'Marcha con modo D/S/M',
     shift: 'Shift lights',
     shiftDesc: 'Diez luces de 5000 a 7000 rpm',
+    map: 'Ventana de mapa',
+    mapDesc: 'Muestra el mapa de Waze, Android Auto o CarPlay',
     clock: 'Reloj',
     clockDesc: 'Hora en formato 24 h',
     turnLeft: 'Intermitente izquierdo',
@@ -346,7 +349,7 @@ export const es: Dictionary = {
     howToInstall: 'Cómo instalarlo en el auto',
     deps: 'Dependencias en la unidad',
     depsNote:
-      'idv7lol necesita el MGU Store con cluster-render ≥ 0.6.9. El Studio no puede comprobar qué hay instalado en tu auto.',
+      'idv7lol necesita el MGU Store con cluster-render ≥ 0.8.7. El Studio no puede comprobar qué hay instalado en tu auto.',
   },
   timeline: {
     clips: 'Clips',
@@ -664,6 +667,7 @@ export const ES_FIELD_LABELS: Record<string, string> = {
   Panel: 'Panel',
   'Pie fill': 'Relleno de sector',
   Placement: 'Posición',
+  'Map window': 'Ventana de mapa',
   Radius: 'Radio',
   Readout: 'Lectura',
   Rectangle: 'Rectángulo',

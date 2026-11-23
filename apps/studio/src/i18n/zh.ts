@@ -71,6 +71,7 @@ export const zh: Dictionary = {
     'value.digital': '数字显示',
     'indicator.gear': '挡位指示',
     'indicator.shiftlights': '换挡灯',
+    map: '地图窗口',
     clock: '时钟',
     telltale: '指示灯',
     'status.panel': '状态面板',
@@ -111,6 +112,8 @@ export const zh: Dictionary = {
     gearDesc: '挡位及 D/S/M 模式',
     shift: '换挡灯',
     shiftDesc: '10 个灯，5000 至 7000 rpm',
+    map: '地图窗口',
+    mapDesc: '显示 Waze、Android Auto 或 CarPlay 的地图',
     clock: '时钟',
     clockDesc: '24 小时制时间',
     turnLeft: '转向灯（左）',
@@ -334,7 +337,7 @@ export const zh: Dictionary = {
     howToInstall: '如何安装到车上',
     deps: '主机上的依赖',
     depsNote:
-      'idv7lol 需要安装 MGU Store 及 cluster-render ≥ 0.6.9。Studio 无法检查你车上安装了什么。',
+      'idv7lol 需要安装 MGU Store 及 cluster-render ≥ 0.8.7。Studio 无法检查你车上安装了什么。',
   },
   timeline: {
     clips: '片段',
@@ -647,6 +650,7 @@ export const ZH_FIELD_LABELS: Record<string, string> = {
   Panel: '面板',
   'Pie fill': '扇形填充',
   Placement: '放置位置',
+  'Map window': '地图窗口',
   Radius: '半径',
   Readout: '数值显示',
   Rectangle: '矩形',

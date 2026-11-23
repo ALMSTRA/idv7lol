@@ -73,6 +73,7 @@ export const ru: Dictionary = {
     'value.digital': 'Цифровое показание',
     'indicator.gear': 'Индикатор передачи',
     'indicator.shiftlights': 'Индикатор переключения',
+    map: 'Окно карты',
     clock: 'Часы',
     telltale: 'Сигнальная лампа',
     'status.panel': 'Панель состояния',
@@ -114,6 +115,8 @@ export const ru: Dictionary = {
     gearDesc: 'Передача с режимом D/S/M',
     shift: 'Индикатор переключения',
     shiftDesc: 'Десять огней от 5000 до 7000 rpm',
+    map: 'Окно карты',
+    mapDesc: 'Показывает карту Waze, Android Auto или CarPlay',
     clock: 'Часы',
     clockDesc: '24-часовой формат',
     turnLeft: 'Указатель поворота (левый)',
@@ -347,7 +350,7 @@ export const ru: Dictionary = {
     howToInstall: 'Как установить в машину',
     deps: 'Зависимости на головном устройстве',
     depsNote:
-      'Для idv7lol нужен MGU Store с cluster-render ≥ 0.6.9. Studio не может проверить, что установлено в вашей машине.',
+      'Для idv7lol нужен MGU Store с cluster-render ≥ 0.8.7. Studio не может проверить, что установлено в вашей машине.',
   },
   timeline: {
     clips: 'Клипы',
@@ -665,6 +668,7 @@ export const RU_FIELD_LABELS: Record<string, string> = {
   Panel: 'Панель',
   'Pie fill': 'Заливка сектора',
   Placement: 'Размещение',
+  'Map window': 'Окно карты',
   Radius: 'Радиус',
   Readout: 'Показание',
   Rectangle: 'Прямоугольник',

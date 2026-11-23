@@ -154,6 +154,33 @@ or links a text to one; editing a linked text changes the style and every text t
 Palettes panel lists the styles to rename or remove them; texts that used a removed style keep its
 look. The texts carry the style's values too, so a theme read by an older Studio looks the same.
 
+### A map window
+
+The `map` component is a window in which the car shows the map another app draws on the cluster:
+Waze, or Android Auto or CarPlay maps, through
+[waze-on-cluster](https://github.com/robertnisipeanu/idrive-apps). The theme only says where the
+window is; the bundled Map View theme has one. The Studio draws a sample of streets there, since
+it has no map.
+
+- The car's renderer puts the map **under the theme's layers**, wherever the window is in the
+  layer list (cluster-render PROTOCOL.md, "Hosting from layers"). So the compiler cuts plain
+  rectangles under the window open (a backdrop needs nothing from you), and warns about anything
+  else under it (`map.covered`): an ellipse, a gauge or a picture there would be drawn over the
+  map. Components above the window in the list are drawn over the map, as you would expect:
+  readouts, a frame, a shade.
+- While no map is there the window shows its `fill`: no map app running, the map switched off in
+  the car app (Settings > Map in the theme), or a cluster-render older than 0.8.2. The fill gives
+  way only once the renderer says the map is drawn in the window.
+- The map is 1088x480 on iDrive 7. The window shows its middle in the window's own proportions,
+  so nothing is squashed: 720x480 shows the centre part at its own size, a wider window shows a
+  band of it.
+- One window per theme, at least 64x32, inside the layout. Keep it above y 646: lower, the car
+  cuts it at the cluster's bottom strip.
+- A package with a map window needs car app 0.2.21 or newer; an older one says so and does not
+  install it.
+
+Not tested in a vehicle.
+
 ## Units
 
 Draw a theme in km/h, km, °C and bar and leave `binding.unit` unset. The car app's **Units**

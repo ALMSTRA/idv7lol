@@ -45,7 +45,9 @@ export type ShaderKind =
   | 'sprite'
   | 'band'
   | 'mask'
-  | 'needle-image';
+  | 'needle-image'
+  | 'map'
+  | 'flat-hole';
 
 /** A static uniform: numbers sent once when the layer is made. */
 export type StaticUniforms = Record<string, number[]>;

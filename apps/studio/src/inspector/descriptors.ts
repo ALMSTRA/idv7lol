@@ -347,6 +347,16 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
       ],
     },
   ],
+  map: [
+    {
+      title: 'Map window',
+      fields: [
+        { path: 'fill', label: 'Fill', kind: 'color' },
+        { path: 'radius', label: 'Radius', kind: 'number', min: 0, max: 500 },
+        { path: 'stroke', label: 'Border', kind: 'stroke' },
+      ],
+    },
+  ],
   clock: [
     {
       title: 'Clock',

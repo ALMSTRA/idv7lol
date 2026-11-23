@@ -621,6 +621,18 @@ export const LIBRARY: LibraryEntry[] = [
     },
   },
   {
+    id: 'map',
+    group: 'readouts',
+    type: 'map',
+    nameKey: 'map',
+    descKey: 'mapDesc',
+    overrides: {
+      width: 540,
+      height: 360,
+      props: { radius: 18, stroke: { color: '$text-muted', width: 2 } },
+    },
+  },
+  {
     id: 'clock',
     group: 'readouts',
     type: 'clock',

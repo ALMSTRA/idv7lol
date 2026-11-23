@@ -17,7 +17,7 @@ Los detalles están en `docs/user/INSTALL_MAC.md`.
 
 ## Pasos básicos
 
-1. Abre idv7lol Studio y elige una plantilla (las más nuevas primero: Lily Pad, Supercar Track,
+1. Abre idv7lol Studio y elige una plantilla (las más nuevas primero: Map View, con ventana de mapa, Lily Pad, Supercar Track,
    Neon Drive, Heritage 89, Volt Runner; luego Performance, Modern, Classic, Night Minimal, Rally
    Dash), el ejemplo mínimo o un lienzo vacío.
 2. Arrastra un componente de la **Biblioteca** al lienzo, por ejemplo el _Tacómetro_.

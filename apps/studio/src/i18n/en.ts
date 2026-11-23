@@ -70,6 +70,7 @@ export const en = {
     'value.digital': 'Digital readout',
     'indicator.gear': 'Gear indicator',
     'indicator.shiftlights': 'Shift lights',
+    map: 'Map window',
     clock: 'Clock',
     telltale: 'Telltale',
     'status.panel': 'Status panel',
@@ -111,6 +112,8 @@ export const en = {
     gearDesc: 'Gear with D/S/M mode',
     shift: 'Shift lights',
     shiftDesc: 'Ten lights from 5000 to 7000 rpm',
+    map: 'Map window',
+    mapDesc: 'Shows the Waze, Android Auto or CarPlay map',
     clock: 'Clock',
     clockDesc: '24-hour time',
     turnLeft: 'Turn signal (left)',
@@ -338,7 +341,7 @@ export const en = {
     howToInstall: 'How to install on the car',
     deps: 'Dependencies on the head unit',
     depsNote:
-      'idv7lol needs the MGU Store with cluster-render ≥ 0.6.9. The Studio cannot verify what is installed on your car.',
+      'idv7lol needs the MGU Store with cluster-render ≥ 0.8.7. The Studio cannot verify what is installed on your car.',
   },
   timeline: {
     clips: 'Clips',

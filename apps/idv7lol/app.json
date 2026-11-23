@@ -2,7 +2,7 @@
   "id": "idv7lol",
   "title": "idv7lol",
   "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
-  "version": "0.2.20",
+  "version": "0.2.21",
   "startType": "autostart",
   "vendor": "custom",
   "license": "GPL-3.0-or-later",
@@ -115,6 +115,7 @@
         ["idv7lol-classic", "IDV7LOL Classic"],
         ["idv7lol-heritage-89", "Heritage 89"],
         ["idv7lol-lily-pad", "Lily Pad"],
+        ["idv7lol-map-view", "IDV7LOL Map View"],
         ["idv7lol-modern", "IDV7LOL Modern"],
         ["idv7lol-neon-drive", "Neon Drive"],
         ["idv7lol-night-minimal", "Night Minimal"],
@@ -199,6 +200,16 @@
     {
       "key": "sweep",
       "label": "Start-up sweep",
+      "type": "choice",
+      "default": "on",
+      "options": [
+        ["on", "On"],
+        ["off", "Off"]
+      ]
+    },
+    {
+      "key": "map",
+      "label": "Map in the theme",
       "type": "choice",
       "default": "on",
       "options": [
@@ -318,7 +329,7 @@
     }
   },
   "requires": {
-    "cluster-render": "0.6.9",
+    "cluster-render": "0.8.7",
     "mgu-deploy": "0.8.27"
   }
 }

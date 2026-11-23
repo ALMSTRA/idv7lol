@@ -99,7 +99,14 @@ channel now offers an update only when the car app or the kit changes (`build.sh
 `mgu-repo.json`, mgu-store #205).
 
 **The app page says "not connected".** cluster-render is not installed or not running. Install
-it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.6.9+.
+it from the Store (source `robertnisipeanu/idrive-apps`); the app requires version 0.8.7+.
+
+**The map window of a theme shows its fill, not a map.** The window shows a map only while
+another app draws one on the cluster: Waze, or Android Auto or CarPlay maps, through
+waze-on-cluster (source `robertnisipeanu/idrive-apps`), with navigation or the map open on the
+phone. Check Settings > Map in the theme is On. The Status tab's renderer line ends with
+`map:` and what the renderer says: `the map is drawn in the window`, or `waiting` and why.
+Not tested in a vehicle.
 
 **"Waiting for live car data".** No signal has arrived: with the engine off and the car asleep
 the bus is silent. Start the car, or set _Demo data: On_ to check the layout.

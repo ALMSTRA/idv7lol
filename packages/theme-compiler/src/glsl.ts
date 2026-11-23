@@ -88,6 +88,40 @@ void main() {
 }
 `;
 
+/**
+ * A rectangle with a window cut out of it: the car draws a hosted map under the theme's lowest
+ * layer over the map window (cluster-render PROTOCOL.md, "Hosting from layers"), so a backdrop
+ * under the window must be open there for the map to show.
+ */
+export const FLAT_HOLE_FS = `${FLAT_FS.replace('void main() {', 'void shape() {')}
+uniform vec4 u_hole;    // x, y, w, h of the window, in this layer's pixels
+uniform float u_hole_r; // its corner radius
+void main() {
+  shape();
+  vec2 hc = u_hole.zw * 0.5;
+  float dh = sdRoundBox(px() - u_hole.xy - hc, hc, u_hole_r);
+  gl_FragColor.a *= clamp(0.5 + dh, 0.0, 1.0);
+}
+`;
+
+/**
+ * The map window's own layer: its frame, and its fill while no map shows there. The car app sets
+ * u_on to 1 once the renderer says the map is drawn in the window; the fill then gives way.
+ */
+export const MAP_FS = `${PRELUDE}${COMMON}
+uniform vec4 u_fill;
+uniform vec4 u_stroke;
+uniform vec4 u_shape;   // radius, strokeWidth, 0, 0
+uniform float u_on;     // 1: the map shows through
+void main() {
+  vec2 c = u_size * 0.5;
+  float d = sdRoundBox(px() - c, c, u_shape.x);
+  vec4 col = vec4(u_fill.rgb, u_fill.a * cov(d) * (1.0 - u_on));
+  if (u_shape.y > 0.0) col = over(col, vec4(u_stroke.rgb, u_stroke.a * cov(abs(d + u_shape.y * 0.5) - u_shape.y * 0.5)));
+  gl_FragColor = col;
+}
+`;
+
 export const PANEL_FS = `${PRELUDE}${COMMON}
 uniform vec4 u_fill;
 uniform vec4 u_fill2;
@@ -706,6 +740,8 @@ export const SHADERS: Readonly<Record<ShaderKind, string>> = {
   'needle-image': NEEDLE_IMAGE_FS,
   sprite: SPRITE_FS,
   flat: FLAT_FS,
+  'flat-hole': FLAT_HOLE_FS,
+  map: MAP_FS,
   panel: PANEL_FS,
   'arc-band': ARC_BAND_FS,
   'arc-ticks': ARC_TICKS_FS,
