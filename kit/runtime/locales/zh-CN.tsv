@@ -69,7 +69,7 @@ feet	英尺
 miles	英里
 1/4 mile	1/4 英里
 1/8 mile	1/8 英里
-Renderer	渲染器
+Renderer	渲染
 GPU 60 fps (default)	GPU 60 帧（默认）
 Software	软件渲染
 Screen layout	屏幕布局
@@ -182,9 +182,9 @@ OK	正常
 READY	就绪
 Ready	就绪
 Oil	机油
-OIL	机油
+OIL	机油温度
 Coolant	冷却液
-COOLANT	冷却液
+COOLANT	冷却液温度
 WATER	水温
 RPM	转速
 SPEED	车速
@@ -1660,7 +1660,7 @@ Comfort Individual	舒适个性化
 Eco Pro	节能
 Eco Pro+	节能+
 Eco Pro Individual	节能个性化
-ENGINE	发动机
+ENGINE	发动机转速
 VOLTAGE FROM	电压来源
 running	运行中
 Ambient config	氛围灯设置
@@ -1680,3 +1680,122 @@ Hybrid Eco	混合动力节能
 Hybrid Comfort	混合动力舒适
 Electric Individual	纯电个性化
 Sport Boost	运动增强
+
+# idv7lol car app
+Show on the cluster	显示在仪表上
+Off (factory cluster)	关闭（原车仪表）
+Automatic (driving mode)	自动（随驾驶模式）
+Palette: amber	配色：琥珀
+Palette: sport	配色：运动
+Palette: daylight	配色：日间
+Palette: red	配色：红色
+Palette: pond	配色：池塘
+Palette: firefly	配色：萤火
+Palette: toxic	配色：荧光绿
+Palette: lotus	配色：莲花
+Palette: night	配色：夜间
+Palette: eco	配色：节能
+Palette: neon	配色：霓虹
+Palette: blood	配色：深红
+Palette: acid	配色：酸橙
+Palette: track	配色：赛道
+Palette: rally	配色：拉力
+Palette: stage	配色：赛段
+Palette: ice	配色：冰蓝
+Palette: corsa	配色：竞速
+Palette: volt	配色：电光
+Palette: dusk	配色：暮色
+App screen	应用界面
+Modern (tabs and previews)	现代（标签页与预览）
+Classic (text pages)	经典（文字页）
+Theme from USB on show	当前 USB 主题
+Keep it	保留
+Remove it from the car	从车机移除
+Bottom strip	仪表底栏
+The car's own (no black boxes)	原车底栏（无黑块）
+Covered by the layout (may leave black boxes)	由布局覆盖（可能出现黑块）
+Auto (the car's own)	自动（使用原车单位）
+Start-up sweep	启动时指针扫表
+Time zone	时区
+Fixed offset (Clock: offset from UTC)	固定偏移（在设置中选择 UTC 偏移）
+Clock: offset from UTC (Time zone: Fixed offset)	时钟 UTC 偏移（固定偏移模式）
+Melbourne, Sydney, Canberra, Hobart	墨尔本、悉尼、堪培拉、霍巴特
+Brisbane	布里斯班
+Adelaide	阿德莱德
+Darwin	达尔文
+Perth	珀斯
+Auckland	奥克兰
+UK, Ireland, Portugal	英国、爱尔兰、葡萄牙
+Central Europe	中欧
+Eastern Europe	东欧
+US Eastern	美国东部
+US Central	美国中部
+US Mountain	美国山地
+Arizona	亚利桑那州
+US Pacific	美国太平洋沿岸
+Auto (until the car answers)	自动（仅在车辆数据就绪前）
+Fuel tank size	油箱容量
+Themes	主题
+Data	数据
+Status	状态
+About	关于
+Theme	主题
+Palette	配色
+Page	翻页
+The factory cluster shows. Press Show to put the layout up.	当前显示原车仪表。按「显示」启用主题布局。
+Renderer not connected	渲染器未连接
+cluster-render is not running. Install or update it in the MGU Store.	cluster-render 未运行，请在 MGU Store 中安装或更新。
+Layout failed	布局加载失败
+This theme could not be drawn. Pick another theme.	无法绘制此主题，请切换到其他主题。
+Waiting for the car	正在等待车辆
+The layout goes up once the car is switched on.	车辆启动后显示主题布局。
+Waiting for car data	正在等待车辆数据
+Demo data is on: it never goes to the cluster by itself.	演示数据已开启，仅在主动开启仪表显示时使用。
+No live signals yet.	尚无实时信号。
+On the cluster (demo data)	仪表显示中（演示数据）
+On the cluster	仪表显示中
+Cluster renderer	仪表渲染器
+CAR DATA	车辆数据
+DRIVE MODE	驾驶模式
+SHIFT PROGRAMME	换挡程序
+GEAR	挡位
+FUEL	燃油
+Not live	无实时数据
+Demo	演示
+Sport Plus	运动增强
+Safety	安全
+Experimental software. Factory warnings stay on top. Deactivate here or uninstall from the MGU Store to restore everything.	实验版应用。原车警告始终置顶。在此关闭显示，或从 MGU Store 卸载，即可恢复原车仪表。
+Providers	信号来源
+USB themes	USB 主题
+Copy themes to idv7lol/themes on a USB stick and plug it in.	将主题复制到 U 盘的 idv7lol/themes 目录，再插入车机。
+Only themes installed from USB can be removed. This one is built in.	仅可移除从 U 盘安装的主题。这是内置主题。
+Removed	已移除
+Installed from USB:	已从 U 盘安装：
+Press Theme to pick it.	按「主题」选择。
+Refused	未导入
+Signals (demo)  ·  catalog id, value, age	信号（演示） · 标识、数值、数据年龄
+Signals (car)  ·  catalog id, value, age	信号（车辆） · 标识、数值、数据年龄
+Cluster renderer status (connected)	仪表渲染器状态（已连接）
+Cluster renderer status (disconnected)	仪表渲染器状态（未连接）
+open this page with the layout showing	请先启用布局，再打开此页
+idv7lol is free, open-source software (GPL-3.0-or-later): github.com/ALMSTRA/idv7lol	idv7lol 是自由开源软件（GPL-3.0-or-later）：github.com/ALMSTRA/idv7lol
+Not affiliated with BMW AG. Experimental: use parked, keep the factory warnings in view.	与 BMW AG 无关联。实验版本，请在驻车时操作，并始终留意原车警告。
+Themes are made with idv7lol Studio and compiled to one GPU layer per piece.	主题由 idv7lol Studio 制作，编译后每个部件对应一个 GPU 图层。
+Drawing by cluster-render (Robert Nisipeanu, MPL-2.0 client). Fonts: Barlow (SIL OFL 1.1).	渲染：cluster-render（Robert Nisipeanu，客户端使用 MPL-2.0）。字体：Barlow（SIL OFL 1.1）。
+App kit: cauliflowermossgrape/idrive7-apps (MIT).	应用工具包：cauliflowermossgrape/idrive7-apps（MIT）。
+Versions: app	版本：应用
+compiler	编译器
+messages sent:	已发送消息：
+layers:	图层：
+targets:	渲染目标：
+layers	个图层
+panel:	面板：
+refused ops:	已拒绝操作：
+shift programme	换挡程序
+gear	挡位
+oil	机油
+coolant	冷却液
+installed	已安装
+connected	已连接
+not connected	未连接
+disconnected	未连接

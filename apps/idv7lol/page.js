@@ -8,7 +8,8 @@
  * where the Store's renderer draws the page it takes none, so a theme shows as its sketch, the
  * flat shapes the theme compiler leaves in `theme.preview` (theme-compiler preview.ts).
  *
- * The kit's fonts have no accented letters: every string drawn here goes through ascii() first.
+ * The caller may format application UI labels before drawing. Theme sketches and raw diagnostic
+ * values use the original ASCII-compatible rendering path.
  *
  * Node 8: CommonJS, ES2017, builtins only.
  */
@@ -292,24 +293,20 @@ function toneColour(t, tone) {
   return tone === 'on' ? GOOD : tone === 'bad' ? t.crit : tone === 'wait' ? t.warn : t.dim;
 }
 
-function label(cv, s, x, y, size, c, opts) {
-  return cv.text(
-    ascii(s).slice(0, 140),
-    x,
-    y,
-    size,
-    c,
-    Object.assign({ literal: true }, opts || {}),
-  );
+function labels(format = ascii) {
+  return (cv, s, x, y, size, c, opts) =>
+    cv.text(format(s).slice(0, 140), x, y, size, c, Object.assign({ literal: true }, opts || {}));
 }
 
-function pill(cv, t, x, y, text, tone) {
+const label = labels();
+
+function pill(cv, t, x, y, text, tone, format = ascii) {
   const c = toneColour(t, tone);
-  const w = cv.textWidth(ascii(text), 18, { font: 'bold', literal: true }) + 50;
+  const w = cv.textWidth(format(text).slice(0, 140), 18, { font: 'bold', literal: true }) + 50;
   cv.roundRect(x, y, w, 34, 17, withAlpha(t.bg, 0.86));
   cv.strokeRoundRect(x, y, w, 34, 17, 1.5, withAlpha(c, 0.7));
   cv.circle(x + 19, y + 17, 6, c);
-  label(cv, text, x + 34, y + 23, 18, t.text, { font: 'bold' });
+  labels(format)(cv, text, x + 34, y + 23, 18, t.text, { font: 'bold' });
   return w;
 }
 
@@ -354,6 +351,7 @@ function themeAt(x, y) {
  * or after) }.
  */
 function themesPage(cv, t, m) {
+  const drawLabel = labels(m.format);
   const cur = m.themes[1];
   const dx = Math.max(-260, Math.min(260, m.dx || 0));
   const cw = THEMES.centre.w;
@@ -398,21 +396,21 @@ function themesPage(cv, t, m) {
   const ch = drawPreview(cv, cur.theme, cur.palette, cx, cy, cw);
   const on = m.state.tone === 'on';
   cv.strokeRoundRect(cx - 3, cy - 3, cw + 6, ch + 6, 6, on ? 3 : 1.5, on ? ACCENT : t.panelEdge);
-  pill(cv, t, cx + 14, cy + 12, m.state.label, m.state.tone);
+  pill(cv, t, cx + 14, cy + 12, m.state.label, m.state.tone, m.format);
   label(cv, cur.theme.name, W / 2 + dx, cy + ch + 50, 40, t.text, {
     align: 'center',
     font: 'bold',
   });
   const sub =
     m.layers + ' layers  ·  ' + m.at + ' of ' + m.count + '  ·  Palette: ' + m.paletteName;
-  const subW = cv.textWidth(ascii(sub), 19, { literal: true });
+  const subW = cv.textWidth((m.format || ascii)(sub).slice(0, 140), 19, { literal: true });
   const sx = W / 2 - (subW + 96) / 2;
-  label(cv, sub, sx, cy + ch + 84, 19, t.dim);
+  drawLabel(cv, sub, sx, cy + ch + 84, 19, t.dim);
   const pal = paletteOf(cur.theme, cur.palette);
   ['accent', 'text', 'danger'].forEach((tok, i) => {
     cv.circle(sx + subW + 26 + i * 28, cy + ch + 78, 9, kitColour(pal[tok], '#808080'));
   });
-  label(cv, m.note || m.state.detail, W / 2, BOTTOM - 8, 16, t.dim, { align: 'center' });
+  drawLabel(cv, m.note || m.state.detail, W / 2, BOTTOM - 8, 16, t.dim, { align: 'center' });
 }
 
 /**
@@ -420,44 +418,45 @@ function themesPage(cv, t, m) {
  * programme, fuelPct, fuelText, oil, coolant }.
  */
 function dataPage(cv, t, m) {
+  const drawLabel = labels(m.format);
   const y0 = TOP + 12;
   // what is on the cluster
   card(cv, t, 40, y0, 480, BOTTOM - y0 - 12);
   const ph = drawPreview(cv, m.theme.theme, m.theme.palette, 60, y0 + 20, 440);
   label(cv, m.theme.theme.name, 60, y0 + ph + 62, 30, t.text, { font: 'bold' });
-  pill(cv, t, 60, y0 + ph + 78, m.state.label, m.state.tone);
-  label(cv, 'DRIVE MODE', 60, y0 + ph + 150, 15, t.dim, { font: 'bold', spacing: 1.5 });
-  label(cv, m.mode || '-', 60, y0 + ph + 182, 28, t.text, { font: 'bold' });
-  label(cv, 'CAR DATA', 300, y0 + ph + 150, 15, t.dim, { font: 'bold', spacing: 1.5 });
-  label(cv, m.source, 300, y0 + ph + 182, 28, m.source === 'Live' ? GOOD : t.warn, {
+  pill(cv, t, 60, y0 + ph + 78, m.state.label, m.state.tone, m.format);
+  drawLabel(cv, 'DRIVE MODE', 60, y0 + ph + 150, 15, t.dim, { font: 'bold', spacing: 1.5 });
+  drawLabel(cv, m.mode || '-', 60, y0 + ph + 182, 28, t.text, { font: 'bold' });
+  drawLabel(cv, 'CAR DATA', 300, y0 + ph + 150, 15, t.dim, { font: 'bold', spacing: 1.5 });
+  drawLabel(cv, m.source, 300, y0 + ph + 182, 28, m.source === 'Live' ? GOOD : t.warn, {
     font: 'bold',
   });
 
-  const head = (s, x, y) => label(cv, s, x, y, 15, t.dim, { font: 'bold', spacing: 1.5 });
+  const head = (s, x, y) => drawLabel(cv, s, x, y, 15, t.dim, { font: 'bold', spacing: 1.5 });
   // speed
   card(cv, t, 540, y0, 520, 250);
   head('SPEED', 564, y0 + 30);
   // in the driver's units, as the layout shows it (m.mph: units.js unitGroups has 'speed')
   const speed = m.mph && isNum(m.speed) ? m.speed * 0.621371192 : m.speed;
-  label(cv, fmt(speed), 564, y0 + 196, 150, t.text, { font: 'num' });
-  label(cv, m.mph ? 'mph' : 'km/h', 564, y0 + 232, 22, t.dim);
+  drawLabel(cv, fmt(speed), 564, y0 + 196, 150, t.text, { font: 'num' });
+  drawLabel(cv, m.mph ? 'mph' : 'km/h', 564, y0 + 232, 22, t.dim);
   // engine speed
   card(cv, t, 1080, y0, 480, 118);
   head('ENGINE', 1104, y0 + 30);
-  label(cv, fmt(m.rpm), 1104, y0 + 94, 58, t.text, { font: 'num' });
-  label(cv, 'rpm', 1290, y0 + 94, 20, t.dim);
+  drawLabel(cv, fmt(m.rpm), 1104, y0 + 94, 58, t.text, { font: 'num' });
+  drawLabel(cv, 'rpm', 1290, y0 + 94, 20, t.dim);
   meter(cv, t, 1350, y0 + 76, 186, isNum(m.rpm) ? m.rpm / (m.redline || 7000) : 0, ACCENT);
   // gear and shift programme
   card(cv, t, 1080, y0 + 132, 232, 118);
   head('GEAR', 1104, y0 + 162);
-  label(cv, m.gear || '-', 1104, y0 + 230, 62, t.text, { font: 'bold' });
+  drawLabel(cv, m.gear || '-', 1104, y0 + 230, 62, t.text, { font: 'bold' });
   card(cv, t, 1328, y0 + 132, 232, 118);
   head('SHIFT PROGRAMME', 1352, y0 + 162);
-  label(cv, m.programme || '-', 1352, y0 + 230, 62, t.text, { font: 'bold' });
+  drawLabel(cv, m.programme || '-', 1352, y0 + 230, 62, t.text, { font: 'bold' });
   // fuel
   card(cv, t, 540, y0 + 264, 1020, 84);
   head('FUEL', 564, y0 + 294);
-  label(cv, isNum(m.fuelPct) ? fmt(m.fuelPct) + ' %' : '--', 564, y0 + 332, 32, t.text, {
+  drawLabel(cv, isNum(m.fuelPct) ? fmt(m.fuelPct) + ' %' : '--', 564, y0 + 332, 32, t.text, {
     font: 'bold',
   });
   meter(
@@ -469,7 +468,7 @@ function dataPage(cv, t, m) {
     isNum(m.fuelPct) ? m.fuelPct / 100 : 0,
     isNum(m.fuelPct) && m.fuelPct < 15 ? t.crit : t.warn,
   );
-  label(cv, m.fuelText || '', 1536, y0 + 296, 18, t.dim, { align: 'right' });
+  drawLabel(cv, m.fuelText || '', 1536, y0 + 296, 18, t.dim, { align: 'right' });
   // temperatures
   [
     ['OIL', m.oil, 540],
@@ -477,7 +476,7 @@ function dataPage(cv, t, m) {
   ].forEach((r) => {
     card(cv, t, r[2], y0 + 362, 502, BOTTOM - 12 - (y0 + 362));
     head(r[0], r[2] + 24, y0 + 392);
-    label(cv, isNum(r[1]) ? fmt(r[1]) + '°' : '--', r[2] + 24, y0 + 430, 32, t.text, {
+    drawLabel(cv, isNum(r[1]) ? fmt(r[1]) + '°' : '--', r[2] + 24, y0 + 430, 32, t.text, {
       font: 'bold',
     });
     meter(
@@ -494,6 +493,7 @@ function dataPage(cv, t, m) {
 
 /** The first text page: one line each for the cluster, the theme, the renderer, the car and the rest. */
 function statusPage(cv, t, m) {
+  const drawLabel = labels(m.format);
   const lines = [
     ['On the cluster', m.state.label + '  ·  ' + m.state.detail],
     ['Theme', m.themeLine],
@@ -510,8 +510,8 @@ function statusPage(cv, t, m) {
   ];
   lines.forEach((l, i) => {
     // 9 rows: 40 px apart so the last stays clear of the footer at y 500
-    label(cv, l[0], 48, 140 + i * 40, 20, t.dim, { font: 'bold' });
-    label(
+    drawLabel(cv, l[0], 48, 140 + i * 40, 20, t.dim, { font: 'bold' });
+    drawLabel(
       cv,
       l[1],
       300,
@@ -523,7 +523,8 @@ function statusPage(cv, t, m) {
 }
 
 function signalsPage(cv, t, m) {
-  label(
+  const drawLabel = labels(m.format);
+  drawLabel(
     cv,
     'Signals (' + (m.demo ? 'demo' : 'car') + ')  ·  catalog id, value, age',
     48,
@@ -545,7 +546,8 @@ function signalsPage(cv, t, m) {
 }
 
 function rendererPage(cv, t, m) {
-  label(
+  const drawLabel = labels(m.format);
+  drawLabel(
     cv,
     'Cluster renderer status (' + (m.connected ? 'connected' : 'disconnected') + ')',
     48,
@@ -554,12 +556,16 @@ function rendererPage(cv, t, m) {
     t.dim,
     { font: 'bold' },
   );
-  m.lines.slice(0, 14).forEach((l, i) => label(cv, l, 48, 156 + i * 22, 15, t.text));
-  label(cv, m.footer, 48, 476, 14, t.dim);
+  m.lines.slice(0, 14).forEach((l, i) => {
+    const drawLine = l === 'open this page with the layout showing' ? drawLabel : label;
+    drawLine(cv, l, 48, 156 + i * 22, 15, t.text);
+  });
+  drawLabel(cv, m.footer, 48, 476, 14, t.dim);
 }
 
 function aboutPage(cv, t, m) {
-  label(cv, 'About', 48, 120, 22, t.dim, { font: 'bold' });
+  const drawLabel = labels(m.format);
+  drawLabel(cv, 'About', 48, 120, 22, t.dim, { font: 'bold' });
   [
     'idv7lol is free, open-source software (GPL-3.0-or-later): github.com/ALMSTRA/idv7lol',
     'Not affiliated with BMW AG. Experimental: use parked, keep the factory warnings in view.',
@@ -567,7 +573,7 @@ function aboutPage(cv, t, m) {
     'Drawing by cluster-render (Robert Nisipeanu, MPL-2.0 client). Fonts: Barlow (SIL OFL 1.1).',
     'App kit: cauliflowermossgrape/idrive7-apps (MIT).',
     m.versions,
-  ].forEach((l, i) => label(cv, l, 48, 160 + i * 36, 17, t.text));
+  ].forEach((l, i) => drawLabel(cv, l, 48, 160 + i * 36, 17, t.text));
 }
 
 /** One of the four text pages (0 Status, 1 Signals, 2 Renderer, 3 About), with the app's title. */
@@ -598,4 +604,5 @@ module.exports = {
   dataPage,
   textPage,
   label,
+  labels,
 };
