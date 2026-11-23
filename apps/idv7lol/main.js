@@ -28,11 +28,14 @@ const { ThemeLibrary, UsbWatcher, PREFIX } = require('./usb_themes');
 const { unitGroups, applyUnits } = require('./units');
 
 const G = require('./kit/gauges');
+const { getLanguage, t: translate } = require('./kit/i18n');
 const page = require('./page');
 
 const W = page.W,
   H = page.H;
 const APP_ID = 'idv7lol';
+const formatLabel = getLanguage() === 'zh-CN' ? translate : page.ascii;
+const drawLabel = page.labels(formatLabel);
 
 function loadFonts(theme) {
   const fonts = {};
@@ -293,6 +296,7 @@ mgu.run({
           return th ? { theme: th, palette: th.paletteSelection.default } : null;
         };
         page.themesPage(cv, t, {
+          format: formatLabel,
           themes: [side(-1), { theme: current.theme, palette: pid }, side(1)],
           state,
           layers: current.theme.layers,
@@ -307,6 +311,7 @@ mgu.run({
         const litres = store.number('fuel.volume');
         const range = store.number('vehicle.range');
         page.dataPage(cv, t, {
+          format: formatLabel,
           theme: { theme: current.theme, palette: pid },
           state,
           mode: text('drive.mode'),
@@ -329,6 +334,7 @@ mgu.run({
         const n = modern ? tab - 2 : textPageNo;
         const now = Date.now();
         page.textPage(cv, t, n, {
+          format: formatLabel,
           version,
           state,
           themeLine:
@@ -399,7 +405,7 @@ mgu.run({
             current.theme.compiledWith,
         });
         if (!modern)
-          page.label(
+          drawLabel(
             cv,
             'Show: ' +
               (showing() ? 'ON' : 'off') +

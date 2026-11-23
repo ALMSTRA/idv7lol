@@ -171,6 +171,27 @@ describe('the app page', () => {
     expect(moving.targets).toEqual([]);
   });
 
+  it('measures the localized state label and preserves raw signal names', () => {
+    const { cv, calls } = spy();
+    const widths: unknown[] = [];
+    cv.textWidth = (value) => {
+      widths.push(value);
+      return 100;
+    };
+    const cur = { theme: themes[0]!, palette: themes[0]!.paletteSelection.default };
+    const format = (value: string) => (value === 'On the cluster' ? '仪表显示中' : '译文');
+    page.dataPage(cv, kitThemes.theme(), { theme: cur, state, source: 'Live', format });
+    expect(widths).toContain('仪表显示中');
+    expect(calls.some((c) => c[0] === 'text' && c[1] === '仪表显示中')).toBe(true);
+    page.textPage(cv, kitThemes.theme(), 1, {
+      version: '0.2.19',
+      format,
+      signals: [{ text: 'vehicle.speed = 100', fresh: true }],
+      raw: [],
+    });
+    expect(calls.some((c) => c[0] === 'text' && c[1] === 'vehicle.speed = 100')).toBe(true);
+  });
+
   it('draws every bundled theme and every page on the kit’s own canvas', () => {
     const t = kitThemes.theme();
     expect(themes.length).toBeGreaterThan(8);
