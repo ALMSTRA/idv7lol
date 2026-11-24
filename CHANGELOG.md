@@ -107,6 +107,11 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **Giallo**, a new bundled theme: a yellow rev counter to 10 in the middle (8 to 10 in red), the
+  speed and the gear on two dark panels over it, a map window and trip readings on the left, tyre
+  pressures and temperatures around the factory gear display on the right, and a carbon band
+  along the bottom. A second palette, Nero, turns the dial dark. 47 layers. Car app 0.2.22 has
+  it. Drawn with the car's shaders on WebGL; **not tested in a vehicle**.
 - **A map window in themes**: the new `map` component is a window where the car shows the map
   another app draws on the cluster (Waze, Android Auto or CarPlay maps through waze-on-cluster).
   The theme says where; the car app asks cluster-render for the map there (`host` into `panel`,

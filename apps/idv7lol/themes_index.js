@@ -12,6 +12,15 @@ module.exports = {
       ]
     },
     {
+      "id": "idv7lol-giallo",
+      "name": "IDV7LOL Giallo",
+      "module": "theme_idv7lol_giallo",
+      "palettes": [
+        "giallo",
+        "nero"
+      ]
+    },
+    {
       "id": "idv7lol-heritage-89",
       "name": "Heritage 89",
       "module": "theme_idv7lol_heritage_89",

@@ -8,7 +8,7 @@ Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus an editor for W
 
 ### 🎉 Now in beta: [idv7lol.com](https://www.idv7lol.com)
 
-**Browse** 48 themes with a live preview, **download** any of them for the car (a USB stick, no
+**Browse** 49 themes with a live preview, **download** any of them for the car (a USB stick, no
 account needed), **sign in** to **upload** your own layouts and **vote** for the ones you like.
 
 **New: the [web editor](https://www.idv7lol.com/editor/).** idv7lol Studio in the browser, nothing
@@ -127,6 +127,11 @@ The welcome window, where you start from a template, open a theme or begin with 
 | ----------------------------------------------------------------------- | --------------------------------------------------------------- |
 | ![Classic theme in light mode](docs/assets/screenshots/light-theme.jpg) | ![Digital Dash](docs/assets/screenshots/community-template.jpg) |
 
+Giallo, a yellow rev counter with the speed and the gear over it (the grey box is its map window
+without a map):
+
+![Giallo](docs/assets/screenshots/giallo.jpg)
+
 Map View, with its window for the Waze, Android Auto or CarPlay map (the streets are the
 Studio's sample; the car puts the live map there):
 
@@ -205,7 +210,9 @@ MGU Store removes it completely. This is experimental software: see
   import pictures, GIFs or short videos and edit them, try it with the simulator, and build. In
   English, Spanish, Russian, Japanese and Simplified Chinese, on the desktop or in the
   [browser](https://www.idv7lol.com/editor/).
-- **Themes to start from.** The newest first: Lily Pad (a night pond where a tree frog hops in
+- **Themes to start from.** The newest first: Giallo (a yellow rev counter to 10 in the middle
+  with the speed and the gear on two dark panels over it, a map window, tyre pressures and a
+  carbon band along the bottom), Lily Pad (a night pond where a tree frog hops in
   the rev ring, faster the faster you go, with fireflies for shift lights and reeds for fuel, oil
   and water), Supercar Track (a thick segmented rev band to 10 under a yellow rim, a huge red gear
   and a hexagon floor, in the style of Italian supercar clusters), Neon Drive (cyberpunk: neon

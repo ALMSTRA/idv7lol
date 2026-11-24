@@ -9,6 +9,7 @@ import voltRunner from '../../../../themes/volt-runner/theme.json';
 import lilyPad from '../../../../themes/lily-pad/theme.json';
 import neonDrive from '../../../../themes/neon-drive/theme.json';
 import mapView from '../../../../themes/map-view/theme.json';
+import giallo from '../../../../themes/giallo/theme.json';
 import heritage89 from '../../../../themes/heritage-89/theme.json';
 import minimal from '../../../../themes/examples/minimal/theme.json';
 
@@ -41,6 +42,7 @@ function template(id: string, doc: unknown): Template | null {
 
 // The newest first: they open the template list.
 export const TEMPLATES: Template[] = [
+  { id: 'giallo', doc: giallo },
   { id: 'map-view', doc: mapView },
   { id: 'lily-pad', doc: lilyPad },
   { id: 'supercar-track', doc: supercarTrack },
