@@ -12,6 +12,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
+- **Car app 0.2.24** with the two below. Tested locally; not tested in a vehicle.
+- `apps/idv7lol/cluster_render_client.js` from idrive-apps 3fe7c37 (cluster-render 0.8.12): video
+  frames through shared memory, a scene file's animation sequences (`--play`, `--skip`), a scene's
+  `over_order`, and text layers the service lays out (0.8.11). Copied verbatim; loads on Node
+  8.9.4. idv7lol uses none of the new calls yet (its texts stay glyph layers from its own atlas),
+  so the renderer it asks for stays 0.8.7.
+- `kit/runtime/display.js` and `kit/runtime/gauges.js` from idrive7-apps 454e47f: the kit's new
+  look for the app's page on the central screen (tabs, buttons and chips) and the controller's
+  mark, a white ring in a halo of the theme's colour.
 - `apps/idv7lol/cluster_render_client.js` follows upstream again (idrive-apps 7dd5e04,
   cluster-render 0.8.7): hosting from layers, canvases, shared values, eased animations, the text
   helper's messages and the rest of 0.7.0 to 0.8.7. Copied verbatim; loads on Node 8.9.4.
