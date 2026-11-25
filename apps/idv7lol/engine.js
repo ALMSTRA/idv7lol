@@ -63,6 +63,20 @@ function targetSize(targets, name) {
 }
 
 /**
+ * Where all of a tw x th map goes in a w x h window: as large as fits, in the middle, in the
+ * map's own proportions. { x, y, w, h } from the window's corner.
+ */
+function mapWhole(tw, th, w, h) {
+  let rw = w;
+  let rh = Math.round((w * th) / tw);
+  if (rh > h) {
+    rh = h;
+    rw = Math.round((h * tw) / th);
+  }
+  return { x: Math.floor((w - rw) / 2), y: Math.floor((h - rh) / 2), w: rw, h: rh };
+}
+
+/**
  * The part of a tw x th map that a w x h window shows: its middle, as large as fits, in the
  * window's proportions, so the map is never squashed.
  */
@@ -371,15 +385,36 @@ class ClusterEngine {
     const size = win && cr.ready && cr.hostLayers ? targetSize(cr.targets, MAP_TARGET) : null;
     let msg = null;
     if (win && size) {
-      msg = Object.assign(
-        { target: MAP_TARGET, x: win.x, y: win.y, w: win.w, h: win.h },
-        mapPart(size.w, size.h, win.w, win.h),
-      );
+      const fit = win.st.piece.statics._fit;
+      const whole = fit && fit[0] === 1 ? mapWhole(size.w, size.h, win.w, win.h) : null;
+      if (whole && whole.w >= MAP_MIN.w && whole.h >= MAP_MIN.h) {
+        // all of the map, as large as fits in the window; the window's fill stays around it
+        msg = {
+          target: MAP_TARGET,
+          x: win.x + whole.x,
+          y: win.y + whole.y,
+          w: whole.w,
+          h: whole.h,
+          src_x: 0,
+          src_y: 0,
+          src_w: size.w,
+          src_h: size.h,
+        };
+      } else {
+        msg = Object.assign(
+          { target: MAP_TARGET, x: win.x, y: win.y, w: win.w, h: win.h },
+          mapPart(size.w, size.h, win.w, win.h),
+        );
+      }
     }
     const want = msg ? JSON.stringify(msg) : '';
     if (want !== this.mapHost) {
-      if (msg) cr.host(this.target, msg);
-      else cr.unhost(MAP_TARGET);
+      if (msg) {
+        cr.host(this.target, msg);
+        // the window's fill gives way only where the map is drawn
+        const p = win.st.piece;
+        cr.uniform(win.st.ref, 'u_open', [msg.x - p.x, msg.y - p.y, msg.w, msg.h]);
+      } else cr.unhost(MAP_TARGET);
       this.mapHost = want;
       this.mapLive = false;
       this.mapWhy = '';
@@ -1414,6 +1449,7 @@ class ClusterEngine {
 module.exports = {
   ClusterEngine,
   mapPart,
+  mapWhole,
   targetSize,
   resolveColor,
   parseColor,

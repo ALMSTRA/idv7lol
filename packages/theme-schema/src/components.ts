@@ -584,7 +584,15 @@ export const MapPropsSchema = z.object({
   fill: ColorSchema.default('#11161c'),
   radius: z.number().min(0).default(0),
   stroke: StrokeSchema.optional(),
+  /**
+   * What of the map the window shows. `cover`: its middle, as large as fills the window, in the
+   * window's proportions. `contain`: all of it, as large as fits, the fill around it.
+   */
+  fit: z.enum(['cover', 'contain']).default('cover'),
 });
+
+/** The size of the map other apps draw on an iDrive 7 cluster (the hello's `map:1088x480`). */
+export const MAP_PICTURE_SIZE = { width: 1088, height: 480 } as const;
 
 /* -------------------------------------------------------------------------- */
 /* Union                                                                      */

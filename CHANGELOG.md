@@ -107,6 +107,14 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **All of the map in a map window**: the `map` component has a `fit`. `cover`, as before, fills
+  the window with the middle of the map; the new `contain` shows all of the map as large as fits
+  and keeps the window's fill around it, so a small window no longer cuts the map's sides (a
+  720x480 window showed the middle 720 of 1088 columns). In the Studio it is **Map shown** in the
+  inspector. Car app 0.2.23; an older app shows such a window as `cover`. The size of the map
+  itself is the phone's (1088x480 on iDrive 7, set by waze-on-cluster) and a theme cannot ask for
+  another: the documentation now says so (issue 13). Tested locally, the shader drawn on WebGL;
+  **not tested in a vehicle**.
 - **Giallo**, a new bundled theme: a yellow rev counter to 10 in the middle (8 to 10 in red), the
   speed and the gear on two dark panels over it, a map window and trip readings on the left, tyre
   pressures and temperatures around the factory gear display on the right, and a carbon band

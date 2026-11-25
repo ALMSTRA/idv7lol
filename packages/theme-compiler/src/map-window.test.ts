@@ -64,6 +64,19 @@ describe('the map window', () => {
     );
   });
 
+  it('tells the car when the window shows all of the map, not its middle', () => {
+    const fills = compileTheme(theme()).compiled!.pieces.find((p) => p.shader === 'map')!;
+    expect(fills.statics['_fit']).toBeUndefined();
+    const doc = theme();
+    const win = doc.components.find((c) => c.id === 'map')!;
+    if (win.type === 'map') win.props.fit = 'contain';
+    const whole = compileTheme(doc).compiled!.pieces.find((p) => p.shader === 'map')!;
+    expect(whole.statics['_fit']).toEqual([1]);
+    // the part the map is drawn in is the car app's to say: no uniform of it in the package
+    expect(whole.statics['u_open']).toBeUndefined();
+    expect(declaredUniforms(SHADERS['map'])).toContain('u_open');
+  });
+
   it('leaves themes without a window exactly as before', () => {
     const doc = theme();
     doc.components = doc.components.filter((c) => c.id !== 'map');

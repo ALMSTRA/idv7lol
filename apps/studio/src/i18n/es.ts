@@ -668,6 +668,7 @@ export const ES_FIELD_LABELS: Record<string, string> = {
   'Pie fill': 'Relleno de sector',
   Placement: 'Posición',
   'Map window': 'Ventana de mapa',
+  'Map shown': 'Mapa mostrado',
   Radius: 'Radio',
   Readout: 'Lectura',
   Rectangle: 'Rectángulo',

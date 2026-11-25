@@ -95,6 +95,14 @@ tested locally (unit tests on fake sticks, and the three bundled themes plus a c
 and accepted). **Not tested in a vehicle.** The first car test must confirm that the app can read a
 stick, that the new button appears, and that an installed theme draws like a built-in one.
 
+## Map window (added 2026-11-23, car app 0.2.21)
+
+A theme's `map` component, hosted from layers by cluster-render 0.8.2 or newer: developed and
+tested locally. **Not tested in a vehicle by the project.** Reported working by a user on a G28
+with iDrive 7 07/2022 and a CarPlay map (issue 13, with photographs), in Map View and in a
+full-screen theme. `fit` `contain` (all of the map in the window, car app 0.2.23) is tested
+locally only.
+
 ## Pending (ordered)
 
 1. **More vehicle tests.** Install, drawing and turning off are confirmed on one car. Still to

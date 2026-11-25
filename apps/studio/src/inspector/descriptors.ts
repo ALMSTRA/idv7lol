@@ -354,6 +354,7 @@ export const DESCRIPTORS: Record<Exclude<ComponentType, 'group'>, SectionDescrip
         { path: 'fill', label: 'Fill', kind: 'color' },
         { path: 'radius', label: 'Radius', kind: 'number', min: 0, max: 500 },
         { path: 'stroke', label: 'Border', kind: 'stroke' },
+        { path: 'fit', label: 'Map shown', kind: 'select', options: opt(['cover', 'contain']) },
       ],
     },
   ],

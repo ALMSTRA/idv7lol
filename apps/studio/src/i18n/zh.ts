@@ -651,6 +651,7 @@ export const ZH_FIELD_LABELS: Record<string, string> = {
   'Pie fill': '扇形填充',
   Placement: '放置位置',
   'Map window': '地图窗口',
+  'Map shown': '显示的地图',
   Radius: '半径',
   Readout: '数值显示',
   Rectangle: '矩形',

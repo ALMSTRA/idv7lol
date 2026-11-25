@@ -14,8 +14,9 @@ interface Engine {
   setShown(want: boolean): void;
   status(): { map: string };
 }
-const { ClusterEngine, mapPart, targetSize } = require('./engine.js') as {
+const { ClusterEngine, mapPart, mapWhole, targetSize } = require('./engine.js') as {
   ClusterEngine: new (o: Record<string, unknown>) => Engine;
+  mapWhole(tw: number, th: number, w: number, h: number): Record<string, number>;
   mapPart(tw: number, th: number, w: number, h: number): Record<string, number>;
   targetSize(targets: unknown, name: string): { w: number; h: number } | null;
 };
@@ -97,8 +98,11 @@ function mapTheme(window = { x: 600, y: 150, width: 720, height: 480 }) {
   return doc;
 }
 
-function compileMap(window?: Parameters<typeof mapTheme>[0]) {
-  const result = compileTheme(mapTheme(window), {
+function compileMap(window?: Parameters<typeof mapTheme>[0], fit?: 'cover' | 'contain') {
+  const doc = mapTheme(window);
+  const win = doc.components.find((c) => c.id === 'map');
+  if (fit && win && win.type === 'map') win.props.fit = fit;
+  const result = compileTheme(doc, {
     fonts: { sans: { pixels: baked.pixels, metrics: baked.metrics } },
   });
   expect(result.report.errors).toEqual([]);
@@ -255,6 +259,49 @@ describe('the map window on the car', () => {
     state.strip = 646;
     advance(2);
     expect(client.of('host')[0]).toMatchObject({ x: 600, y: 300, w: 720, h: 346 });
+  });
+
+  it('shows all of the map, as large as fits, in a window that asks for it', () => {
+    expect(mapWhole(1088, 480, 720, 480)).toEqual({ x: 0, y: 81, w: 720, h: 318 });
+    expect(mapWhole(1088, 480, 1920, 720)).toEqual({ x: 144, y: 0, w: 1632, h: 720 });
+    expect(mapWhole(1088, 480, 1088, 480)).toEqual({ x: 0, y: 0, w: 1088, h: 480 });
+
+    const { compiled } = compileMap(undefined, 'contain');
+    const { client, advance } = setup(compiled!);
+    advance(2);
+    // the whole 1088x480 picture, in the middle of the 720x480 window at 600,150
+    expect(client.of('host')).toEqual([
+      {
+        op: 'host',
+        into: 'panel',
+        target: 'map',
+        x: 600,
+        y: 231,
+        w: 720,
+        h: 318,
+        src_x: 0,
+        src_y: 0,
+        src_w: 1088,
+        src_h: 480,
+      },
+    ]);
+    // the fill gives way there only: the rest of the window keeps it
+    const map = client.of('layer').find((l) => l.fs === SHADERS['map'])!;
+    const open = client.ops.filter((o) => o.ref === map.ref && o.name === 'u_open').pop()!.v;
+    expect(open).toEqual([0, 81, 720, 318]);
+
+    // a window that fills its place: the fill gives way in all of it
+    const cover = setup(compileMap().compiled!);
+    cover.advance(2);
+    const m2 = cover.client.of('layer').find((l) => l.fs === SHADERS['map'])!;
+    expect(
+      cover.client.ops.filter((o) => o.ref === m2.ref && o.name === 'u_open').pop()!.v,
+    ).toEqual([0, 0, 720, 480]);
+
+    // too thin for all of the map (under 32 rows): its middle fills the window, as before
+    const thin = setup(compileMap({ x: 600, y: 150, width: 64, height: 40 }, 'contain').compiled!);
+    thin.advance(2);
+    expect(thin.client.of('host')[0]).toMatchObject({ x: 600, y: 150, w: 64, h: 40 });
   });
 
   it('says nothing about a map for a theme without a window', () => {

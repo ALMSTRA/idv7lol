@@ -173,13 +173,22 @@ it has no map.
   way only once the renderer says the map is drawn in the window.
 - The map is 1088x480 on iDrive 7. The window shows its middle in the window's own proportions,
   so nothing is squashed: 720x480 shows the centre part at its own size, a wider window shows a
-  band of it.
+  band of it. That is `fit` `cover`. With `fit` `contain` the window shows all of the map, as
+  large as fits, in the middle, and keeps its fill around it: a 720x480 window shows the whole
+  1088x480 at 720x318. Car app 0.2.23 or newer; an older one shows `cover`.
+- A larger window does not show more of the world, only the same picture larger. The picture is
+  the one the phone draws for the cluster, at the size waze-on-cluster tells it (its README, "Map
+  size and upload": 1088x480, the cluster's own map area). A theme cannot ask for another size
+  or zoom. To see the most of it, use `contain`; to see it sharpest, give the window the map's
+  own size or less.
 - One window per theme, at least 64x32, inside the layout. Keep it above y 646: lower, the car
   cuts it at the cluster's bottom strip.
 - A package with a map window needs car app 0.2.21 or newer; an older one says so and does not
   install it.
 
-Not tested in a vehicle.
+Not tested in a vehicle by the project. A user reports the window showing a CarPlay map (Amap)
+in a G28 with iDrive 7 07/2022, in the bundled Map View and in a full-screen theme of their own
+(issue 13).
 
 ## Units
 

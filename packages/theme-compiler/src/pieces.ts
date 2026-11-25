@@ -1319,6 +1319,8 @@ function buildMap(ctx: Ctx, f: FlatComponent): void {
     0,
   ];
   piece.statics['u_on'] = [0];
+  // all of the map in the window, not its middle filling it: the car app reads this
+  if (p.fit === 'contain') piece.statics['_fit'] = [1];
   ctx.pieces.push(piece);
 }
 

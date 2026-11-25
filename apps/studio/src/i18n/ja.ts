@@ -671,6 +671,7 @@ export const JA_FIELD_LABELS: Record<string, string> = {
   'Pie fill': '扇形の塗り',
   Placement: '配置',
   'Map window': 'マップウィンドウ',
+  'Map shown': '表示する地図',
   Radius: '半径',
   Readout: '数値表示',
   Rectangle: '長方形',

@@ -1,4 +1,4 @@
-import type { MapComponent } from '@idv7lol/theme-schema';
+import { MAP_PICTURE_SIZE, type MapComponent } from '@idv7lol/theme-schema';
 import type { ComponentRenderer } from './types.js';
 
 /** Streets of the sample map, as fractions of the window: [x0, y0, x1, y1, width]. */
@@ -29,12 +29,27 @@ export const mapRenderer: ComponentRenderer<MapComponent> = {
     const { ctx } = rc;
     const p = c.props;
     const r = Math.min(p.radius, w / 2, h / 2);
-    const unit = Math.min(w, h);
+    const whole = { w, h };
     ctx.save();
     rc.roundRectPath(0, 0, w, h, r);
     ctx.clip();
     ctx.fillStyle = rc.color(p.fill);
     ctx.fillRect(0, 0, w, h);
+    if (p.fit === 'contain') {
+      // all of the map, as large as fits: the sample goes in that part, the fill stays around
+      const k = Math.min(w / MAP_PICTURE_SIZE.width, h / MAP_PICTURE_SIZE.height);
+      const mw = MAP_PICTURE_SIZE.width * k;
+      const mh = MAP_PICTURE_SIZE.height * k;
+      ctx.translate((w - mw) / 2, (h - mh) / 2);
+      ctx.beginPath();
+      ctx.rect(0, 0, mw, mh);
+      ctx.clip();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillRect(0, 0, mw, mh);
+      w = mw;
+      h = mh;
+    }
+    const unit = Math.min(w, h);
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.13)';
@@ -63,6 +78,8 @@ export const mapRenderer: ComponentRenderer<MapComponent> = {
     ctx.closePath();
     ctx.fill();
     ctx.restore();
+    w = whole.w;
+    h = whole.h;
     if (p.stroke && p.stroke.width > 0) {
       // inside the window, as the car draws it
       const half = p.stroke.width / 2;

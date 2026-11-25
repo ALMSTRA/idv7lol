@@ -106,17 +106,25 @@ void main() {
 
 /**
  * The map window's own layer: its frame, and its fill while no map shows there. The car app sets
- * u_on to 1 once the renderer says the map is drawn in the window; the fill then gives way.
+ * u_on to 1 once the renderer says the map is drawn in the window; the fill then gives way, in
+ * all of the window or, when the map is drawn in a part of it (u_open), in that part only.
  */
 export const MAP_FS = `${PRELUDE}${COMMON}
 uniform vec4 u_fill;
 uniform vec4 u_stroke;
 uniform vec4 u_shape;   // radius, strokeWidth, 0, 0
 uniform float u_on;     // 1: the map shows through
+uniform vec4 u_open;    // x, y, w, h of the part the map is drawn in; w 0: all of the window
 void main() {
   vec2 c = u_size * 0.5;
-  float d = sdRoundBox(px() - c, c, u_shape.x);
-  vec4 col = vec4(u_fill.rgb, u_fill.a * cov(d) * (1.0 - u_on));
+  vec2 p = px();
+  float d = sdRoundBox(p - c, c, u_shape.x);
+  float open = u_on;
+  if (u_open.z > 0.0) {
+    vec2 q = p - u_open.xy;
+    open *= step(0.0, q.x) * step(0.0, q.y) * step(q.x, u_open.z) * step(q.y, u_open.w);
+  }
+  vec4 col = vec4(u_fill.rgb, u_fill.a * cov(d) * (1.0 - open));
   if (u_shape.y > 0.0) col = over(col, vec4(u_stroke.rgb, u_stroke.a * cov(abs(d + u_shape.y * 0.5) - u_shape.y * 0.5)));
   gl_FragColor = col;
 }

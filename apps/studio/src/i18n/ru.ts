@@ -669,6 +669,7 @@ export const RU_FIELD_LABELS: Record<string, string> = {
   'Pie fill': 'Заливка сектора',
   Placement: 'Размещение',
   'Map window': 'Окно карты',
+  'Map shown': 'Показ карты',
   Radius: 'Радиус',
   Readout: 'Показание',
   Rectangle: 'Прямоугольник',
