@@ -8,7 +8,7 @@ Custom digital cluster layouts for BMW iDrive 7 (MGU) cars, plus an editor for W
 
 ### 🎉 Now in beta: [idv7lol.com](https://www.idv7lol.com)
 
-**Browse** 49 themes with a live preview, **download** any of them for the car (a USB stick, no
+**Browse** 54 themes with a live preview, **download** any of them for the car (a USB stick, no
 account needed), **sign in** to **upload** your own layouts and **vote** for the ones you like.
 
 **New: the [web editor](https://www.idv7lol.com/editor/).** idv7lol Studio in the browser, nothing
@@ -224,8 +224,9 @@ MGU Store removes it completely. This is experimental software: see
   Runner (bright yellow, with a running bolt in the middle). Map View has a window for the map
   that Waze, Android Auto or CarPlay draw on the cluster. Then Performance, Modern, Classic,
   Night Minimal and Rally Dash, plus twelve free community layouts converted from eroobeeroo's
-  Cluster Layouts (GPL, credited in each theme) and twenty-three converted from FDX100's KurdBimmer
-  Themes (MIT, credited in each theme).
+  Cluster Layouts (GPL, credited in each theme), twenty-three converted from FDX100's KurdBimmer
+  Themes (MIT, credited in each theme) and five more community conversions (Apex II, Veloce,
+  Circuit, Aero and Vetro, MIT).
 - **The car app**, which runs on the head unit, draws the active theme through `cluster-render`,
   and lets you turn it on or off and switch themes from the iDrive menu.
 - **The pieces behind them:** a signal catalog, the theme format, a renderer for the PC preview,

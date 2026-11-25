@@ -10,6 +10,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ## [Unreleased]
 
+### Added
+
+- **Five community themes**: Apex II (a round rev counter with a red needle and the gear in its
+  middle), Veloce (a wide arc of rev tiles), Circuit (three round dials on carbon), Aero (a rev
+  rail across the screen on navy) and Vetro (a dial under glass on a perforated floor, in black,
+  red or yellow). Converted by hand from Cluster Themes 0.26.0 (MIT, see
+  `themes/community/README.md`); 54 themes in all. Tested locally (validated, drawn with the car
+  app's engine on a PC); not tested in a vehicle.
+
 ### Changed
 
 - **Texts drawn by the renderer (car app 0.2.25, a setting, off by default).** With _Texts drawn

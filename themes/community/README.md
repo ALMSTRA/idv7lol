@@ -81,6 +81,42 @@ What differs from upstream, all of them:
   power over 0 to 300 kW.
 - In these six the badge spot, the M stripes and model badges are left out, like every wordmark.
 
+## Cluster Themes conversions
+
+The five folders that start with `ct-` (Apex II, Veloce, Circuit, Aero and Vetro) are hand
+conversions of the five cluster themes of Cluster Themes 0.26.0 in
+[jsbaughman/apps](https://github.com/jsbaughman/apps) (commit a7d7168, 24 November 2026), a fork
+of bimmer-lab/apps.
+
+- Original themes: Copyright (c) 2026 bimmer-lab, MIT. The conversions keep the MIT licence. They
+  are listed as community themes; this section and `THIRD_PARTY_NOTICES.md` carry the notice.
+- Only the arrangement, proportions, colours and readouts were taken over, from the layout files,
+  their generators and the two pictures upstream has. No upstream shader, JavaScript, font or
+  image is included, and nothing of upstream was run.
+- Not tested in a vehicle.
+
+What differs from upstream, all five: one font, so no italics and a solid gear where upstream's is
+hollow; no bottom row of clock, range and outside temperature, where the car's own strip shows;
+dials and arcs made smaller or moved so that nothing sits under the cowl, the gear bracket, the
+eDrive box or the strip; no tyre temperatures (the signal catalog has none); drawn in km/h, °C and
+bar and converted by the car app's Units setting; upstream's settings (backgrounds, tach response,
+picks of readings, the shift light, the Waze window) belong to its app and only the defaults are
+drawn.
+
+- Apex II (`ct-apex`, upstream "Apex"; another Apex is already here): upstream's smaller dial for
+  cars with the driver camera; a power readout and two rows of g where upstream has a G-meter; the
+  backdrop is two red fades, without carbon.
+- Veloce (`ct-veloce`): the arc is part of a circle, not of an ellipse, and smaller, so it ends
+  left of the gear bracket; no needle across the tiles; the two right-hand scales are stacked
+  right of the bracket.
+- Circuit (`ct-circuit`): the right dial keeps its bezel and face, empty at the gear bracket,
+  with the tyre pressures under it; boost reads 0 to 3 bar; Yellow and Blue dials are palettes.
+- Aero (`ct-aero`): the rev rail is straight, with the revs as the end of a white line, not a
+  blade; the car and the tyres are smaller, under the gear bracket; clock and outside temperature
+  are at the top of the side panels.
+- Vetro (`ct-vetro`): the tyre panel has no car, its four boxes stand around the gear bracket; no
+  glass sheen, needle glow or shift flash; Red and Yellow dials are palettes.
+
 ## Status
 
 Validated and compiled with the theme compiler CLI and rendered with the Studio engine

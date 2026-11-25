@@ -41,6 +41,12 @@ Copyright (c) 2026 FDX100 (the KurdBimmer themes and changes), MIT. Their arrang
 colours and readouts were carried over; no upstream code, shader, font or image was copied. The
 conversions stay under the MIT licence. See `themes/community/README.md`.
 
+The five `themes/community/ct-*` themes are hand conversions of the cluster themes of Cluster
+Themes 0.26.0 in [jsbaughman/apps](https://github.com/jsbaughman/apps), a fork of bimmer-lab/apps,
+Copyright (c) 2026 bimmer-lab, MIT. Their arrangement, proportions, colours and readouts were
+carried over; no upstream code, shader, font or image was copied. The conversions stay under the
+MIT licence. See `themes/community/README.md`.
+
 Runtime dependencies of the Studio and tooling (React, Vite, Tauri, zod, zustand, …) are
 listed with their licences in the generated `apps/studio/src-tauri/THIRD_PARTY.txt` and
 `package-lock.json`.
