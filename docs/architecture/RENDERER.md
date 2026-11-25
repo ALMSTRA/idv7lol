@@ -99,6 +99,12 @@ below needs 0.8.2. What the releases up to 0.6.9 fixed, which is why that was th
 - 0.8.4: the cluster map no longer disappears about 2 s after it shows when a cluster theme is
   installed and the car's logging has RAMSES's messages off. 0.8.7: a finished session's
   animations are freed on iDrive 7.
+- 0.8.8 to 0.8.12 (the client idv7lol carries is 0.8.12's; none of this is used or required yet):
+  video frames through shared memory; 0.8.9 a map the cluster stops drawing while DLT is off is
+  asked for again within about 2 s, and a scene file's animation sequences can be played
+  (`--play`, `--skip`); 0.8.10 `over_order`; 0.8.11 **text layers**: a font sent once, then only
+  strings, up to 256 glyphs a line, the hello's `text` 1 says the service takes them; 0.8.12
+  `--skip` on iDrive 7.
 
 ## iDrive 8 (not supported by idv7lol)
 
@@ -243,6 +249,7 @@ Studio as hints (info zones, no findings) until someone checks them:
 | cluster-render  | 0.5.10–0.6.4 | 0.5.12 no mapping guard; 0.6.0 scene hosts; 0.6.3 images hidden until written; 0.6.4 upload cap                                               |
 | cluster-render  | 0.6.5–0.6.9  | 0.6.5 upload ceiling kept across drives; 0.6.6 scene kept through a slot lock; 0.6.9 stalled fetch recovered (required)                       |
 | cluster-render  | 0.7.0–0.8.7  | 0.8.2 hosting from layers (the map window); 0.8.4 map kept with a theme installed; 0.8.7 session memory freed (required)                      |
+| cluster-render  | 0.8.8–0.8.12 | 0.8.9 map asked for again with DLT off; 0.8.11 text layers; client copied, nothing of it required                                             |
 | mgu-deploy      | 0.8.27       | required by idv7lol (0.8.16 safe mode, 0.8.19 MainApp 6.4.8, 0.8.21 manifest check, 0.8.26 safe mode counts every start, 0.8.27 fewer writes) |
 | Cluster Layouts | 0.13.2       | requires cluster-render 0.4.2, idrive7-renderd 2.1.7, mgu-inputgate 1.0.0                                                                     |
 | Cluster Layouts | 0.28.1       | still requires cluster-render 0.4.2; PolyForm Noncommercial since commit `10cefda`                                                            |
