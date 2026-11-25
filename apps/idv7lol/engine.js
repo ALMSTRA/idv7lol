@@ -20,7 +20,16 @@
  * Nothing here writes to the vehicle. The client (cluster_render_client.js)
  * replays layers by itself after a reconnect.
  */
-const { layoutLine, formatNumber, formatDash, formatClock, enumText } = require('./text');
+const {
+  layoutLine,
+  formatNumber,
+  formatDash,
+  formatClock,
+  enumText,
+  fontTable,
+  textLine,
+  MAX_GLYPHS,
+} = require('./text');
 const { convert } = require('./units');
 const conditions = require('./conditions');
 const { decodeEtc2Rgba } = require('./etc2');
@@ -185,6 +194,25 @@ function ease(name, t) {
   }
 }
 
+/**
+ * Whether a piece of the text shader can be a text layer of the renderer instead (cluster-render
+ * PROTOCOL.md "Text"): such a layer draws one line in one colour and one size and takes no
+ * uniform, so a line with a unit or a label in a second colour or size, a glow or an animation
+ * of its own stays an effect layer.
+ */
+function plainLine(piece) {
+  if (piece.shader !== 'text' || piece.texture || piece.usesTime || piece.colors.u_glow)
+    return false;
+  if ((piece.animations || []).length || !piece.dynamics.length) return false;
+  return piece.dynamics.every((d) => {
+    if (d.kind === 'zone-color') return d.uniform === 'u_color';
+    if (d.kind === 'clock' || d.kind === 'gear' || d.kind === 'mode-text') return true;
+    return (
+      d.kind === 'text' && !d.secondary && String(d.template || '').indexOf(SECONDARY_START) < 0
+    );
+  });
+}
+
 /* ---------- the engine ---------- */
 
 class ClusterEngine {
@@ -209,6 +237,11 @@ class ClusterEngine {
     this.stripY = opts.stripY || (() => null);
     // whether a theme's map window may show the map (a setting)
     this.mapOn = opts.map || (() => true);
+    // whether plain lines of text are the renderer's text layers where it has them (a setting)
+    this.textLayers = opts.textLayers || (() => false);
+    this.textMode = false; // this build made text layers
+    this.textFailed = false; // the renderer refused one: effect layers from then on
+    this.fontRef = 0;
     this.mapHost = ''; // the host asked of the renderer, as JSON, or ''
     this.mapLive = false; // the renderer says the map is drawn in the window
     this.mapWhy = '';
@@ -243,6 +276,7 @@ class ClusterEngine {
     this.cr.on('refused', (op, ref, reason) => {
       this.refused++;
       this.log.warn('cluster-render refused ' + op + ' ' + ref + ': ' + reason);
+      this._textRefused(ref);
     });
     this.cr.on('target', (name, state, holder, reason) => {
       if (name !== this.target) return;
@@ -256,6 +290,7 @@ class ClusterEngine {
       if (state === 'error') {
         this.log.warn('layer ' + ref + ' error: ' + reason);
         this._etc2Refused(ref, reason);
+        this._textRefused(ref);
       }
     });
     this.cr.on('status', (text) => {
@@ -353,6 +388,7 @@ class ClusterEngine {
       failed: this.failed === this.theme,
       messages: this.messages,
       map: this.mapStatus(),
+      textLayers: this.pieces.filter((p) => p.text && p.ref).length,
     };
   }
 
@@ -517,6 +553,20 @@ class ClusterEngine {
       this.messages++;
     });
     const defaultFamily = theme.fonts[0];
+    // Plain lines as the renderer's text layers, drawn from the same atlas as a font: the string
+    // goes once a change and the service lays it out, where an effect layer looks every pixel up
+    // in 32 glyphs. Only when the setting asks and the service says it takes them.
+    this.textMode = this._textWanted();
+    this.fontRef = 0;
+    if (this.textMode && defaultFamily && this.assets[defaultFamily]) {
+      const m = this.fonts[defaultFamily].metrics;
+      const ref = m.spread > 0 ? this.cr.font(this.assets[defaultFamily], fontTable(m)) : 0;
+      if (ref) {
+        if (this._made) this._made.push(ref);
+        this.fontRef = ref;
+        this.messages++;
+      } else this.log.warn('font refused: texts stay effect layers');
+    }
     // A layer reaching below the strip is cut short there: its height on the screen, 0 when it
     // is all below, or null when it stays whole (above the strip, the strip covered, or turned).
     const strip = this.stripY();
@@ -546,10 +596,27 @@ class ClusterEngine {
         }
       }
       if (piece.usesTime) opts.time = true;
-      const ref = shownH === 0 ? 0 : this._make('effect', opts);
+      let ref = 0;
+      let text = false;
+      if (shownH !== 0 && this.fontRef && plainLine(piece)) {
+        // the line's height stays the piece's when the strip cuts the layer short
+        const line = Object.assign({}, opts, {
+          font: this.fontRef,
+          max: MAX_GLYPHS,
+          size: piece.h,
+          color: resolveColor(piece.colors.u_color, pal).map(r3),
+          text: '',
+        });
+        delete line.fs;
+        ref = this._make('text', line);
+        text = !!ref;
+      }
+      if (!text && shownH !== 0) ref = this._make('effect', opts);
       const st = {
         piece,
         ref,
+        text,
+        lastStyle: null,
         eased: {},
         lastText: null,
         lastColor: {},
@@ -563,6 +630,7 @@ class ClusterEngine {
         return st;
       }
       this.messages++;
+      if (text) return st; // a text layer takes no uniform: its colour went with it
       this.cr.uniform(ref, 'u_size', [piece.w, piece.h]);
       if (shownH !== null)
         this.cr.uniform(ref, 'u_keep', [Math.round((shownH / piece.h) * 1e6) / 1e6]);
@@ -692,6 +760,9 @@ class ClusterEngine {
     });
     if (this.band) this.cr.drop(this.band);
     this.band = 0;
+    // the font before its atlas, which the renderer keeps while a font draws from it
+    if (this.fontRef) this.cr.drop(this.fontRef);
+    this.fontRef = 0;
     Object.keys(this.assets).forEach((fam) => this.cr.drop(this.assets[fam]));
     this.images.forEach((st) => {
       if (st.ref) this.cr.drop(st.ref);
@@ -706,6 +777,12 @@ class ClusterEngine {
   _sendColors(st, pal) {
     const piece = st.piece;
     if (!st.ref) return;
+    if (st.text) {
+      // its one colour, unless a zone or the gear's manual colour set another
+      if (st.lastColor.u_color === undefined)
+        this.cr.textStyle(st.ref, { color: resolveColor(piece.colors.u_color, pal).map(r3) });
+      return;
+    }
     Object.keys(piece.colors).forEach((name) => {
       if (
         st.lastColor[name] !== undefined &&
@@ -830,6 +907,15 @@ class ClusterEngine {
     }
     if (want !== this.shown) this.setShown(want);
     if (!this.shown) return;
+    // Text layers came or went (the setting, a renderer that connected after the layout went up,
+    // another renderer after a reconnect, a refusal): the layout is made again the other way.
+    if (this.cr.ready && this._textWanted() !== this.textMode) {
+      this.log.info(
+        'texts: ' + (this.textMode ? 'effect layers again' : "the renderer's text layers"),
+      );
+      this._swap(this.theme, null);
+      if (!this.shown) return;
+    }
     const pid = this.paletteId();
     if (pid !== this.lastPalette) {
       this.lastPalette = pid;
@@ -1169,7 +1255,42 @@ class ClusterEngine {
     return fam && this.fonts[fam] ? this.fonts[fam].metrics : null;
   }
 
+  /** Text layers are asked for and the connected renderer takes them. */
+  _textWanted() {
+    return !this.textFailed && !!this.textLayers() && !!this.cr.ready && !!this.cr.texts;
+  }
+
+  /** The renderer refused a font or a text layer, or could not draw one: effect layers again. */
+  _textRefused(ref) {
+    if (this.textFailed || !this.textMode) return;
+    if (ref !== this.fontRef && !this.pieces.some((p) => p.text && p.ref === ref)) return;
+    this.textFailed = true;
+    this.log.warn('text layers refused by the renderer: texts go back to effect layers');
+  }
+
+  /** A text layer's string and how it sits in its rect, sent when they change. */
+  _sendTextLayer(st, parts, align, tracking, force) {
+    const m = this._metrics();
+    if (!m) return;
+    const h = st.piece.h;
+    const line = textLine(parts.map((p) => p.text).join(''), m, st.piece.w / h, tracking);
+    const al = align === 0 ? 'left' : align === 1 ? 'right' : 'center';
+    const spacing = Math.round(line.spacing * h * 100) / 100;
+    const style = al + ' ' + spacing;
+    if (force || style !== st.lastStyle) {
+      st.lastStyle = style;
+      this.cr.textStyle(st.ref, { align: al, spacing });
+      this.messages++;
+    }
+    if (force || line.text !== st.lastText) {
+      st.lastText = line.text;
+      this.cr.setText(st.ref, line.text);
+      this.messages++;
+    }
+  }
+
   _sendLine(st, parts, align, tracking, scale2, force) {
+    if (st.text) return this._sendTextLayer(st, parts, align, tracking, force);
     const m = this._metrics();
     if (!m) return;
     const line = layoutLine(parts, m, st.piece.w / st.piece.h, align, tracking, scale2 || 1, false);
@@ -1186,7 +1307,8 @@ class ClusterEngine {
     const key = rgba.map(r3).join(',');
     if (!force && st.lastColor[name] === key) return;
     st.lastColor[name] = key;
-    this.cr.uniform(st.ref, name, vec(rgba));
+    if (st.text) this.cr.textStyle(st.ref, { color: rgba.map(r3) });
+    else this.cr.uniform(st.ref, name, vec(rgba));
     this.messages++;
   }
 

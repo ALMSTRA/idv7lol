@@ -153,6 +153,8 @@ mgu.run({
       sweep: () => settings.get('sweep') !== 'off',
       // a theme's map window shows the map another app draws, unless switched off
       map: () => settings.get('map') !== 'off',
+      // plain lines of text as the renderer's text layers, where it has them (cluster-render 0.8.11)
+      textLayers: () => settings.get('textLayers') === 'on',
       utcOffsetMinutes: utcOffset,
       // The layout ends above the cluster's own bottom strip unless the setting says otherwise:
       // drawn over it, some KOMBIs leave black boxes until the head unit restarts (issue #7).
@@ -354,7 +356,8 @@ mgu.run({
             st.target +
             '  ·  refused ops: ' +
             st.refused +
-            (st.map ? '  ·  map: ' + String(st.map).slice(0, 48) : ''),
+            (st.map ? '  ·  map: ' + String(st.map).slice(0, 48) : '') +
+            (st.textLayers ? '  ·  text layers: ' + st.textLayers : ''),
           carLine:
             (vs.demo ? 'DEMO' : vehicle.live() ? 'live' : 'not live') +
             '  ·  ' +

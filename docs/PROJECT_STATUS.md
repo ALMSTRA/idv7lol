@@ -103,6 +103,15 @@ with iDrive 7 07/2022 and a CarPlay map (issue 13, with photographs), in Map Vie
 full-screen theme. `fit` `contain` (all of the map in the window, car app 0.2.23) is tested
 locally only.
 
+## Text layers (added 2026-11-25, car app 0.2.25)
+
+Plain lines of text as cluster-render 0.8.11's text layers, behind the setting _Texts drawn by
+the renderer_, off by default: developed and tested locally (the shipped client takes the font,
+the layers and their strings; the line's layout compared with the service's). **Not tested in a
+vehicle.** To check on a car: every text present, in place and sharp, colours following the
+palette, the gear and the clock changing, and the Status tab's renderer line ending in
+`text layers: N`.
+
 ## Pending (ordered)
 
 1. **More vehicle tests.** Install, drawing and turning off are confirmed on one car. Still to

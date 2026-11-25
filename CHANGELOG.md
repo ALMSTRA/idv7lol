@@ -12,6 +12,17 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
+- **Texts drawn by the renderer (car app 0.2.25, a setting, off by default).** With _Texts drawn
+  by the renderer_ on and cluster-render 0.8.11 or newer, a plain line of text (a label, a value
+  without a unit beside it, the gear, the driving mode, the clock) is one of the renderer's text
+  layers: the glyph atlas goes once as a font, then only the string when it changes, and the
+  service lays the line out, where the app's own layer looks every pixel up in 32 glyphs. A line
+  with a second colour or size (a value with its unit, a status row), a glow or an animation
+  stays as it was, and so does everything with the setting off, an older renderer, or after the
+  renderer refuses a text layer. The font table holds whole atlas pixels, so such a line can sit
+  up to a pixel and 2% of its height off where the Studio draws it. Tested locally (the client
+  the app ships takes the messages; the layout compared with cluster-render's own); **not tested
+  in a vehicle**, which is why it is off unless asked for.
 - **Car app 0.2.24** with the two below. Tested locally; not tested in a vehicle.
 - `apps/idv7lol/cluster_render_client.js` from idrive-apps 3fe7c37 (cluster-render 0.8.12): video
   frames through shared memory, a scene file's animation sequences (`--play`, `--skip`), a scene's

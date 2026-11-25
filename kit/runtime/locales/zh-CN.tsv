@@ -1717,6 +1717,8 @@ Covered by the layout (may leave black boxes)	由布局覆盖（可能出现黑�
 Auto (the car's own)	自动（使用原车单位）
 Start-up sweep	启动时指针扫表
 Map in the theme	主题中的地图
+Texts drawn by the renderer	由渲染器绘制文字
+On (cluster-render 0.8.11)	开启（cluster-render 0.8.11）
 Time zone	时区
 Fixed offset (Clock: offset from UTC)	固定偏移（在设置中选择 UTC 偏移）
 Clock: offset from UTC (Time zone: Fixed offset)	时钟 UTC 偏移（固定偏移模式）

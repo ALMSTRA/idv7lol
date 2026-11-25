@@ -153,8 +153,82 @@ function layoutLine(parts, metrics, boxW, align, tracking, scale2, tabular) {
   return { codes, centres, width: total };
 }
 
+/** A glyph's advance in glyph heights, as layoutLine takes it. */
+function glyphAdvance(metrics, code, ch) {
+  return Math.max(metrics.adv[code] || 0.5, ch === ' ' ? SPACE_MIN : 0);
+}
+
+/**
+ * The atlas as a font of the renderer's text layers (cluster-render PROTOCOL.md "Text"):
+ * { line, glyphs, sdf }. A glyph's box is its cell, which it is centred in, so its left offset
+ * puts the cell's middle at the middle of its advance; the table holds whole atlas pixels, which
+ * is why a line drawn from it can sit a pixel or two off the one layoutLine places.
+ */
+function fontTable(metrics) {
+  const seen = {};
+  const glyphs = [];
+  const chars = metrics.chars;
+  for (let code = 0; code < chars.length; code++) {
+    const ch = chars[code];
+    const cp = ch.charCodeAt(0);
+    if (seen[cp] || (cp >= 0xd800 && cp <= 0xdfff)) continue;
+    seen[cp] = true;
+    const adv = glyphAdvance(metrics, code, ch) * metrics.cellH;
+    const blank = ch === ' ';
+    glyphs.push(
+      cp +
+        ':' +
+        (code % metrics.cols) * metrics.cellW +
+        ',' +
+        Math.floor(code / metrics.cols) * metrics.cellH +
+        ',' +
+        (blank ? 0 : metrics.cellW) +
+        ',' +
+        (blank ? 0 : metrics.cellH) +
+        ',' +
+        Math.round((adv - metrics.cellW) / 2) +
+        ',0,' +
+        Math.round(adv),
+    );
+  }
+  return { line: metrics.cellH, glyphs: glyphs.join(' '), sdf: metrics.spread };
+}
+
+/**
+ * A line for a text layer: { text, spacing }. text has only glyphs of the font (a lower-case
+ * letter it lacks as its capital), at most as many as layoutLine draws. spacing, in glyph heights
+ * between characters, makes the line as wide as layoutLine's: its tracking (dropped when the
+ * line is wider than the box, which then takes the line in by up to 15%), and what the font
+ * table's whole pixels are off by, shared out between the characters.
+ */
+function textLine(text, metrics, boxW, tracking) {
+  let out = '';
+  let exact = 0; // the advances as layoutLine has them
+  let whole = 0; // as the font table has them
+  let n = 0;
+  for (const ch of String(text)) {
+    const code = codeOf(metrics.chars, ch);
+    if (code < 0) continue;
+    if (n >= MAX_GLYPHS) break;
+    const c = metrics.chars[code];
+    const adv = glyphAdvance(metrics, code, c);
+    out += c;
+    exact += adv;
+    whole += Math.round(adv * metrics.cellH) / metrics.cellH;
+    n++;
+  }
+  if (n < 2) return { text: out, spacing: 0 };
+  let tr = tracking || 0;
+  if (tr > 0 && exact + tr * (n - 1) > boxW) tr = 0;
+  let total = exact + tr * (n - 1);
+  if (total > boxW) total *= Math.max(0.85, boxW / total);
+  return { text: out, spacing: (total - whole) / (n - 1) };
+}
+
 module.exports = {
   codeOf,
+  fontTable,
+  textLine,
   formatNumber,
   formatDash,
   formatClock,

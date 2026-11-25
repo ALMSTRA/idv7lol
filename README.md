@@ -188,6 +188,9 @@ the warning about the SSH unlock; read it first).
    - _App screen_: Modern (tabs) or Classic (text pages).
    - _Map in the theme_: a theme with a map window (Map View) shows the map that Waze, Android
      Auto or CarPlay draw on the cluster, through waze-on-cluster. Off keeps the window plain.
+   - _Texts drawn by the renderer_: off by default. On, with cluster-render 0.8.11 or newer,
+     plain lines of text are drawn by the renderer itself, which costs the cluster less. Not
+     tested in a car yet: turn it off again if a text is missing or out of place.
    - _Bottom strip_: leave it on _The car's own_ unless you know your cluster takes a layout over
      it.
    - _Start-up sweep_, _Time zone_, _Fuel tank size_ and _Demo data_.

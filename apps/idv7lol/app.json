@@ -2,7 +2,7 @@
   "id": "idv7lol",
   "title": "idv7lol",
   "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
-  "version": "0.2.24",
+  "version": "0.2.25",
   "startType": "autostart",
   "vendor": "custom",
   "license": "GPL-3.0-or-later",
@@ -218,6 +218,16 @@
       "options": [
         ["on", "On"],
         ["off", "Off"]
+      ]
+    },
+    {
+      "key": "textLayers",
+      "label": "Texts drawn by the renderer",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        ["off", "Off"],
+        ["on", "On (cluster-render 0.8.11)"]
       ]
     },
     {

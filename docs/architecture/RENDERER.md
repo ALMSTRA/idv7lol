@@ -99,12 +99,32 @@ below needs 0.8.2. What the releases up to 0.6.9 fixed, which is why that was th
 - 0.8.4: the cluster map no longer disappears about 2 s after it shows when a cluster theme is
   installed and the car's logging has RAMSES's messages off. 0.8.7: a finished session's
   animations are freed on iDrive 7.
-- 0.8.8 to 0.8.12 (the client idv7lol carries is 0.8.12's; none of this is used or required yet):
+- 0.8.8 to 0.8.12 (the client idv7lol carries is 0.8.12's; none of this is required, and only
+  text layers are used, behind a setting, see "Text layers" below):
   video frames through shared memory; 0.8.9 a map the cluster stops drawing while DLT is off is
   asked for again within about 2 s, and a scene file's animation sequences can be played
   (`--play`, `--skip`); 0.8.10 `over_order`; 0.8.11 **text layers**: a font sent once, then only
   strings, up to 256 glyphs a line, the hello's `text` 1 says the service takes them; 0.8.12
   `--skip` on iDrive 7.
+
+## Text layers (car app 0.2.25, off by default)
+
+PROTOCOL.md "Text" (cluster-render 0.8.11): a client sends a font once, an `r8` atlas and a table
+`code:x,y,w,h,left,top,advance` in whole atlas pixels with `line` and `sdf`, and a text layer
+(`layer` with `kind` `text`: `font`, `max`, `align`, `spacing`, `size`, `color`, `text`) draws one
+line from it; a `text` message sets its string or its style. Such a layer takes no `uniform`,
+`bind` or `link`. The client holds fonts and text layers until a hello with `text` 1.
+
+With the setting _Texts drawn by the renderer_ on and such a hello, `apps/idv7lol/engine.js` makes
+the font over the glyph atlas it already sends (`fontTable()` in `text.js`: each glyph's box is
+its 56x64 cell, `line` 64, `sdf` 8, the atlas's spread) and makes a text layer, not an effect
+layer with the `text` shader, of each piece that is one plain line: one colour, one size, no
+glow, no animation (`plainLine()`). Its `size` is the piece's height, so a layer cut at the bottom
+strip keeps its line's height. `textLine()` gives the string (only glyphs the font has) and a
+`spacing` that makes the line as wide as `layoutLine()` makes it. Palette, zone and manual-gear
+colours go as the layer's `color`. The layout is made again, the other way, when the setting
+changes, when a renderer with or without `text` connects, and for good as effect layers once the
+renderer refuses a font or a text layer or reports one in `error`. Not tested in a vehicle.
 
 ## iDrive 8 (not supported by idv7lol)
 
