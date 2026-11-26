@@ -106,6 +106,10 @@ below needs 0.8.2. What the releases up to 0.6.9 fixed, which is why that was th
   (`--play`, `--skip`); 0.8.10 `over_order`; 0.8.11 **text layers**: a font sent once, then only
   strings, up to 256 glyphs a line, the hello's `text` 1 says the service takes them; 0.8.12
   `--skip` on iDrive 7.
+- 0.8.13 and 0.8.14 (the client idv7lol carries is 0.8.14's since car app 0.2.26; not used or
+  required): the service runs in the head unit's slice for standard services; a host from layers
+  sent with `hide` and `shown` 0 hides the hosted picture while its target is on screen, the
+  hello's `host_hide` 1 says the service takes it; a video layer's `fresh_ms`.
 
 ## Text layers (car app 0.2.25, off by default)
 
