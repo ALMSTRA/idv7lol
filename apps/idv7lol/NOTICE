@@ -21,6 +21,20 @@ This app includes third-party material, each part under its own licence:
    Signed-distance-field atlases baked from the Barlow font family
    (https://github.com/jpt/barlow). SIL Open Font License 1.1, below.
 
+4. Community themes (theme_*.js and their pictures), hand conversions to idv7lol's theme format
+   that carry over the arrangement, proportions, colours and readouts of the originals and none
+   of their code, shaders, fonts or images:
+   - theme_analog_sport.js, theme_classic_m_cluster.js, theme_digital_dash.js, theme_gt3.js:
+     after Cluster Layouts, Copyright (C) 2026 eroobeeroo
+     (https://github.com/eroobeeroo/idrive7-cluster-info), GNU General Public License, version 3
+     or later, as this app.
+   - theme_kb_live.js, theme_kb_neon.js: after KurdBimmer Themes, Copyright (c) 2026 bimmer-lab,
+     Copyright (c) 2026 FDX100 (https://github.com/FDX100/KB), MIT License.
+   - theme_ct_aero.js, theme_ct_apex.js, theme_ct_circuit.js, theme_ct_veloce.js,
+     theme_ct_vetro.js and ct_*.wad: after Cluster Themes, Copyright (c) 2026 bimmer-lab, MIT
+     License.
+   The MIT License's text is the one below, with these copyright lines.
+
 --------------------------------------------------------------------------------
 MIT License (the MGU App Kit, kit/*)
 --------------------------------------------------------------------------------

@@ -3,31 +3,12 @@
 module.exports = {
   "themes": [
     {
-      "id": "idv7lol-classic",
-      "name": "IDV7LOL Classic",
-      "module": "theme_idv7lol_classic",
-      "palettes": [
-        "amber",
-        "sport"
-      ]
-    },
-    {
       "id": "idv7lol-giallo",
       "name": "IDV7LOL Giallo",
       "module": "theme_idv7lol_giallo",
       "palettes": [
         "giallo",
         "nero"
-      ]
-    },
-    {
-      "id": "idv7lol-heritage-89",
-      "name": "Heritage 89",
-      "module": "theme_idv7lol_heritage_89",
-      "palettes": [
-        "amber",
-        "daylight",
-        "red"
       ]
     },
     {
@@ -82,26 +63,6 @@ module.exports = {
       ]
     },
     {
-      "id": "idv7lol-performance",
-      "name": "IDV7LOL Performance",
-      "module": "theme_idv7lol_performance",
-      "palettes": [
-        "night",
-        "sport",
-        "track"
-      ]
-    },
-    {
-      "id": "idv7lol-rally-dash",
-      "name": "Rally Dash",
-      "module": "theme_idv7lol_rally_dash",
-      "palettes": [
-        "rally",
-        "stage",
-        "ice"
-      ]
-    },
-    {
       "id": "idv7lol-supercar-track",
       "name": "Supercar Track",
       "module": "theme_idv7lol_supercar_track",
@@ -120,13 +81,102 @@ module.exports = {
       ]
     },
     {
-      "id": "idv7lol-volt-runner",
-      "name": "Volt Runner",
-      "module": "theme_idv7lol_volt_runner",
+      "id": "analog-sport",
+      "name": "Analog Sport",
+      "module": "theme_analog_sport",
       "palettes": [
-        "volt",
-        "dusk",
+        "comfort",
+        "sport",
+        "efficient"
+      ]
+    },
+    {
+      "id": "classic-m-cluster",
+      "name": "Classic Cluster",
+      "module": "theme_classic_m_cluster",
+      "palettes": [
+        "normal",
         "sport"
+      ]
+    },
+    {
+      "id": "ct-aero",
+      "name": "Aero",
+      "module": "theme_ct_aero",
+      "palettes": [
+        "aero"
+      ]
+    },
+    {
+      "id": "ct-apex",
+      "name": "Apex II",
+      "module": "theme_ct_apex",
+      "palettes": [
+        "apex"
+      ]
+    },
+    {
+      "id": "ct-circuit",
+      "name": "Circuit",
+      "module": "theme_ct_circuit",
+      "palettes": [
+        "red",
+        "yellow",
+        "blue"
+      ]
+    },
+    {
+      "id": "ct-veloce",
+      "name": "Veloce",
+      "module": "theme_ct_veloce",
+      "palettes": [
+        "veloce"
+      ]
+    },
+    {
+      "id": "ct-vetro",
+      "name": "Vetro",
+      "module": "theme_ct_vetro",
+      "palettes": [
+        "nero",
+        "rosso",
+        "giallo"
+      ]
+    },
+    {
+      "id": "digital-dash",
+      "name": "Digital Dash",
+      "module": "theme_digital_dash",
+      "palettes": [
+        "comfort",
+        "sport",
+        "efficient"
+      ]
+    },
+    {
+      "id": "gt3",
+      "name": "GT3",
+      "module": "theme_gt3",
+      "palettes": [
+        "comfort",
+        "sport",
+        "efficient"
+      ]
+    },
+    {
+      "id": "kb-live",
+      "name": "Live Cockpit",
+      "module": "theme_kb_live",
+      "palettes": [
+        "live"
+      ]
+    },
+    {
+      "id": "kb-neon",
+      "name": "Neon City",
+      "module": "theme_kb_neon",
+      "palettes": [
+        "neon"
       ]
     }
   ],

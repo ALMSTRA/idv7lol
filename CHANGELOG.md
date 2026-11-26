@@ -21,6 +21,13 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
+- **The car app carries nineteen themes (car app 0.2.27)**, eight of its own and eleven community
+  ones: Giallo, Lily Pad, Map View, Modern, Neon Drive, Night Minimal, Supercar Track, VDO Classic M, Analog Sport, Classic Cluster, Aero, Apex II, Circuit, Veloce, Vetro, Digital Dash, GT3, Live Cockpit and Neon City. Classic, Heritage 89, Performance, Rally Dash and Volt Runner are no longer in the
+  app; they stay in the Studio and on the site and go to the car on a USB stick. A car that had
+  one of those five chosen shows the first theme of the list after the update, and a new install
+  starts with Modern (it was Performance). The list is `BUNDLED` in
+  `tools/build/build-mgu-themes.ts`, which now also removes what an earlier build left of a theme
+  no longer carried. Tested locally; the eleven community themes are not tested in a vehicle.
 - **Car app 0.2.26** with the two below. Tested locally; not tested in a vehicle.
 - `apps/idv7lol/cluster_render_client.js` from idrive-apps b0f8237 (cluster-render 0.8.14): a
   host from layers can be sent hidden (`hide`), so a map hosted nowhere is not drawn on its own

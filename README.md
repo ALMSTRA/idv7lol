@@ -228,7 +228,8 @@ MGU Store removes it completely. This is experimental software: see
   Themes (MIT, credited in each theme) and five more community conversions (Apex II, Veloce,
   Circuit, Aero and Vetro, MIT).
 - **The car app**, which runs on the head unit, draws the active theme through `cluster-render`,
-  and lets you turn it on or off and switch themes from the iDrive menu.
+  and lets you turn it on or off and switch themes from the iDrive menu. It carries nineteen
+  themes (Giallo, Lily Pad, Map View, Modern, Neon Drive, Night Minimal, Supercar Track, VDO Classic M, Analog Sport, Classic Cluster, Aero, Apex II, Circuit, Veloce, Vetro, Digital Dash, GT3, Live Cockpit and Neon City); any other goes to the car on a USB stick, from the Studio or the site.
 - **The pieces behind them:** a signal catalog, the theme format, a renderer for the PC preview,
   a simulator and the compiler that turns a theme into what the car runs.
 
