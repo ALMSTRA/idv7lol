@@ -2,7 +2,7 @@
   "id": "idv7lol",
   "title": "idv7lol",
   "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
-  "version": "0.2.25",
+  "version": "0.2.26",
   "startType": "autostart",
   "vendor": "custom",
   "license": "GPL-3.0-or-later",

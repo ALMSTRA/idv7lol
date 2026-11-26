@@ -21,6 +21,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Changed
 
+- **Car app 0.2.26** with the two below. Tested locally; not tested in a vehicle.
+- `apps/idv7lol/cluster_render_client.js` from idrive-apps b0f8237 (cluster-render 0.8.14): a
+  host from layers can be sent hidden (`hide`), so a map hosted nowhere is not drawn on its own
+  slot either. Copied verbatim; idv7lol does not use it yet, and the renderer it asks for stays
+  0.8.7.
+- `kit/runtime/car.js`, `mgu.js` and `signals.js` from idrive7-apps 527e9b2: a watch's re-read
+  stops when the watch is shut down (it went on asking a proxy that was gone), a gear can come
+  from an app's own source on a car that sends none, and home-screen widget texts in Simplified
+  Chinese.
 - **Texts drawn by the renderer (car app 0.2.25, a setting, off by default).** With _Texts drawn
   by the renderer_ on and cluster-render 0.8.11 or newer, a plain line of text (a label, a value
   without a unit beside it, the gear, the driving mode, the clock) is one of the renderer's text
