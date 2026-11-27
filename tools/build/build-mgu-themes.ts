@@ -47,9 +47,10 @@ const BUNDLED = [
 ];
 /**
  * What the app may take on the head unit, unpacked. The app manager refuses an install over the
- * `maxDiskUsage` the package declares (20 MiB, the kit's default: car app 0.2.27 took 22.3 MB and
- * failed with E_APP_MANAGER_MAX_DISK_USAGE_EXCEEDED). Kept well under it: a picture is stored as
- * raw RGBA at the size it is drawn, so a theme with a wide backdrop takes megabytes.
+ * `maxDiskUsage` the package declares (car app 0.2.27 took 22.3 MB under the kit's default of
+ * 20 MiB and failed with E_APP_MANAGER_MAX_DISK_USAGE_EXCEEDED; app.json declares 50 MiB since
+ * 0.2.29). Kept under the old limit all the same, the only one an install is known to pass: a
+ * picture is stored as raw RGBA at the size it is drawn, so a wide backdrop takes megabytes.
  */
 const DISK_BUDGET = 12 * 1024 * 1024;
 /** The theme a new install starts with. */

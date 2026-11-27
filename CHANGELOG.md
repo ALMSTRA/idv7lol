@@ -19,6 +19,14 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   `themes/community/README.md`); 54 themes in all. Tested locally (validated, drawn with the car
   app's engine on a PC); not tested in a vehicle.
 
+### Changed
+
+- **The car app declares 50 MiB of disk (car app 0.2.29)**, `maxDiskUsage` in
+  `apps/idv7lol/app.json`, where it had the kit's default of 20 MiB. It still carries sixteen
+  themes and takes 13.1 MB with the kit, so the room is for themes installed from a USB stick.
+  Other apps of the same kit declare 25 and 100 MiB; that this app installs with the higher
+  figure is not tested in a vehicle.
+
 ### Fixed
 
 - **Car app 0.2.27 did not install** (reported from a car: `E_APP_MANAGER_MAX_DISK_USAGE_EXCEEDED`,
