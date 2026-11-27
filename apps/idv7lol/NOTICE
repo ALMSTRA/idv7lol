@@ -30,9 +30,8 @@ This app includes third-party material, each part under its own licence:
      or later, as this app.
    - theme_kb_live.js, theme_kb_neon.js: after KurdBimmer Themes, Copyright (c) 2026 bimmer-lab,
      Copyright (c) 2026 FDX100 (https://github.com/FDX100/KB), MIT License.
-   - theme_ct_aero.js, theme_ct_apex.js, theme_ct_circuit.js, theme_ct_veloce.js,
-     theme_ct_vetro.js and ct_*.wad: after Cluster Themes, Copyright (c) 2026 bimmer-lab, MIT
-     License.
+   - theme_ct_aero.js, theme_ct_apex.js and ct_*.wad: after Cluster Themes, Copyright (c) 2026
+     bimmer-lab, MIT License.
    The MIT License's text is the one below, with these copyright lines.
 
 --------------------------------------------------------------------------------

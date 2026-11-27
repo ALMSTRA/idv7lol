@@ -2,7 +2,7 @@
   "id": "idv7lol",
   "title": "idv7lol",
   "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
-  "version": "0.2.27",
+  "version": "0.2.28",
   "startType": "autostart",
   "vendor": "custom",
   "license": "GPL-3.0-or-later",
@@ -77,8 +77,12 @@
     "com.harman.infotainment.systemfunctions.tasu.tasu.InternalTasu": {
       "_optional": "the engine unit's boost and fuel percentage (read only); without it no boost unless the car sends one, and the fuel gauge uses litres over the tank size",
       "_instances": "SystemFunctionsInternalTasuInst1",
-      "_methods": ["sendTasuRequest"],
-      "_broadcasts": ["sendTasuResponse"]
+      "_methods": [
+        "sendTasuRequest"
+      ],
+      "_broadcasts": [
+        "sendTasuResponse"
+      ]
     }
   },
   "screens": [
@@ -87,11 +91,26 @@
       "kind": "canvas",
       "title": "idv7lol",
       "buttons": [
-        ["BTN_SHOW", "Show"],
-        ["BTN_THEME", "Theme"],
-        ["BTN_PALETTE", "Palette"],
-        ["BTN_PAGE", "Page"],
-        ["BTN_SETTINGS", "Settings"]
+        [
+          "BTN_SHOW",
+          "Show"
+        ],
+        [
+          "BTN_THEME",
+          "Theme"
+        ],
+        [
+          "BTN_PALETTE",
+          "Palette"
+        ],
+        [
+          "BTN_PAGE",
+          "Page"
+        ],
+        [
+          "BTN_SETTINGS",
+          "Settings"
+        ]
       ]
     }
   ],
@@ -102,8 +121,14 @@
       "type": "choice",
       "default": "off",
       "options": [
-        ["off", "Off (factory cluster)"],
-        ["on", "On"]
+        [
+          "off",
+          "Off (factory cluster)"
+        ],
+        [
+          "on",
+          "On"
+        ]
       ]
     },
     {
@@ -112,25 +137,70 @@
       "type": "choice",
       "default": "idv7lol-modern",
       "options": [
-        ["idv7lol-giallo", "IDV7LOL Giallo"],
-        ["idv7lol-lily-pad", "Lily Pad"],
-        ["idv7lol-map-view", "IDV7LOL Map View"],
-        ["idv7lol-modern", "IDV7LOL Modern"],
-        ["idv7lol-neon-drive", "Neon Drive"],
-        ["idv7lol-night-minimal", "Night Minimal"],
-        ["idv7lol-supercar-track", "Supercar Track"],
-        ["vdo-classic-m", "VDO Classic M"],
-        ["analog-sport", "Analog Sport"],
-        ["classic-m-cluster", "Classic Cluster"],
-        ["ct-aero", "Aero"],
-        ["ct-apex", "Apex II"],
-        ["ct-circuit", "Circuit"],
-        ["ct-veloce", "Veloce"],
-        ["ct-vetro", "Vetro"],
-        ["digital-dash", "Digital Dash"],
-        ["gt3", "GT3"],
-        ["kb-live", "Live Cockpit"],
-        ["kb-neon", "Neon City"]
+        [
+          "idv7lol-giallo",
+          "IDV7LOL Giallo"
+        ],
+        [
+          "idv7lol-lily-pad",
+          "Lily Pad"
+        ],
+        [
+          "idv7lol-map-view",
+          "IDV7LOL Map View"
+        ],
+        [
+          "idv7lol-modern",
+          "IDV7LOL Modern"
+        ],
+        [
+          "idv7lol-neon-drive",
+          "Neon Drive"
+        ],
+        [
+          "idv7lol-night-minimal",
+          "Night Minimal"
+        ],
+        [
+          "idv7lol-supercar-track",
+          "Supercar Track"
+        ],
+        [
+          "vdo-classic-m",
+          "VDO Classic M"
+        ],
+        [
+          "analog-sport",
+          "Analog Sport"
+        ],
+        [
+          "classic-m-cluster",
+          "Classic Cluster"
+        ],
+        [
+          "ct-aero",
+          "Aero"
+        ],
+        [
+          "ct-apex",
+          "Apex II"
+        ],
+        [
+          "digital-dash",
+          "Digital Dash"
+        ],
+        [
+          "gt3",
+          "GT3"
+        ],
+        [
+          "kb-live",
+          "Live Cockpit"
+        ],
+        [
+          "kb-neon",
+          "Neon City"
+        ]
       ]
     },
     {
@@ -139,33 +209,94 @@
       "type": "choice",
       "default": "auto",
       "options": [
-        ["auto", "Automatic (driving mode)"],
-        ["giallo", "Palette: giallo"],
-        ["nero", "Palette: nero"],
-        ["pond", "Palette: pond"],
-        ["firefly", "Palette: firefly"],
-        ["toxic", "Palette: toxic"],
-        ["lotus", "Palette: lotus"],
-        ["night", "Palette: night"],
-        ["sport", "Palette: sport"],
-        ["eco", "Palette: eco"],
-        ["neon", "Palette: neon"],
-        ["blood", "Palette: blood"],
-        ["acid", "Palette: acid"],
-        ["amber", "Palette: amber"],
-        ["track", "Palette: track"],
-        ["corsa", "Palette: corsa"],
-        ["comfort", "Palette: comfort"],
-        ["efficient", "Palette: efficient"],
-        ["normal", "Palette: normal"],
-        ["aero", "Palette: aero"],
-        ["apex", "Palette: apex"],
-        ["red", "Palette: red"],
-        ["yellow", "Palette: yellow"],
-        ["blue", "Palette: blue"],
-        ["veloce", "Palette: veloce"],
-        ["rosso", "Palette: rosso"],
-        ["live", "Palette: live"]
+        [
+          "auto",
+          "Automatic (driving mode)"
+        ],
+        [
+          "giallo",
+          "Palette: giallo"
+        ],
+        [
+          "nero",
+          "Palette: nero"
+        ],
+        [
+          "pond",
+          "Palette: pond"
+        ],
+        [
+          "firefly",
+          "Palette: firefly"
+        ],
+        [
+          "toxic",
+          "Palette: toxic"
+        ],
+        [
+          "lotus",
+          "Palette: lotus"
+        ],
+        [
+          "night",
+          "Palette: night"
+        ],
+        [
+          "sport",
+          "Palette: sport"
+        ],
+        [
+          "eco",
+          "Palette: eco"
+        ],
+        [
+          "neon",
+          "Palette: neon"
+        ],
+        [
+          "blood",
+          "Palette: blood"
+        ],
+        [
+          "acid",
+          "Palette: acid"
+        ],
+        [
+          "amber",
+          "Palette: amber"
+        ],
+        [
+          "track",
+          "Palette: track"
+        ],
+        [
+          "corsa",
+          "Palette: corsa"
+        ],
+        [
+          "comfort",
+          "Palette: comfort"
+        ],
+        [
+          "efficient",
+          "Palette: efficient"
+        ],
+        [
+          "normal",
+          "Palette: normal"
+        ],
+        [
+          "aero",
+          "Palette: aero"
+        ],
+        [
+          "apex",
+          "Palette: apex"
+        ],
+        [
+          "live",
+          "Palette: live"
+        ]
       ]
     },
     {
@@ -174,8 +305,14 @@
       "type": "choice",
       "default": "modern",
       "options": [
-        ["modern", "Modern (tabs and previews)"],
-        ["classic", "Classic (text pages)"]
+        [
+          "modern",
+          "Modern (tabs and previews)"
+        ],
+        [
+          "classic",
+          "Classic (text pages)"
+        ]
       ]
     },
     {
@@ -184,8 +321,14 @@
       "type": "choice",
       "default": "keep",
       "options": [
-        ["keep", "Keep it"],
-        ["remove", "Remove it from the car"]
+        [
+          "keep",
+          "Keep it"
+        ],
+        [
+          "remove",
+          "Remove it from the car"
+        ]
       ]
     },
     {
@@ -194,8 +337,14 @@
       "type": "choice",
       "default": "car",
       "options": [
-        ["car", "The car's own (no black boxes)"],
-        ["layout", "Covered by the layout (may leave black boxes)"]
+        [
+          "car",
+          "The car's own (no black boxes)"
+        ],
+        [
+          "layout",
+          "Covered by the layout (may leave black boxes)"
+        ]
       ]
     },
     {
@@ -204,10 +353,22 @@
       "type": "choice",
       "default": "auto",
       "options": [
-        ["auto", "Auto (the car's own)"],
-        ["metric", "km/h, °C, bar"],
-        ["mph-celsius", "mph, °C, bar"],
-        ["mph-fahrenheit", "mph, °F, psi"]
+        [
+          "auto",
+          "Auto (the car's own)"
+        ],
+        [
+          "metric",
+          "km/h, °C, bar"
+        ],
+        [
+          "mph-celsius",
+          "mph, °C, bar"
+        ],
+        [
+          "mph-fahrenheit",
+          "mph, °F, psi"
+        ]
       ]
     },
     {
@@ -216,8 +377,14 @@
       "type": "choice",
       "default": "on",
       "options": [
-        ["on", "On"],
-        ["off", "Off"]
+        [
+          "on",
+          "On"
+        ],
+        [
+          "off",
+          "Off"
+        ]
       ]
     },
     {
@@ -226,8 +393,14 @@
       "type": "choice",
       "default": "on",
       "options": [
-        ["on", "On"],
-        ["off", "Off"]
+        [
+          "on",
+          "On"
+        ],
+        [
+          "off",
+          "Off"
+        ]
       ]
     },
     {
@@ -236,8 +409,14 @@
       "type": "choice",
       "default": "off",
       "options": [
-        ["off", "Off"],
-        ["on", "On (cluster-render 0.8.11)"]
+        [
+          "off",
+          "Off"
+        ],
+        [
+          "on",
+          "On (cluster-render 0.8.11)"
+        ]
       ]
     },
     {
@@ -246,22 +425,70 @@
       "type": "choice",
       "default": "offset",
       "options": [
-        ["offset", "Fixed offset (Clock: offset from UTC)"],
-        ["melbourne", "Melbourne, Sydney, Canberra, Hobart"],
-        ["brisbane", "Brisbane"],
-        ["adelaide", "Adelaide"],
-        ["darwin", "Darwin"],
-        ["perth", "Perth"],
-        ["auckland", "Auckland"],
-        ["uk", "UK, Ireland, Portugal"],
-        ["cet", "Central Europe"],
-        ["eet", "Eastern Europe"],
-        ["us-eastern", "US Eastern"],
-        ["us-central", "US Central"],
-        ["us-mountain", "US Mountain"],
-        ["arizona", "Arizona"],
-        ["us-pacific", "US Pacific"],
-        ["utc", "UTC"]
+        [
+          "offset",
+          "Fixed offset (Clock: offset from UTC)"
+        ],
+        [
+          "melbourne",
+          "Melbourne, Sydney, Canberra, Hobart"
+        ],
+        [
+          "brisbane",
+          "Brisbane"
+        ],
+        [
+          "adelaide",
+          "Adelaide"
+        ],
+        [
+          "darwin",
+          "Darwin"
+        ],
+        [
+          "perth",
+          "Perth"
+        ],
+        [
+          "auckland",
+          "Auckland"
+        ],
+        [
+          "uk",
+          "UK, Ireland, Portugal"
+        ],
+        [
+          "cet",
+          "Central Europe"
+        ],
+        [
+          "eet",
+          "Eastern Europe"
+        ],
+        [
+          "us-eastern",
+          "US Eastern"
+        ],
+        [
+          "us-central",
+          "US Central"
+        ],
+        [
+          "us-mountain",
+          "US Mountain"
+        ],
+        [
+          "arizona",
+          "Arizona"
+        ],
+        [
+          "us-pacific",
+          "US Pacific"
+        ],
+        [
+          "utc",
+          "UTC"
+        ]
       ]
     },
     {
@@ -270,26 +497,86 @@
       "type": "choice",
       "default": "0",
       "options": [
-        ["-600", "-10:00"],
-        ["-540", "-09:00"],
-        ["-480", "-08:00"],
-        ["-420", "-07:00"],
-        ["-360", "-06:00"],
-        ["-300", "-05:00"],
-        ["-240", "-04:00"],
-        ["-180", "-03:00"],
-        ["-120", "-02:00"],
-        ["-60", "-01:00"],
-        ["0", "UTC"],
-        ["60", "+01:00"],
-        ["120", "+02:00"],
-        ["180", "+03:00"],
-        ["240", "+04:00"],
-        ["300", "+05:00"],
-        ["330", "+05:30"],
-        ["480", "+08:00"],
-        ["540", "+09:00"],
-        ["600", "+10:00"]
+        [
+          "-600",
+          "-10:00"
+        ],
+        [
+          "-540",
+          "-09:00"
+        ],
+        [
+          "-480",
+          "-08:00"
+        ],
+        [
+          "-420",
+          "-07:00"
+        ],
+        [
+          "-360",
+          "-06:00"
+        ],
+        [
+          "-300",
+          "-05:00"
+        ],
+        [
+          "-240",
+          "-04:00"
+        ],
+        [
+          "-180",
+          "-03:00"
+        ],
+        [
+          "-120",
+          "-02:00"
+        ],
+        [
+          "-60",
+          "-01:00"
+        ],
+        [
+          "0",
+          "UTC"
+        ],
+        [
+          "60",
+          "+01:00"
+        ],
+        [
+          "120",
+          "+02:00"
+        ],
+        [
+          "180",
+          "+03:00"
+        ],
+        [
+          "240",
+          "+04:00"
+        ],
+        [
+          "300",
+          "+05:00"
+        ],
+        [
+          "330",
+          "+05:30"
+        ],
+        [
+          "480",
+          "+08:00"
+        ],
+        [
+          "540",
+          "+09:00"
+        ],
+        [
+          "600",
+          "+10:00"
+        ]
       ]
     },
     {
@@ -298,9 +585,18 @@
       "type": "choice",
       "default": "auto",
       "options": [
-        ["auto", "Auto (until the car answers)"],
-        ["on", "On"],
-        ["off", "Off"]
+        [
+          "auto",
+          "Auto (until the car answers)"
+        ],
+        [
+          "on",
+          "On"
+        ],
+        [
+          "off",
+          "Off"
+        ]
       ]
     },
     {
@@ -313,10 +609,88 @@
         "0": "Automatic"
       },
       "steps": [
-        0, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74,
-        75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97,
-        98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110
+        0,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110
       ]
     }
   ],

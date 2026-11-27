@@ -19,6 +19,15 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
   `themes/community/README.md`); 54 themes in all. Tested locally (validated, drawn with the car
   app's engine on a PC); not tested in a vehicle.
 
+### Fixed
+
+- **Car app 0.2.27 did not install** (reported from a car: `E_APP_MANAGER_MAX_DISK_USAGE_EXCEEDED`,
+  nothing installed). Unpacked it took 22.3 MB and the package declares 20 MiB; 0.2.26 took 10.5 MB.
+  **Car app 0.2.28** carries sixteen themes and takes 10.9 MB: Circuit, Veloce and Vetro, whose
+  backdrops are the heaviest pictures, are no longer in the app and go to the car on a USB stick
+  like the rest. The build now fails when the app would take over 12 MiB unpacked. Tested locally
+  (sizes measured, package built); the install is not tested in a vehicle.
+
 ### Changed
 
 - **The car app carries nineteen themes (car app 0.2.27)**, eight of its own and eleven community

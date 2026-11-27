@@ -9,7 +9,14 @@
  * font_<family>.js (metrics). themes_index.js lists them and app.json's
  * "clusterTheme" and "palette" settings are refreshed from the result.
  */
-import { readFileSync, writeFileSync, readdirSync, existsSync, unlinkSync } from 'node:fs';
+import {
+  readFileSync,
+  writeFileSync,
+  readdirSync,
+  existsSync,
+  unlinkSync,
+  statSync,
+} from 'node:fs';
 import { join } from 'node:path';
 import { compileThemeFile } from '../../packages/theme-compiler/src/node.js';
 import type { CompiledTheme } from '../../packages/theme-compiler/src/types.js';
@@ -33,14 +40,18 @@ const BUNDLED = [
   'community/classic-m-cluster',
   'community/ct-aero',
   'community/ct-apex',
-  'community/ct-circuit',
-  'community/ct-veloce',
-  'community/ct-vetro',
   'community/digital-dash',
   'community/gt3',
   'community/kb-live',
   'community/kb-neon',
 ];
+/**
+ * What the app may take on the head unit, unpacked. The app manager refuses an install over the
+ * `maxDiskUsage` the package declares (20 MiB, the kit's default: car app 0.2.27 took 22.3 MB and
+ * failed with E_APP_MANAGER_MAX_DISK_USAGE_EXCEEDED). Kept well under it: a picture is stored as
+ * raw RGBA at the size it is drawn, so a theme with a wide backdrop takes megabytes.
+ */
+const DISK_BUDGET = 12 * 1024 * 1024;
 /** The theme a new install starts with. */
 const DEFAULT_THEME = 'idv7lol-modern';
 const THEME_DIRS = BUNDLED.filter((d) => {
@@ -158,4 +169,17 @@ if (existsSync(appJsonPath)) {
   writeFileSync(appJsonPath, JSON.stringify(app, null, 2) + '\n');
 }
 
+if (!failed) {
+  let bytes = 0;
+  for (const name of readdirSync(APP)) {
+    const st = statSync(join(APP, name));
+    if (st.isFile() && !/\.test\.ts$/.test(name)) bytes += st.size;
+  }
+  const mb = (n: number) => (n / 1048576).toFixed(1);
+  console.log(`${APP}: ${mb(bytes)} MiB unpacked, budget ${mb(DISK_BUDGET)} MiB`);
+  if (bytes > DISK_BUDGET) {
+    console.error(`FAIL ${APP} takes ${mb(bytes)} MiB, over the budget: carry fewer themes`);
+    failed = true;
+  }
+}
 if (failed) process.exitCode = 1;

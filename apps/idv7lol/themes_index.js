@@ -116,34 +116,6 @@ module.exports = {
       ]
     },
     {
-      "id": "ct-circuit",
-      "name": "Circuit",
-      "module": "theme_ct_circuit",
-      "palettes": [
-        "red",
-        "yellow",
-        "blue"
-      ]
-    },
-    {
-      "id": "ct-veloce",
-      "name": "Veloce",
-      "module": "theme_ct_veloce",
-      "palettes": [
-        "veloce"
-      ]
-    },
-    {
-      "id": "ct-vetro",
-      "name": "Vetro",
-      "module": "theme_ct_vetro",
-      "palettes": [
-        "nero",
-        "rosso",
-        "giallo"
-      ]
-    },
-    {
       "id": "digital-dash",
       "name": "Digital Dash",
       "module": "theme_digital_dash",

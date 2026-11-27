@@ -14,7 +14,7 @@ on stable power, and know how to remove the app (last section).
 - The Store itself needs mgu-deploy and app-privacy, installed by the Store's own
   installer.
 
-The app carries nineteen themes compiled in (Giallo, Lily Pad, Map View, Modern, Neon Drive, Night Minimal, Supercar Track, VDO Classic M, Analog Sport, Classic Cluster, Aero, Apex II, Circuit, Veloce, Vetro, Digital Dash, GT3, Live Cockpit and Neon City; the list is `BUNDLED` in
+The app carries sixteen themes compiled in (Giallo, Lily Pad, Map View, Modern, Neon Drive, Night Minimal, Supercar Track, VDO Classic M, Analog Sport, Classic Cluster, Aero, Apex II, Digital Dash, GT3, Live Cockpit and Neon City; the list is `BUNDLED` in
 `tools/build/build-mgu-themes.ts`). From version 0.2.0 it also installs any other theme, yours
 or one of the rest in this repository, from a USB stick (next section). To change the built-in
 ones instead, edit that list in the repository or your fork and rebuild
