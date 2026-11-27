@@ -23,7 +23,9 @@ const BOTTOM = 512;
 /** idv7lol's own accent, the cyan of its logo. */
 const ACCENT = '#22d3ee';
 const GOOD = '#34d378';
-const MODERN_TABS = ['Themes', 'Data', 'Status', 'Signals', 'Renderer', 'About'];
+const MODERN_TABS = ['Themes', 'Store', 'Data', 'Status', 'Signals', 'Renderer', 'About'];
+/** How many tabs come before the four text pages (Status, Signals, Renderer, About). */
+const TEXT_TABS_FROM = 3;
 const CLASSIC_PAGES = 4;
 
 const FOLD = {
@@ -413,6 +415,89 @@ function themesPage(cv, t, m) {
   drawLabel(cv, m.note || m.state.detail, W / 2, BOTTOM - 8, 16, t.dim, { align: 'center' });
 }
 
+/** Where the Store tab draws: the theme on offer on the left, the phone's code on the right. */
+const STORE = { x: 40, y: TOP + 18, w: 660, side: 1150, qr: 216 };
+
+/**
+ * The Store tab. `m`: { format, lines: [text] (shown when there is no theme to offer: the store
+ * is off, offline or loading), item: { theme, name, author, version, layers, size, status }, at,
+ * count, progress (0..1 or null), note, bad (the note is an error), hint,
+ * qr: { size, get(x, y) } or null }.
+ */
+function storePage(cv, t, m) {
+  const drawLabel = labels(m.format);
+  const x = STORE.x;
+  const y = STORE.y;
+  const w = STORE.w;
+  const h = Math.round((w * 720) / 1920);
+  const tx = x + w + 36;
+  if (m.item) {
+    const it = m.item;
+    drawPreview(cv, it.theme, 'store', x, y, w);
+    cv.strokeRoundRect(x - 3, y - 3, w + 6, h + 6, 6, 1.5, t.panelEdge);
+    drawLabel(cv, it.name, tx, y + 40, 36, t.text, { font: 'bold' });
+    drawLabel(cv, it.author ? 'by ' + it.author : '', tx, y + 74, 20, t.dim);
+    drawLabel(
+      cv,
+      (it.version ? 'Version ' + it.version + '  ·  ' : '') +
+        (it.layers ? it.layers + ' layers  ·  ' : '') +
+        Math.max(1, Math.round(it.size / 1024)) +
+        ' KB',
+      tx,
+      y + 106,
+      19,
+      t.dim,
+    );
+    const tone = it.status === 'installed' || it.status === 'bundled' ? 'on' : 'wait';
+    const word =
+      it.status === 'installed'
+        ? 'Installed'
+        : it.status === 'bundled'
+          ? 'Comes with the app'
+          : it.status === 'update'
+            ? 'Update available'
+            : 'Not installed';
+    pill(cv, t, tx, y + 130, word, it.status ? tone : 'off', m.format);
+    drawLabel(cv, m.at + ' of ' + m.count, tx, y + 204, 19, t.dim);
+    if (typeof m.progress === 'number') {
+      meter(cv, t, x, y + h + 22, w, m.progress, ACCENT);
+      drawLabel(cv, Math.round(m.progress * 100) + ' %', x + w + 14, y + h + 33, 17, t.dim);
+    }
+  } else {
+    card(cv, t, x, y, STORE.side - x - 40, h);
+    (m.lines || []).slice(0, 6).forEach((line, i) => {
+      drawLabel(cv, line, x + 28, y + 52 + i * 34, i ? 20 : 26, i ? t.dim : t.text, {
+        font: i ? undefined : 'bold',
+      });
+    });
+  }
+  if (m.qr) {
+    const side = STORE.qr;
+    const qx = STORE.side + (W - 40 - STORE.side - side) / 2;
+    const quiet = 3;
+    const cell = Math.floor(side / (m.qr.size + quiet * 2));
+    const used = cell * (m.qr.size + quiet * 2);
+    cv.fillRect(qx, y, used, used, [255, 255, 255, 255]);
+    for (let j = 0; j < m.qr.size; j++)
+      for (let i = 0; i < m.qr.size; i++)
+        if (m.qr.get(i, j))
+          cv.fillRect(qx + (i + quiet) * cell, y + (j + quiet) * cell, cell, cell, [0, 0, 0, 255]);
+    const cx = qx + used / 2;
+    drawLabel(cv, 'Or pick on your phone', cx, y + used + 34, 22, t.text, {
+      align: 'center',
+      font: 'bold',
+    });
+    drawLabel(cv, 'Scan, then tap Send to my car.', cx, y + used + 62, 17, t.dim, {
+      align: 'center',
+    });
+    drawLabel(cv, 'The themes come here by themselves.', cx, y + used + 84, 17, t.dim, {
+      align: 'center',
+    });
+  }
+  if (m.note) drawLabel(cv, m.note, x, BOTTOM - 44, 18, m.bad ? t.crit : t.text);
+  drawLabel(cv, m.hint || '', x, BOTTOM - 12, 16, t.dim);
+}
+
 /**
  * The Data tab. `m`: { theme: { theme, palette }, state, mode, source, speed, rpm, redline, gear,
  * programme, fuelPct, fuelText, oil, coolant }.
@@ -593,7 +678,9 @@ module.exports = {
   THEMES,
   themeAt,
   MODERN_TABS,
+  TEXT_TABS_FROM,
   CLASSIC_PAGES,
+  STORE,
   ascii,
   fmt,
   isNum,
@@ -601,6 +688,7 @@ module.exports = {
   drawPreview,
   stateOf,
   themesPage,
+  storePage,
   dataPage,
   textPage,
   label,

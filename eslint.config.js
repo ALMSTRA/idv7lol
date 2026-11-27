@@ -12,6 +12,7 @@ export default tseslint.config(
       'kit/**',
       'local/**',
       'apps/idv7lol/cluster_render_client.js',
+      'apps/idv7lol/certs.js',
       'apps/idv7lol/theme_*.js',
       'apps/idv7lol/font_*.js',
       'apps/idv7lol/themes_index.js',

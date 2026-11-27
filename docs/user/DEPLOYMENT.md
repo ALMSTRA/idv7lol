@@ -42,6 +42,43 @@ the app uses its own copy. Unknown fonts fall back to the app's font. At most 20
 **Not tested in a vehicle.** That the app can read the stick at `/media` is inferred from Cluster
 Layouts, which writes its logs there; it still has to be confirmed on a car.
 
+## Themes from the online store
+
+From car app 0.2.30 the app can take themes straight from [idv7lol.com](https://www.idv7lol.com),
+without a USB stick. **Not tested in a vehicle yet.**
+
+What the car needs:
+
+- **Internet for apps.** The head unit gives apps none by itself, and the car's own LTE does not
+  reach them. Install `mgu-uplink` from the MGU Store and connect a phone's hotspot (Wi-Fi or
+  cable), an LTE stick or a USB network adapter, as its page in the Store explains. idv7lol's
+  package asks for internet (`"mguInternet": true`); without `mgu-uplink` that does nothing.
+- **The setting.** _Settings › Online store › On_. It is off after an install, and with it off
+  the app never connects anywhere.
+- **The car parked.** Over walking pace the store stops and a download under way is dropped.
+
+Then open the app and go to the **Store** tab (Modern interface):
+
+1. **In the car.** _Next_ goes through the catalog, one theme at a time with its sketch, author
+   and size. _Install_, then _Yes, install_, downloads it. It joins the themes of the Themes tab;
+   the cluster does not change until you pick it.
+2. **On your phone.** Scan the QR code the tab shows. It opens the site's page for your car: tap
+   **Send to my car** on the themes you want. While the Store tab is open the car looks every
+   15 seconds and installs what you sent. No account, nothing to type in the car.
+
+What the app sends: plain downloads from `www.idv7lol.com`, with the app's version. No VIN, no
+position, nothing read from the car. The code in the QR is 20 random characters the app makes
+once and keeps in its data folder; a reinstall makes a new one.
+
+What it accepts: the catalog must be signed with idv7lol's key, a theme must be exactly the file
+the signed catalog names (size and SHA-256), and then it goes through the same checks as a
+package from a USB stick (next to nothing can be in it but a layout: no code, no shaders). Up to
+8 MiB a theme and 20 installed themes, USB ones included. To remove one, show it and use
+_Settings › Theme from USB on show › Remove it from the car_.
+
+If the tab says _No internet_, the uplink is not online: check the hotspot and `mgu-uplink` in the
+MGU Store. A USB stick always works.
+
 ## Requirements
 
 - A BMW with iDrive 7 (MGU) head unit. The development car runs software `20w44.1-1-3`; that

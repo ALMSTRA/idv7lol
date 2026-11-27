@@ -548,6 +548,10 @@ def build(app_id, language='en', preview_only=False):
     # impl.background runs then, without screens
     if spec.get('autostart'):
         pkg['mguAppStartType'] = 'autostart'
+    # app.json "mguInternet": the app gets internet through the Store's mgu-uplink, while that is
+    # installed and online (mgu-store docs/PUBLISHING.md); without it the field does nothing
+    if spec.get('mguInternet') is True:
+        pkg['mguInternet'] = True
     json.dump(pkg, open(os.path.join(src, 'package.json'), 'w', encoding='utf-8', newline='\n'), indent=2)
     json.dump(manifest, open(os.path.join(src, 'manifest.json'), 'w', encoding='utf-8', newline='\n'), indent=2)
     shutil.copy(os.path.join(KIT, 'platform', 'permissions.json'), os.path.join(src, 'permissions.json'))

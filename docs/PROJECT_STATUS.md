@@ -112,6 +112,17 @@ vehicle.** To check on a car: every text present, in place and sharp, colours fo
 palette, the gear and the clock changing, and the Status tab's renderer line ending in
 `text layers: N`.
 
+## Online store (added 2026-11-27, car app 0.2.30)
+
+The app's Store tab takes themes from idv7lol.com: a signed catalog, a download checked against
+it, then the USB checks; a QR code opens the site's page on a phone, and what is sent from there
+installs by itself. Off by default, parked only, and it needs `mgu-uplink` in the car. Protocol
+and sources in `docs/architecture/STORE.md`. **Developed, tested locally, published; not tested
+in a vehicle.** To confirm in a car: that `mgu-uplink` lets the app out after an install with
+`mguInternet`, that the lease file appears in the data folder and its DNS answers, that Node 8 on
+the unit accepts the site's certificate (with the clock off too), a download and an install, the
+bar's relabelled buttons, and that the store stops when the car moves.
+
 ## Pending (ordered)
 
 1. **More vehicle tests.** Install, drawing and turning off are confirmed on one car. Still to

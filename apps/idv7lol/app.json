@@ -2,9 +2,10 @@
   "id": "idv7lol",
   "title": "idv7lol",
   "description": "Your own layout on the whole instrument cluster: themes made with idv7lol Studio, drawn by the cluster itself",
-  "version": "0.2.29",
+  "version": "0.2.30",
   "maxDiskUsage": 52428800,
   "startType": "autostart",
+  "mguInternet": true,
   "vendor": "custom",
   "license": "GPL-3.0-or-later",
   "loggingId": "IDV7",
@@ -417,6 +418,22 @@
         [
           "on",
           "On (cluster-render 0.8.11)"
+        ]
+      ]
+    },
+    {
+      "key": "store",
+      "label": "Online store",
+      "type": "choice",
+      "default": "off",
+      "options": [
+        [
+          "off",
+          "Off"
+        ],
+        [
+          "on",
+          "On (needs mgu-uplink)"
         ]
       ]
     },

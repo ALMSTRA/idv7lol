@@ -12,6 +12,18 @@ PC preview), **compiled** (artifacts built), **published** (on GitHub), **tested
 
 ### Added
 
+- **The store in the car (car app 0.2.30).** A **Store** tab on the app's page offers the themes
+  of idv7lol.com: _Next_ goes through the catalog, _Install_ and _Yes, install_ download one, and
+  it joins the Themes tab without changing the cluster. The tab also shows a QR code: scanned
+  with a phone it opens the site's page for that car, and what is sent from there installs by
+  itself while the tab is open. Off until _Settings › Online store_ is on, only while parked, and
+  only in a car with internet for apps (`mgu-uplink` from the MGU Store and a phone hotspot; the
+  package now says `"mguInternet": true`). The catalog must carry idv7lol's signature (ECDSA
+  P-256), a theme must be the file the catalog names (size and SHA-256), and it then passes the
+  same checks as a USB package. Nothing about the car is sent. `docs/architecture/STORE.md` has
+  the protocol; `apps/idv7lol/certs.js` is mgu-store's certificate check, copied verbatim
+  (GPL-3.0-or-later). Tested locally (a stand-in server, the page drawn on a PC, Node 8 against
+  the live site); **not tested in a vehicle**.
 - **Five community themes**: Apex II (a round rev counter with a red needle and the gear in its
   middle), Veloce (a wide arc of rev tiles), Circuit (three round dials on carbon), Aero (a rev
   rail across the screen on navy) and Vetro (a dial under glass on a perforated floor, in black,

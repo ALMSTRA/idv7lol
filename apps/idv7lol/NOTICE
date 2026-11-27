@@ -32,6 +32,12 @@ This app includes third-party material, each part under its own licence:
      Copyright (c) 2026 FDX100 (https://github.com/FDX100/KB), MIT License.
    - theme_ct_aero.js, theme_ct_apex.js and ct_*.wad: after Cluster Themes, Copyright (c) 2026
      bimmer-lab, MIT License.
+
+5. certs.js
+   A server's certificate chain checked without its dates, from the MGU Store
+   (https://github.com/robertnisipeanu/mgu-store, native/mgu-updater/js/certs.js), copied
+   verbatim. Copyright (C) 2026 Robert Nisipeanu and IterioDev. GNU General Public License,
+   version 3 or later, as this app.
    The MIT License's text is the one below, with these copyright lines.
 
 --------------------------------------------------------------------------------

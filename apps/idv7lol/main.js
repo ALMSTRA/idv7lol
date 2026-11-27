@@ -7,7 +7,8 @@
  * compiler (theme_<id>.js) and draws it through the cluster-render service
  * (engine.js). Its own page on the central display (page.js) shows the
  * themes, the car's data and diagnostics; everything else is in the Settings
- * the kit builds from app.json.
+ * the kit builds from app.json. With "Online store" on, its Store tab offers
+ * the themes of idv7lol.com (store.js), while the car is parked.
  *
  * Safety: off by default. The layout exists only while "Show on the
  * cluster" is on AND car data is live; it is dropped (and the factory
@@ -26,6 +27,10 @@ const index = require('./themes_index');
 const SHADERS = require('./shaders');
 const { ThemeLibrary, UsbWatcher, PREFIX } = require('./usb_themes');
 const { unitGroups, applyUnits } = require('./units');
+const { Store } = require('./store');
+const net = require('./net');
+const STORE_KEYS = require('./store_keys');
+const qr = require('./kit/qr');
 
 const G = require('./kit/gauges');
 const { getLanguage, t: translate } = require('./kit/i18n');
@@ -35,6 +40,12 @@ const W = page.W,
   H = page.H;
 const APP_ID = 'idv7lol';
 const formatLabel = getLanguage() === 'zh-CN' ? translate : page.ascii;
+const STORE_TAB = page.MODERN_TABS.indexOf('Store');
+const DATA_TAB = page.MODERN_TABS.indexOf('Data');
+// the store looks for the catalog, then for themes sent from a phone, this often while it shows
+const STORE_LOOK_MS = 15000;
+// and for the catalog again once the one on show is this old (half a minute when the tab opens)
+const STORE_CATALOG_MS = 5 * 60 * 1000;
 const drawLabel = page.labels(formatLabel);
 
 function loadFonts(theme) {
@@ -255,6 +266,148 @@ mgu.run({
       usbNote = 'Removed ' + name + '.';
     }
 
+    /* ---------- the online store: the Store tab (store.js) ---------- */
+    const dataDir = ctx.dataDir || process.cwd();
+    const storeOn = () => settings.get('store') === 'on';
+    const onStore = () => !classic() && tab === STORE_TAB && storeOn();
+    let storeSel = 0; // which theme of the catalog the tab shows
+    let storeArmed = false; // Install was pressed once: the next press installs
+    let storeLooked = 0; // when the store last asked the site for anything
+    let storeShown = false; // the Store tab was the one on show at the last frame
+    let leaseRead = { at: 0, lease: null }; // the uplink's lease, read once a second at most
+    let phoneQr = null;
+    const store = new Store({
+      dataDir,
+      library,
+      log,
+      appVersion: version,
+      shaders: SHADERS,
+      fonts: index.fonts.length ? index.fonts : ['sans'],
+      keys: STORE_KEYS,
+      get: net.get,
+      lease: () => {
+        const now = Date.now();
+        if (now - leaseRead.at > 1000 || now < leaseRead.at)
+          leaseRead = { at: now, lease: net.readLease(dataDir) };
+        return leaseRead.lease;
+      },
+      // parked: no speed known (a bench), or one under walking pace
+      moving: () => {
+        const v = vehicle.store.number('vehicle.speed');
+        return page.isNum(v) && v > 3;
+      },
+      bundled: index.themes.map((th) => th.id),
+      onChange: () => {
+        forgetUsbSketches();
+        if (onStore()) show();
+      },
+      onInstalled: (meta) => {
+        storage = library.storage();
+        // a new copy of the theme on show replaced its files: reload it, as from a stick
+        if (meta.key !== current.key) return;
+        try {
+          current = loadTheme(current.key, library);
+          engine.setTheme(themeShown(), current.fonts);
+        } catch (e) {
+          log.warn('theme reload failed: ' + e);
+        }
+      },
+    });
+    // a car that moves off ends a download, whatever is on screen by then
+    setInterval(() => store.tick(), 1000);
+    /** The site's page for this car as a QR code, the smallest that holds it. */
+    const phoneCode = () => {
+      if (!phoneQr) {
+        const bytes = Buffer.from(store.phoneUrl(), 'utf8');
+        let v = 1;
+        while (v < 40 && qr.capacity(v, 'M') < bytes.length) v++;
+        phoneQr = qr.encode(bytes, { version: v, ecl: 'M' });
+      }
+      return phoneQr;
+    };
+    /** Ask the site again: the catalog while there is none, then what a phone sent. */
+    const storeLook = (opening) => {
+      if (!onStore() || store.busy) return;
+      storeLooked = Date.now();
+      const age = Date.now() - store.loadedAt;
+      if (!store.loaded || age > STORE_CATALOG_MS || age < 0 || (opening && age > 30000))
+        store.refresh(() => store.loaded && store.checkInbox());
+      else store.checkInbox();
+    };
+    const storeModel = () => {
+      const m = { format: formatLabel, qr: null, lines: null, item: null };
+      if (!storeOn()) {
+        m.lines = [
+          'The online store is off',
+          'Themes from idv7lol.com, installed here without a USB stick.',
+          'Turn it on in Settings > Online store.',
+          'It needs internet for apps: mgu-uplink from the MGU Store and a phone hotspot.',
+          'It works only while the car is parked.',
+        ];
+        return m;
+      }
+      m.qr = phoneCode();
+      const blocked = store.blocked();
+      if (!store.items.length) {
+        m.lines = [
+          'Online store',
+          blocked ||
+            store.error ||
+            (store.busy || !store.loaded ? 'Loading the catalog...' : 'The catalog has no themes.'),
+        ];
+        return m;
+      }
+      storeSel = Math.max(0, Math.min(store.items.length - 1, storeSel));
+      const it = store.items[storeSel];
+      m.item = Object.assign({}, it, { status: store.statusOf(it) });
+      m.at = storeSel + 1;
+      m.count = store.items.length;
+      m.progress =
+        store.busy === it.id && store.progress ? store.progress.bytes / store.progress.total : null;
+      m.note = store.error || blocked || store.note;
+      m.bad = !!(store.error || blocked);
+      m.hint = storeArmed
+        ? 'Install ' + it.name + '? Press Yes, install. Next cancels.'
+        : 'Next: another theme   ·   Install: this one   ·   From your phone: they install by themselves';
+      return m;
+    };
+    // The bar's Theme and Palette buttons are Next and Install while the store shows.
+    let barShown = '';
+    const syncBar = () => {
+      const want = onStore() ? (storeArmed ? 'armed' : 'store') : 'main';
+      if (want === barShown) return;
+      barShown = want;
+      ui.text('BTN_THEME', translate(want === 'main' ? 'Theme' : 'Next'));
+      ui.text(
+        'BTN_PALETTE',
+        translate(want === 'main' ? 'Palette' : want === 'armed' ? 'Yes, install' : 'Install'),
+      );
+    };
+    function storeNext() {
+      storeArmed = false;
+      if (store.items.length) storeSel = (storeSel + 1) % store.items.length;
+      store.note = '';
+      store.error = '';
+      return show();
+    }
+    function storeInstall() {
+      const it = store.items[storeSel];
+      if (!it || store.busy) return show();
+      const status = store.statusOf(it);
+      if (status === 'installed' || status === 'bundled') {
+        storeArmed = false;
+        store.note = it.name + ' is already in the car. Pick it in the Themes tab.';
+        return show();
+      }
+      if (!storeArmed) {
+        storeArmed = true;
+        return show();
+      }
+      storeArmed = false;
+      store.install(it);
+      return show();
+    }
+
     // The kit tells every setting it is given, the same value too (picked again in the HMI). Only a
     // real change rebuilds the layout: a rebuild that changes nothing still flashes the cluster.
     const last = { theme: settings.get(THEME), bottomStrip: settings.get('bottomStrip') };
@@ -278,6 +431,8 @@ mgu.run({
       }
       if (k === 'units') followUnits();
       if (k === 'palette') engine.recolour();
+      // the store switched off: nothing more comes from the site, a download under way too
+      if (k === 'store' && !storeOn()) store.cancel();
       // "Theme from USB on show > Remove it from the car" is a one-off: it goes back to Keep
       if (k === 'usbRemove' && settings.get('usbRemove') === 'remove') {
         removeUsbTheme();
@@ -291,7 +446,7 @@ mgu.run({
       const st = engine.status();
       const vs = vehicle.status();
       const state = stateNow();
-      const store = vehicle.store;
+      const signals = vehicle.store;
       const pid = paletteId();
       const modern = !classic();
       if (modern && tab === 0) {
@@ -314,31 +469,33 @@ mgu.run({
           dx: dragX,
           go: stepTheme,
         });
-      } else if (modern && tab === 1) {
-        const litres = store.number('fuel.volume');
-        const range = store.number('vehicle.range');
+      } else if (modern && tab === STORE_TAB) {
+        page.storePage(cv, t, storeModel());
+      } else if (modern && tab === DATA_TAB) {
+        const litres = signals.number('fuel.volume');
+        const range = signals.number('vehicle.range');
         page.dataPage(cv, t, {
           format: formatLabel,
           theme: { theme: current.theme, palette: pid },
           state,
           mode: text('drive.mode'),
           source: vs.demo ? 'Demo' : vehicle.live() ? 'Live' : 'Not live',
-          speed: store.number('vehicle.speed'),
+          speed: signals.number('vehicle.speed'),
           mph: groups().indexOf('speed') >= 0,
-          rpm: store.number('engine.rpm'),
+          rpm: signals.number('engine.rpm'),
           redline: 7000,
           gear: text('transmission.gear'),
           programme: text('transmission.mode'),
-          fuelPct: store.number('fuel.level'),
+          fuelPct: signals.number('fuel.level'),
           fuelText:
             (page.isNum(litres) ? page.fmt(litres) + ' l' : '') +
             (page.isNum(litres) && page.isNum(range) ? '  ·  ' : '') +
             (page.isNum(range) ? page.fmt(range) + ' km' : ''),
-          oil: store.number('engine.oil.temp'),
-          coolant: store.number('engine.coolant.temp'),
+          oil: signals.number('engine.oil.temp'),
+          coolant: signals.number('engine.coolant.temp'),
         });
       } else {
-        const n = modern ? tab - 2 : textPageNo;
+        const n = modern ? tab - page.TEXT_TABS_FROM : textPageNo;
         const now = Date.now();
         page.textPage(cv, t, n, {
           format: formatLabel,
@@ -361,15 +518,15 @@ mgu.run({
           carLine:
             (vs.demo ? 'DEMO' : vehicle.live() ? 'live' : 'not live') +
             '  ·  ' +
-            page.fmt(store.number('vehicle.speed')) +
+            page.fmt(signals.number('vehicle.speed')) +
             ' km/h  ·  ' +
-            page.fmt(store.number('engine.rpm')) +
+            page.fmt(signals.number('engine.rpm')) +
             ' rpm  ·  gear ' +
             (text('transmission.gear') || '-') +
             '  ·  oil ' +
-            page.fmt(store.number('engine.oil.temp')) +
+            page.fmt(signals.number('engine.oil.temp')) +
             '°  ·  coolant ' +
-            page.fmt(store.number('engine.coolant.temp')) +
+            page.fmt(signals.number('engine.coolant.temp')) +
             '°',
           modeLine:
             (text('drive.mode') || '-') +
@@ -385,11 +542,11 @@ mgu.run({
                 ? 'Themes cannot be saved: ' + storage
                 : 'Copy themes to idv7lol/themes on a USB stick and plug it in.')),
           demo: vs.demo,
-          signals: store
+          signals: signals
             .ids()
             .sort()
             .map((id) => {
-              const s = store.get(id);
+              const s = signals.get(id);
               const v = typeof s.value === 'number' ? Math.round(s.value * 100) / 100 : s.value;
               return {
                 text: id + '  =  ' + v + '   (' + Math.round((now - s.at) / 100) / 10 + ' s)',
@@ -441,7 +598,7 @@ mgu.run({
 
     /** What the page shows now, as one string: it is drawn again only when this changes. */
     function shownNow() {
-      const store = vehicle.store;
+      const signals = vehicle.store;
       const state = stateNow();
       const modern = !classic();
       const parts = [
@@ -457,11 +614,25 @@ mgu.run({
         groups().join(','),
       ];
       const n = (id, step) => {
-        const v = store.number(id);
+        const v = signals.number(id);
         return page.isNum(v) ? Math.round(v / step) * step : '-';
       };
       if (modern && tab === 0) parts.push(themeKeys().length);
-      else if (modern && tab === 1)
+      else if (modern && tab === STORE_TAB) {
+        const it = store.items[storeSel];
+        parts.push(
+          storeOn(),
+          storeSel,
+          storeArmed,
+          store.items.length,
+          store.busy,
+          store.progress ? Math.floor((store.progress.bytes * 20) / store.progress.total) : '',
+          store.note,
+          store.error,
+          storeOn() ? store.blocked() : '',
+          it ? store.statusOf(it) : '',
+        );
+      } else if (modern && tab === DATA_TAB)
         parts.push(
           n('vehicle.speed', 1),
           n('engine.rpm', 20),
@@ -477,11 +648,18 @@ mgu.run({
           vehicle.live(),
         );
       // the text pages show values and their ages: twice a second (About: never by itself)
-      else if ((modern ? tab - 2 : textPageNo) !== 3) parts.push(Math.floor(Date.now() / 500));
+      else if ((modern ? tab - page.TEXT_TABS_FROM : textPageNo) !== 3)
+        parts.push(Math.floor(Date.now() / 500));
       return parts.join('|');
     }
 
     function render(force) {
+      syncBar();
+      if (onStore()) {
+        if (!storeShown) storeLook(true);
+        else if (Date.now() - storeLooked >= STORE_LOOK_MS) storeLook(false);
+      } else storeArmed = false;
+      storeShown = onStore();
       const now = shownNow();
       if (!force && now === drawn) return Promise.resolve();
       drawn = now;
@@ -503,7 +681,7 @@ mgu.run({
       settings.set(THEME, ids[(i + d + ids.length) % ids.length]);
       return show();
     }
-    ui.onClick('BTN_THEME', () => stepTheme(1));
+    ui.onClick('BTN_THEME', () => (onStore() ? storeNext() : stepTheme(1)));
     // Themes tab, where the kit hands the page a finger's whole gesture: the sketches follow it,
     // far enough sideways is the next theme (to the left) or the one before, and a tap on a
     // neighbour's sketch is that theme. Anywhere else the kit keeps the touch.
@@ -539,6 +717,7 @@ mgu.run({
         return true;
       });
     ui.onClick('BTN_PALETTE', () => {
+      if (onStore()) return storeInstall();
       const ids = ['auto'].concat(Object.keys(current.theme.palettes));
       const i = ids.indexOf(settings.get('palette'));
       settings.set('palette', ids[(i + 1) % ids.length]);

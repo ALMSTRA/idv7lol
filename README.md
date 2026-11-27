@@ -20,8 +20,13 @@ The site and the [install guide](https://www.idv7lol.com/instalar/) are in Engli
 [report bugs](https://www.idv7lol.com/reportar/) with a picture or a video.
 [Read the announcement](https://www.idv7lol.com/beta/).
 
-**Coming very soon to try:** download themes from the site's catalog straight in the car, no USB
-stick needed.
+**New, to try: the store in the car.** From car app 0.2.30 the app's own page has a **Store** tab:
+browse the site's catalog on the central display and install a theme with two presses, no USB
+stick. Or scan the QR code it shows, tap **Send to my car** on your phone, and the themes arrive
+by themselves. It is off until you turn on _Settings › Online store_, works only while parked,
+and needs internet for apps in the car: `mgu-uplink` from the MGU Store with a phone hotspot (the
+car's own LTE does not reach apps). Not tested in a vehicle yet:
+[how it works](docs/user/DEPLOYMENT.md#themes-from-the-online-store).
 
 </td></tr></table>
 
@@ -229,7 +234,7 @@ MGU Store removes it completely. This is experimental software: see
   Circuit, Aero and Vetro, MIT).
 - **The car app**, which runs on the head unit, draws the active theme through `cluster-render`,
   and lets you turn it on or off and switch themes from the iDrive menu. It carries sixteen
-  themes (Giallo, Lily Pad, Map View, Modern, Neon Drive, Night Minimal, Supercar Track, VDO Classic M, Analog Sport, Classic Cluster, Aero, Apex II, Digital Dash, GT3, Live Cockpit and Neon City); any other goes to the car on a USB stick, from the Studio or the site.
+  themes (Giallo, Lily Pad, Map View, Modern, Neon Drive, Night Minimal, Supercar Track, VDO Classic M, Analog Sport, Classic Cluster, Aero, Apex II, Digital Dash, GT3, Live Cockpit and Neon City); any other goes to the car from the app's Store tab (the site's catalog, with internet in the car) or on a USB stick, from the Studio or the site.
 - **The pieces behind them:** a signal catalog, the theme format, a renderer for the PC preview,
   a simulator and the compiler that turns a theme into what the car runs.
 

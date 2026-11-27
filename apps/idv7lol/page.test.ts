@@ -21,6 +21,8 @@ const page = require('./page.js') as {
   stateOf(s: Record<string, unknown>): { tone: string; label: string; detail: string };
   drawPreview(cv: object, theme: object, pid: string, x: number, y: number, w: number): number;
   themesPage(cv: object, t: object, m: object): void;
+  storePage(cv: object, t: object, m: object): void;
+  STORE: { qr: number; side: number };
   dataPage(cv: object, t: object, m: object): void;
   textPage(cv: object, t: object, n: number, m: object): void;
 };
@@ -265,5 +267,47 @@ describe('what ships in the car app’s package', () => {
     expect((JSON.parse(read('./app.json')) as { license: string }).license).toBe(
       'GPL-3.0-or-later',
     );
+  });
+});
+
+describe('the Store tab', () => {
+  const t = kitThemes.theme();
+  const th = themes[0]!;
+  const item = {
+    name: 'Some theme',
+    author: 'Community',
+    version: '1.0.0',
+    layers: 12,
+    size: 150000,
+    status: 'update',
+    theme: {
+      name: 'Some theme',
+      background: '#000000',
+      preview: th.preview,
+      palettes: { store: { colors: {} } },
+      paletteSelection: { default: 'store' },
+    },
+  };
+  const qr = { size: 33, get: (x: number, y: number) => (x + y) % 2 === 0 };
+
+  it('draws a theme on offer, its download and the phone code', () => {
+    const bare = new Recorder(page.W, page.H).clear('#000000');
+    const before = bare.n;
+    page.storePage(bare, t, { item, at: 1, count: 9 });
+    const plain = bare.n - before;
+    expect(plain).toBeGreaterThan(0);
+    const full = new Recorder(page.W, page.H).clear('#000000');
+    page.storePage(full, t, { item, at: 1, count: 9, progress: 0.5, note: 'Installed.', qr });
+    // the code alone is some five hundred dark squares
+    expect(full.n - before).toBeGreaterThan(plain + 500);
+    expect(page.STORE.side + page.STORE.qr).toBeLessThan(page.W);
+  });
+
+  it('says why when there is nothing to offer', () => {
+    const cv = new Recorder(page.W, page.H).clear('#000000');
+    const before = cv.n;
+    page.storePage(cv, t, { lines: ['The online store is off', 'Turn it on in Settings.'] });
+    expect(cv.n).toBeGreaterThan(before);
+    expect(page.MODERN_TABS.indexOf('Store')).toBe(1);
   });
 });
